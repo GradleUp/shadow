@@ -815,6 +815,32 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun allowCustomShadowJarWithoutShadowR8Configuration() {
+    val customShadowJar = "customShadowJar"
+    projectScript.writeText(
+      """
+        ${getDefaultProjectBuildScript(applyShadowPlugin = false)}
+        def $customShadowJar = tasks.register('$customShadowJar', ${ShadowJar::class.java.name}) {
+          minimize {
+            r8 {}
+          }
+          doLast {
+            assert $customShadowJar.get().r8Classpath.files.empty
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    val result = runWithFailure(customShadowJar)
+
+    assertThat(result.output)
+      .contains(
+        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+      )
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/1975")
   @Test
   fun skipNonExistentDependencyDirectory() {

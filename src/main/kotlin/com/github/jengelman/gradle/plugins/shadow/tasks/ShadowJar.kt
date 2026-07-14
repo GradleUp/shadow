@@ -152,6 +152,7 @@ public abstract class ShadowJar : Jar() {
   public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
       if (enabled && tool == MinimizeTool.R8) {
+        // Call findByName here for allowing custom ShadowJar task without shadowR8 registered.
         project.configurations.findByName(R8_CONFIGURATION_NAME) ?: project.files()
       } else {
         emptySet()
