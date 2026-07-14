@@ -101,12 +101,8 @@ class UnusedTrackerTest {
       if (classpath != null) addAll(listOf("-classpath", classpath.absolutePath))
       addAll(sourceFiles.map(File::getAbsolutePath))
     }
-    val compiler = ToolProvider.getSystemJavaCompiler()
-    org.junit.jupiter.api.Assumptions.assumeTrue(
-      compiler != null,
-      "JDK (javax.tools.JavaCompiler) is required to compile test sources",
-    )
-    val result = compiler!!.run(null, null, null, *arguments.toTypedArray())
+    val result =
+      ToolProvider.getSystemJavaCompiler().run(null, null, null, *arguments.toTypedArray())
     assertThat(result).isEqualTo(0)
   }
 }
