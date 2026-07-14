@@ -5,6 +5,7 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.BaseTransformerTest.Companion.canTransformResource
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
+import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
 import java.net.JarURLConnection
@@ -16,6 +17,9 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
 import kotlin.reflect.full.isSubclassOf
+import org.gradle.api.file.DuplicatesStrategy
+import org.gradle.api.file.FileCopyDetails
+import org.gradle.api.file.FileTreeElement
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
@@ -38,6 +42,28 @@ class DuplicatesStrategyCheckerTest {
         it.canTransformResource(path = file.path, file = file)
       }
       assertThat(invocationCount).isEqualTo(15)
+    } finally {
+      onCheckDupStrategyInvoked = null
+    }
+  }
+
+  @Test
+  fun checkerHandlesEveryEarlyReturnAndDuplicatesStrategy() {
+    var invocationCount = 0
+    onCheckDupStrategyInvoked = { invocationCount++ }
+    try {
+      ResourceTransformer.checkDupStrategy(false, noOpDelegate<FileTreeElement>())
+      ResourceTransformer.checkDupStrategy(true, noOpDelegate<FileTreeElement>())
+      DuplicatesStrategy.entries.forEach { strategy ->
+        val details =
+          object : FileCopyDetails by noOpDelegate() {
+            override fun getPath(): String = "duplicate.txt"
+
+            override fun getDuplicatesStrategy(): DuplicatesStrategy = strategy
+          }
+        ResourceTransformer.checkDupStrategy(true, details)
+      }
+      assertThat(invocationCount).isEqualTo(2 + DuplicatesStrategy.entries.size)
     } finally {
       onCheckDupStrategyInvoked = null
     }

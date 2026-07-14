@@ -6,7 +6,7 @@ import org.gradle.api.artifacts.ResolvedDependency
 
 internal class DefaultDependencyFilter(project: Project) :
   DependencyFilter.AbstractDependencyFilter(project) {
-  override fun resolve(
+  public override fun resolve(
     dependencies: Set<ResolvedDependency>,
     includedDependencies: MutableSet<ResolvedDependency>,
     excludedDependencies: MutableSet<ResolvedDependency>,

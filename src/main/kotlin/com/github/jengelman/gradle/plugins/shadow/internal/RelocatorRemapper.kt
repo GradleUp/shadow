@@ -23,18 +23,16 @@ internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
     // original class names. This is not a problem at runtime (because these entries in the constant
     // pool are never used), but confuses some tools such as Felix's maven-bundle-plugin that use
     // the constant pool to determine the dependencies of a class.
-    val cw = ClassWriter(0)
-    val cr = ClassReader(bytes)
-    val cv = ClassRemapper(cw, remapper)
-
     try {
+      val cw = ClassWriter(0)
+      val cr = ClassReader(bytes)
+      val cv = ClassRemapper(cw, remapper)
       cr.accept(cv, ClassReader.EXPAND_FRAMES)
+      // If we didn't need to change anything, keep the original bytes as-is.
+      if (modified) cw.toByteArray() else bytes
     } catch (t: Throwable) {
       throw GradleException("Error in ASM processing class $path", t)
     }
-
-    // If we didn't need to change anything, keep the original bytes as-is.
-    if (modified) cw.toByteArray() else bytes
   }
 
 private class RelocatorRemapper(

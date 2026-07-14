@@ -76,6 +76,25 @@ class ReproduciblePropertiesTest {
       )
   }
 
+  @ParameterizedTest
+  @MethodSource("generalCharsetsProvider")
+  fun escapesSpecialCharacters(charset: Charset) {
+    val output =
+      ReproducibleProperties()
+        .also { properties ->
+          properties[" leading:=#!"] = "line1\nline2\t\\"
+        }
+        .writeToString(charset)
+
+    assertThat(output)
+      .isEqualTo(
+        """
+        |\ leading\:\=\#\!=line1\nline2\t\\
+        |"""
+          .trimMargin()
+      )
+  }
+
   private companion object Companion {
     @JvmStatic
     fun generalCharsetsProvider() =

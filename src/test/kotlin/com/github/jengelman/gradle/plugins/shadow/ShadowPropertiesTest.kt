@@ -98,6 +98,28 @@ class ShadowPropertiesTest {
     }
 
   @Test
+  fun inheritManifestFromMultipleSourcesWithMergeAction() =
+    with(project) {
+      plugins.apply(JavaPlugin::class.java)
+      val jar1 = tasks.register("manifestSource1", Jar::class.java)
+      val jar2 = tasks.register("manifestSource2", Jar::class.java)
+      jar1.configure { it.manifest.attributes["shared"] = "one" }
+      jar2.configure { it.manifest.attributes["shared"] = "two" }
+
+      @Suppress("DEPRECATION")
+      tasks.shadowJar.configure {
+        it.manifest.inheritFrom(jar1.get().manifest, jar2.get().manifest) { merge ->
+          merge.eachEntry { details ->
+            if (details.key == "shared") details.exclude()
+          }
+        }
+      }
+
+      assertThat(tasks.shadowJar.get().manifest.effectiveManifest.attributes)
+        .containsOnly("Manifest-Version" to "1.0")
+    }
+
+  @Test
   fun inheritManifestMainClassFromJar() =
     with(project) {
       plugins.apply(JavaPlugin::class.java)

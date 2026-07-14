@@ -12,8 +12,10 @@ import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
 import kotlin.reflect.KClass
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -58,6 +60,22 @@ class BytecodeRemappingTest {
     val result = details.remapClass(noMatchRelocators)
 
     assertThat(result).isEqualTo(details.file.readBytes())
+  }
+
+  @Test
+  fun asmFailureIsWrappedWithClassPath() {
+    val path = "broken/Example.class"
+    val file = tempDir.resolve("broken.class").toFile().apply { writeText("not bytecode") }
+    val details =
+      object : FileCopyDetails by noOpDelegate() {
+        override fun getPath(): String = path
+
+        override fun getFile(): File = file
+      }
+
+    val failure = assertThrows<GradleException> { details.remapClass(relocators) }
+
+    assertThat(failure.message).isEqualTo("Error in ASM processing class $path")
   }
 
   @Test
