@@ -340,6 +340,9 @@ public abstract class ShadowJar : Jar() {
   public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
     minimizeJar.set(true)
     action.execute(minimizeSpec)
+    if (minimizeSpec.tool.get() == MinimizeTool.R8) {
+      project.configurations.named(R8_CONFIGURATION_NAME) { it.isCanBeResolved = true }
+    }
   }
 
   /** Extra dependency operations to be applied in the shadow steps. */
