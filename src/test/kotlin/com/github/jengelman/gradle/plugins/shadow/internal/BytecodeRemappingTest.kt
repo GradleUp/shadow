@@ -211,6 +211,17 @@ class BytecodeRemappingTest {
   }
 
   @Test
+  fun nestedClassSignatureIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val method = result.classInfo().methodData.first { it.name == "methodWithNestedGeneric" }
+    assertThat(checkNotNull(method.signature))
+      .isEqualTo(
+        $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V"
+      )
+  }
+
+  @Test
   fun localVariableIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -255,6 +266,10 @@ class BytecodeRemappingTest {
 
   open class FixtureBase
 
+  class FixtureGenericOuter<T> {
+    inner class FixtureInner
+  }
+
   @Suppress("unused") // Used by parsing bytecode.
   @FixtureAnnotation
   class FixtureSubject : FixtureBase(), FixtureInterface {
@@ -292,6 +307,8 @@ class BytecodeRemappingTest {
     }
 
     fun methodWithGeneric(list: List<FixtureBase>): FixtureBase = list[0]
+
+    fun methodWithNestedGeneric(arg: FixtureGenericOuter<FixtureBase>.FixtureInner) = Unit
   }
 }
 
