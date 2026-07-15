@@ -16,6 +16,10 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
+import org.gradle.api.artifacts.ExternalModuleDependency
+import org.gradle.api.artifacts.ModuleDependency
+import org.gradle.api.artifacts.ResolvedArtifact
+import org.gradle.api.artifacts.component.ProjectComponentIdentifier
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
@@ -62,9 +66,8 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
               .get()
               .flatMap { it.resolvedConfiguration.resolvedArtifacts }
               .filterNot { it.file in includedFiles }
-              .map { it.moduleVersion.id.toString() }
-              .distinct()
-              .map(dependencies::create)
+              .distinctBy { it.id.componentIdentifier to it.file }
+              .map { artifact -> createShadowDependency(artifact) }
           }
         }
       )
@@ -132,6 +135,29 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         )
       }
     }
+  }
+
+  private fun Project.createShadowDependency(artifact: ResolvedArtifact): ModuleDependency {
+    val componentIdentifier = artifact.id.componentIdentifier
+    val dependency =
+      if (
+        componentIdentifier is ProjectComponentIdentifier &&
+          componentIdentifier.build.buildPath == ":"
+      ) {
+        dependencies.project(mapOf("path" to componentIdentifier.projectPath)) as ModuleDependency
+      } else {
+        dependencies.create(artifact.moduleVersion.id.toString()) as ExternalModuleDependency
+      }
+    dependency.isTransitive = false
+    if (dependency is ExternalModuleDependency) {
+      dependency.artifact { dependencyArtifact ->
+        dependencyArtifact.name = artifact.name
+        dependencyArtifact.type = artifact.type
+        dependencyArtifact.extension = artifact.extension
+        dependencyArtifact.classifier = artifact.classifier
+      }
+    }
+    return dependency
   }
 
   protected open fun Project.configureComponents() {

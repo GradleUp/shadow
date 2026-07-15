@@ -118,6 +118,41 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   @Test
+  fun installShadowIncludesExcludedDependencyWithoutItsTransitiveDependencies() {
+    prepare(
+      dependenciesBlock = "implementation 'my:d:1.0'",
+      projectBlock =
+        """
+        shadow {
+          addExcludedDependenciesToShadowConfiguration = true
+        }
+        shadowJar {
+          dependencies {
+            exclude(dependency('my:d:1.0'))
+          }
+        }
+        """
+          .trimIndent(),
+    )
+
+    runWithSuccess(installShadowDistPath)
+
+    val installPath = path("build/install/")
+    assertThat(installPath.walkEntries())
+      .containsOnly(
+        "myapp-shadow/bin/myapp",
+        "myapp-shadow/bin/myapp.bat",
+        "myapp-shadow/lib/d-1.0.jar",
+        "myapp-shadow/lib/myapp-1.0-all.jar",
+      )
+    commonAssertions(
+      jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
+      entriesContained = arrayOf(mainClass, "c.properties"),
+      classPathAttr = "d-1.0.jar",
+    )
+  }
+
+  @Test
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 

@@ -58,6 +58,44 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun publishExcludedDependencyWithoutItsTransitiveDependencies() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          shadow {
+            addExcludedDependenciesToShadowConfiguration = true
+          }
+          """
+            .trimIndent(),
+        dependenciesBlock = "implementation 'my:d:1.0'",
+        shadowBlock =
+          """
+          dependencies {
+            exclude(dependency('my:d:1.0'))
+          }
+          """
+            .trimIndent(),
+      ) + lineSeparator
+    )
+
+    publish()
+
+    val pomPath = repoPath("my/maven-all/1.0/maven-all-1.0.pom")
+    assertPomCommon(pomPath, arrayOf("my:d:1.0"))
+    assertThat(
+        pomReader.read(pomPath).dependencies.single().exclusions.map { exclusion ->
+          "${exclusion.groupId}:${exclusion.artifactId}"
+        }
+      )
+      .containsOnly("*:*")
+    assertShadowVariantCommon(
+      gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
+      coordinates = arrayOf("my:d:1.0"),
+    )
+  }
+
+  @Test
   fun publishShadowJarWithCorrectTargetJvm() {
     projectScript.appendText(
       publishConfiguration(

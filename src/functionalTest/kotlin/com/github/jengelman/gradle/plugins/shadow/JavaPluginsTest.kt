@@ -25,6 +25,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.testGradleVersion
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
@@ -630,6 +631,92 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll {
       containsOnly(*manifestEntries)
       getMainAttr(classPathAttributeKey).isEqualTo("b-1.0.jar a-1.0.jar")
+    }
+  }
+
+  @Test
+  fun addExcludedDependencyIntoShadowConfigurationWithoutItsTransitiveDependencies() {
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'my:d:1.0'
+        }
+        shadow {
+          addExcludedDependenciesToShadowConfiguration = true
+        }
+        $shadowJarTask {
+          dependencies {
+            exclude(dependency('my:d:1.0'))
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("c.properties", *manifestEntries)
+      getMainAttr(classPathAttributeKey).isEqualTo("d-1.0.jar")
+    }
+  }
+
+  @Test
+  fun addExcludedProjectDependencyIntoShadowConfiguration() {
+    settingsScript.appendText("include 'client'$lineSeparator")
+    path("client/build.gradle").writeText(getDefaultProjectBuildScript())
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation project(':client')
+        }
+        shadow {
+          addExcludedDependenciesToShadowConfiguration = true
+        }
+        $shadowJarTask {
+          dependencies {
+            exclude(project(':client'))
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*manifestEntries)
+      getMainAttr(classPathAttributeKey).isEqualTo("client-1.0.jar")
+    }
+  }
+
+  @Test
+  fun preserveArtifactSelectorWhenAddingExcludedDependencyIntoShadowConfiguration() {
+    JarBuilder(localRepo.root.resolve("my/a/1.0/a-1.0-tests.jar"))
+      .insert("a-tests.properties", "a-tests")
+      .write()
+    projectScript.appendText(
+      """
+        dependencies {
+          implementation 'my:a:1.0:tests'
+        }
+        shadow {
+          addExcludedDependenciesToShadowConfiguration = true
+        }
+        $shadowJarTask {
+          dependencies {
+            exclude(dependency('my:a:1.0'))
+          }
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*manifestEntries)
+      getMainAttr(classPathAttributeKey).isEqualTo("a-1.0-tests.jar")
     }
   }
 
