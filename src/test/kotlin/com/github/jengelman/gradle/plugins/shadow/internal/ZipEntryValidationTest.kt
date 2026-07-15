@@ -2,11 +2,38 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
+import java.nio.charset.StandardCharsets
+import java.util.Properties
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 
 class ZipEntryValidationTest {
+
+  @Test
+  fun zipEntryUsesRequestedOrReproducibleTimestampAndAppliesConfiguration() {
+    val preserved = zipEntry("file", lastModified = 1234) { comment = "configured" }
+    val reproducible = zipEntry("file", preserveLastModified = false, lastModified = 1234)
+    val missingTimestamp = zipEntry("file", lastModified = -1)
+
+    assertThat(preserved.time).isEqualTo(1234)
+    assertThat(preserved.comment).isEqualTo("configured")
+    assertThat(reproducible.time).isEqualTo(missingTimestamp.time)
+  }
+
+  @Test
+  fun propertiesInputStreamUsesRequestedCharsetAndComments() {
+    val properties = Properties().apply { setProperty("greeting", "你好") }
+
+    val charset = StandardCharsets.UTF_16
+    val bytes = properties.inputStream(charset, "header").readBytes()
+    val content = String(bytes, charset)
+
+    assertThat(content.startsWith("#header")).isTrue()
+    val loaded = Properties().apply { load(bytes.inputStream().reader(charset)) }
+    assertThat(loaded.getProperty("greeting")).isEqualTo("你好")
+  }
 
   @Test
   fun validZipEntryNamesDoNotThrow() {
