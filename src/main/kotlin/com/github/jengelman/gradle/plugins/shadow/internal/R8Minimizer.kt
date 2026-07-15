@@ -127,7 +127,7 @@ internal class R8Minimizer(
     }
   }
 
-  internal fun createRules(
+  private fun createRules(
     inputJar: File,
     r8Args: List<String>,
     extractedRulesFile: File,
@@ -151,14 +151,14 @@ internal class R8Minimizer(
     return rules.toList()
   }
 
-  internal fun shouldDisableOptimization(r8Args: List<String>): Boolean {
+  private fun shouldDisableOptimization(r8Args: List<String>): Boolean {
     return !r8Spec.optimizationEnabled.get() &&
       (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
   }
 
   // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
   // refers to every class directly.
-  internal fun sourceKeepRules(inputJar: File): List<String> {
+  private fun sourceKeepRules(inputJar: File): List<String> {
     val jarClasses = jarClassEntries(inputJar)
     return sourceSetsClassesDirs
       .asSequence()
@@ -182,7 +182,7 @@ internal class R8Minimizer(
 
   // Keep dependencies users explicitly excluded from minimization, matching the existing
   // minimize { exclude(...) } contract for the default analyzer.
-  internal fun keptDependencyRules(inputJar: File): List<String> {
+  private fun keptDependencyRules(inputJar: File): List<String> {
     val jarClasses = jarClassEntries(inputJar)
     return keptDependencyFiles
       .asSequence()
@@ -198,7 +198,7 @@ internal class R8Minimizer(
 
   // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
   // interface and every listed provider even if R8 sees no direct references.
-  internal fun serviceKeepRules(inputJar: File): List<String> {
+  private fun serviceKeepRules(inputJar: File): List<String> {
     val rules = linkedSetOf<String>()
     JarFile(inputJar).use { jarFile ->
       jarFile
@@ -275,7 +275,7 @@ internal class R8Minimizer(
 
   // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
   // reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
-  internal fun normalizeJar(inputJar: File, outputJar: File) {
+  private fun normalizeJar(inputJar: File, outputJar: File) {
     val entries =
       JarFile(inputJar).use { jarFile ->
         jarFile
