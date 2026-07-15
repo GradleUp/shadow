@@ -22,9 +22,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.vafer.jdeb.shaded.objectweb.asm.AnnotationVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
 import org.vafer.jdeb.shaded.objectweb.asm.FieldVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Label
 import org.vafer.jdeb.shaded.objectweb.asm.MethodVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.ModuleVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 /**
@@ -219,6 +221,45 @@ class BytecodeRemappingTest {
       .isEqualTo(
         $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V"
       )
+  }
+
+  @Test
+  fun moduleMainClassIsRelocated() {
+    val originalMainClass =
+      $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase"
+    val writer = ClassWriter(0)
+    writer.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null)
+    writer.visitModule("example.module", 0, null).apply { visitMainClass(originalMainClass) }
+    writer.visitEnd()
+    val file =
+      tempDir.resolve("module-info.class").toFile().apply { writeBytes(writer.toByteArray()) }
+    val details =
+      object : FileCopyDetails by noOpDelegate() {
+        override fun getPath(): String = file.name
+
+        override fun getFile(): File = file
+      }
+
+    val result = details.remapClass(relocators)
+    var remappedMainClass: String? = null
+    ClassReader(result)
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitModule(
+            name: String,
+            access: Int,
+            version: String?,
+          ): ModuleVisitor =
+            object : ModuleVisitor(Opcodes.ASM9) {
+              override fun visitMainClass(mainClass: String) {
+                remappedMainClass = mainClass
+              }
+            }
+        },
+        0,
+      )
+
+    assertThat(remappedMainClass).isEqualTo(relocatedFixtureBase)
   }
 
   @Test
