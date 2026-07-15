@@ -1,14 +1,17 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import java.lang.classfile.AccessFlags
 import java.lang.classfile.Annotation
 import java.lang.classfile.AnnotationElement
 import java.lang.classfile.AnnotationValue
 import java.lang.classfile.ClassFile
+import java.lang.classfile.ClassFileVersion
 import java.lang.classfile.ClassSignature
 import java.lang.classfile.ClassTransform
 import java.lang.classfile.CodeModel
 import java.lang.classfile.CodeTransform
+import java.lang.classfile.CustomAttribute
 import java.lang.classfile.FieldModel
 import java.lang.classfile.FieldTransform
 import java.lang.classfile.Interfaces
@@ -19,17 +22,22 @@ import java.lang.classfile.Signature
 import java.lang.classfile.Superclass
 import java.lang.classfile.TypeAnnotation
 import java.lang.classfile.attribute.AnnotationDefaultAttribute
+import java.lang.classfile.attribute.CompilationIDAttribute
 import java.lang.classfile.attribute.ConstantValueAttribute
+import java.lang.classfile.attribute.DeprecatedAttribute
 import java.lang.classfile.attribute.EnclosingMethodAttribute
 import java.lang.classfile.attribute.ExceptionsAttribute
 import java.lang.classfile.attribute.InnerClassInfo
 import java.lang.classfile.attribute.InnerClassesAttribute
 import java.lang.classfile.attribute.ModuleAttribute
 import java.lang.classfile.attribute.ModuleExportInfo
+import java.lang.classfile.attribute.ModuleHashesAttribute
 import java.lang.classfile.attribute.ModuleMainClassAttribute
 import java.lang.classfile.attribute.ModuleOpenInfo
 import java.lang.classfile.attribute.ModulePackagesAttribute
 import java.lang.classfile.attribute.ModuleProvideInfo
+import java.lang.classfile.attribute.ModuleResolutionAttribute
+import java.lang.classfile.attribute.ModuleTargetAttribute
 import java.lang.classfile.attribute.NestHostAttribute
 import java.lang.classfile.attribute.NestMembersAttribute
 import java.lang.classfile.attribute.PermittedSubclassesAttribute
@@ -42,6 +50,11 @@ import java.lang.classfile.attribute.RuntimeVisibleAnnotationsAttribute
 import java.lang.classfile.attribute.RuntimeVisibleParameterAnnotationsAttribute
 import java.lang.classfile.attribute.RuntimeVisibleTypeAnnotationsAttribute
 import java.lang.classfile.attribute.SignatureAttribute
+import java.lang.classfile.attribute.SourceDebugExtensionAttribute
+import java.lang.classfile.attribute.SourceFileAttribute
+import java.lang.classfile.attribute.SourceIDAttribute
+import java.lang.classfile.attribute.SyntheticAttribute
+import java.lang.classfile.attribute.UnknownAttribute
 import java.lang.classfile.constantpool.StringEntry
 import java.lang.classfile.instruction.ConstantInstruction
 import java.lang.classfile.instruction.ExceptionCatch
@@ -215,7 +228,20 @@ private class ClassFileRelocatorRemapper(
         clb.with(RuntimeVisibleTypeAnnotationsAttribute.of(cle.annotations().map { it.remap() }))
       is RuntimeInvisibleTypeAnnotationsAttribute ->
         clb.with(RuntimeInvisibleTypeAnnotationsAttribute.of(cle.annotations().map { it.remap() }))
-      else -> clb.with(cle)
+      // Preserve standard elements without relocatable references and opaque custom attributes.
+      is AccessFlags,
+      is ClassFileVersion,
+      is CustomAttribute<*>,
+      is CompilationIDAttribute,
+      is DeprecatedAttribute,
+      is ModuleHashesAttribute,
+      is ModuleResolutionAttribute,
+      is ModuleTargetAttribute,
+      is SourceDebugExtensionAttribute,
+      is SourceFileAttribute,
+      is SourceIDAttribute,
+      is SyntheticAttribute,
+      is UnknownAttribute -> clb.with(cle)
     }
   }
 
