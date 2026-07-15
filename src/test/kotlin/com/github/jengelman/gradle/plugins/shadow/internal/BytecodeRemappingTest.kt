@@ -6,6 +6,9 @@ import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
@@ -25,11 +28,14 @@ import org.vafer.jdeb.shaded.objectweb.asm.AnnotationVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
+import org.vafer.jdeb.shaded.objectweb.asm.ConstantDynamic
 import org.vafer.jdeb.shaded.objectweb.asm.FieldVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.Handle
 import org.vafer.jdeb.shaded.objectweb.asm.Label
 import org.vafer.jdeb.shaded.objectweb.asm.MethodVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ModuleVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
+import org.vafer.jdeb.shaded.objectweb.asm.Type
 
 /**
  * The cases reflect the cases in
@@ -308,6 +314,265 @@ class BytecodeRemappingTest {
   }
 
   @Test
+  fun moduleClassReferencesAreRelocatedAndMetadataIsPreserved() {
+    val originalService =
+      $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureInterface"
+    val originalProvider =
+      $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureSubject"
+    val relocatedService = $$"com/example/relocated/BytecodeRemappingTest$FixtureInterface"
+    val relocatedProvider = $$"com/example/relocated/BytecodeRemappingTest$FixtureSubject"
+    val details =
+      moduleInfoDetails(Opcodes.ACC_OPEN, "1.0") {
+        visitRequire("java.base", Opcodes.ACC_MANDATED, "25")
+        visitExport("com/example/api", Opcodes.ACC_SYNTHETIC, "consumer.module")
+        visitOpen("com/example/internal", Opcodes.ACC_MANDATED, "reflective.module")
+        visitUse(originalService)
+        visitProvide(originalService, originalProvider)
+      }
+    var moduleHeader: Triple<String, Int, String?>? = null
+    val requires = mutableListOf<String>()
+    val exports = mutableListOf<String>()
+    val opens = mutableListOf<String>()
+    val uses = mutableListOf<String>()
+    val provides = mutableListOf<Pair<String, List<String>>>()
+
+    ClassReader(details.remapClass(relocators))
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitModule(
+            name: String,
+            access: Int,
+            version: String?,
+          ): ModuleVisitor {
+            moduleHeader = Triple(name, access, version)
+            return object : ModuleVisitor(Opcodes.ASM9) {
+              override fun visitRequire(module: String, access: Int, version: String?) {
+                requires += "$module:$access:$version"
+              }
+
+              override fun visitExport(
+                packaze: String,
+                access: Int,
+                modules: Array<out String>?,
+              ) {
+                exports += "$packaze:$access:${modules?.joinToString()}"
+              }
+
+              override fun visitOpen(
+                packaze: String,
+                access: Int,
+                modules: Array<out String>?,
+              ) {
+                opens += "$packaze:$access:${modules?.joinToString()}"
+              }
+
+              override fun visitUse(service: String) {
+                uses += service
+              }
+
+              override fun visitProvide(service: String, providers: Array<out String>) {
+                provides += service to providers.toList()
+              }
+            }
+          }
+        },
+        0,
+      )
+
+    assertThat(moduleHeader).isEqualTo(Triple("example.module", Opcodes.ACC_OPEN, "1.0"))
+    assertThat(requires).isEqualTo(listOf("java.base:${Opcodes.ACC_MANDATED}:25"))
+    assertThat(exports)
+      .isEqualTo(listOf("com/example/api:${Opcodes.ACC_SYNTHETIC}:consumer.module"))
+    assertThat(opens)
+      .isEqualTo(listOf("com/example/internal:${Opcodes.ACC_MANDATED}:reflective.module"))
+    assertThat(uses).isEqualTo(listOf(relocatedService))
+    assertThat(provides).isEqualTo(listOf(relocatedService to listOf(relocatedProvider)))
+  }
+
+  @Test
+  fun innerClassSimpleNameIsRelocated() {
+    val originalInnerClass = "example/Outer\$Old"
+    val relocatedInnerClass = "example/Outer\$New"
+    val details =
+      classDetails(originalInnerClass) {
+        visitInnerClass(originalInnerClass, "example/Outer", "Old", Opcodes.ACC_PUBLIC)
+      }
+    val exactClassRelocator = setOf(exactPathRelocator(originalInnerClass, relocatedInnerClass))
+    var innerClass: Triple<String, String?, String?>? = null
+
+    val result = details.remapClass(exactClassRelocator)
+    ClassReader(result)
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitInnerClass(
+            name: String,
+            outerName: String?,
+            innerName: String?,
+            access: Int,
+          ) {
+            innerClass = Triple(name, outerName, innerName)
+          }
+        },
+        0,
+      )
+
+    assertThat(ClassReader(result).className).isEqualTo(relocatedInnerClass)
+    assertThat(innerClass).isEqualTo(Triple(relocatedInnerClass, "example/Outer", "New"))
+  }
+
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun fieldStringConstantHonorsSkipSetting(skipStringConstants: Boolean) {
+    val originalValue =
+      $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
+    val relocatedValue = $$"com.example.relocated.BytecodeRemappingTest$FixtureBase"
+    val details =
+      classDetails("example/Constants") {
+        visitField(
+            Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC or Opcodes.ACC_FINAL,
+            "VALUE",
+            "Ljava/lang/String;",
+            null,
+            originalValue,
+          )
+          .visitEnd()
+      }
+    val stringRelocators =
+      setOf(
+        SimpleRelocator(
+          "com.github.jengelman.gradle.plugins.shadow.internal",
+          "com.example.relocated",
+          skipStringConstants = skipStringConstants,
+        )
+      )
+    var fieldValue: Any? = null
+
+    ClassReader(details.remapClass(stringRelocators))
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitField(
+            access: Int,
+            name: String,
+            descriptor: String,
+            signature: String?,
+            value: Any?,
+          ): FieldVisitor? {
+            if (name == "VALUE") fieldValue = value
+            return null
+          }
+        },
+        0,
+      )
+
+    assertThat(fieldValue).isEqualTo(if (skipStringConstants) originalValue else relocatedValue)
+  }
+
+  @Test
+  fun constantPoolAndInvokeDynamicReferencesAreRelocated() {
+    val originalType =
+      $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase"
+    val relocatedType = $$"com/example/relocated/BytecodeRemappingTest$FixtureBase"
+    val originalDescriptor = "L$originalType;"
+    val relocatedDescriptor = "L$relocatedType;"
+    val methodHandle =
+      Handle(Opcodes.H_INVOKESTATIC, originalType, "factory", "()$originalDescriptor", false)
+    val constantBootstrap =
+      Handle(
+        Opcodes.H_INVOKESTATIC,
+        "java/lang/invoke/ConstantBootstraps",
+        "nullConstant",
+        "(Ljava/lang/invoke/MethodHandles\$Lookup;Ljava/lang/String;Ljava/lang/Class;)Ljava/lang/Object;",
+        false,
+      )
+    val callSiteBootstrap =
+      Handle(
+        Opcodes.H_INVOKESTATIC,
+        originalType,
+        "bootstrap",
+        "(Ljava/lang/invoke/MethodHandles\$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",
+        false,
+      )
+    val callSiteBootstrapDescriptor = callSiteBootstrap.desc
+    val details =
+      classDetails("example/Constants") {
+        visitMethod(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC, "test", "()V", null, null).apply {
+          visitCode()
+          visitLdcInsn(Type.getType(originalDescriptor))
+          visitInsn(Opcodes.POP)
+          visitLdcInsn(Type.getMethodType("()$originalDescriptor"))
+          visitInsn(Opcodes.POP)
+          visitLdcInsn(methodHandle)
+          visitInsn(Opcodes.POP)
+          visitLdcInsn(ConstantDynamic("constant", originalDescriptor, constantBootstrap))
+          visitInsn(Opcodes.POP)
+          visitInvokeDynamicInsn(
+            "call",
+            "()$originalDescriptor",
+            callSiteBootstrap,
+            Type.getType(originalDescriptor),
+            methodHandle,
+          )
+          visitInsn(Opcodes.POP)
+          visitInsn(Opcodes.RETURN)
+          visitMaxs(1, 0)
+          visitEnd()
+        }
+      }
+    val references = mutableListOf<String>()
+
+    fun recordReference(value: Any) {
+      when (value) {
+        is Type -> references += "type:${value.descriptor}"
+        is Handle -> references += "handle:${value.owner}:${value.desc}"
+        is ConstantDynamic -> {
+          references += "constant:${value.descriptor}"
+          recordReference(value.bootstrapMethod)
+          repeat(value.bootstrapMethodArgumentCount) {
+            recordReference(value.getBootstrapMethodArgument(it))
+          }
+        }
+      }
+    }
+
+    ClassReader(details.remapClass(relocators))
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitMethod(
+            access: Int,
+            name: String,
+            descriptor: String,
+            signature: String?,
+            exceptions: Array<out String>?,
+          ): MethodVisitor =
+            object : MethodVisitor(Opcodes.ASM9) {
+              override fun visitLdcInsn(value: Any) {
+                recordReference(value)
+              }
+
+              override fun visitInvokeDynamicInsn(
+                name: String,
+                descriptor: String,
+                bootstrapMethodHandle: Handle,
+                vararg bootstrapMethodArguments: Any,
+              ) {
+                references += "invokedynamic:$descriptor"
+                recordReference(bootstrapMethodHandle)
+                bootstrapMethodArguments.forEach(::recordReference)
+              }
+            }
+        },
+        0,
+      )
+
+    assertThat(references).contains("type:$relocatedDescriptor")
+    assertThat(references).contains("type:()$relocatedDescriptor")
+    assertThat(references).contains("handle:$relocatedType:()$relocatedDescriptor")
+    assertThat(references).contains("handle:$relocatedType:$callSiteBootstrapDescriptor")
+    assertThat(references).contains("constant:$relocatedDescriptor")
+    assertThat(references).contains("invokedynamic:()$relocatedDescriptor")
+  }
+
+  @Test
   fun localVariableIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -339,19 +604,50 @@ class BytecodeRemappingTest {
       override fun getFile(): File = _file
     }
 
-  private fun moduleInfoDetails(configure: ModuleVisitor.() -> Unit): FileCopyDetails {
+  private fun moduleInfoDetails(
+    access: Int = 0,
+    version: String? = null,
+    configure: ModuleVisitor.() -> Unit,
+  ): FileCopyDetails {
     val writer = ClassWriter(0)
     writer.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null)
-    writer.visitModule("example.module", 0, null).apply(configure).visitEnd()
+    writer.visitModule("example.module", access, version).apply(configure).visitEnd()
     writer.visitEnd()
-    val file =
-      tempDir.resolve("module-info.class").toFile().apply { writeBytes(writer.toByteArray()) }
+    return bytecodeDetails("module-info.class", writer.toByteArray())
+  }
+
+  private fun classDetails(
+    internalName: String,
+    configure: ClassWriter.() -> Unit,
+  ): FileCopyDetails {
+    val writer = ClassWriter(0)
+    writer.visit(Opcodes.V17, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+    writer.configure()
+    writer.visitEnd()
+    return bytecodeDetails("$internalName.class", writer.toByteArray())
+  }
+
+  private fun bytecodeDetails(path: String, bytes: ByteArray): FileCopyDetails {
+    val file = tempDir.resolve(path).createParentDirectories().toFile().apply { writeBytes(bytes) }
     return object : FileCopyDetails by noOpDelegate() {
-      override fun getPath(): String = file.name
+      override fun getPath(): String = path
 
       override fun getFile(): File = file
     }
   }
+
+  private fun exactPathRelocator(original: String, relocated: String): Relocator =
+    object : Relocator {
+      override fun canRelocatePath(path: String): Boolean = path == original
+
+      override fun relocatePath(context: RelocatePathContext): String = relocated
+
+      override fun canRelocateClass(className: String): Boolean = false
+
+      override fun relocateClass(context: RelocateClassContext): String = context.className
+
+      override fun applyToSourceContent(sourceContent: String): String = sourceContent
+    }
 
   // ---------------------------------------------------------------------------
   // Fixture classes – declared as nested classes so their bytecode is compiled

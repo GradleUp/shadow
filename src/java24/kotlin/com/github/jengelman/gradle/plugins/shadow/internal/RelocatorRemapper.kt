@@ -119,10 +119,18 @@ private class ClassFileRelocatorRemapper(
         clb.with(
           InnerClassesAttribute.of(
             cle.classes().map { ici ->
+              val innerClassName = ici.innerClass().asSymbol().internalName()
+              val mappedInnerClass = mapClassDesc(ici.innerClass().asSymbol())
               InnerClassInfo.of(
-                mapClassDesc(ici.innerClass().asSymbol()),
+                mappedInnerClass,
                 ici.outerClass().map { mapClassDesc(it.asSymbol()) },
-                ici.innerName().map { it.stringValue() },
+                ici.innerName().map {
+                  mapInnerClassName(
+                    innerClassName,
+                    mappedInnerClass.internalName(),
+                    it.stringValue(),
+                  )
+                },
                 ici.flagsMask(),
               )
             }
@@ -221,6 +229,30 @@ private class ClassFileRelocatorRemapper(
     return if (internalName == mappedInternalName) desc
     else ClassDesc.ofDescriptor("L$mappedInternalName;")
   }
+
+  // Keep InnerClasses.inner_name consistent with ASM's Remapper.mapInnerClassName behavior.
+  private fun mapInnerClassName(name: String, mappedName: String, innerName: String): String {
+    if (name == mappedName) return innerName
+    val namePackageIndex = name.lastIndexOf('/')
+    val mappedPackageIndex = mappedName.lastIndexOf('/')
+    if (
+      namePackageIndex != -1 &&
+        mappedPackageIndex != -1 &&
+        name.substring(namePackageIndex) == mappedName.substring(mappedPackageIndex)
+    ) {
+      return innerName
+    }
+    val innerClassIndex = mappedName.lastIndexOf('$')
+    if (innerClassIndex == -1) return innerName
+    var innerNameIndex = innerClassIndex + 1
+    while (innerNameIndex < mappedName.length && mappedName[innerNameIndex].isDigit()) {
+      innerNameIndex++
+    }
+    return mappedName.substring(innerNameIndex)
+  }
+
+  private fun ClassDesc.internalName(): String =
+    descriptorString().let { it.substring(1, it.length - 1) }
 
   private fun asFieldTransform() = FieldTransform { fb, fe ->
     when (fe) {
