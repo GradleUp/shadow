@@ -28,6 +28,7 @@ import java.lang.classfile.attribute.ModuleAttribute
 import java.lang.classfile.attribute.ModuleExportInfo
 import java.lang.classfile.attribute.ModuleMainClassAttribute
 import java.lang.classfile.attribute.ModuleOpenInfo
+import java.lang.classfile.attribute.ModulePackagesAttribute
 import java.lang.classfile.attribute.ModuleProvideInfo
 import java.lang.classfile.attribute.NestHostAttribute
 import java.lang.classfile.attribute.NestMembersAttribute
@@ -179,6 +180,13 @@ private class ClassFileRelocatorRemapper(
         )
       is ModuleMainClassAttribute ->
         clb.with(ModuleMainClassAttribute.of(mapClassDesc(cle.mainClass().asSymbol())))
+      // ModulePackages is stored separately from Module, so it must be relocated independently.
+      is ModulePackagesAttribute ->
+        clb.with(
+          ModulePackagesAttribute.ofNames(
+            cle.packages().map { PackageDesc.ofInternalName(map(it.asSymbol().internalName())) }
+          )
+        )
       is NestHostAttribute ->
         clb.with(NestHostAttribute.of(mapClassDesc(cle.nestHost().asSymbol())))
       is NestMembersAttribute ->

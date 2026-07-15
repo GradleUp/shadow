@@ -231,18 +231,7 @@ class BytecodeRemappingTest {
   fun moduleMainClassIsRelocated() {
     val originalMainClass =
       $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase"
-    val writer = ClassWriter(0)
-    writer.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null)
-    writer.visitModule("example.module", 0, null).apply { visitMainClass(originalMainClass) }
-    writer.visitEnd()
-    val file =
-      tempDir.resolve("module-info.class").toFile().apply { writeBytes(writer.toByteArray()) }
-    val details =
-      object : FileCopyDetails by noOpDelegate() {
-        override fun getPath(): String = file.name
-
-        override fun getFile(): File = file
-      }
+    val details = moduleInfoDetails { visitMainClass(originalMainClass) }
 
     val result = details.remapClass(relocators)
     var remappedMainClass: String? = null
@@ -264,6 +253,58 @@ class BytecodeRemappingTest {
       )
 
     assertThat(remappedMainClass).isEqualTo(relocatedFixtureBase)
+  }
+
+  @Test
+  fun modulePackagesAreRelocated() {
+    val originalPackage = "com/github/jengelman/gradle/plugins/shadow/internal"
+    val relocatedPackage = "com/example/relocated"
+    val details = moduleInfoDetails {
+      visitPackage(originalPackage)
+      visitExport(originalPackage, 0)
+      visitOpen(originalPackage, 0)
+    }
+
+    val result = details.remapClass(relocators)
+    val packages = mutableListOf<String>()
+    val exports = mutableListOf<String>()
+    val opens = mutableListOf<String>()
+    ClassReader(result)
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitModule(
+            name: String,
+            access: Int,
+            version: String?,
+          ): ModuleVisitor =
+            object : ModuleVisitor(Opcodes.ASM9) {
+              override fun visitPackage(packaze: String) {
+                packages += packaze
+              }
+
+              override fun visitExport(
+                packaze: String,
+                access: Int,
+                modules: Array<out String>?,
+              ) {
+                exports += packaze
+              }
+
+              override fun visitOpen(
+                packaze: String,
+                access: Int,
+                modules: Array<out String>?,
+              ) {
+                opens += packaze
+              }
+            }
+        },
+        0,
+      )
+
+    assertThat(packages).isEqualTo(listOf(relocatedPackage))
+    assertThat(exports).isEqualTo(listOf(relocatedPackage))
+    assertThat(opens).isEqualTo(listOf(relocatedPackage))
   }
 
   @Test
@@ -297,6 +338,20 @@ class BytecodeRemappingTest {
 
       override fun getFile(): File = _file
     }
+
+  private fun moduleInfoDetails(configure: ModuleVisitor.() -> Unit): FileCopyDetails {
+    val writer = ClassWriter(0)
+    writer.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null)
+    writer.visitModule("example.module", 0, null).apply(configure).visitEnd()
+    writer.visitEnd()
+    val file =
+      tempDir.resolve("module-info.class").toFile().apply { writeBytes(writer.toByteArray()) }
+    return object : FileCopyDetails by noOpDelegate() {
+      override fun getPath(): String = file.name
+
+      override fun getFile(): File = file
+    }
+  }
 
   // ---------------------------------------------------------------------------
   // Fixture classes – declared as nested classes so their bytecode is compiled

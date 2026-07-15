@@ -50,4 +50,7 @@ private class RelocatorRemapper(
 
   override fun map(internalName: String): String =
     relocators.mapName(name = internalName, onModified = onModified)
+
+  // Module attributes encode package names separately, so ASM remaps them through this hook.
+  override fun mapPackageName(name: String): String = map(name)
 }
