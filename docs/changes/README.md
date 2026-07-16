@@ -1,5 +1,7 @@
 # Change Log
 
+## [Unreleased](https://github.com/GradleUp/shadow/compare/9.6.0...HEAD) - 2026-xx-xx
+
 
 ## [9.6.0](https://github.com/GradleUp/shadow/releases/tag/9.6.0) - 2026-07-16
 
