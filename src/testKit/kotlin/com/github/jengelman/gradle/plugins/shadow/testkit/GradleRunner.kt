@@ -28,6 +28,15 @@ val enableNoImplicitLookupInParentProjects: String
       else -> ""
     }
 
+// TODO: this could be inlined after bumping the min Gradle requirement to 9.7 or above.
+private val isolatedProjectsFlag: String
+  get() =
+    when {
+      GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.7.0-rc-1") ->
+        "--isolated-projects"
+      else -> "-Dorg.gradle.unsafe.isolated-projects=true"
+    }
+
 val commonGradleArgs =
   setOf(
     "--configuration-cache",
@@ -36,7 +45,7 @@ val commonGradleArgs =
     // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
     "-Dorg.gradle.configuration-cache.parallel=true",
     // https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
-    "-Dorg.gradle.unsafe.isolated-projects=true",
+    isolatedProjectsFlag,
   )
 
 fun gradleRunner(
