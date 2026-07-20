@@ -59,7 +59,7 @@ spotless {
 }
 
 tapmoc {
-  gradle(libs.versions.minGradle.get())
+  gradle("9.2.0")
   java(17)
   // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
   kotlin("2.2.0")
