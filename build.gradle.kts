@@ -58,10 +58,11 @@ spotless {
 }
 
 tapmoc {
-  gradle(libs.versions.minGradle)
+  gradle(libs.versions.minGradle.get())
   java(17)
   // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
   kotlin("2.2.0")
+  checkDependencies()
 }
 
 val testPluginClasspath =
