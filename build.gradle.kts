@@ -7,6 +7,7 @@ import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import tapmoc.Severity
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
@@ -62,7 +63,7 @@ tapmoc {
   java(17)
   // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
   kotlin("2.2.0")
-  checkDependencies()
+  checkJavaClassFiles(Severity.ERROR)
 }
 
 val testPluginClasspath =
