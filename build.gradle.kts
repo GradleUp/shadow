@@ -6,8 +6,6 @@ import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
 
 plugins {
@@ -18,6 +16,7 @@ plugins {
   alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
   alias(libs.plugins.buildConfig)
+  alias(libs.plugins.tapmoc)
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -31,18 +30,9 @@ dokka { dokkaPublications.html { outputDirectory = rootDir.resolve("docs/api") }
 kotlin {
   explicitApi()
   @OptIn(ExperimentalAbiValidation::class) abiValidation()
-  val jdkRelease = "17"
   compilerOptions {
     allWarningsAsErrors = true
-    // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
-    apiVersion = KotlinVersion.KOTLIN_2_2
-    languageVersion = apiVersion
-    jvmTarget = JvmTarget.fromTarget(jdkRelease)
     jvmDefault = JvmDefaultMode.NO_COMPATIBILITY
-    freeCompilerArgs.add("-Xjdk-release=$jdkRelease")
-  }
-  target.compilations.configureEach {
-    compileJavaTaskProvider { options.release = jdkRelease.toInt() }
   }
 }
 
@@ -65,6 +55,13 @@ spotless {
     ktfmt(libs.ktfmt.get().version).googleStyle()
     target("*.kts")
   }
+}
+
+tapmoc {
+  gradle(libs.versions.minGradle)
+  java(17)
+  // https://docs.gradle.org/current/userguide/compatibility.html#kotlin
+  kotlin("2.2.0")
 }
 
 val testPluginClasspath =
@@ -103,14 +100,6 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
   suppressPomMetadataWarningsFor(JAVADOC_ELEMENTS_CONFIGURATION_NAME)
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
-}
-
-configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
-  attributes.attribute(
-    // TODO: https://github.com/gradle/gradle/issues/24608
-    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-    objects.named(libs.versions.minGradle.get()),
-  )
 }
 
 val testGradleVersion: String =
