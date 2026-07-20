@@ -40,4 +40,4 @@ mavenPublish = "com.vanniktech.maven.publish:0.37.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 spotless = "com.diffplug.spotless:8.8.0"
 buildConfig = "com.github.gmazzo.buildconfig:6.0.10"
-tapmoc = "com.gradleup.tapmoc:0.4.0"
+tapmoc = "com.gradleup.tapmoc:0.4.2"
