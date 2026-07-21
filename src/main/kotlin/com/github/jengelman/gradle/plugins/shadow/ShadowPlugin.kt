@@ -20,7 +20,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
       withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) { apply(ShadowKmpPlugin::class.java) }
       withId("com.android.base") {
         throw GradleException(
-          "Shadow does not support using with AGP, you may need Android Fused Library plugin instead. " +
+          "Shadow does not support being used with AGP. You may need the Android Fused Library plugin instead. " +
             "See https://developer.android.com/build/publish-library/fused-library"
         )
       }
