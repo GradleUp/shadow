@@ -3,6 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.6.1...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Bump min Gradle requirement to 9.4.0. ([#2114](https://github.com/GradleUp/shadow/pull/2114))
+
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))

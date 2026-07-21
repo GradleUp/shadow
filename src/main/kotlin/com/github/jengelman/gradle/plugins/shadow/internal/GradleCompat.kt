@@ -10,8 +10,6 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
-import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
@@ -20,7 +18,6 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.util.GradleVersion
 
 /** Return `runtimeClasspath` or `runtime` configuration. */
 internal inline val Project.runtimeConfiguration: Configuration
@@ -59,39 +56,6 @@ internal fun Project.addBuildScanCustomValues() {
     buildScan.buildFinished {
       buildScan.value("shadow.${task.path}.executed", "true")
       buildScan.value("shadow.${task.path}.didWork", task.didWork.toString())
-    }
-  }
-}
-
-// TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above.
-internal fun Configuration.extendsFromCompat(vararg superConfigs: Provider<out Configuration>) {
-  if (GradleVersion.current() >= GradleVersion.version("9.4.0")) {
-    @Suppress("UnstableApiUsage") extendsFrom(*superConfigs)
-  } else {
-    extendsFrom(*superConfigs.map { it.get() }.toTypedArray())
-  }
-}
-
-// TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above.
-internal fun Project.moveGradleApiIntoCompileOnly() {
-  // gradleApi has been added into compileOnlyApi since Gradle 9.4.0.
-  if (GradleVersion.current() >= GradleVersion.version("9.4.0")) return
-
-  // org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
-  plugins.withId("org.gradle.java-gradle-plugin") {
-    val gradleApi = dependencies.gradleApi()
-    // Remove the gradleApi so it isn't merged into the jar file.
-    // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
-    // See
-    // https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161.
-    configurations.named(API_CONFIGURATION_NAME) { api ->
-      // Only proceed if the removal is successful.
-      if (!api.dependencies.remove(gradleApi)) return@named
-      // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
-      configurations
-        .getByName(COMPILE_ONLY_CONFIGURATION_NAME)
-        .dependencies
-        .add(dependencies.gradleApi())
     }
   }
 }
