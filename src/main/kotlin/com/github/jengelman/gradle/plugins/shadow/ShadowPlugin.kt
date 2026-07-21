@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_
 import com.github.jengelman.gradle.plugins.shadow.internal.addBuildScanCustomValues
 import com.github.jengelman.gradle.plugins.shadow.internal.findOptionalProperty
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -18,7 +19,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
       withId("org.gradle.application") { apply(ShadowApplicationPlugin::class.java) }
       withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) { apply(ShadowKmpPlugin::class.java) }
       withId("com.android.base") {
-        error(
+        throw GradleException(
           "Shadow does not support using with AGP, you may need Android Fused Library plugin instead. " +
             "See https://developer.android.com/build/publish-library/fused-library"
         )

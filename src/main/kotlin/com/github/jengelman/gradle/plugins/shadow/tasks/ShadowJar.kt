@@ -40,6 +40,7 @@ import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
@@ -523,7 +524,7 @@ public abstract class ShadowJar : Jar() {
             or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
           """
               .trimIndent()
-          error(message)
+          throw GradleException(message)
         }
         else -> {
           from(archiveOperations.zipTree(file))

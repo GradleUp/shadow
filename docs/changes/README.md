@@ -2,6 +2,9 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.6.0...HEAD) - 2026-xx-xx
 
+### Changed
+
+- Use `GradleException` for expected build failures. ([#2113](https://github.com/GradleUp/shadow/pull/2113))
 
 ## [9.6.0](https://github.com/GradleUp/shadow/releases/tag/9.6.0) - 2026-07-16
 

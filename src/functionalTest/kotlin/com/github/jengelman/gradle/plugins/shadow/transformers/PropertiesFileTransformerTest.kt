@@ -41,7 +41,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       assertThat(result.output.invariantEolString)
         .contains(
           """
-          Caused by: java.lang.IllegalStateException: The following properties files have conflicting property values and cannot be merged:
+          Caused by: org.gradle.api.GradleException: The following properties files have conflicting property values and cannot be merged:
            * META-INF/test.properties
              * Property key2 is duplicated 2 times with different values
           """
