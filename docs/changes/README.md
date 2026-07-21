@@ -6,6 +6,10 @@
 
 - Use `GradleException` for expected build failures. ([#2113](https://github.com/GradleUp/shadow/pull/2113))
 
+### Fixed
+
+- Preserve repeated lines in R8 rule files when using `minimize { r8 { ... } }`.
+
 ## [9.6.0](https://github.com/GradleUp/shadow/releases/tag/9.6.0) - 2026-07-16
 
 ### Added

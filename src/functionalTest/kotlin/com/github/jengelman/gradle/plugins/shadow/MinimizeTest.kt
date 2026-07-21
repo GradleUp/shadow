@@ -418,6 +418,48 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
+  fun minimizeWithR8PreservesRepeatedLinesInClasspathRules() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        minimize {
+          r8 {}
+        }
+        """
+          .trimIndent()
+    )
+    path("client/src/main/resources/META-INF/proguard/client.pro")
+      .writeText(
+        """
+        -keep class client.Reflective {
+          public <init>();
+        }
+        -keep class client.Unused {
+          public <init>();
+        }
+        """
+          .trimIndent()
+      )
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly(
+        "client/",
+        "client/Used.class",
+        "client/Reflective.class",
+        "client/Unused.class",
+        "server/",
+        "server/Server.class",
+        "META-INF/proguard/",
+        "META-INF/proguard/client.pro",
+        *manifestEntries,
+      )
+    }
+  }
+
+  @Test
   fun minimizeWithR8CanEnableObfuscation() {
     writeR8Repository()
     writeR8ClientAndServerModules(

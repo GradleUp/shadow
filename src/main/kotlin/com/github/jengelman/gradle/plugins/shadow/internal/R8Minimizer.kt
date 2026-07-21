@@ -132,23 +132,23 @@ internal class R8Minimizer(
     r8Args: List<String>,
     extractedRulesFile: File,
   ): List<String> {
-    val rules = linkedSetOf<String>()
-    if (shouldDisableOptimization(r8Args)) {
-      rules += DefaultR8Spec.DONT_OPTIMIZE_RULE
-    }
-    rules += sourceKeepRules(inputJar)
-    rules += keptDependencyRules(inputJar)
-    rules += serviceKeepRules(inputJar)
-    rules += extractedRulesFile.readLines()
-    r8Spec.keepRuleFiles.files
-      .sortedBy { it.absolutePath }
-      .forEach { file ->
-        if (file.isFile) {
-          rules += file.readLines()
-        }
+    return buildList {
+      if (shouldDisableOptimization(r8Args)) {
+        add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
       }
-    rules += r8Spec.keepRules.get()
-    return rules.toList()
+      addAll(sourceKeepRules(inputJar))
+      addAll(keptDependencyRules(inputJar))
+      addAll(serviceKeepRules(inputJar))
+      addAll(extractedRulesFile.readLines())
+      r8Spec.keepRuleFiles.files
+        .sortedBy { it.absolutePath }
+        .forEach { file ->
+          if (file.isFile) {
+            addAll(file.readLines())
+          }
+        }
+      addAll(r8Spec.keepRules.get())
+    }
   }
 
   private fun shouldDisableOptimization(r8Args: List<String>): Boolean {
