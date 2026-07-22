@@ -8,7 +8,7 @@
 
 ### Fixed
 
-- Preserve repeated lines in R8 rule files when using `minimize { r8 { ... } }`.
+- Preserve repeated lines in R8 rule files when using `minimize { r8 { ... } }`. ([#2115](https://github.com/GradleUp/shadow/pull/2115))
 
 ## [9.6.0](https://github.com/GradleUp/shadow/releases/tag/9.6.0) - 2026-07-16
 
