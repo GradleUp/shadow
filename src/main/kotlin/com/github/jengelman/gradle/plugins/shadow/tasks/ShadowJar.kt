@@ -508,29 +508,7 @@ public abstract class ShadowJar : Jar() {
 
   @TaskAction
   override fun copy() {
-    includedDependencies.files.forEach { file ->
-      when {
-        !file.exists() -> {
-          logger.info("Skipping non-existent dependency: {}", file)
-        }
-        file.isDirectory -> {
-          from(file)
-        }
-        file.extension.equals("aar", ignoreCase = true) && file.isAar() -> {
-          val message =
-            """
-            Shadowing AAR file is not supported.
-            Please exclude dependency artifact: $file
-            or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
-          """
-              .trimIndent()
-          throw GradleException(message)
-        }
-        else -> {
-          from(archiveOperations.zipTree(file))
-        }
-      }
-    }
+    addIncludedDependencies()
     injectManifestAttributes()
     super.copy()
     minimizeWithR8()
@@ -634,6 +612,32 @@ public abstract class ShadowJar : Jar() {
         }
       }
     }
+
+  private fun addIncludedDependencies() {
+    includedDependencies.files.forEach { file ->
+      when {
+        !file.exists() -> {
+          logger.info("Skipping non-existent dependency: {}", file)
+        }
+        file.isDirectory -> {
+          from(file)
+        }
+        file.extension.equals("aar", ignoreCase = true) && file.isAar() -> {
+          val message =
+            """
+            Shadowing AAR file is not supported.
+            Please exclude dependency artifact: $file
+            or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
+          """
+              .trimIndent()
+          throw GradleException(message)
+        }
+        else -> {
+          from(archiveOperations.zipTree(file))
+        }
+      }
+    }
+  }
 
   private fun injectManifestAttributes() {
     val mainClassValue = mainClass.orNull
