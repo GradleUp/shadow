@@ -358,14 +358,14 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8HonorsCustomKeepRules() {
+  fun minimizeWithR8HonorsCustomProguardRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
         minimize {
           r8 {
-            keepRules.add("-keep class client.Reflective { *; }")
+            proguardRules.add("-keep class client.Reflective { *; }")
           }
         }
         """

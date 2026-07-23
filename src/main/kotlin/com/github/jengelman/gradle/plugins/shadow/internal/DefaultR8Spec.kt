@@ -17,9 +17,9 @@ internal open class DefaultR8Spec @Inject constructor(objectFactory: ObjectFacto
 
   override val args: ListProperty<String> = objectFactory.listProperty(defaultArgs)
 
-  override val keepRules: ListProperty<String> = objectFactory.listProperty()
+  override val proguardRules: ListProperty<String> = objectFactory.listProperty()
 
-  override val keepRuleFiles: ConfigurableFileCollection = objectFactory.fileCollection()
+  override val proguardRuleFiles: ConfigurableFileCollection = objectFactory.fileCollection()
 
   override fun enableObfuscation() {
     defaultArgs.set(emptyList())

@@ -136,18 +136,18 @@ internal class R8Minimizer(
       if (shouldDisableOptimization(r8Args)) {
         add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
       }
-      addAll(sourceKeepRules(inputJar))
+      addAll(sourceProguardRules(inputJar))
       addAll(keptDependencyRules(inputJar))
-      addAll(serviceKeepRules(inputJar))
+      addAll(serviceProguardRules(inputJar))
       addAll(extractedRulesFile.readLines())
-      r8Spec.keepRuleFiles.files
+      r8Spec.proguardRuleFiles.files
         .sortedBy { it.absolutePath }
         .forEach { file ->
           if (file.isFile) {
             addAll(file.readLines())
           }
         }
-      addAll(r8Spec.keepRules.get())
+      addAll(r8Spec.proguardRules.get())
     }
   }
 
@@ -158,7 +158,7 @@ internal class R8Minimizer(
 
   // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
   // refers to every class directly.
-  private fun sourceKeepRules(inputJar: File): List<String> {
+  private fun sourceProguardRules(inputJar: File): List<String> {
     val jarClasses = jarClassEntries(inputJar)
     return sourceSetsClassesDirs
       .asSequence()
@@ -198,7 +198,7 @@ internal class R8Minimizer(
 
   // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
   // interface and every listed provider even if R8 sees no direct references.
-  private fun serviceKeepRules(inputJar: File): List<String> {
+  private fun serviceProguardRules(inputJar: File): List<String> {
     val rules = linkedSetOf<String>()
     JarFile(inputJar).use { jarFile ->
       jarFile

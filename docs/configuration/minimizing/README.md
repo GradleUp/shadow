@@ -92,8 +92,8 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
       minimize {
         r8 {
           // Optional extra configuration
-          keepRules.add("-keep class com.example.ReflectiveApi { *; }")
-          keepRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
+          proguardRules.add("-keep class com.example.ReflectiveApi { *; }")
+          proguardRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
         }
       }
     }
@@ -110,8 +110,8 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
       minimize {
         r8 {
           // Optional extra configuration
-          keepRules.add('-keep class com.example.ReflectiveApi { *; }')
-          keepRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
+          proguardRules.add('-keep class com.example.ReflectiveApi { *; }')
+          proguardRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
         }
       }
     }
