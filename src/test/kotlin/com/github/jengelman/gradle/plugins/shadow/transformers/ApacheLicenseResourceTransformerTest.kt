@@ -17,20 +17,22 @@ class ApacheLicenseResourceTransformerTest :
   }
 
   @Test
-  fun canTransformResource() {
-    assertThat(transformer.canTransformResource("META-INF/LICENSE")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/LICENSE.TXT")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/License.txt")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/LICENSE.md")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/License.md")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
-  }
+  fun canTransformResource() =
+    with(transformer) {
+      assertThat(canTransformResource("META-INF/LICENSE")).isTrue()
+      assertThat(canTransformResource("META-INF/LICENSE.TXT")).isTrue()
+      assertThat(canTransformResource("META-INF/License.txt")).isTrue()
+      assertThat(canTransformResource("META-INF/LICENSE.md")).isTrue()
+      assertThat(canTransformResource("META-INF/License.md")).isTrue()
+      assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
+    }
 
   @Test
-  fun canTransformByPattern() {
-    transformer.exclude("META-INF/LICENSE.txt")
-    transformer.include("META-INF/LICENSE.*")
-    assertThat(transformer.canTransformResource("META-INF/LICENSE.txt")).isFalse()
-    assertThat(transformer.canTransformResource("META-INF/LICENSE.log")).isTrue()
-  }
+  fun canTransformByPattern() =
+    with(transformer) {
+      exclude("META-INF/LICENSE.txt")
+      include("META-INF/LICENSE.*")
+      assertThat(canTransformResource("META-INF/LICENSE.txt")).isFalse()
+      assertThat(canTransformResource("META-INF/LICENSE.log")).isTrue()
+    }
 }

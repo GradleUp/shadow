@@ -14,16 +14,17 @@ import org.junit.jupiter.api.Test
 class ComponentsXmlResourceTransformerTest :
   BaseTransformerTest<ComponentsXmlResourceTransformer>() {
   @Test
-  fun configurationMerging() {
-    XMLUnit.setNormalizeWhitespace(true)
-    transformer.transform(resourceContext("components-1.xml"))
-    transformer.transform(resourceContext("components-2.xml"))
+  fun configurationMerging() =
+    with(transformer) {
+      XMLUnit.setNormalizeWhitespace(true)
+      transform(resourceContext("components-1.xml"))
+      transform(resourceContext("components-2.xml"))
 
-    val diff =
-      XMLUnit.compareXML(
-        requireResourceAsPath("components-expected.xml").readText(),
-        transformer.transformedResource.decodeToString(),
-      )
-    assertThat(diff.identical()).isTrue()
-  }
+      val diff =
+        XMLUnit.compareXML(
+          requireResourceAsPath("components-expected.xml").readText(),
+          transformedResource.decodeToString(),
+        )
+      assertThat(diff.identical()).isTrue()
+    }
 }

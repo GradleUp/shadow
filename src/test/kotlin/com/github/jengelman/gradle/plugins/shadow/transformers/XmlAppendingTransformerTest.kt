@@ -12,11 +12,12 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
   }
 
   @Test
-  fun canTransformResource() {
-    transformer.resource.set("abcdefghijklmnopqrstuvwxyz")
+  fun canTransformResource() =
+    with(transformer) {
+      resource.set("abcdefghijklmnopqrstuvwxyz")
 
-    assertThat(transformer.canTransformResource("abcdefghijklmnopqrstuvwxyz")).isTrue()
-    assertThat(transformer.canTransformResource("ABCDEFGHIJKLMNOPQRSTUVWXYZ")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
-  }
+      assertThat(canTransformResource("abcdefghijklmnopqrstuvwxyz")).isTrue()
+      assertThat(canTransformResource("ABCDEFGHIJKLMNOPQRSTUVWXYZ")).isTrue()
+      assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
+    }
 }

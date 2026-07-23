@@ -16,65 +16,59 @@ class MinimizeSpecsTest {
   private val project = ProjectBuilder.builder().build()
 
   @Test
-  fun defaultMinimizeSpecUsesDependencyAnalyzer() {
-    val spec = project.objects.newInstance(DefaultMinimizeSpec::class.java, project)
-
-    assertThat(spec.tool.get()).isEqualTo(MinimizeTool.DEPENDENCY_ANALYZER)
-    assertThat(spec.r8SpecForInputs).isNull()
-  }
-
-  @Test
-  fun r8ConfiguresToolAndExposesSameSpecAsInput() {
-    val spec = project.objects.newInstance(DefaultMinimizeSpec::class.java, project)
-    lateinit var configured: Any
-
-    spec.r8 { configured = it }
-
-    assertThat(spec.tool.get()).isEqualTo(MinimizeTool.R8)
-    assertThat(spec.r8SpecForInputs).isSameInstanceAs(configured)
-    assertThat(spec.r8Spec).isSameInstanceAs(configured)
-  }
+  fun defaultMinimizeSpecUsesDependencyAnalyzer() =
+    with(project.objects.newInstance(DefaultMinimizeSpec::class.java, project)) {
+      assertThat(tool.get()).isEqualTo(MinimizeTool.DEPENDENCY_ANALYZER)
+      assertThat(r8SpecForInputs).isNull()
+    }
 
   @Test
-  fun defaultR8SpecIsShrinkOnly() {
-    val spec = project.objects.newInstance(DefaultR8Spec::class.java)
+  fun r8ConfiguresToolAndExposesSameSpecAsInput() =
+    with(project.objects.newInstance(DefaultMinimizeSpec::class.java, project)) {
+      lateinit var configured: Any
+      r8 { configured = it }
 
-    assertThat(spec.args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
-    assertThat(spec.obfuscationEnabled.get()).isFalse()
-    assertThat(spec.optimizationEnabled.get()).isFalse()
-    assertThat(spec.keepRules.get()).isEmpty()
-    assertThat(spec.keepRuleFiles.files).isEmpty()
-  }
-
-  @Test
-  fun enablingObfuscationRemovesDefaultArgument() {
-    val spec = project.objects.newInstance(DefaultR8Spec::class.java)
-
-    spec.enableObfuscation()
-
-    assertThat(spec.args.get()).isEmpty()
-    assertThat(spec.obfuscationEnabled.get()).isTrue()
-    assertThat(spec.optimizationEnabled.get()).isFalse()
-  }
+      assertThat(tool.get()).isEqualTo(MinimizeTool.R8)
+      assertThat(r8SpecForInputs).isSameInstanceAs(configured)
+      assertThat(r8Spec).isSameInstanceAs(configured)
+    }
 
   @Test
-  fun enablingOptimizationOnlyChangesOptimizationFlag() {
-    val spec = project.objects.newInstance(DefaultR8Spec::class.java)
-
-    spec.enableOptimization()
-
-    assertThat(spec.args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
-    assertThat(spec.obfuscationEnabled.get()).isFalse()
-    assertThat(spec.optimizationEnabled.get()).isTrue()
-  }
+  fun defaultR8SpecIsShrinkOnly() =
+    with(project.objects.newInstance(DefaultR8Spec::class.java)) {
+      assertThat(args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
+      assertThat(obfuscationEnabled.get()).isFalse()
+      assertThat(optimizationEnabled.get()).isFalse()
+      assertThat(keepRules.get()).isEmpty()
+      assertThat(keepRuleFiles.files).isEmpty()
+    }
 
   @Test
-  fun explicitArgumentsTakePrecedenceOverChangedDefaults() {
-    val spec = project.objects.newInstance(DefaultR8Spec::class.java)
-    spec.args.set(listOf("--debug"))
+  fun enablingObfuscationRemovesDefaultArgument() =
+    with(project.objects.newInstance(DefaultR8Spec::class.java)) {
+      enableObfuscation()
 
-    spec.enableObfuscation()
+      assertThat(args.get()).isEmpty()
+      assertThat(obfuscationEnabled.get()).isTrue()
+      assertThat(optimizationEnabled.get()).isFalse()
+    }
 
-    assertThat(spec.args.get()).containsExactly("--debug")
-  }
+  @Test
+  fun enablingOptimizationOnlyChangesOptimizationFlag() =
+    with(project.objects.newInstance(DefaultR8Spec::class.java)) {
+      enableOptimization()
+
+      assertThat(args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
+      assertThat(obfuscationEnabled.get()).isFalse()
+      assertThat(optimizationEnabled.get()).isTrue()
+    }
+
+  @Test
+  fun explicitArgumentsTakePrecedenceOverChangedDefaults() =
+    with(project.objects.newInstance(DefaultR8Spec::class.java)) {
+      args.set(listOf("--debug"))
+      enableObfuscation()
+
+      assertThat(args.get()).containsExactly("--debug")
+    }
 }

@@ -23,11 +23,12 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
     }
 
   @Test
-  fun hasTransformedResource() {
-    transformer.append("Tag", "Something")
+  fun hasTransformedResource() =
+    with(transformer) {
+      append("Tag", "Something")
 
-    assertThat(transformer.hasTransformedResource()).isTrue()
-  }
+      assertThat(hasTransformedResource()).isTrue()
+    }
 
   @Test
   fun hasNotTransformedResource() {
@@ -53,12 +54,12 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
     }
 
   @Test
-  fun noTransformation() {
-    val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()
-    transformer.transform(manifestTransformerContext)
-    val targetLines =
-      transformer.transformToJar().use { it.getStream(MANIFEST_NAME).reader().readLines() }
+  fun noTransformation() =
+    with(transformer) {
+      val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()
+      transform(manifestTransformerContext)
+      val targetLines = transformToJar().use { it.getStream(MANIFEST_NAME).reader().readLines() }
 
-    assertThat(targetLines).isEqualTo(sourceLines)
-  }
+      assertThat(targetLines).isEqualTo(sourceLines)
+    }
 }
