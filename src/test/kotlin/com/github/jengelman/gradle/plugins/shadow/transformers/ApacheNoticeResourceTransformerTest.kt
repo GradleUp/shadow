@@ -21,39 +21,42 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   }
 
   @Test
-  fun canTransformResource() {
-    assertThat(transformer.canTransformResource("META-INF/NOTICE")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.TXT")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/Notice.txt")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.md")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/Notice.md")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
-  }
+  fun canTransformResource() =
+    with(transformer) {
+      assertThat(canTransformResource("META-INF/NOTICE")).isTrue()
+      assertThat(canTransformResource("META-INF/NOTICE.TXT")).isTrue()
+      assertThat(canTransformResource("META-INF/Notice.txt")).isTrue()
+      assertThat(canTransformResource("META-INF/NOTICE.md")).isTrue()
+      assertThat(canTransformResource("META-INF/Notice.md")).isTrue()
+      assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
+    }
 
   @Test
-  fun canTransformByPattern() {
-    transformer.exclude("META-INF/NOTICE.txt")
-    transformer.include("META-INF/NOTICE.*")
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.txt")).isFalse()
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.log")).isTrue()
-  }
+  fun canTransformByPattern() =
+    with(transformer) {
+      exclude("META-INF/NOTICE.txt")
+      include("META-INF/NOTICE.*")
+      assertThat(canTransformResource("META-INF/NOTICE.txt")).isFalse()
+      assertThat(canTransformResource("META-INF/NOTICE.log")).isTrue()
+    }
 
   @Test
-  fun preamble1ShouldHaveATrailingSpace() {
-    val baos = ByteArrayOutputStream()
-    val zos = ZipOutputStream(baos)
+  fun preamble1ShouldHaveATrailingSpace() =
+    with(transformer) {
+      val baos = ByteArrayOutputStream()
+      val zos = ZipOutputStream(baos)
 
-    transformer.projectName.set("test-project")
-    transformer.transform(textContext(NOTICE_RESOURCE))
-    transformer.modifyOutputStream(zos, false)
-    zos.close()
+      projectName.set("test-project")
+      transform(textContext(NOTICE_RESOURCE))
+      modifyOutputStream(zos, false)
+      zos.close()
 
-    val zis = ZipInputStream(baos.toByteArray().inputStream())
-    zis.nextEntry
-    val output = zis.readAllBytes().toString(Charset.forName(transformer.charsetName.get()))
+      val zis = ZipInputStream(baos.toByteArray().inputStream())
+      zis.nextEntry
+      val output = zis.readAllBytes().toString(Charset.forName(charsetName.get()))
 
-    assertThat(output).contains("in this case for test-project")
-  }
+      assertThat(output).contains("in this case for test-project")
+    }
 
   private companion object {
     const val NOTICE_RESOURCE = "META-INF/NOTICE"
