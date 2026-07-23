@@ -50,6 +50,9 @@
 
 - Bump min Gradle requirement to 9.2.0. ([#2057](https://github.com/GradleUp/shadow/pull/2057))
 - Remove `afterEvaluate` when adding variants. ([#2056](https://github.com/GradleUp/shadow/pull/2056))
+
+### Deprecated
+
 - Deprecate `enableKotlinModuleRemapping` for `ShadowJar`. ([#2073](https://github.com/GradleUp/shadow/pull/2073))  
   Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files.
   This flag will be disabled and removed in the next major release.
@@ -145,8 +148,11 @@
 - Change the group of `startShadowScripts` from `application` to `other`. ([#1797](https://github.com/GradleUp/shadow/pull/1797))
 - Update ASM and jdependency to support Java 26. ([#1799](https://github.com/GradleUp/shadow/pull/1799))
 - Bump min Gradle requirement to 9.0.0. ([#1801](https://github.com/GradleUp/shadow/pull/1801))
-- Deprecate `PreserveFirstFoundResourceTransformer.resources`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
 - Make the output of `PropertiesFileTransformer` reproducible. ([#1861](https://github.com/GradleUp/shadow/pull/1861))
+
+### Deprecated
+
+- Deprecate `PreserveFirstFoundResourceTransformer.resources`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
 - Deprecate `ShadowCopyAction`. ([#1876](https://github.com/GradleUp/shadow/pull/1876))  
   It should not be used as a public API. Will be made internal in a future release.
 
@@ -196,6 +202,15 @@
   and `META-INF/groovy` will be merged into `META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule`.
 - Move injecting `Class-Path` manifest attr logic from `doFirst` into `copy`. ([#1720](https://github.com/GradleUp/shadow/pull/1720))
 - Move injecting `Main-Class` manifest attr logic from `doFirst` into `copy`. ([#1724](https://github.com/GradleUp/shadow/pull/1724))
+- Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
+- Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
+- Stop using start script templates bundled in Shadow. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
+- Bump min Java requirement to 17. ([#1744](https://github.com/GradleUp/shadow/pull/1744))
+- Require most optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
+- Make assemble depend on shadowJar even if it is added later. ([#1766](https://github.com/GradleUp/shadow/pull/1766))
+
+### Deprecated
+
 - Deprecate `InheritManifest` and `inheritFrom`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
   ```kotlin
   tasks.shadowJar {
@@ -209,12 +224,6 @@
     // But if you want to inherit the manifest for your custom `ShadowJar` task, you still need to do it explicitly.
   }
   ```
-- Use default `JavaExec` error message when main class is not set. ([#1725](https://github.com/GradleUp/shadow/pull/1725))
-- Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
-- Stop using start script templates bundled in Shadow. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
-- Bump min Java requirement to 17. ([#1744](https://github.com/GradleUp/shadow/pull/1744))
-- Require most optional properties non-null. ([#1745](https://github.com/GradleUp/shadow/pull/1745))
-- Make assemble depend on shadowJar even if it is added later. ([#1766](https://github.com/GradleUp/shadow/pull/1766))
 
 ### Fixed
 
@@ -503,6 +512,9 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 ### Changed
 
 - Update jdependency to support Java 27. ([#2040](https://github.com/GradleUp/shadow/pull/2040))
+
+### Deprecated
+
 - Deprecate `KnowsTask`, it will be removed in the next major release. ([#1957](https://github.com/GradleUp/shadow/pull/1957))
 
 ### Fixed
@@ -581,11 +593,14 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ### Changed
 
-- `ShadowExtension.component` has been deprecated, now you can use `component.shadow`
-  instead. ([#956](https://github.com/GradleUp/shadow/pull/956))
 - **BREAKING CHANGE:** update
   to [jdependency 2.11](https://github.com/tcurdt/jdependency/releases/tag/jdependency-2.11), this requires Java 11 or
   above to run. ([#974](https://github.com/GradleUp/shadow/pull/974))
+
+### Deprecated
+
+- `ShadowExtension.component` has been deprecated, now you can use `component.shadow`
+  instead. ([#956](https://github.com/GradleUp/shadow/pull/956))
 
 ### Fixed
 
