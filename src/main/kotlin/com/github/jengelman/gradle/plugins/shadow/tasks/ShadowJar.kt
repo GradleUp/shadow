@@ -36,7 +36,6 @@ import java.util.jar.JarFile
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
-import kotlin.io.extension
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
