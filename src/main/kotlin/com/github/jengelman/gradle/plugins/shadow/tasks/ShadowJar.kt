@@ -36,6 +36,7 @@ import java.util.jar.JarFile
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
+import kotlin.io.extension
 import kotlin.reflect.full.hasAnnotation
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
@@ -614,6 +615,16 @@ public abstract class ShadowJar : Jar() {
     }
 
   private fun addIncludedDependencies() {
+    val isAar: File.() -> Boolean = {
+      try {
+        extension.equals("aar", ignoreCase = true) &&
+          ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
+      } catch (_: ZipException) {
+        // File is not a valid ZIP, so it cannot be an AAR.
+        false
+      }
+    }
+
     includedDependencies.files.forEach { file ->
       when {
         !file.exists() -> {
@@ -622,7 +633,7 @@ public abstract class ShadowJar : Jar() {
         file.isDirectory -> {
           from(file)
         }
-        file.isAar -> {
+        file.isAar() -> {
           val message =
             """
             Shadowing AAR file is not supported.
@@ -785,13 +796,3 @@ public abstract class ShadowJar : Jar() {
     }
   }
 }
-
-private val File.isAar: Boolean
-  get() =
-    try {
-      extension.equals("aar", ignoreCase = true) &&
-        ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
-    } catch (_: ZipException) {
-      // File is not a valid ZIP, so it cannot be an AAR.
-      false
-    }
