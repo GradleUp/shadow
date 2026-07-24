@@ -127,7 +127,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
     minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
-      if (!enabled) return@zip project.provider { emptyList() }
+      if (!enabled) return@zip emptySet<File>()
       when (tool) {
         MinimizeTool.DEPENDENCY_ANALYZER,
         MinimizeTool.R8 -> project.getApiJars()
