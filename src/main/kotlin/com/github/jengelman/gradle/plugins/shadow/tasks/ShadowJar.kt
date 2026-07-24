@@ -389,7 +389,7 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
+  /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
   @Suppress("DEPRECATION")
   @JvmOverloads
   public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
