@@ -6,8 +6,8 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultR8Spec
-import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.R8Minimizer
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
@@ -77,9 +77,10 @@ import org.gradle.process.ExecOperations
 @ShadowDsl
 @CacheableTask
 public abstract class ShadowJar : Jar() {
-  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
-
   private val defaultR8Spec = objectFactory.newInstance(DefaultR8Spec::class.java)
+
+  private val defaultMinimizeSpec =
+    objectFactory.newInstance(DefaultMinimizeSpec::class.java, defaultR8Spec)
 
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
@@ -125,11 +126,36 @@ public abstract class ShadowJar : Jar() {
   )
   internal val enableR8: Property<Boolean> = objectFactory.property(false)
 
+  /** Options for [minimize]. */
+  @Deprecated(
+    message =
+      "Configure R8 with `ShadowJar.r8` instead. This compatibility property will be removed in Shadow 10."
+  )
+  @get:Nested
+  public open val minimizeSpec: @Suppress("DEPRECATION") MinimizeSpec = defaultMinimizeSpec
+
+  private val minimizeWithDependencyAnalyzer =
+    minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
+      @Suppress("DEPRECATION")
+      enabled && tool == MinimizeTool.DEPENDENCY_ANALYZER
+    }
+
+  private val legacyR8Enabled =
+    minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
+      @Suppress("DEPRECATION")
+      enabled && tool == MinimizeTool.R8
+    }
+
+  private val shouldRunR8 =
+    enableR8.zip(legacyR8Enabled) { explicitlyEnabled, legacyEnabled ->
+      explicitlyEnabled || legacyEnabled
+    }
+
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { enabled ->
+    minimizeWithDependencyAnalyzer.map { enabled ->
       if (enabled) {
-        dependencyFilterForMinimize.resolve(configurations.get()) - apiJars
+        defaultMinimizeSpec.resolve(configurations.get()) - apiJars
       } else {
         emptySet()
       }
@@ -138,7 +164,7 @@ public abstract class ShadowJar : Jar() {
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { enabled ->
+    minimizeWithDependencyAnalyzer.map { enabled ->
       if (enabled) {
         project.getApiJars()
       } else {
@@ -150,7 +176,7 @@ public abstract class ShadowJar : Jar() {
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.zip(enableR8) { minimizeEnabled, r8IsEnabled ->
+    minimizeWithDependencyAnalyzer.zip(shouldRunR8) { minimizeEnabled, r8IsEnabled ->
       if (minimizeEnabled || r8IsEnabled) {
         project.sourceSets.map { sourceSet ->
           sourceSet.output.classesDirs.filter(File::isDirectory)
@@ -165,11 +191,11 @@ public abstract class ShadowJar : Jar() {
   @get:Nested
   @get:Optional
   internal val r8SpecForInputs: R8Spec?
-    get() = if (enableR8.get()) defaultR8Spec else null
+    get() = if (shouldRunR8.get()) defaultR8Spec else null
 
   @get:Classpath
   public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
-    enableR8.map { enabled ->
+    shouldRunR8.map { enabled ->
       if (enabled) {
         // Use findByName so custom ShadowJar tasks can be configured even when shadowR8 isn't
         // registered.
@@ -359,11 +385,11 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize. */
+  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
-  public open fun minimize(action: Action<DependencyFilter> = Action {}) {
+  public open fun minimize(action: Action<in @Suppress("DEPRECATION") MinimizeSpec> = Action {}) {
     minimizeJar.set(true)
-    action.execute(dependencyFilterForMinimize)
+    action.execute(defaultMinimizeSpec)
   }
 
   /** Enable R8 post-processing and execute the [action] with the [R8Spec]. */
@@ -566,7 +592,7 @@ public abstract class ShadowJar : Jar() {
       }
     }
     val unusedClasses =
-      if (minimizeJar.get()) {
+      if (minimizeWithDependencyAnalyzer.get()) {
         val unusedTracker =
           UnusedTracker(
             sourceSetsClassesDirs = sourceSetsClassesDirs.files,
@@ -737,7 +763,7 @@ public abstract class ShadowJar : Jar() {
   }
 
   private fun minimizeWithR8() {
-    if (!enableR8.get()) return
+    if (!shouldRunR8.get()) return
     R8Minimizer(
         execOperations = execOperations,
         logger = logger,

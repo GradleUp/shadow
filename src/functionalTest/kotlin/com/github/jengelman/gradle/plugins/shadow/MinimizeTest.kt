@@ -328,6 +328,35 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun legacyMinimizeR8DslDelegatesToStandaloneR8() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        minimize {
+          r8 {
+            proguardRules.add("-keep class client.Reflective { *; }")
+          }
+        }
+        """
+          .trimIndent()
+    )
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        "client/",
+        "client/Used.class",
+        "client/Reflective.class",
+        *manifestEntries,
+      )
+    }
+  }
+
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun enableR8ByCliOption(enable: Boolean) {
