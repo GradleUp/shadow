@@ -72,14 +72,18 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 > When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from 
 > minimization as well.
 
-## Minimizing with R8
+## Post-processing with R8
 
 Shadow can also run [R8](https://r8.googlesource.com/r8) over the final shadowed JAR. This is useful when you want
-whole-program shrinking instead of the default dependency analyzer. R8 runs after Shadow has merged, transformed, and
-relocated the JAR, so service descriptors in `META-INF/services` are used to keep service providers.
+whole-program shrinking independently of the default dependency analyzer. R8 runs after Shadow has merged,
+transformed, relocated, and optionally minimized the JAR, so service descriptors in `META-INF/services` are used to
+keep service providers.
 
 The default R8 configuration only shrinks unused code. It disables name minification and optimization.
 Shadow also extracts R8 rules published in dependency JARs, for example under `META-INF/proguard`.
+
+The `minimize` and `r8` blocks are independent and can be enabled separately or together. Dependency exclusions in
+`minimize` only configure Shadow's dependency analyzer; use ProGuard rules to keep classes during R8 post-processing.
 
 === "Kotlin"
 
@@ -89,12 +93,10 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
     }
 
     tasks.shadowJar {
-      minimize {
-        r8 {
-          // Optional extra configuration
-          proguardRules.add("-keep class com.example.ReflectiveApi { *; }")
-          proguardRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
-        }
+      r8 {
+        // Optional extra configuration
+        proguardRules.add("-keep class com.example.ReflectiveApi { *; }")
+        proguardRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
       }
     }
     ```
@@ -107,12 +109,10 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      minimize {
-        r8 {
-          // Optional extra configuration
-          proguardRules.add('-keep class com.example.ReflectiveApi { *; }')
-          proguardRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
-        }
+      r8 {
+        // Optional extra configuration
+        proguardRules.add('-keep class com.example.ReflectiveApi { *; }')
+        proguardRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
       }
     }
     ```
@@ -150,10 +150,8 @@ For example, to downgrade R8 warnings to info:
     }
 
     tasks.shadowJar {
-      minimize {
-        r8 {
-          args.addAll(listOf("--map-diagnostics", "warning", "info"))
-        }
+      r8 {
+        args.addAll(listOf("--map-diagnostics", "warning", "info"))
       }
     }
     ```
@@ -166,10 +164,8 @@ For example, to downgrade R8 warnings to info:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      minimize {
-        r8 {
-          args.addAll(['--map-diagnostics', 'warning', 'info'])
-        }
+      r8 {
+        args.addAll(['--map-diagnostics', 'warning', 'info'])
       }
     }
     ```
@@ -184,10 +180,8 @@ To enable name obfuscation:
     }
 
     tasks.shadowJar {
-      minimize {
-        r8 {
-          enableObfuscation()
-        }
+      r8 {
+        enableObfuscation()
       }
     }
     ```
@@ -200,10 +194,8 @@ To enable name obfuscation:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      minimize {
-        r8 {
-          enableObfuscation()
-        }
+      r8 {
+        enableObfuscation()
       }
     }
     ```
@@ -218,10 +210,8 @@ To enable optimization:
     }
 
     tasks.shadowJar {
-      minimize {
-        r8 {
-          enableOptimization()
-        }
+      r8 {
+        enableOptimization()
       }
     }
     ```
@@ -234,10 +224,8 @@ To enable optimization:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      minimize {
-        r8 {
-          enableOptimization()
-        }
+      r8 {
+        enableOptimization()
       }
     }
     ```
@@ -252,11 +240,9 @@ To enable both:
     }
 
     tasks.shadowJar {
-      minimize {
-        r8 {
-          enableObfuscation()
-          enableOptimization()
-        }
+      r8 {
+        enableObfuscation()
+        enableOptimization()
       }
     }
     ```
@@ -269,11 +255,9 @@ To enable both:
     }
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      minimize {
-        r8 {
-          enableObfuscation()
-          enableOptimization()
-        }
+      r8 {
+        enableObfuscation()
+        enableOptimization()
       }
     }
     ```

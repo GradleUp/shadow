@@ -151,6 +151,7 @@ class ShadowPropertiesTest {
         @Suppress("DEPRECATION") assertThat(enableKotlinModuleRemapping.get()).isTrue()
         assertThat(failOnDuplicateEntries.get()).isFalse()
         assertThat(minimizeJar.get()).isFalse()
+        assertThat(enableR8.get()).isFalse()
         assertThat(mainClass.orNull).isNull()
         assertThat(javaLauncher.get().metadata.jvmVersion)
           .isEqualTo(

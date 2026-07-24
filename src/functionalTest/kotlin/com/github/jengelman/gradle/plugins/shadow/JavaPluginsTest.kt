@@ -125,6 +125,8 @@ class JavaPluginsTest : BasePluginTest() {
         "--no-add-multi-release-attribute     Disables option --add-multi-release-attribute.",
         "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
         "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
+        "--enable-r8     Runs R8 over the final shadowed JAR.",
+        "--no-enable-r8     Disables option --enable-r8.",
         "--enable-kotlin-module-remapping     Enables remapping of Kotlin module metadata files.",
         "--no-enable-kotlin-module-remapping     Disables option --enable-kotlin-module-remapping.",
         "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
@@ -822,9 +824,7 @@ class JavaPluginsTest : BasePluginTest() {
       """
         ${getDefaultProjectBuildScript(applyShadowPlugin = false)}
         def $customShadowJar = tasks.register('$customShadowJar', ${ShadowJar::class.java.name}) {
-          minimize {
-            r8 {}
-          }
+          r8 {}
         }
       """
         .trimIndent()
@@ -834,7 +834,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(result.output)
       .contains(
-        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+        "R8 post-processing requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
       )
   }
 

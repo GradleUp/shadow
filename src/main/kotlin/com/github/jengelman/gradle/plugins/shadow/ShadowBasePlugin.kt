@@ -26,7 +26,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
         it.description = "Specify runtime dependencies that are not merged into the final JAR."
       }
       configurations.register(R8_CONFIGURATION_NAME) {
-        it.description = "R8 executable used by ShadowJar R8 minimization."
+        it.description = "R8 executable used by ShadowJar post-processing."
         it.isCanBeConsumed = false
         // Defer the dependency resolving.
         it.isCanBeResolved = false

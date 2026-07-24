@@ -286,6 +286,9 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public final fun minimize ()V
 	public fun minimize (Lorg/gradle/api/Action;)V
 	public static synthetic fun minimize$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
+	public final fun r8 ()V
+	public fun r8 (Lorg/gradle/api/Action;)V
+	public static synthetic fun r8$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public final fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)V
 	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)V
 	public final fun relocate (Ljava/lang/Class;)V

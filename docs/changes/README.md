@@ -6,6 +6,8 @@
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))
+- Deprecate `minimize { r8 { ... } }` in favor of the standalone `r8 { ... }` block. ([#2123](https://github.com/GradleUp/shadow/pull/2123))  
+  The previous DSL remains available as a compatibility layer until Shadow 10.
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 
