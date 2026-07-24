@@ -39,8 +39,8 @@ class MinimizeSpecsTest {
       assertThat(args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
       assertThat(obfuscationEnabled.get()).isFalse()
       assertThat(optimizationEnabled.get()).isFalse()
-      assertThat(keepRules.get()).isEmpty()
-      assertThat(keepRuleFiles.files).isEmpty()
+      assertThat(proguardRules.get()).isEmpty()
+      assertThat(proguardRuleFiles.files).isEmpty()
     }
 
   @Test

@@ -347,8 +347,8 @@ class CachingTest : BasePluginTest() {
     try {
       writeR8Repository()
       writeR8ClientAndServerModules()
-      val keepRules = path("server/r8-rules.pro")
-      keepRules.writeText("")
+      val proguardRules = path("server/r8-rules.pro")
+      proguardRules.writeText("")
 
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
@@ -361,7 +361,7 @@ class CachingTest : BasePluginTest() {
         )
       }
 
-      keepRules.writeText("-keep class client.Reflective { *; }")
+      proguardRules.writeText("-keep class client.Reflective { *; }")
 
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
@@ -670,7 +670,7 @@ class CachingTest : BasePluginTest() {
         $shadowJarTask {
           minimize {
             r8 {
-              keepRuleFiles.from(file("r8-rules.pro"))
+              proguardRuleFiles.from(file("r8-rules.pro"))
             }
           }
         }

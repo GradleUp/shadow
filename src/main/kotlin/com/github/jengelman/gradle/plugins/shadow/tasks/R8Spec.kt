@@ -18,13 +18,30 @@ public interface R8Spec {
    */
   @get:Input public val args: ListProperty<String>
 
-  /** Additional ProGuard/R8 keep rules. */
-  @get:Input public val keepRules: ListProperty<String>
+  @Deprecated(
+    message = "Use `proguardRules` instead. This will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("proguardRules"),
+  )
+  @get:Input
+  public val keepRules: ListProperty<String>
+    get() = proguardRules
 
-  /** Files containing additional ProGuard/R8 keep rules. */
+  /** Additional ProGuard/R8 rules. */
+  @get:Input public val proguardRules: ListProperty<String>
+
+  @Deprecated(
+    message = "Use `proguardRuleFiles` instead. This will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("proguardRuleFiles"),
+  )
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val keepRuleFiles: ConfigurableFileCollection
+    get() = proguardRuleFiles
+
+  /** Files containing additional ProGuard/R8 rules. */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  public val proguardRuleFiles: ConfigurableFileCollection
 
   /**
    * Enable R8 name obfuscation while keeping Shadow's default no-optimization behavior.

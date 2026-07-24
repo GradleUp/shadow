@@ -226,8 +226,10 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun enableObfuscation ()V
 	public abstract fun enableOptimization ()V
 	public abstract fun getArgs ()Lorg/gradle/api/provider/ListProperty;
-	public abstract fun getKeepRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
-	public abstract fun getKeepRules ()Lorg/gradle/api/provider/ListProperty;
+	public fun getKeepRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getKeepRules ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getProguardRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getProguardRules ()Lorg/gradle/api/provider/ListProperty;
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
