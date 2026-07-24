@@ -27,9 +27,8 @@ import org.gradle.process.ExecOperations
  * replacing the original jar.
  *
  * Generated rules are based on the final jar contents. Source-set classes are kept as roots,
- * dependencies excluded from minimization are kept, service descriptors keep providers for
- * downstream `ServiceLoader` users, and R8 consumer rules are extracted from the jar. User rule
- * files and inline rules are appended last.
+ * service descriptors keep providers for downstream `ServiceLoader` users, and R8 consumer rules
+ * are extracted from the jar. User rule files and inline rules are appended last.
  *
  * The default R8 configuration is shrink-only. Shadow passes `--no-minification` to disable name
  * obfuscation and generates `-dontoptimize` unless optimization is enabled explicitly.
@@ -41,7 +40,6 @@ internal class R8Minimizer(
   private val r8Spec: DefaultR8Spec,
   private val javaLauncher: Provider<JavaLauncher>,
   private val sourceSetsClassesDirs: Iterable<File>,
-  private val keptDependencyFiles: Iterable<File>,
   private val relocators: Iterable<Relocator>,
   private val preserveFileTimestamps: Boolean,
   private val reproducibleFileOrder: Boolean,
@@ -52,7 +50,7 @@ internal class R8Minimizer(
   fun minimize(inputJar: File, temporaryDir: File) {
     if (r8Classpath.isEmpty) {
       throw GradleException(
-        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+        "R8 post-processing requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
       )
     }
 
@@ -65,7 +63,7 @@ internal class R8Minimizer(
     val javaHome =
       launcher?.metadata?.installationPath?.asFile?.absolutePath ?: System.getProperty("java.home")
     if (javaHome.isNullOrBlank()) {
-      throw GradleException("R8 minimization requires the java.home system property.")
+      throw GradleException("R8 post-processing requires the java.home system property.")
     }
 
     extractClasspathRules(inputJar, extractedRulesFile, launcher)
@@ -137,7 +135,6 @@ internal class R8Minimizer(
         add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
       }
       addAll(sourceProguardRules(inputJar))
-      addAll(keptDependencyRules(inputJar))
       addAll(serviceProguardRules(inputJar))
       addAll(extractedRulesFile.readLines())
       r8Spec.proguardRuleFiles.files
@@ -177,22 +174,6 @@ internal class R8Minimizer(
       .distinct()
       .sorted()
       .map { "-keep,includedescriptorclasses class $it { *; }" }
-      .toList()
-  }
-
-  // Keep dependencies users explicitly excluded from minimization, matching the existing
-  // minimize { exclude(...) } contract for the default analyzer.
-  private fun keptDependencyRules(inputJar: File): List<String> {
-    val jarClasses = jarClassEntries(inputJar)
-    return keptDependencyFiles
-      .asSequence()
-      .flatMap { it.classNames() }
-      .map { relocators.relocateClass(it) }
-      .filter { it.isJavaTypeName() }
-      .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
-      .distinct()
-      .sorted()
-      .map { "-keep class $it { *; }" }
       .toList()
   }
 
@@ -242,35 +223,6 @@ internal class R8Minimizer(
       .replace(File.separatorChar, '/')
       .removeSuffix(".class")
       .replace('/', '.')
-  }
-
-  private fun File.classNames(): Sequence<String> {
-    return when {
-      isDirectory ->
-        walkTopDown()
-          .filter { it.isFile && it.name.endsWith(".class") }
-          .mapNotNull {
-            it.toClassName(relativeTo = this)
-          }
-      isFile ->
-        JarFile(this)
-          .use { jarFile ->
-            jarFile
-              .entries()
-              .asSequence()
-              .filter { !it.isDirectory && it.name.endsWith(".class") }
-              .mapNotNull { it.name.toClassName() }
-              .toList()
-          }
-          .asSequence()
-      else -> emptySequence()
-    }
-  }
-
-  private fun String.toClassName(): String? {
-    val name = substringAfterLast('/')
-    if (name == "module-info.class" || name == "package-info.class") return null
-    return removeSuffix(".class").replace('/', '.')
   }
 
   // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve

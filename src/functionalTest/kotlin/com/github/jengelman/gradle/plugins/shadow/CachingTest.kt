@@ -668,10 +668,8 @@ class CachingTest : BasePluginTest() {
           implementation project(':client')
         }
         $shadowJarTask {
-          minimize {
-            r8 {
-              proguardRuleFiles.from(file("r8-rules.pro"))
-            }
+          r8 {
+            proguardRuleFiles.from(file("r8-rules.pro"))
           }
         }
         """

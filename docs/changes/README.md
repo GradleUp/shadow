@@ -3,6 +3,12 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.6.1...HEAD) - 2026-xx-xx
 
+### Changed
+
+- **BREAKING CHANGE:** Move R8 configuration from `minimize { r8 { ... } }` to an independent
+  `r8 { ... }` post-processing block backed by the `enableR8` property and `--enable-r8` command
+  line option. `minimize` exclusions no longer generate R8/ProGuard rules.
+
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))

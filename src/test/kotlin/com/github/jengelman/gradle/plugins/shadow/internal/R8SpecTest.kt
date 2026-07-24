@@ -3,35 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.isEmpty
-import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNull
-import assertk.assertions.isSameInstanceAs
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.tasks.MinimizeTool
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 
-class MinimizeSpecsTest {
+class R8SpecTest {
   private val project = ProjectBuilder.builder().build()
-
-  @Test
-  fun defaultMinimizeSpecUsesDependencyAnalyzer() =
-    with(project.objects.newInstance(DefaultMinimizeSpec::class.java, project)) {
-      assertThat(tool.get()).isEqualTo(MinimizeTool.DEPENDENCY_ANALYZER)
-      assertThat(r8SpecForInputs).isNull()
-    }
-
-  @Test
-  fun r8ConfiguresToolAndExposesSameSpecAsInput() =
-    with(project.objects.newInstance(DefaultMinimizeSpec::class.java, project)) {
-      lateinit var configured: Any
-      r8 { configured = it }
-
-      assertThat(tool.get()).isEqualTo(MinimizeTool.R8)
-      assertThat(r8SpecForInputs).isSameInstanceAs(configured)
-      assertThat(r8Spec).isSameInstanceAs(configured)
-    }
 
   @Test
   fun defaultR8SpecIsShrinkOnly() =

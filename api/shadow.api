@@ -209,19 +209,6 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
-	public abstract fun getTool ()Lorg/gradle/api/provider/Property;
-	public abstract fun r8 (Lorg/gradle/api/Action;)V
-}
-
-public final class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool : java/lang/Enum {
-	public static final field DEPENDENCY_ANALYZER Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
-	public static final field R8 Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
-	public static fun getEntries ()Lkotlin/enums/EnumEntries;
-	public static fun valueOf (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
-	public static fun values ()[Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
-}
-
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/R8Spec {
 	public abstract fun enableObfuscation ()V
 	public abstract fun enableOptimization ()V
@@ -271,7 +258,6 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
-	public fun getMinimizeSpec ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec;
 	public fun getR8Classpath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
@@ -286,6 +272,9 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public final fun minimize ()V
 	public fun minimize (Lorg/gradle/api/Action;)V
 	public static synthetic fun minimize$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
+	public final fun r8 ()V
+	public fun r8 (Lorg/gradle/api/Action;)V
+	public static synthetic fun r8$default (Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar;Lorg/gradle/api/Action;ILjava/lang/Object;)V
 	public final fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;)V
 	public fun relocate (Lcom/github/jengelman/gradle/plugins/shadow/relocation/Relocator;Lorg/gradle/api/Action;)V
 	public final fun relocate (Ljava/lang/Class;)V

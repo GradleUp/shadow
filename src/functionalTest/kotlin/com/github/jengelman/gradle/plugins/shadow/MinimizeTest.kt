@@ -305,14 +305,12 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8ShrinksUnusedDependencyClasses() {
+  fun r8ShrinksUnusedDependencyClasses() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {}
-        }
+        r8 {}
         """
           .trimIndent()
     )
@@ -330,8 +328,43 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun enableR8ByCliOption(enable: Boolean) {
+    writeR8Repository()
+    writeR8ClientAndServerModules(serverShadowBlock = "")
+
+    if (enable) {
+      runWithSuccess(serverShadowJarPath, "--enable-r8")
+    } else {
+      runWithSuccess(serverShadowJarPath, "--no-enable-r8")
+    }
+
+    assertThat(outputServerShadowedJar).useAll {
+      if (enable) {
+        containsOnly(
+          "server/",
+          "server/Server.class",
+          "client/",
+          "client/Used.class",
+          *manifestEntries,
+        )
+      } else {
+        containsOnly(
+          "server/",
+          "server/Server.class",
+          "client/",
+          "client/Used.class",
+          "client/Unused.class",
+          "client/Reflective.class",
+          *manifestEntries,
+        )
+      }
+    }
+  }
+
   @Test
-  fun minimizeWithR8KeepsServiceProviders() {
+  fun r8KeepsServiceProviders() {
     writeR8Repository()
     writeR8ServiceModules()
 
@@ -358,15 +391,13 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8HonorsCustomProguardRules() {
+  fun r8HonorsCustomProguardRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            proguardRules.add("-keep class client.Reflective { *; }")
-          }
+        r8 {
+          proguardRules.add("-keep class client.Reflective { *; }")
         }
         """
           .trimIndent()
@@ -387,14 +418,12 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8UsesClasspathRules() {
+  fun r8UsesClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {}
-        }
+        r8 {}
         """
           .trimIndent()
     )
@@ -418,14 +447,12 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8PreservesRepeatedLinesInClasspathRules() {
+  fun r8PreservesRepeatedLinesInClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {}
-        }
+        r8 {}
         """
           .trimIndent()
     )
@@ -460,15 +487,13 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8CanEnableObfuscation() {
+  fun r8CanEnableObfuscation() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            enableObfuscation()
-          }
+        r8 {
+          enableObfuscation()
         }
         """
           .trimIndent()
@@ -488,15 +513,13 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8CanEnableOptimization() {
+  fun r8CanEnableOptimization() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            enableOptimization()
-          }
+        r8 {
+          enableOptimization()
         }
         """
           .trimIndent()
@@ -514,14 +537,16 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8HonorsDependencyExcludes() {
+  fun minimizeAndR8CanBeConfiguredIndependently() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
         minimize {
           exclude(project(':client'))
-          r8 {}
+        }
+        r8 {
+          proguardRules.add("-keep class client.** { *; }")
         }
         """
           .trimIndent()
@@ -543,7 +568,7 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8UsesJavaToolchain() {
+  fun r8UsesJavaToolchain() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverProjectBlock =
@@ -558,9 +583,7 @@ class MinimizeTest : BasePluginTest() {
         doFirst {
           logger.lifecycle("R8 launcher JDK " + javaLauncher.get().metadata.languageVersion.asInt())
         }
-        minimize {
-          r8 {}
-        }
+        r8 {}
         """
           .trimIndent(),
     )
@@ -800,9 +823,7 @@ class MinimizeTest : BasePluginTest() {
           implementation project(':service')
         }
         $shadowJarTask {
-          minimize {
-            r8 {}
-          }
+          r8 {}
         }
         """
           .trimIndent() + lineSeparator
