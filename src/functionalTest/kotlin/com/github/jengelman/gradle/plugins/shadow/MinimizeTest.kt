@@ -393,6 +393,32 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
+  fun disableR8ByCliOptionOverridesR8Block() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        r8 {}
+        """
+          .trimIndent()
+    )
+
+    runWithSuccess(serverShadowJarPath, "--no-enable-r8")
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        "client/",
+        "client/Used.class",
+        "client/Unused.class",
+        "client/Reflective.class",
+        *manifestEntries,
+      )
+    }
+  }
+
+  @Test
   fun r8KeepsServiceProviders() {
     writeR8Repository()
     writeR8ServiceModules()
