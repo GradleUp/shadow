@@ -152,14 +152,14 @@ Here are the options that can be passed to the `shadowJar`:
 --no-add-multi-release-attribute      Disables option --add-multi-release-attribute.
 --enable-auto-relocation              Enables auto relocation of packages in the dependencies.
 --no-enable-auto-relocation           Disables option --enable-auto-relocation.
---enable-r8                           Runs R8 over the final shadowed JAR.
+--enable-r8                           Post-processes the assembled shadowed JAR with R8.
 --no-enable-r8                        Disables option --enable-r8.
 --enable-kotlin-module-remapping      Enables remapping of Kotlin module metadata files.
 --no-enable-kotlin-module-remapping   Disables option --enable-kotlin-module-remapping.
 --fail-on-duplicate-entries           Fails build if the ZIP entries in the shadowed JAR are duplicate.
 --no-fail-on-duplicate-entries        Disables option --fail-on-duplicate-entries.
 --main-class                          Main class attribute to add to manifest.
---minimize-jar                        Minimizes the jar by removing unused classes.
+--minimize-jar                        Uses Shadow's dependency analyzer to remove unused dependency classes.
 --no-minimize-jar                     Disables option --minimize-jar.
 --relocation-prefix                   Prefix used for auto relocation of packages in the dependencies.
 --rerun                               Causes the task to be re-run even if up-to-date.

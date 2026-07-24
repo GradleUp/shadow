@@ -103,9 +103,16 @@ public abstract class ShadowJar : Jar() {
   }
 
   /**
-   * Minimizes the jar by removing unused classes.
+   * Enables Shadow's built-in dependency-analysis minimization.
+   *
+   * Shadow removes unused classes from selected dependency JARs while assembling the shadowed JAR.
+   * This is independent of R8 post-processing. If both are enabled, dependency-analysis
+   * minimization runs first.
    *
    * Defaults to `false`.
+   *
+   * @see [minimize]
+   * @see [r8]
    */
   @Deprecated(
     message = "Use `minimize()` instead. This property will be made non-public in Shadow 10.",
@@ -114,19 +121,26 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(
     option = "minimize-jar",
-    description = "Minimizes the jar by removing unused classes.",
+    description = "Uses Shadow's dependency analyzer to remove unused dependency classes.",
   )
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Runs R8 over the final shadowed JAR.
+   * Enables R8 post-processing of the assembled shadowed JAR.
+   *
+   * R8 runs after Shadow has merged, transformed, and relocated the JAR, and after optional
+   * dependency-analysis minimization. R8 uses [R8Spec] rules and does not use dependency exclusions
+   * configured by [minimize].
    *
    * Defaults to `false`.
+   *
+   * @see [r8]
+   * @see [minimize]
    */
   @get:Input
   @get:Option(
     option = "enable-r8",
-    description = "Runs R8 over the final shadowed JAR.",
+    description = "Post-processes the assembled shadowed JAR with R8.",
   )
   internal val enableR8: Property<Boolean> = objectFactory.property(false)
 
@@ -389,7 +403,12 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
+  /**
+   * Enable Shadow's dependency-analysis minimization and configure dependency exclusions.
+   *
+   * This removes unused classes from selected dependency JARs while assembling the shadowed JAR. It
+   * does not enable R8. If [r8] is also configured, R8 post-processing runs afterward.
+   */
   @Suppress("DEPRECATION")
   @JvmOverloads
   public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
@@ -397,7 +416,12 @@ public abstract class ShadowJar : Jar() {
     action.execute(defaultMinimizeSpec)
   }
 
-  /** Enable R8 post-processing and execute the [action] with the [R8Spec]. */
+  /**
+   * Enable R8 post-processing and configure it with the supplied [action].
+   *
+   * R8 processes the assembled shadowed JAR after merging, transformation, relocation, and optional
+   * dependency-analysis minimization. Calling this does not enable [minimize].
+   */
   @JvmOverloads
   public open fun r8(action: Action<R8Spec> = Action {}) {
     enableR8.set(true)

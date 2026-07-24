@@ -8,7 +8,11 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
-/** Configures R8 post-processing enabled by [ShadowJar.r8]. */
+/**
+ * Configures R8 post-processing enabled by [ShadowJar.r8].
+ *
+ * R8 rules are independent of dependency exclusions configured by [ShadowJar.minimize].
+ */
 @ShadowDsl
 public interface R8Spec {
   /**

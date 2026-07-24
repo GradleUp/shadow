@@ -69,7 +69,7 @@ nav:
       - 'Dependencies': configuration/dependencies/README.md
       - 'Merging': configuration/merging/README.md
       - 'Relocation': configuration/relocation/README.md
-      - 'Minimizing': configuration/minimizing/README.md
+      - 'Minimizing and R8': configuration/minimizing/README.md
       - 'Reproducible Builds': configuration/reproducible-builds/README.md
   - 'Custom Tasks': custom-tasks/README.md
   - 'Application Plugin': application-plugin/README.md

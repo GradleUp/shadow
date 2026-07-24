@@ -1,7 +1,19 @@
-# Minimizing
+# Minimizing and R8 post-processing
 
-Shadow can automatically remove all JARs and classes of dependencies that are not used by the project, thereby
-minimizing the resulting shadowed JAR.
+Shadow provides two independent ways to reduce the contents of a shadowed JAR. Calling one does not enable the other.
+When both are enabled, `minimize()` runs first and R8 processes its result.
+
+| | `minimize()` | `r8()` |
+| --- | --- | --- |
+| Implementation | Shadow's dependency analyzer | R8 whole-program processing |
+| Execution stage | While assembling the shadowed JAR | After merging, transformation, relocation, and optional minimization |
+| Configuration | Dependency and project exclusions | R8 arguments and ProGuard/R8 rules |
+| Command-line option | `--minimize-jar` | `--enable-r8` |
+
+## Dependency-analysis minimization
+
+`minimize()` uses Shadow's dependency analyzer to remove unused classes from selected dependency JARs while assembling
+the shadowed JAR. It does not run R8.
 
 === "Kotlin"
 
@@ -82,8 +94,13 @@ keep service providers.
 The default R8 configuration only shrinks unused code. It disables name minification and optimization.
 Shadow also extracts R8 rules published in dependency JARs, for example under `META-INF/proguard`.
 
-The `minimize` and `r8` blocks are independent and can be enabled separately or together. Dependency exclusions in
-`minimize` only configure Shadow's dependency analyzer; use ProGuard rules to keep classes during R8 post-processing.
+Dependency exclusions in `minimize` only configure Shadow's dependency analyzer. They are not converted into R8 rules;
+use ProGuard/R8 rules to keep classes during R8 post-processing.
+
+!!! warning "Deprecated nested R8 configuration"
+
+    Shadow 9 accepts `minimize { r8 { ... } }` as a compatibility DSL, but this form selects R8 instead of running
+    Shadow's dependency analyzer. Move `r8 { ... }` outside `minimize` before upgrading to Shadow 10.
 
 === "Kotlin"
 
