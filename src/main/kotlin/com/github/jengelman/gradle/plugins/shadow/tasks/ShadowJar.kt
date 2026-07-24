@@ -107,6 +107,10 @@ public abstract class ShadowJar : Jar() {
    *
    * Defaults to `false`.
    */
+  @Deprecated(
+    message = "Use `minimize()` instead. This property will be made non-public in Shadow 10.",
+    replaceWith = ReplaceWith("minimize()"),
+  )
   @get:Input
   @get:Option(
     option = "minimize-jar",
@@ -134,15 +138,15 @@ public abstract class ShadowJar : Jar() {
   @get:Nested
   public open val minimizeSpec: @Suppress("DEPRECATION") MinimizeSpec = defaultMinimizeSpec
 
+  @Suppress("DEPRECATION")
   private val minimizeWithDependencyAnalyzer =
     minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
-      @Suppress("DEPRECATION")
       enabled && tool == MinimizeTool.DEPENDENCY_ANALYZER
     }
 
+  @Suppress("DEPRECATION")
   private val legacyR8Enabled =
     minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
-      @Suppress("DEPRECATION")
       enabled && tool == MinimizeTool.R8
     }
 
@@ -385,9 +389,10 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
+  /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
+  @Suppress("DEPRECATION")
   @JvmOverloads
-  public open fun minimize(action: Action<in @Suppress("DEPRECATION") MinimizeSpec> = Action {}) {
+  public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
     minimizeJar.set(true)
     action.execute(defaultMinimizeSpec)
   }
