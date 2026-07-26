@@ -13,9 +13,10 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
 import org.gradle.api.tasks.Internal
 
-// DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
 @ShadowDsl
-public interface DependencyFilter : Serializable {
+public interface DependencyFilter :
+  // DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
+  Serializable {
   /** Resolve a [configuration] against the [include]/[exclude] rules in the filter. */
   public fun resolve(configuration: Configuration): FileCollection
 
