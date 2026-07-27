@@ -289,7 +289,7 @@ public abstract class ShadowJar : Jar() {
   )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
-  @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
+  @Suppress("DEPRECATION")
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
@@ -549,9 +549,9 @@ public abstract class ShadowJar : Jar() {
       }
     val actualTransformers =
       transformers.get().let { set ->
-        @Suppress("DEPRECATION")
         if (
-          enableKotlinModuleRemapping.get() && set.none { it is KotlinModuleMetadataTransformer }
+          @Suppress("DEPRECATION") enableKotlinModuleRemapping.get() &&
+            set.none { it is KotlinModuleMetadataTransformer }
         ) {
           set + KotlinModuleMetadataTransformer::class.java.create(objectFactory)
         } else {

@@ -36,7 +36,7 @@ public open class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  private val includeResources by unsafeLazy { @Suppress("DEPRECATION") include(resources.get()) }
+  private val includeResources by unsafeLazy { include(@Suppress("DEPRECATION") resources.get()) }
 
   @get:Internal protected val found: MutableSet<String> = mutableSetOf()
 
