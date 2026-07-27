@@ -6,6 +6,7 @@ import assertk.assertions.isTrue
 import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import java.util.Properties
+import java.util.zip.ZipInputStream
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
@@ -85,7 +86,7 @@ class ZipEntryValidationTest {
     }
 
     val names =
-      java.util.zip.ZipInputStream(output.toByteArray().inputStream()).use { zis ->
+      ZipInputStream(output.toByteArray().inputStream()).use { zis ->
         val names = mutableSetOf<String>()
         while (true) {
           val entry = zis.nextEntry ?: break
