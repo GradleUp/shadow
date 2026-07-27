@@ -81,7 +81,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
      * it a prime choice to test for improper case-less string comparisons.
      */
     fun setupTurkishLocale() {
-      @Suppress("DEPRECATION") Locale.setDefault(Locale("tr"))
+      Locale.setDefault(@Suppress("DEPRECATION") Locale("tr"))
     }
   }
 }

@@ -219,7 +219,7 @@ public open class ShadowCopyAction(
   }
 
   public companion object {
-    @Suppress("DEPRECATION") private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+    private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
     private val ZipOutputStream.entries: List<ZipEntry>

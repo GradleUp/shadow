@@ -1,5 +1,5 @@
 [versions]
-minGradle = "9.2.0"
+minGradle = "9.4.0"
 kotlin = "2.4.10"
 moshi = "1.15.2"
 pluginPublish = "2.1.1"

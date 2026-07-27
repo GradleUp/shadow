@@ -107,6 +107,10 @@ public abstract class ShadowJar : Jar() {
    *
    * Defaults to `false`.
    */
+  @Deprecated(
+    message = "Use `minimize()` instead. This property will be made non-public in Shadow 10.",
+    replaceWith = ReplaceWith("minimize()"),
+  )
   @get:Input
   @get:Option(
     option = "minimize-jar",
@@ -135,13 +139,13 @@ public abstract class ShadowJar : Jar() {
   public open val minimizeSpec: @Suppress("DEPRECATION") MinimizeSpec = defaultMinimizeSpec
 
   private val minimizeWithDependencyAnalyzer =
-    minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
+    _minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
       @Suppress("DEPRECATION")
       enabled && tool == MinimizeTool.DEPENDENCY_ANALYZER
     }
 
   private val legacyR8Enabled =
-    minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
+    _minimizeJar.zip(defaultMinimizeSpec.tool) { enabled, tool ->
       @Suppress("DEPRECATION")
       enabled && tool == MinimizeTool.R8
     }
@@ -153,24 +157,14 @@ public abstract class ShadowJar : Jar() {
 
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeWithDependencyAnalyzer.map { enabled ->
-      if (enabled) {
-        defaultMinimizeSpec.resolve(configurations.get()) - apiJars
-      } else {
-        emptySet()
-      }
+    minimizeWithDependencyAnalyzer.map {
+      if (it) (defaultMinimizeSpec.resolve(configurations.get()) - apiJars) else emptySet()
     }
   }
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeWithDependencyAnalyzer.map { enabled ->
-      if (enabled) {
-        project.getApiJars()
-      } else {
-        emptySet<File>()
-      }
-    }
+    minimizeWithDependencyAnalyzer.map { if (it) project.getApiJars() else emptySet<File>() }
   }
 
   @get:InputFiles
@@ -339,7 +333,7 @@ public abstract class ShadowJar : Jar() {
   )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
-  @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
+  @Suppress("DEPRECATION")
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
@@ -385,10 +379,10 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
+  /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
   public open fun minimize(action: Action<in @Suppress("DEPRECATION") MinimizeSpec> = Action {}) {
-    minimizeJar.set(true)
+    _minimizeJar.set(true)
     action.execute(defaultMinimizeSpec)
   }
 
@@ -606,9 +600,9 @@ public abstract class ShadowJar : Jar() {
       }
     val actualTransformers =
       transformers.get().let { set ->
-        @Suppress("DEPRECATION")
         if (
-          enableKotlinModuleRemapping.get() && set.none { it is KotlinModuleMetadataTransformer }
+          @Suppress("DEPRECATION") enableKotlinModuleRemapping.get() &&
+            set.none { it is KotlinModuleMetadataTransformer }
         ) {
           set + KotlinModuleMetadataTransformer::class.java.create(objectFactory)
         } else {
@@ -638,6 +632,9 @@ public abstract class ShadowJar : Jar() {
     action.execute(transformer)
     transformers.add(transformer)
   }
+
+  private val _minimizeJar
+    get() = @Suppress("DEPRECATION") minimizeJar
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
