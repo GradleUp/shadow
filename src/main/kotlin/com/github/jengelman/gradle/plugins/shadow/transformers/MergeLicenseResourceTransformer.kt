@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import java.nio.charset.StandardCharsets.UTF_8
 import java.util.LinkedHashSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -119,7 +118,7 @@ public open class MergeLicenseResourceTransformer(
   }
 
   internal fun transformInternal(bytes: ByteArray) {
-    val content = bytes.toString(UTF_8).trim('\n', '\r')
+    val content = bytes.toString(Charsets.UTF_8).trim('\n', '\r')
     if (content.isNotEmpty()) {
       elements.add(content)
     }

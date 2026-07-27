@@ -3,9 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.File
-import java.nio.file.Files
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
+import kotlin.io.path.moveTo
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipOutputStream
@@ -98,7 +98,7 @@ internal class R8Minimizer(
     }
 
     normalizeJar(r8Output, normalizedOutput)
-    Files.move(normalizedOutput.toPath(), inputJar.toPath(), REPLACE_EXISTING)
+    normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
   }
 
   // R8's command line does not automatically apply consumer rules carried inside program jars.

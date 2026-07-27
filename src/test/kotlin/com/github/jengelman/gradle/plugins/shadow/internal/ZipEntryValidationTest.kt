@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
-import java.nio.charset.StandardCharsets
 import java.util.Properties
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
@@ -26,7 +25,7 @@ class ZipEntryValidationTest {
   fun propertiesInputStreamUsesRequestedCharsetAndComments() {
     val properties = Properties().apply { setProperty("greeting", "你好") }
 
-    val charset = StandardCharsets.UTF_16
+    val charset = Charsets.UTF_16
     val bytes = properties.inputStream(charset, "header").readBytes()
     val content = String(bytes, charset)
 
