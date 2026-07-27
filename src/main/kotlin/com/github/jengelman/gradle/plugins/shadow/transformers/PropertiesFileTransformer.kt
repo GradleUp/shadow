@@ -5,7 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
@@ -223,9 +223,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     }
 
     propertiesEntries.forEach { (path, props) ->
-      os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      props.writeWithoutComments(charset, os)
-      os.closeEntry()
+      os.writeEntry(path, preserveFileTimestamps) {
+        props.writeWithoutComments(charset, this)
+      }
     }
   }
 

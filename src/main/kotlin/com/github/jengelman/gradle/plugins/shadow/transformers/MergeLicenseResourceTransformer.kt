@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.util.LinkedHashSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -112,9 +112,9 @@ public open class MergeLicenseResourceTransformer(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
-    os.write(buildLicense().toByteArray())
-    os.closeEntry()
+    os.writeEntry(outputPath.get(), preserveFileTimestamps) {
+      write(buildLicense().toByteArray())
+    }
   }
 
   internal fun transformInternal(bytes: ByteArray) {

@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
@@ -94,10 +94,10 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(COMPONENTS_XML_PATH, preserveFileTimestamps))
-    os.write(transformedResource)
-    components.clear()
-    os.closeEntry()
+    os.writeEntry(COMPONENTS_XML_PATH, preserveFileTimestamps) {
+      write(transformedResource)
+      components.clear()
+    }
   }
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()

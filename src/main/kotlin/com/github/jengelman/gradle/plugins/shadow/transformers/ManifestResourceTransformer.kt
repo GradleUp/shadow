@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.IOException
 import java.util.jar.Attributes as JarAttribute
 import java.util.jar.JarFile.MANIFEST_NAME
@@ -75,9 +75,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     mainClass.get().takeIf(CharSequence::isNotEmpty)?.let { attributes[mainClassAttributeKey] = it }
     manifestEntries.get().forEach { (key, value) -> attributes[JarAttribute.Name(key)] = value }
 
-    os.putNextEntry(zipEntry(MANIFEST_NAME, preserveFileTimestamps))
-    manifest!!.write(os)
-    os.closeEntry()
+    os.writeEntry(MANIFEST_NAME, preserveFileTimestamps) {
+      manifest!!.write(this)
+    }
   }
 
   public open fun attributes(attributes: Map<String, JarAttribute>) {

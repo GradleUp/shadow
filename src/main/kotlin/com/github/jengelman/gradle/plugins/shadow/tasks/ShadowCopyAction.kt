@@ -4,6 +4,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
+import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
@@ -13,7 +14,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -104,17 +104,17 @@ public open class ShadowCopyAction(
       name.parentDirectoryEntries().asReversed().forEach { entryName ->
         if (!added.add(entryName)) return@forEach
         val details = visitedDirs[entryName.removeSuffix("/")]
-        val (lastModified, flag) =
+        val (lastModified, unixMode) =
           if (details == null) {
-            currentTimeMillis to UnixStat.DEFAULT_DIR_PERM
+            currentTimeMillis to UnixMode.directory()
           } else {
-            details.lastModified to details.permissions.toUnixNumeric()
+            details.lastModified to UnixMode.directory(details.permissions.toUnixNumeric())
           }
         zos.writeEntry(
           name = entryName,
           preserveLastModified = preserveFileTimestamps,
           lastModified = lastModified,
-          unixMode = UnixStat.DIR_FLAG or flag,
+          unixMode = unixMode,
         )
       }
     }
@@ -205,7 +205,7 @@ public open class ShadowCopyAction(
         name = entryName,
         preserveLastModified = preserveFileTimestamps,
         lastModified = lastModified,
-        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric(),
+        unixMode = UnixMode.file(permissions.toUnixNumeric()),
       ) {
         if (bytes == null) {
           copyTo(this)

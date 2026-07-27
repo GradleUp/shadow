@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.net.URL
@@ -51,12 +51,12 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
       val aggregator = PluginCache()
       aggregator.loadCacheFiles(urlEnumeration)
       relocatePlugins(aggregator)
-      os.putNextEntry(zipEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps))
-      // Prevent the aggregator to close the jar output.
-      aggregator.writeCache(CloseShieldOutputStream.wrap(os))
+      os.writeEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps) {
+        // Prevent the aggregator to close the jar output.
+        aggregator.writeCache(CloseShieldOutputStream.wrap(this))
+      }
     } finally {
       deleteTempFiles()
-      os.closeEntry()
     }
   }
 
