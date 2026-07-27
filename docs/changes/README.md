@@ -9,9 +9,10 @@
 
 ### Deprecated
 
-- Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))
-- Deprecate `ShadowJar.minimizeJar`; call `ShadowJar.minimize()` explicitly instead. ([#2124](https://github.com/GradleUp/shadow/pull/2124))  
-  The property will be made non-public in Shadow 10.
+- Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  
+  Calling `proguardRules` and `proguardRuleFiles` instead. The properties will be removed in Shadow 10.
+- Deprecate `ShadowJar.minimizeJar`. ([#2124](https://github.com/GradleUp/shadow/pull/2124))  
+  Calling `ShadowJar.minimize()` explicitly instead. The property will be made non-public in Shadow 10.
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 
