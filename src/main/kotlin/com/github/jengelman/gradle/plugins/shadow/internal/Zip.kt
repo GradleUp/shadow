@@ -41,9 +41,11 @@ internal inline fun ZipOutputStream.writeEntry(
       this.unixMode = unixMode
     }
   )
-  write()
-  closeEntry()
-}
+  try {
+    write()
+  } finally {
+    closeEntry()
+  }
 
 internal fun String.parentDirectoryEntries(): List<String> {
   val parents = mutableListOf<String>()
