@@ -1,13 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import java.util.jar.Attributes.Name as JarAttributeName
-import org.apache.tools.zip.ZipEntry
-import org.gradle.api.GradleException
 
 /** Known as `Main-Class` in the manifest file. */
 internal val mainClassAttributeKey = JarAttributeName.MAIN_CLASS.toString()
@@ -27,27 +24,6 @@ internal inline fun <reified T : Any> Any?.cast(): T = this as T
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun <T : Any> unsafeLazy(noinline initializer: () -> T): Lazy<T> =
   lazy(LazyThreadSafetyMode.NONE, initializer)
-
-internal inline fun zipEntry(
-  name: String,
-  preserveLastModified: Boolean = true,
-  lastModified: Long = -1,
-  block: ZipEntry.() -> Unit = {},
-): ZipEntry {
-  if (name.split('/', '\\').any { it == ".." }) {
-    throw GradleException("Malicious ZIP entry containing path traversal sequence: $name")
-  }
-
-  return ZipEntry(name).apply {
-    time =
-      if (preserveLastModified && lastModified >= 0) {
-        lastModified
-      } else {
-        CONSTANT_TIME_FOR_ZIP_ENTRIES
-      }
-    block()
-  }
-}
 
 internal fun Properties.inputStream(
   charset: Charset = Charsets.ISO_8859_1,

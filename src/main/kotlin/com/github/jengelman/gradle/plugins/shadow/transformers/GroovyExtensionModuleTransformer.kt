@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.util.Properties
 import org.apache.tools.zip.ZipOutputStream
@@ -66,9 +66,9 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   override fun hasTransformedResource(): Boolean = module.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, preserveFileTimestamps))
-    module.inputStream().use { it.copyTo(os) }
-    os.closeEntry()
+    os.writeEntry(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, preserveFileTimestamps) {
+      module.inputStream().use { it.copyTo(this) }
+    }
   }
 
   private fun handle(key: String, value: String, mergeValue: (String) -> Unit) {

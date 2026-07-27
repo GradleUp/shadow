@@ -3,10 +3,16 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
+import java.io.ByteArrayOutputStream
+import java.nio.file.Path
 import java.util.Properties
+import org.apache.tools.zip.UnixStat
+import org.apache.tools.zip.ZipFile
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.junit.jupiter.api.io.TempDir
 
 class ZipEntryValidationTest {
 
@@ -17,14 +23,34 @@ class ZipEntryValidationTest {
   }
 
   @Test
-  fun zipEntryUsesRequestedOrReproducibleTimestampAndAppliesConfiguration() {
-    val preserved = zipEntry("file", lastModified = 1234) { comment = "configured" }
-    val reproducible = zipEntry("file", preserveLastModified = false, lastModified = 1234)
-    val missingTimestamp = zipEntry("file", lastModified = -1)
+  fun writeEntryUsesRequestedOrReproducibleTimestampAndAppliesUnixMode(@TempDir tempDir: Path) {
+    val requestedTimestamp = 1_700_000_000_000
+    val archive = tempDir.resolve("output.jar").toFile()
+    ZipOutputStream(archive).use { output ->
+      output.writeEntry(
+        "preserved",
+        lastModified = requestedTimestamp,
+        unixMode = UnixMode.file(),
+      )
+      output.writeEntry("directory/", unixMode = UnixMode.directory(448))
+      output.writeEntry(
+        "reproducible",
+        preserveLastModified = false,
+        lastModified = requestedTimestamp,
+      )
+      output.writeEntry("missing-timestamp", lastModified = -1)
+    }
 
-    assertThat(preserved.time).isEqualTo(1234)
-    assertThat(preserved.comment).isEqualTo("configured")
-    assertThat(reproducible.time).isEqualTo(missingTimestamp.time)
+    ZipFile(archive).use { zip ->
+      val preserved = zip.getEntry("preserved")
+      val directory = zip.getEntry("directory/")
+      val reproducible = zip.getEntry("reproducible")
+      val missingTimestamp = zip.getEntry("missing-timestamp")
+      assertThat(preserved.time).isEqualTo(requestedTimestamp)
+      assertThat(preserved.unixMode).isEqualTo(UnixStat.FILE_FLAG or UnixStat.DEFAULT_FILE_PERM)
+      assertThat(directory.unixMode).isEqualTo(UnixStat.DIR_FLAG or 448)
+      assertThat(reproducible.time).isEqualTo(missingTimestamp.time)
+    }
   }
 
   @Test
@@ -51,9 +77,11 @@ class ZipEntryValidationTest {
         "relative/path/to/resource",
       )
 
-    for (name in validNames) {
-      val entry = zipEntry(name)
-      assertThat(entry.name).isEqualTo(name)
+    val output = ByteArrayOutputStream()
+    ZipOutputStream(output).use { zip ->
+      for (name in validNames) {
+        zip.writeEntry(name)
+      }
     }
   }
 
@@ -74,7 +102,7 @@ class ZipEntryValidationTest {
     for (name in maliciousNames) {
       val exception =
         assertThrows<GradleException> {
-          zipEntry(name)
+          ZipOutputStream(ByteArrayOutputStream()).use { it.writeEntry(name) }
         }
       assertThat(exception.message)
         .isEqualTo("Malicious ZIP entry containing path traversal sequence: $name")

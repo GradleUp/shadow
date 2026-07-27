@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import javax.inject.Inject
@@ -83,9 +83,9 @@ public open class KotlinModuleMetadataTransformer(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     moduleEntries.forEach { (path, bytes) ->
-      os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      os.write(bytes)
-      os.closeEntry()
+      os.writeEntry(path, preserveFileTimestamps) {
+        write(bytes)
+      }
     }
   }
 }

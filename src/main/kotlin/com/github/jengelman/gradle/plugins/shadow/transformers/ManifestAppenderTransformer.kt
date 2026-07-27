@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
@@ -53,21 +53,20 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun hasTransformedResource(): Boolean = attributes.get().isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(MANIFEST_NAME, preserveFileTimestamps))
-    os.write(manifestContents)
+    os.writeEntry(MANIFEST_NAME, preserveFileTimestamps) {
+      write(manifestContents)
 
-    if (attributes.get().isNotEmpty()) {
-      for ((key, value) in attributes.get()) {
-        os.write(key.toByteArray())
-        os.write(SEPARATOR)
-        os.write(value.toString().toByteArray())
-        os.write(EOL)
+      if (attributes.get().isNotEmpty()) {
+        for ((key, value) in attributes.get()) {
+          write(key.toByteArray())
+          write(SEPARATOR)
+          write(value.toString().toByteArray())
+          write(EOL)
+        }
+        write(EOL)
+        attributes.empty()
       }
-      os.write(EOL)
-      attributes.empty()
     }
-
-    os.closeEntry()
   }
 
   public open fun append(name: String, value: Comparable<*>) {

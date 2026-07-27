@@ -6,7 +6,6 @@ import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
 import kotlin.io.path.moveTo
-import org.apache.tools.zip.UnixStat
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
@@ -302,7 +301,7 @@ internal class R8Minimizer(
           zos.writeEntry(
             name = entryName,
             preserveLastModified = preserveFileTimestamps,
-            unixMode = UnixStat.DIR_FLAG or DEFAULT_DIR_MODE,
+            unixMode = UnixMode.directory(),
           )
         }
         if (added.add(entry.name)) {
@@ -310,7 +309,7 @@ internal class R8Minimizer(
             name = entry.name,
             preserveLastModified = preserveFileTimestamps,
             lastModified = entry.time,
-            unixMode = UnixStat.FILE_FLAG or DEFAULT_FILE_MODE,
+            unixMode = UnixMode.file(),
           ) {
             write(entry.bytes)
           }
@@ -352,8 +351,6 @@ internal class R8Minimizer(
     const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
     const val R8_RULES_MAIN_CLASS = "com.android.tools.r8.ExtractR8Rules"
     const val SERVICES_PATH = "META-INF/services/"
-    const val DEFAULT_DIR_MODE = 493 // 0755
-    const val DEFAULT_FILE_MODE = 420 // 0644
     // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
     // service lines, comments, malformed providers, and JVM-only names R8 would reject.
     val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")

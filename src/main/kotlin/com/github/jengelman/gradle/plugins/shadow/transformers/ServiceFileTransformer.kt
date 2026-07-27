@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import org.apache.tools.zip.ZipOutputStream
@@ -59,9 +59,9 @@ constructor(
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     serviceEntries.forEach { (path, data) ->
-      os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      os.write(data.joinToString("\n").toByteArray())
-      os.closeEntry()
+      os.writeEntry(path, preserveFileTimestamps) {
+        write(data.joinToString("\n").toByteArray())
+      }
     }
   }
 

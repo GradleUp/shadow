@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -52,13 +52,13 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun hasTransformedResource(): Boolean = data.size() > 0
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
-    data.let {
-      // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
-      it.toByteArray().inputStream().copyTo(os)
-      it.reset()
+    os.writeEntry(resource.get(), preserveFileTimestamps) {
+      data.let {
+        // Closing a ByteArrayOutputStream has no effect, so we don't use a use block here.
+        it.toByteArray().inputStream().copyTo(this)
+        it.reset()
+      }
     }
-    os.closeEntry()
   }
 
   public companion object {

@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -206,9 +206,9 @@ public open class ApacheNoticeResourceTransformer(
       }
     }
 
-    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
-    os.write(sb.toString().trim().toByteArray(charset))
-    os.closeEntry()
+    os.writeEntry(outputPath.get(), preserveFileTimestamps) {
+      write(sb.toString().trim().toByteArray(charset))
+    }
 
     entries.clear()
   }
