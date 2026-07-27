@@ -7,8 +7,6 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
 import kotlin.io.path.moveTo
 import org.apache.tools.zip.UnixStat
-import org.apache.tools.zip.Zip64Mode
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
@@ -292,50 +290,30 @@ internal class R8Minimizer(
           .toList()
       }
     val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
-    val entryCompressionMethod =
-      when (entryCompression) {
-        ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
-        ZipEntryCompression.STORED -> ZipOutputStream.STORED
-      }
-    val zipOutputStream =
-      if (entryCompressionMethod == ZipOutputStream.STORED) {
-        ZipOutputStream(outputJar)
-      } else {
-        ZipOutputStream(outputJar.outputStream().buffered())
-      }
-    zipOutputStream.use { zos ->
+    createZipOutputStream(outputJar, entryCompression, zip64).use { zos ->
       if (metadataCharset != null) {
         zos.setEncoding(metadataCharset)
       }
-      zos.setUseZip64(if (zip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
-      zos.setMethod(entryCompressionMethod)
       val added = mutableSetOf<String>()
 
-      fun addParentDirs(name: String) {
-        val parent = name.substringBeforeLast('/', "")
-        if (parent.isEmpty()) return
-        addParentDirs(parent)
-        val entryName = "$parent/"
-        if (added.add(entryName)) {
-          zos.putNextEntry(
-            zipEntry(entryName, preserveFileTimestamps) {
-              unixMode = UnixStat.DIR_FLAG or DEFAULT_DIR_MODE
-            }
-          )
-          zos.closeEntry()
-        }
-      }
-
       orderedEntries.forEach { entry ->
-        addParentDirs(entry.name)
-        if (added.add(entry.name)) {
-          zos.putNextEntry(
-            zipEntry(entry.name, preserveFileTimestamps, entry.time) {
-              unixMode = UnixStat.FILE_FLAG or DEFAULT_FILE_MODE
-            }
+        entry.name.parentDirectoryEntries().forEach { entryName ->
+          if (!added.add(entryName)) return@forEach
+          zos.writeEntry(
+            name = entryName,
+            preserveLastModified = preserveFileTimestamps,
+            unixMode = UnixStat.DIR_FLAG or DEFAULT_DIR_MODE,
           )
-          zos.write(entry.bytes)
-          zos.closeEntry()
+        }
+        if (added.add(entry.name)) {
+          zos.writeEntry(
+            name = entry.name,
+            preserveLastModified = preserveFileTimestamps,
+            lastModified = entry.time,
+            unixMode = UnixStat.FILE_FLAG or DEFAULT_FILE_MODE,
+          ) {
+            write(entry.bytes)
+          }
         }
       }
     }

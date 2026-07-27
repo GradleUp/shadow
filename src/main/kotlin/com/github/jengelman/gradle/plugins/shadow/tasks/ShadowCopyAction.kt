@@ -5,8 +5,9 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
+import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -99,28 +100,24 @@ public open class ShadowCopyAction(
     val added = entries.toMutableSet()
     val currentTimeMillis = System.currentTimeMillis()
 
-    fun addParent(name: String) {
-      val parent = name.substringBeforeLast('/', "")
-      val entryName = "$parent/"
-      if (parent.isNotEmpty() && added.add(entryName)) {
-        val details = visitedDirs[parent]
+    entries.forEach { name ->
+      name.parentDirectoryEntries().asReversed().forEach { entryName ->
+        if (!added.add(entryName)) return@forEach
+        val details = visitedDirs[entryName.removeSuffix("/")]
         val (lastModified, flag) =
           if (details == null) {
             currentTimeMillis to UnixStat.DEFAULT_DIR_PERM
           } else {
             details.lastModified to details.permissions.toUnixNumeric()
           }
-        val entry =
-          zipEntry(entryName, preserveFileTimestamps, lastModified) {
-            unixMode = UnixStat.DIR_FLAG or flag
-          }
-        zos.putNextEntry(entry)
-        zos.closeEntry()
-        addParent(parent)
+        zos.writeEntry(
+          name = entryName,
+          preserveLastModified = preserveFileTimestamps,
+          lastModified = lastModified,
+          unixMode = UnixStat.DIR_FLAG or flag,
+        )
       }
     }
-
-    entries.forEach { addParent(it) }
   }
 
   private fun checkDuplicateEntries(zos: ZipOutputStream) {
@@ -204,17 +201,18 @@ public open class ShadowCopyAction(
     }
 
     private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
-      val entry =
-        zipEntry(entryName, preserveFileTimestamps, lastModified) {
-          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+      zipOutStr.writeEntry(
+        name = entryName,
+        preserveLastModified = preserveFileTimestamps,
+        lastModified = lastModified,
+        unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric(),
+      ) {
+        if (bytes == null) {
+          copyTo(this)
+        } else {
+          write(bytes)
         }
-      zipOutStr.putNextEntry(entry)
-      if (bytes == null) {
-        copyTo(zipOutStr)
-      } else {
-        zipOutStr.write(bytes)
       }
-      zipOutStr.closeEntry()
     }
   }
 
