@@ -103,6 +103,10 @@ public abstract class ShadowJar : Jar() {
    *
    * Defaults to `false`.
    */
+  @Deprecated(
+    message = "Use `minimize()` instead. This property will be made non-public in Shadow 10.",
+    replaceWith = ReplaceWith("minimize()"),
+  )
   @get:Input
   @get:Option(
     option = "minimize-jar",
@@ -115,20 +119,20 @@ public abstract class ShadowJar : Jar() {
 
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
+    _minimizeJar.map {
       if (it) (defaultMinimizeSpec.resolve(configurations.get()) - apiJars) else emptySet()
     }
   }
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
+    _minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
   }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
+    _minimizeJar.map {
       if (it) {
         project.sourceSets.map { sourceSet ->
           sourceSet.output.classesDirs.filter(File::isDirectory)
@@ -141,7 +145,7 @@ public abstract class ShadowJar : Jar() {
 
   @get:Classpath
   public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
+    _minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
       if (enabled && tool == MinimizeTool.R8) {
         // Use findByName so custom ShadowJar tasks can be configured even when shadowR8 isn't
         // registered.
@@ -331,10 +335,10 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [MinimizeSpec] for minimize. */
+  /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
   public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
-    minimizeJar.set(true)
+    _minimizeJar.set(true)
     action.execute(minimizeSpec)
   }
 
@@ -531,7 +535,7 @@ public abstract class ShadowJar : Jar() {
       }
     }
     val unusedClasses =
-      if (minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
+      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         val unusedTracker =
           UnusedTracker(
             sourceSetsClassesDirs = sourceSetsClassesDirs.files,
@@ -577,6 +581,9 @@ public abstract class ShadowJar : Jar() {
     action.execute(transformer)
     transformers.add(transformer)
   }
+
+  private val _minimizeJar
+    get() = @Suppress("DEPRECATION") minimizeJar
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
@@ -702,7 +709,7 @@ public abstract class ShadowJar : Jar() {
   }
 
   private fun minimizeWithR8() {
-    val useR8 = minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
+    val useR8 = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
     if (!useR8) return
     val keptDependencyFiles = includedDependencies.files - toMinimize.files
     R8Minimizer(
