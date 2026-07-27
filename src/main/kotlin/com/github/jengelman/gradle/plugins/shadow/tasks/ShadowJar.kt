@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
 import com.github.jengelman.gradle.plugins.shadow.internal.R8Minimizer
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
@@ -37,8 +38,6 @@ import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
-import org.apache.tools.zip.Zip64Mode
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -67,7 +66,6 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
-import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -512,24 +510,7 @@ public abstract class ShadowJar : Jar() {
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val zosProvider = { destination: File ->
       try {
-        val entryCompressionMethod =
-          when (entryCompression) {
-            ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
-            ZipEntryCompression.STORED -> ZipOutputStream.STORED
-          }
-        val stream =
-          if (entryCompressionMethod == ZipOutputStream.STORED) {
-            ZipOutputStream(destination)
-          } else {
-            // Improve performance by avoiding lots of small writes to the file system.
-            // It is not possible to do this with STORED entries as the implementation requires a
-            // RandomAccessFile to update the CRC after write.
-            ZipOutputStream(destination.outputStream().buffered())
-          }
-        stream.apply {
-          setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
-          setMethod(entryCompressionMethod)
-        }
+        createZipOutputStream(destination, entryCompression, isZip64)
       } catch (e: Exception) {
         throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }

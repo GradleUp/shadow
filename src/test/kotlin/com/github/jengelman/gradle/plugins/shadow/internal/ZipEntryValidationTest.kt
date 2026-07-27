@@ -11,6 +11,12 @@ import org.junit.jupiter.api.assertThrows
 class ZipEntryValidationTest {
 
   @Test
+  fun parentDirectoryEntriesAreOrderedFromRootToLeaf() {
+    assertThat("foo/bar/baz.txt".parentDirectoryEntries()).isEqualTo(listOf("foo/", "foo/bar/"))
+    assertThat("file.txt".parentDirectoryEntries()).isEqualTo(emptyList())
+  }
+
+  @Test
   fun zipEntryUsesRequestedOrReproducibleTimestampAndAppliesConfiguration() {
     val preserved = zipEntry("file", lastModified = 1234) { comment = "configured" }
     val reproducible = zipEntry("file", preserveLastModified = false, lastModified = 1234)
