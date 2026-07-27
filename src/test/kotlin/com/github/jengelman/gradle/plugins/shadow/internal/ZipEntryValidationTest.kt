@@ -83,6 +83,18 @@ class ZipEntryValidationTest {
         zip.writeEntry(name)
       }
     }
+
+    val names =
+      java.util.zip.ZipInputStream(output.toByteArray().inputStream()).use { zis ->
+        val names = mutableSetOf<String>()
+        while (true) {
+          val entry = zis.nextEntry ?: break
+          names += entry.name
+        }
+        names
+      }
+
+    assertThat(names).isEqualTo(validNames.toSet())
   }
 
   @Test
