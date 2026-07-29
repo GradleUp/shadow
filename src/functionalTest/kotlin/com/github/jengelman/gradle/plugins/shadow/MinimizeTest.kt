@@ -433,6 +433,17 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    assertThat(path("server/build/shadowJar/configuration.txt").readText())
+      .isEqualTo(
+        """
+        -dontoptimize
+        -keep,includedescriptorclasses class server.Server { *; }
+        # Rules extracted from:
+        # ${outputServerShadowedJar.path.toRealPath()}:META-INF/proguard/client.pro
+        -keep class client.Reflective { *; }
+        """
+          .trimIndent()
+      )
   }
 
   @Test
