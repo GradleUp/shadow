@@ -5,7 +5,7 @@
 
 ### Added
 
-- Allow configuring the final R8 ProGuard configuration file with `R8Spec.configurationFile`.
+- Allow configuring the final R8 ProGuard configuration file with `R8Spec.configurationFile`. ([#2133](https://github.com/GradleUp/shadow/pull/2133))
 
 ### Changed
 
