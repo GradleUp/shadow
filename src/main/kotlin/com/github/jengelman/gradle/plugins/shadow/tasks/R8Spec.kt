@@ -48,7 +48,7 @@ public interface R8Spec {
   /**
    * The collective ProGuard configuration output by R8.
    *
-   * Defaults to `build/shadowJar/configuration.txt`.
+   * Defaults to `build/shadowJar/r8/configuration.txt`.
    */
   @get:OutputFile public val configurationFile: RegularFileProperty
 

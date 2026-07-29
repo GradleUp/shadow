@@ -330,8 +330,8 @@ class MinimizeTest : BasePluginTest() {
       )
     }
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
-    val configurationDirectory = path("server/build/shadowJar").toRealPath()
-    assertThat(path("server/build/shadowJar/configuration.txt").readText().invariantEolString)
+    val configurationDirectory = path("server/build/shadowJar/r8").toRealPath()
+    assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfiguration
@@ -490,9 +490,9 @@ class MinimizeTest : BasePluginTest() {
       )
     }
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
-    val configurationDirectory = path("server/build/shadowJar").toRealPath()
+    val configurationDirectory = path("server/build/shadowJar/r8").toRealPath()
     val embeddedRules = "${outputServerShadowedJar.path.toRealPath()}:META-INF/proguard/client.pro"
-    assertThat(path("server/build/shadowJar/configuration.txt").readText().invariantEolString)
+    assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfiguration

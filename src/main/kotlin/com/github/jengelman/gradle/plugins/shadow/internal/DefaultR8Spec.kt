@@ -31,7 +31,7 @@ constructor(
   override val configurationFile: RegularFileProperty =
     objectFactory
       .fileProperty()
-      .convention(layout.buildDirectory.file("shadowJar/configuration.txt"))
+      .convention(layout.buildDirectory.file("shadowJar/r8/configuration.txt"))
 
   override fun enableObfuscation() {
     defaultArgs.set(emptyList())

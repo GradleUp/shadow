@@ -42,7 +42,9 @@ class MinimizeSpecsTest {
       assertThat(proguardRules.get()).isEmpty()
       assertThat(proguardRuleFiles.files).isEmpty()
       assertThat(configurationFile.get().asFile)
-        .isEqualTo(project.layout.buildDirectory.file("shadowJar/configuration.txt").get().asFile)
+        .isEqualTo(
+          project.layout.buildDirectory.file("shadowJar/r8/configuration.txt").get().asFile
+        )
     }
 
   @Test
