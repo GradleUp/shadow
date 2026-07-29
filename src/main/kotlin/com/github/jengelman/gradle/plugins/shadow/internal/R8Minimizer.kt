@@ -23,10 +23,11 @@ import org.gradle.process.ExecOperations
  * R8 does not know about Shadow's reproducible archive settings, so its output is normalized before
  * replacing the original jar.
  *
- * Generated rules are based on the final jar contents. Source-set classes are kept as roots,
- * dependencies excluded from minimization are kept, service descriptors keep providers for
- * downstream `ServiceLoader` users, and R8 consumer rules are extracted from the jar. User rule
- * files and inline rules are appended last.
+ * Shadow-generated rules are based on the final jar contents. Source-set classes are kept as roots,
+ * dependencies excluded from minimization are kept, and service descriptors keep providers for
+ * downstream `ServiceLoader` users. User rule files and inline rules are appended after these rules
+ * within Shadow's generated configuration. R8 applies consumer rules embedded in the jar as
+ * separate configuration sources, with no ordering guarantee relative to Shadow's configuration.
  *
  * The default R8 configuration is shrink-only. Shadow passes `--no-minification` to disable name
  * obfuscation and generates `-dontoptimize` unless optimization is enabled explicitly.
@@ -54,7 +55,6 @@ internal class R8Minimizer(
     }
 
     val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
-    val extractedRulesFile = r8Dir.resolve("classpath-rules.pro")
     val rulesFile = r8Dir.resolve("rules.pro")
     val configurationFile = r8Spec.configurationFile.get().asFile
     val r8Output = r8Dir.resolve("output.jar")
@@ -66,15 +66,12 @@ internal class R8Minimizer(
       throw GradleException("R8 minimization requires the java.home system property.")
     }
 
-    extractClasspathRules(inputJar, extractedRulesFile, launcher)
-
     val r8Args = r8Spec.args.get()
     rulesFile.writeText(
       createRules(
           baseDirectory = configurationFile.parentFile.apply { mkdirs() },
           inputJar = inputJar,
           r8Args = r8Args,
-          extractedRulesFile = extractedRulesFile,
         )
         .joinToString(System.lineSeparator())
     )
@@ -107,38 +104,7 @@ internal class R8Minimizer(
     normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
   }
 
-  // R8's command line does not automatically apply consumer rules carried inside program jars.
-  // Extract them from the exact jar R8 will shrink, matching the classpath-rule handling used by
-  // Android builds.
-  private fun extractClasspathRules(
-    inputJar: File,
-    outputFile: File,
-    launcher: JavaLauncher?,
-  ) {
-    val arguments = buildList {
-      add("--rules-output")
-      add(outputFile.absolutePath)
-      add("--include-origin-comments")
-      add(inputJar.absolutePath)
-    }
-
-    logger.info("Extracting R8 rules from {}.", inputJar)
-    execOperations.javaexec {
-      it.classpath = r8Classpath
-      it.mainClass.set(R8_RULES_MAIN_CLASS)
-      if (launcher != null) {
-        it.executable = launcher.executablePath.asFile.absolutePath
-      }
-      it.args(arguments)
-    }
-  }
-
-  private fun createRules(
-    baseDirectory: File,
-    inputJar: File,
-    r8Args: List<String>,
-    extractedRulesFile: File,
-  ): List<String> {
+  private fun createRules(baseDirectory: File, inputJar: File, r8Args: List<String>): List<String> {
     return buildList {
       add(baseDirectory.toBaseDirectoryRule())
       if (shouldDisableOptimization(r8Args)) {
@@ -147,7 +113,6 @@ internal class R8Minimizer(
       addAll(sourceProguardRules(inputJar))
       addAll(keptDependencyRules(inputJar))
       addAll(serviceProguardRules(inputJar))
-      addAll(extractedRulesFile.readLines())
       r8Spec.proguardRuleFiles.files
         .sortedBy { it.absolutePath }
         .forEach { file ->
@@ -367,7 +332,6 @@ internal class R8Minimizer(
 
   private companion object {
     const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
-    const val R8_RULES_MAIN_CLASS = "com.android.tools.r8.ExtractR8Rules"
     const val SERVICES_PATH = "META-INF/services/"
     // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
     // service lines, comments, malformed providers, and JVM-only names R8 would reject.

@@ -500,9 +500,6 @@ class MinimizeTest : BasePluginTest() {
         |-basedirectory '$outputConfigDir'
         |-dontoptimize
         |-keep,includedescriptorclasses class server.Server { *; }
-        |# Rules extracted from:
-        |# $embeddedConfigPath
-        |-keep class client.Reflective { *; }
         |# End of content from $inputConfigPath
         |# The proguard configuration file for the following section is $embeddedConfigPath
         |-keep class client.Reflective { *; }
