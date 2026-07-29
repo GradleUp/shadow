@@ -122,6 +122,67 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
 Shadow writes the final generated ProGuard configuration to
 `build/shadowJar/configuration.txt` by default. Set `configurationFile` to retain it elsewhere.
 
+R8 also supports ProGuard reporting options such as
+[`-printmapping`](https://www.guardsquare.com/manual/configuration/usage#printmapping),
+[`-printseeds`](https://www.guardsquare.com/manual/configuration/usage#printseeds), and
+[`-printusage`](https://www.guardsquare.com/manual/configuration/usage#printusage). Add them as
+`proguardRules` when you want to retain name mappings, matched keep rules, or removed code:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableObfuscation()
+          configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+          proguardRules.addAll(
+            "-printmapping reports/mapping.txt",
+            "-printseeds reports/seeds.txt",
+            "-printusage reports/usage.txt",
+          )
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableObfuscation()
+          configurationFile.set(layout.buildDirectory.file('r8/configuration.txt'))
+          proguardRules.addAll(
+            '-printmapping reports/mapping.txt',
+            '-printseeds reports/seeds.txt',
+            '-printusage reports/usage.txt',
+          )
+        }
+      }
+    }
+    ```
+
+Relative report paths are resolved from the directory containing `configurationFile`. The example above writes the
+reports under `build/r8/reports`. Use absolute paths if the reports must be written independently of the configuration
+file location. This behavior follows
+[R8's configuration parser](https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java).
+`-printmapping` only contains renamed items, so call `enableObfuscation()` when you need a useful mapping.
+
+These reporting options belong in the build's R8 configuration, not in rules published inside a dependency JAR.
+Android's
+[library optimization guidance](https://developer.android.com/topic/performance/app-optimization/library-optimization#optimization-requirements)
+lists them among the global options that library authors should not publish as consumer keep rules.
+
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
 published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:
 

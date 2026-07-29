@@ -405,6 +405,46 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
+  fun minimizeWithR8GeneratesReportsRelativeToConfigurationFile() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        minimize {
+          r8 {
+            enableObfuscation()
+            configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+            proguardRules.addAll(
+              "-printmapping reports/mapping.txt",
+              "-printseeds reports/seeds.txt",
+              "-printusage reports/usage.txt",
+            )
+          }
+        }
+        """
+          .trimIndent()
+    )
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(path("server/build/r8/configuration.txt").readText())
+      .isEqualTo(
+        """
+        -dontoptimize
+        -keep,includedescriptorclasses class server.Server { *; }
+        -printmapping reports/mapping.txt
+        -printseeds reports/seeds.txt
+        -printusage reports/usage.txt
+        """
+          .trimIndent()
+      )
+    assertThat(path("server/build/r8/reports/mapping.txt").readText()).contains("client.Used")
+    assertThat(path("server/build/r8/reports/seeds.txt").readText()).contains("server.Server")
+    assertThat(path("server/build/r8/reports/usage.txt").readText())
+      .contains("client.Reflective", "client.Unused")
+  }
+
+  @Test
   fun minimizeWithR8UsesClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
