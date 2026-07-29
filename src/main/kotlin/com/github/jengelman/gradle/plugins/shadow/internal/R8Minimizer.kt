@@ -250,7 +250,7 @@ internal class R8Minimizer(
   }
 
   private fun File.asProguardPath(): String {
-    return "'${absolutePath.replace("\\", "\\\\").replace("'", "\\'")}'"
+    return "'${absolutePath.replace("'", "\\'")}'"
   }
 
   private fun File.classNames(): Sequence<String> {
