@@ -328,6 +328,8 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    assertThat(path("server/build/shadowJar/configuration.txt").readText())
+      .contains("-keep,includedescriptorclasses class server.Server { *; }")
   }
 
   @Test
@@ -366,6 +368,7 @@ class MinimizeTest : BasePluginTest() {
         minimize {
           r8 {
             proguardRules.add("-keep class client.Reflective { *; }")
+            configurationFile.set(layout.buildDirectory.file("r8/final-configuration.txt"))
           }
         }
         """
@@ -384,6 +387,8 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    assertThat(path("server/build/r8/final-configuration.txt").readText())
+      .contains("-keep class client.Reflective { *; }")
   }
 
   @Test

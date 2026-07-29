@@ -94,6 +94,7 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
           // Optional extra configuration
           proguardRules.add("-keep class com.example.ReflectiveApi { *; }")
           proguardRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
+          configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
         }
       }
     }
@@ -112,10 +113,14 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
           // Optional extra configuration
           proguardRules.add('-keep class com.example.ReflectiveApi { *; }')
           proguardRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
+          configurationFile.set(layout.buildDirectory.file('r8/configuration.txt'))
         }
       }
     }
     ```
+
+Shadow writes the final generated ProGuard configuration to
+`build/shadowJar/configuration.txt` by default. Set `configurationFile` to retain it elsewhere.
 
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
 published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:

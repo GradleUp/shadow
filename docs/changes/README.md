@@ -3,6 +3,10 @@
 
 ## [Unreleased](https://github.com/GradleUp/shadow/compare/9.6.1...HEAD) - 2026-xx-xx
 
+### Added
+
+- Allow configuring the final R8 ProGuard configuration file with `R8Spec.configurationFile`.
+
 ### Changed
 
 - Bump min Gradle requirement to 9.4.0. ([#2114](https://github.com/GradleUp/shadow/pull/2114))
