@@ -334,13 +334,13 @@ class MinimizeTest : BasePluginTest() {
     assertThat(path("server/build/shadowJar/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        # The proguard configuration file for the following section is $inputConfiguration
-        -basedirectory '$configurationDirectory'
-        -dontoptimize
-        -keep,includedescriptorclasses class server.Server { *; }
-        # End of content from $inputConfiguration
-        """
-          .trimIndent() + "\n"
+        |# The proguard configuration file for the following section is $inputConfiguration
+        |-basedirectory '$configurationDirectory'
+        |-dontoptimize
+        |-keep,includedescriptorclasses class server.Server { *; }
+        |# End of content from $inputConfiguration
+        |"""
+          .trimMargin()
       )
   }
 
@@ -404,14 +404,14 @@ class MinimizeTest : BasePluginTest() {
     assertThat(path("server/build/r8/final-configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        # The proguard configuration file for the following section is $inputConfiguration
-        -basedirectory '$configurationDirectory'
-        -dontoptimize
-        -keep,includedescriptorclasses class server.Server { *; }
-        -keep class client.Reflective { *; }
-        # End of content from $inputConfiguration
-        """
-          .trimIndent() + "\n"
+        |# The proguard configuration file for the following section is $inputConfiguration
+        |-basedirectory '$configurationDirectory'
+        |-dontoptimize
+        |-keep,includedescriptorclasses class server.Server { *; }
+        |-keep class client.Reflective { *; }
+        |# End of content from $inputConfiguration
+        |"""
+          .trimMargin()
       )
   }
 
@@ -443,16 +443,16 @@ class MinimizeTest : BasePluginTest() {
     assertThat(path("server/build/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        # The proguard configuration file for the following section is $inputConfiguration
-        -basedirectory '$configurationDirectory'
-        -dontoptimize
-        -keep,includedescriptorclasses class server.Server { *; }
-        -printmapping reports/mapping.txt
-        -printseeds reports/seeds.txt
-        -printusage reports/usage.txt
-        # End of content from $inputConfiguration
-        """
-          .trimIndent() + "\n"
+        |# The proguard configuration file for the following section is $inputConfiguration
+        |-basedirectory '$configurationDirectory'
+        |-dontoptimize
+        |-keep,includedescriptorclasses class server.Server { *; }
+        |-printmapping reports/mapping.txt
+        |-printseeds reports/seeds.txt
+        |-printusage reports/usage.txt
+        |# End of content from $inputConfiguration
+        |"""
+          .trimMargin()
       )
     assertThat(path("server/build/r8/reports/mapping.txt").readText()).contains("client.Used")
     assertThat(path("server/build/r8/reports/seeds.txt").readText()).contains("server.Server")
@@ -495,19 +495,19 @@ class MinimizeTest : BasePluginTest() {
     assertThat(path("server/build/shadowJar/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        # The proguard configuration file for the following section is $inputConfiguration
-        -basedirectory '$configurationDirectory'
-        -dontoptimize
-        -keep,includedescriptorclasses class server.Server { *; }
-        # Rules extracted from:
-        # $embeddedRules
-        -keep class client.Reflective { *; }
-        # End of content from $inputConfiguration
-        # The proguard configuration file for the following section is $embeddedRules
-        -keep class client.Reflective { *; }
-        # End of content from $embeddedRules
-        """
-          .trimIndent() + "\n"
+        |# The proguard configuration file for the following section is $inputConfiguration
+        |-basedirectory '$configurationDirectory'
+        |-dontoptimize
+        |-keep,includedescriptorclasses class server.Server { *; }
+        |# Rules extracted from:
+        |# $embeddedRules
+        |-keep class client.Reflective { *; }
+        |# End of content from $inputConfiguration
+        |# The proguard configuration file for the following section is $embeddedRules
+        |-keep class client.Reflective { *; }
+        |# End of content from $embeddedRules
+        |"""
+          .trimMargin()
       )
   }
 
