@@ -329,7 +329,13 @@ class MinimizeTest : BasePluginTest() {
       )
     }
     assertThat(path("server/build/shadowJar/configuration.txt").readText())
-      .contains("-keep,includedescriptorclasses class server.Server { *; }")
+      .isEqualTo(
+        """
+        -dontoptimize
+        -keep,includedescriptorclasses class server.Server { *; }
+        """
+          .trimIndent()
+      )
   }
 
   @Test
@@ -388,7 +394,14 @@ class MinimizeTest : BasePluginTest() {
       )
     }
     assertThat(path("server/build/r8/final-configuration.txt").readText())
-      .contains("-keep class client.Reflective { *; }")
+      .isEqualTo(
+        """
+        -dontoptimize
+        -keep,includedescriptorclasses class server.Server { *; }
+        -keep class client.Reflective { *; }
+        """
+          .trimIndent()
+      )
   }
 
   @Test
