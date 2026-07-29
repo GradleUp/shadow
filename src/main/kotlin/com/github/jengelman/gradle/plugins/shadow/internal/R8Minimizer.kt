@@ -55,7 +55,7 @@ internal class R8Minimizer(
 
     val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
     val extractedRulesFile = r8Dir.resolve("classpath-rules.pro")
-    val inputConfigurationFile = r8Dir.resolve("configuration.pro")
+    val rulesFile = r8Dir.resolve("configuration.pro")
     val configurationFile = r8Spec.configurationFile.get().asFile
     val r8Output = r8Dir.resolve("output.jar")
     val normalizedOutput = r8Dir.resolve("normalized-output.jar")
@@ -70,7 +70,7 @@ internal class R8Minimizer(
 
     val r8Args = r8Spec.args.get()
     configurationFile.parentFile.mkdirs()
-    inputConfigurationFile.writeText(
+    rulesFile.writeText(
       buildList {
           add("-basedirectory ${configurationFile.parentFile.asProguardPath()}")
           addAll(createRules(inputJar, r8Args, extractedRulesFile))
@@ -83,7 +83,7 @@ internal class R8Minimizer(
       add("--output")
       add(r8Output.absolutePath)
       add("--pg-conf")
-      add(inputConfigurationFile.absolutePath)
+      add(rulesFile.absolutePath)
       add("--pg-conf-output")
       add(configurationFile.absolutePath)
       add("--lib")
