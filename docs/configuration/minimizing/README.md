@@ -119,8 +119,8 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
     }
     ```
 
-Shadow writes the final generated ProGuard configuration to
-`build/shadowJar/configuration.txt` by default. Set `configurationFile` to retain it elsewhere.
+R8 writes the collective ProGuard configuration it used to `build/shadowJar/configuration.txt` by default. Shadow
+passes this location to R8 with `--pg-conf-output`. Set `configurationFile` to retain it elsewhere.
 
 R8 also supports ProGuard reporting options such as
 [`-printmapping`](https://www.guardsquare.com/manual/configuration/usage#printmapping),

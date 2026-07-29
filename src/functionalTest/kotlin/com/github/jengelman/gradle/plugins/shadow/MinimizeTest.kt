@@ -328,13 +328,18 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
+    val configurationDirectory = path("server/build/shadowJar").toRealPath()
     assertThat(path("server/build/shadowJar/configuration.txt").readText())
       .isEqualTo(
         """
+        # The proguard configuration file for the following section is $inputConfiguration
+        -basedirectory '$configurationDirectory'
         -dontoptimize
         -keep,includedescriptorclasses class server.Server { *; }
+        # End of content from $inputConfiguration
         """
-          .trimIndent()
+          .trimIndent() + lineSeparator
       )
   }
 
@@ -393,14 +398,19 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
+    val configurationDirectory = path("server/build/r8").toRealPath()
     assertThat(path("server/build/r8/final-configuration.txt").readText())
       .isEqualTo(
         """
+        # The proguard configuration file for the following section is $inputConfiguration
+        -basedirectory '$configurationDirectory'
         -dontoptimize
         -keep,includedescriptorclasses class server.Server { *; }
         -keep class client.Reflective { *; }
+        # End of content from $inputConfiguration
         """
-          .trimIndent()
+          .trimIndent() + lineSeparator
       )
   }
 
@@ -427,16 +437,21 @@ class MinimizeTest : BasePluginTest() {
 
     runWithSuccess(serverShadowJarPath)
 
+    val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
+    val configurationDirectory = path("server/build/r8").toRealPath()
     assertThat(path("server/build/r8/configuration.txt").readText())
       .isEqualTo(
         """
+        # The proguard configuration file for the following section is $inputConfiguration
+        -basedirectory '$configurationDirectory'
         -dontoptimize
         -keep,includedescriptorclasses class server.Server { *; }
         -printmapping reports/mapping.txt
         -printseeds reports/seeds.txt
         -printusage reports/usage.txt
+        # End of content from $inputConfiguration
         """
-          .trimIndent()
+          .trimIndent() + lineSeparator
       )
     assertThat(path("server/build/r8/reports/mapping.txt").readText()).contains("client.Used")
     assertThat(path("server/build/r8/reports/seeds.txt").readText()).contains("server.Server")
@@ -473,16 +488,25 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
+    val configurationDirectory = path("server/build/shadowJar").toRealPath()
+    val embeddedRules = "${outputServerShadowedJar.path.toRealPath()}:META-INF/proguard/client.pro"
     assertThat(path("server/build/shadowJar/configuration.txt").readText())
       .isEqualTo(
         """
+        # The proguard configuration file for the following section is $inputConfiguration
+        -basedirectory '$configurationDirectory'
         -dontoptimize
         -keep,includedescriptorclasses class server.Server { *; }
         # Rules extracted from:
-        # ${outputServerShadowedJar.path.toRealPath()}:META-INF/proguard/client.pro
+        # $embeddedRules
         -keep class client.Reflective { *; }
+        # End of content from $inputConfiguration
+        # The proguard configuration file for the following section is $embeddedRules
+        -keep class client.Reflective { *; }
+        # End of content from $embeddedRules
         """
-          .trimIndent()
+          .trimIndent() + lineSeparator
       )
   }
 

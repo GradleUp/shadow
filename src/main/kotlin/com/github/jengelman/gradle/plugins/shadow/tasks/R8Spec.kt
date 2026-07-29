@@ -46,7 +46,7 @@ public interface R8Spec {
   public val proguardRuleFiles: ConfigurableFileCollection
 
   /**
-   * The final ProGuard configuration generated for R8.
+   * The collective ProGuard configuration output by R8.
    *
    * Defaults to `build/shadowJar/configuration.txt`.
    */
