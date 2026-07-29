@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.net.URLClassLoader
 import java.util.ServiceLoader
@@ -330,7 +331,7 @@ class MinimizeTest : BasePluginTest() {
     }
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
     val configurationDirectory = path("server/build/shadowJar").toRealPath()
-    assertThat(path("server/build/shadowJar/configuration.txt").readText())
+    assertThat(path("server/build/shadowJar/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         # The proguard configuration file for the following section is $inputConfiguration
@@ -339,7 +340,7 @@ class MinimizeTest : BasePluginTest() {
         -keep,includedescriptorclasses class server.Server { *; }
         # End of content from $inputConfiguration
         """
-          .trimIndent() + lineSeparator
+          .trimIndent() + "\n"
       )
   }
 
@@ -400,7 +401,7 @@ class MinimizeTest : BasePluginTest() {
     }
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
     val configurationDirectory = path("server/build/r8").toRealPath()
-    assertThat(path("server/build/r8/final-configuration.txt").readText())
+    assertThat(path("server/build/r8/final-configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         # The proguard configuration file for the following section is $inputConfiguration
@@ -410,7 +411,7 @@ class MinimizeTest : BasePluginTest() {
         -keep class client.Reflective { *; }
         # End of content from $inputConfiguration
         """
-          .trimIndent() + lineSeparator
+          .trimIndent() + "\n"
       )
   }
 
@@ -439,7 +440,7 @@ class MinimizeTest : BasePluginTest() {
 
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
     val configurationDirectory = path("server/build/r8").toRealPath()
-    assertThat(path("server/build/r8/configuration.txt").readText())
+    assertThat(path("server/build/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         # The proguard configuration file for the following section is $inputConfiguration
@@ -451,7 +452,7 @@ class MinimizeTest : BasePluginTest() {
         -printusage reports/usage.txt
         # End of content from $inputConfiguration
         """
-          .trimIndent() + lineSeparator
+          .trimIndent() + "\n"
       )
     assertThat(path("server/build/r8/reports/mapping.txt").readText()).contains("client.Used")
     assertThat(path("server/build/r8/reports/seeds.txt").readText()).contains("server.Server")
@@ -491,7 +492,7 @@ class MinimizeTest : BasePluginTest() {
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
     val configurationDirectory = path("server/build/shadowJar").toRealPath()
     val embeddedRules = "${outputServerShadowedJar.path.toRealPath()}:META-INF/proguard/client.pro"
-    assertThat(path("server/build/shadowJar/configuration.txt").readText())
+    assertThat(path("server/build/shadowJar/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         # The proguard configuration file for the following section is $inputConfiguration
@@ -506,7 +507,7 @@ class MinimizeTest : BasePluginTest() {
         -keep class client.Reflective { *; }
         # End of content from $embeddedRules
         """
-          .trimIndent() + lineSeparator
+          .trimIndent() + "\n"
       )
   }
 
