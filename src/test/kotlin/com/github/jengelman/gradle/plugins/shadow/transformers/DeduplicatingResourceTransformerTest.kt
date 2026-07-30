@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingReso
 import java.io.File
 import java.nio.file.Path
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -25,6 +26,14 @@ class DeduplicatingResourceTransformerTest :
 
   private var hash1 = ""
   private var hash3 = ""
+
+  @Test
+  fun sha256Hex() {
+    val file = tempDir.resolve("sha256").toFile().apply { writeText("content") }
+
+    assertThat(file.sha256Hex())
+      .isEqualTo("ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73")
+  }
 
   @BeforeEach
   fun setupFiles() {

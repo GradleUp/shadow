@@ -3,8 +3,9 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import java.io.File
+import java.security.MessageDigest
+import java.util.HexFormat
 import javax.inject.Inject
-import org.apache.commons.codec.digest.DigestUtils
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
@@ -117,7 +118,16 @@ public open class DeduplicatingResourceTransformer(
   internal companion object {
     fun File.sha256Hex(): String {
       try {
-        return inputStream().use { DigestUtils.sha256Hex(it) }
+        val digest = MessageDigest.getInstance("SHA-256")
+        inputStream().use { input ->
+          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+          while (true) {
+            val count = input.read(buffer)
+            if (count < 0) break
+            digest.update(buffer, 0, count)
+          }
+        }
+        return HexFormat.of().formatHex(digest.digest())
       } catch (e: Exception) {
         throw RuntimeException("Failed to read data or calculate hash for $this", e)
       }
