@@ -74,7 +74,7 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 
 ## Minimizing with R8
 
-Shadow can also run [R8](https://r8.googlesource.com/r8) over the final shadowed JAR. This is useful when you want
+Shadow can also run [R8][R8] over the final shadowed JAR. This is useful when you want
 whole-program shrinking instead of the default dependency analyzer. R8 runs after Shadow has merged, transformed, and
 relocated the JAR, so service descriptors in `META-INF/services` are used to keep service providers.
 
@@ -94,6 +94,7 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
           // Optional extra configuration
           proguardRules.add("-keep class com.example.ReflectiveApi { *; }")
           proguardRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
+          configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
         }
       }
     }
@@ -112,10 +113,77 @@ Shadow also extracts R8 rules published in dependency JARs, for example under `M
           // Optional extra configuration
           proguardRules.add('-keep class com.example.ReflectiveApi { *; }')
           proguardRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
+          configurationFile.set(layout.buildDirectory.file('r8/configuration.txt'))
         }
       }
     }
     ```
+
+R8 writes the collective ProGuard configuration it used to `build/shadowJar/r8/configuration.txt` by default. Shadow
+passes this location to R8 with `--pg-conf-output`. Set `configurationFile` to retain it elsewhere.
+
+R8 also supports ProGuard reporting options such as
+
+- [`-printmapping`][-printmapping]
+- [`-printseeds`][-printseeds]
+- [`-printusage`][-printusage]
+
+Add them as `proguardRules` when you want to retain name mappings, matched keep rules, or removed code:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          enableObfuscation()
+          configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+          proguardRules.addAll(
+            "-printmapping reports/mapping.txt",
+            "-printseeds reports/seeds.txt",
+            "-printusage reports/usage.txt",
+          )
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          enableObfuscation()
+          configurationFile.set(layout.buildDirectory.file('r8/configuration.txt'))
+          proguardRules.addAll(
+            '-printmapping reports/mapping.txt',
+            '-printseeds reports/seeds.txt',
+            '-printusage reports/usage.txt',
+          )
+        }
+      }
+    }
+    ```
+
+Relative report paths are resolved from the directory containing `configurationFile`. The example above writes the
+reports under `build/r8/reports`. Use absolute paths if the reports must be written independently of the configuration
+file location. This behavior follows
+[R8's configuration parser][ProguardConfigurationParser].
+`-printmapping` only contains renamed items, so call `enableObfuscation()` when you need a useful mapping.
+
+These reporting options belong in the build's R8 configuration, not in rules published inside a dependency JAR.
+Android's
+[library optimization guidance][library-optimization-guidance]
+lists them among the global options that library authors should not publish as consumer keep rules.
 
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
 published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:
@@ -278,4 +346,10 @@ To enable both:
     }
     ```
 
+[-printmapping]: https://www.guardsquare.com/manual/configuration/usage#printmapping
+[-printseeds]: https://www.guardsquare.com/manual/configuration/usage#printseeds
+[-printusage]: https://www.guardsquare.com/manual/configuration/usage#printusage
+[library-optimization-guidance]: https://developer.android.com/topic/performance/app-optimization/library-optimization
+[R8]: https://r8.googlesource.com/r8
+[ProguardConfigurationParser]: https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html

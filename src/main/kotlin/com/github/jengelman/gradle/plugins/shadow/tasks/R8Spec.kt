@@ -2,9 +2,11 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 
@@ -42,6 +44,13 @@ public interface R8Spec {
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val proguardRuleFiles: ConfigurableFileCollection
+
+  /**
+   * The collective ProGuard configuration output by R8.
+   *
+   * Defaults to `build/shadowJar/r8/configuration.txt`.
+   */
+  @get:OutputFile public val configurationFile: RegularFileProperty
 
   /**
    * Enable R8 name obfuscation while keeping Shadow's default no-optimization behavior.

@@ -56,6 +56,7 @@ internal class R8Minimizer(
     val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
     val extractedRulesFile = r8Dir.resolve("classpath-rules.pro")
     val rulesFile = r8Dir.resolve("rules.pro")
+    val configurationFile = r8Spec.configurationFile.get().asFile
     val r8Output = r8Dir.resolve("output.jar")
     val normalizedOutput = r8Dir.resolve("normalized-output.jar")
     val launcher = javaLauncher.orNull
@@ -69,7 +70,13 @@ internal class R8Minimizer(
 
     val r8Args = r8Spec.args.get()
     rulesFile.writeText(
-      createRules(inputJar, r8Args, extractedRulesFile).joinToString(System.lineSeparator())
+      createRules(
+          baseDirectory = configurationFile.parentFile.apply { mkdirs() },
+          inputJar = inputJar,
+          r8Args = r8Args,
+          extractedRulesFile = extractedRulesFile,
+        )
+        .joinToString(System.lineSeparator())
     )
 
     val arguments = buildList {
@@ -78,6 +85,8 @@ internal class R8Minimizer(
       add(r8Output.absolutePath)
       add("--pg-conf")
       add(rulesFile.absolutePath)
+      add("--pg-conf-output")
+      add(configurationFile.absolutePath)
       add("--lib")
       add(javaHome)
       addAll(r8Args)
@@ -125,11 +134,13 @@ internal class R8Minimizer(
   }
 
   private fun createRules(
+    baseDirectory: File,
     inputJar: File,
     r8Args: List<String>,
     extractedRulesFile: File,
   ): List<String> {
     return buildList {
+      add(baseDirectory.toBaseDirectoryRule())
       if (shouldDisableOptimization(r8Args)) {
         add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
       }
@@ -239,6 +250,13 @@ internal class R8Minimizer(
       .replace(File.separatorChar, '/')
       .removeSuffix(".class")
       .replace('/', '.')
+  }
+
+  private fun File.toBaseDirectoryRule(): String {
+    // Preserve Windows separators: escaping backslashes changes the paths R8 writes to the
+    // collective configuration produced through --pg-conf-output.
+    val normalizedPath = absolutePath.replace("'", "\\'")
+    return "-basedirectory '$normalizedPath'"
   }
 
   private fun File.classNames(): Sequence<String> {
