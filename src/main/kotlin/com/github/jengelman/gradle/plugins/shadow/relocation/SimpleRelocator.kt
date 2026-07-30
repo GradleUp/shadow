@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.Objects
 import java.util.regex.Pattern
-import org.apache.commons.io.FilenameUtils
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 
@@ -222,10 +221,11 @@ constructor(
           continue
         }
 
-        val fileName = FilenameUtils.getName(pattern)
-        val fileParent = FilenameUtils.getPathNoEndSeparator(pattern)
+        val separatorIndex = pattern.indexOfLast { it == '/' || it == '\\' }
+        val fileName = pattern.substring(separatorIndex + 1)
+        val fileParent = pattern.substring(0, separatorIndex.coerceAtLeast(0))
         val filePattern =
-          if (!fileParent.isNullOrEmpty() && fileName.isNotEmpty()) {
+          if (fileParent.isNotEmpty() && fileName.isNotEmpty()) {
             // It's a file pattern like `kotlin/kotlin.kotlin_builtins`, so we don't need to
             // normalize it.
             pattern
