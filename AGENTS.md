@@ -8,3 +8,4 @@ please refer to the [CONTRIBUTING.md](./CONTRIBUTING.md) file.
 2. Adhere to the coding standards and PR templates defined therein.
 3. Follow the environment setup steps to verify your proposed fixes.
 4. Make an atomic commit after completing each task.
+5. Pass `--non-interactive` to Gradle commands to disable interactive console prompts.
