@@ -26,7 +26,7 @@ public interface R8Spec {
   public val keepRules: ListProperty<String>
     get() = proguardRules
 
-  /** Additional ProGuard/R8 rules. */
+  /** Additional R8/ProGuard rules. */
   @get:Input public val proguardRules: ListProperty<String>
 
   @Deprecated(
@@ -38,7 +38,7 @@ public interface R8Spec {
   public val keepRuleFiles: ConfigurableFileCollection
     get() = proguardRuleFiles
 
-  /** Files containing additional ProGuard/R8 rules. */
+  /** Files containing additional R8/ProGuard rules. */
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val proguardRuleFiles: ConfigurableFileCollection
