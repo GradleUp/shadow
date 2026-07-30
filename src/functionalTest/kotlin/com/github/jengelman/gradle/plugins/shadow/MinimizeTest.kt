@@ -329,16 +329,16 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val inputConfiguration = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val configurationDirectory = path("server/build/shadowJar/r8").toRealPath()
+    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
     assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        |# The proguard configuration file for the following section is $inputConfiguration
-        |-basedirectory '$configurationDirectory'
+        |# The proguard configuration file for the following section is $inputConfigPath
+        |-basedirectory '$outputConfigDir'
         |-dontoptimize
         |-keep,includedescriptorclasses class server.Server { *; }
-        |# End of content from $inputConfiguration
+        |# End of content from $inputConfigPath
         |"""
           .trimMargin()
       )
@@ -399,17 +399,17 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val inputConfiguration = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val configurationDirectory = path("server/build/r8/config").toRealPath()
+    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("server/build/r8/config").toRealPath()
     assertThat(path("server/build/r8/config/final-configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        |# The proguard configuration file for the following section is $inputConfiguration
-        |-basedirectory '$configurationDirectory'
+        |# The proguard configuration file for the following section is $inputConfigPath
+        |-basedirectory '$outputConfigDir'
         |-dontoptimize
         |-keep,includedescriptorclasses class server.Server { *; }
         |-keep class client.Reflective { *; }
-        |# End of content from $inputConfiguration
+        |# End of content from $inputConfigPath
         |"""
           .trimMargin()
       )
@@ -438,19 +438,19 @@ class MinimizeTest : BasePluginTest() {
 
     runWithSuccess(serverShadowJarPath)
 
-    val inputConfiguration = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val configurationDirectory = path("server/build/r8").toRealPath()
+    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("server/build/r8").toRealPath()
     assertThat(path("server/build/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        |# The proguard configuration file for the following section is $inputConfiguration
-        |-basedirectory '$configurationDirectory'
+        |# The proguard configuration file for the following section is $inputConfigPath
+        |-basedirectory '$outputConfigDir'
         |-dontoptimize
         |-keep,includedescriptorclasses class server.Server { *; }
         |-printmapping reports/mapping.txt
         |-printseeds reports/seeds.txt
         |-printusage reports/usage.txt
-        |# End of content from $inputConfiguration
+        |# End of content from $inputConfigPath
         |"""
           .trimMargin()
       )
@@ -489,24 +489,24 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val inputConfiguration = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val configurationDirectory = path("server/build/shadowJar/r8").toRealPath()
-    val embeddedRules =
+    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
+    val embeddedConfigPath =
       "${path("server/build/libs/server-1.0-all.jar").toRealPath()}:META-INF/proguard/client.pro"
     assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
-        |# The proguard configuration file for the following section is $inputConfiguration
-        |-basedirectory '$configurationDirectory'
+        |# The proguard configuration file for the following section is $inputConfigPath
+        |-basedirectory '$outputConfigDir'
         |-dontoptimize
         |-keep,includedescriptorclasses class server.Server { *; }
         |# Rules extracted from:
-        |# $embeddedRules
+        |# $embeddedConfigPath
         |-keep class client.Reflective { *; }
-        |# End of content from $inputConfiguration
-        |# The proguard configuration file for the following section is $embeddedRules
+        |# End of content from $inputConfigPath
+        |# The proguard configuration file for the following section is $embeddedConfigPath
         |-keep class client.Reflective { *; }
-        |# End of content from $embeddedRules
+        |# End of content from $embeddedConfigPath
         |"""
           .trimMargin()
       )
