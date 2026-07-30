@@ -74,7 +74,7 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 
 ## Minimizing with R8
 
-Shadow can also run [R8](https://r8.googlesource.com/r8) over the final shadowed JAR. This is useful when you want
+Shadow can also run [R8][R8] over the final shadowed JAR. This is useful when you want
 whole-program shrinking instead of the default dependency analyzer. R8 runs after Shadow has merged, transformed, and
 relocated the JAR, so service descriptors in `META-INF/services` are used to keep service providers.
 
@@ -123,10 +123,12 @@ R8 writes the collective ProGuard configuration it used to `build/shadowJar/r8/c
 passes this location to R8 with `--pg-conf-output`. Set `configurationFile` to retain it elsewhere.
 
 R8 also supports ProGuard reporting options such as
-[`-printmapping`](https://www.guardsquare.com/manual/configuration/usage#printmapping),
-[`-printseeds`](https://www.guardsquare.com/manual/configuration/usage#printseeds), and
-[`-printusage`](https://www.guardsquare.com/manual/configuration/usage#printusage). Add them as
-`proguardRules` when you want to retain name mappings, matched keep rules, or removed code:
+
+- [`-printmapping`][-printmapping]
+- [`-printseeds`][-printseeds]
+- [`-printusage`][-printusage]
+
+Add them as `proguardRules` when you want to retain name mappings, matched keep rules, or removed code:
 
 === "Kotlin"
 
@@ -175,12 +177,12 @@ R8 also supports ProGuard reporting options such as
 Relative report paths are resolved from the directory containing `configurationFile`. The example above writes the
 reports under `build/r8/reports`. Use absolute paths if the reports must be written independently of the configuration
 file location. This behavior follows
-[R8's configuration parser](https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java).
+[R8's configuration parser][ProguardConfigurationParser].
 `-printmapping` only contains renamed items, so call `enableObfuscation()` when you need a useful mapping.
 
 These reporting options belong in the build's R8 configuration, not in rules published inside a dependency JAR.
 Android's
-[library optimization guidance](https://developer.android.com/topic/performance/app-optimization/library-optimization#optimization-requirements)
+[library optimization guidance][library-optimization-guidance]
 lists them among the global options that library authors should not publish as consumer keep rules.
 
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
@@ -344,4 +346,10 @@ To enable both:
     }
     ```
 
+[-printmapping]: https://www.guardsquare.com/manual/configuration/usage#printmapping
+[-printseeds]: https://www.guardsquare.com/manual/configuration/usage#printseeds
+[-printusage]: https://www.guardsquare.com/manual/configuration/usage#printusage
+[library-optimization-guidance]: https://developer.android.com/topic/performance/app-optimization/library-optimization
+[R8]: https://r8.googlesource.com/r8
+[ProguardConfigurationParser]: https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html

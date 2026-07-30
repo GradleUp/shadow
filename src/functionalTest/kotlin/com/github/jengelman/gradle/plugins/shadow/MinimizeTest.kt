@@ -364,7 +364,7 @@ class MinimizeTest : BasePluginTest() {
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
     }
-    val shadowJarUrl = outputServerShadowedJar.use { it.path.toUri().toURL() }
+    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
     URLClassLoader(arrayOf(shadowJarUrl), null).use { loader ->
       val serviceClass = loader.loadClass("service.Greeter")
       assertThat(ServiceLoader.load(serviceClass, loader).toList()).hasSize(1)
@@ -491,9 +491,8 @@ class MinimizeTest : BasePluginTest() {
     }
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
     val configurationDirectory = path("server/build/shadowJar/r8").toRealPath()
-    val embeddedRules = outputServerShadowedJar.use {
-      "${it.path.toRealPath()}:META-INF/proguard/client.pro"
-    }
+    val embeddedRules =
+      "${path("server/build/libs/server-1.0-all.jar").toRealPath()}:META-INF/proguard/client.pro"
     assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
