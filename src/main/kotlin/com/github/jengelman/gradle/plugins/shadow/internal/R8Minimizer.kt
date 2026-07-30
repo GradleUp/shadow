@@ -69,12 +69,13 @@ internal class R8Minimizer(
     extractClasspathRules(inputJar, extractedRulesFile, launcher)
 
     val r8Args = r8Spec.args.get()
-    configurationFile.parentFile.mkdirs()
     rulesFile.writeText(
-      buildList {
-          add("-basedirectory ${configurationFile.parentFile.asProguardPath()}")
-          addAll(createRules(inputJar, r8Args, extractedRulesFile))
-        }
+      createRules(
+          baseDirectory = configurationFile.parentFile.apply { mkdirs() },
+          inputJar = inputJar,
+          r8Args = r8Args,
+          extractedRulesFile = extractedRulesFile,
+        )
         .joinToString(System.lineSeparator())
     )
 
@@ -133,11 +134,13 @@ internal class R8Minimizer(
   }
 
   private fun createRules(
+    baseDirectory: File,
     inputJar: File,
     r8Args: List<String>,
     extractedRulesFile: File,
   ): List<String> {
     return buildList {
+      add(baseDirectory.toBaseDirectoryRule())
       if (shouldDisableOptimization(r8Args)) {
         add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
       }
@@ -249,8 +252,11 @@ internal class R8Minimizer(
       .replace('/', '.')
   }
 
-  private fun File.asProguardPath(): String {
-    return "'${absolutePath.replace("'", "\\'")}'"
+  private fun File.toBaseDirectoryRule(): String {
+    // Preserve Windows separators: escaping backslashes changes the paths R8 writes to the
+    // collective configuration produced through --pg-conf-output.
+    val normalizedPath = absolutePath.replace("'", "\\'")
+    return "-basedirectory '$normalizedPath'"
   }
 
   private fun File.classNames(): Sequence<String> {

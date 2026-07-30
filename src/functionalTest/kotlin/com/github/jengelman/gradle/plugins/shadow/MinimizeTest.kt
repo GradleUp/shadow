@@ -380,7 +380,7 @@ class MinimizeTest : BasePluginTest() {
         minimize {
           r8 {
             proguardRules.add("-keep class client.Reflective { *; }")
-            configurationFile.set(layout.buildDirectory.file("r8/final-configuration.txt"))
+            configurationFile.set(layout.buildDirectory.file("r8/config/final-configuration.txt"))
           }
         }
         """
@@ -400,8 +400,8 @@ class MinimizeTest : BasePluginTest() {
       )
     }
     val inputConfiguration = path("server/build/tmp/shadowJar/r8/configuration.pro").toRealPath()
-    val configurationDirectory = path("server/build/r8").toRealPath()
-    assertThat(path("server/build/r8/final-configuration.txt").readText().invariantEolString)
+    val configurationDirectory = path("server/build/r8/config").toRealPath()
+    assertThat(path("server/build/r8/config/final-configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfiguration
