@@ -55,7 +55,7 @@ internal class R8Minimizer(
 
     val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
     val extractedRulesFile = r8Dir.resolve("classpath-rules.pro")
-    val rulesFile = r8Dir.resolve("configuration.pro")
+    val rulesFile = r8Dir.resolve("rules.pro")
     val configurationFile = r8Spec.configurationFile.get().asFile
     val r8Output = r8Dir.resolve("output.jar")
     val normalizedOutput = r8Dir.resolve("normalized-output.jar")
