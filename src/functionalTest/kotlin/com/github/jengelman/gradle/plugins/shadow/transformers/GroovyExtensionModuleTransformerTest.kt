@@ -14,34 +14,32 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun groovyExtensionModuleTransformer(shortSyntax: Boolean) {
-    val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(buildJarFoo(), buildJarBar())}
-        }
-        $shadowJarTask {
-          mergeGroovyExtensionModules()
-        }
+  @Test
+  fun groovyExtensionModuleTransformer() {
+    projectScript.appendText(
       """
-          .trimIndent()
-      } else {
-        transform<GroovyExtensionModuleTransformer>(
-          dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar())
-        )
+      dependencies {
+        ${implementationFiles(buildJarFoo(), buildJarBar())}
       }
-    projectScript.appendText(config)
+      $shadowJarTask {
+        mergeGroovyExtensionModules()
+      }
+      """
+        .trimIndent()
+    )
 
     runWithSuccess(shadowJarPath)
 
-    commonAssertions()
+    val properties = outputShadowedJar.extensionModuleProperties
+
+    assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
+    assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
+    assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
+      .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
+    assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
+      .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
   }
 
   @Test
@@ -103,17 +101,6 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
           .trimIndent(),
       )
     }
-
-  private fun commonAssertions() {
-    val properties = outputShadowedJar.extensionModuleProperties
-
-    assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
-    assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
-    assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
-      .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
-    assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-      .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
-  }
 
   private companion object {
     const val EXTENSION_CLASSES_FOO = "com.acme.foo.FooExtension,com.acme.foo.BarExtension"

@@ -1,11 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.isEqualTo
-import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
@@ -13,16 +11,11 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactlyInAnyOr
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContents
-import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
-import kotlin.io.path.invariantSeparatorsPathString
-import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
-import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
