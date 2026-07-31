@@ -65,6 +65,18 @@ class BytecodeRemappingTest {
   }
 
   @Test
+  fun classUnmodifiedWhenRelocatorsExist() {
+    // MSHADE-391: When relocators are present for other packages, a class that is not relocated
+    // and contains no references to relocated classes must return its original bytecode untouched.
+    val details = FixtureUnrelated::class.toFileCopyDetails()
+    val specificRelocators = setOf(SimpleRelocator("org.unrelated.pkg", "com.relocated.pkg"))
+
+    val result = details.remapClass(specificRelocators)
+
+    assertThat(result).isEqualTo(details.file.readBytes())
+  }
+
+  @Test
   fun asmFailureIsWrappedWithClassPath() {
     val path = "broken/Example.class"
     val file = tempDir.resolve("broken.class").toFile().apply { writeText("not bytecode") }
@@ -306,6 +318,8 @@ class BytecodeRemappingTest {
   interface FixtureInterface
 
   open class FixtureBase
+
+  class FixtureUnrelated
 
   class FixtureGenericOuter<T> {
     inner class FixtureInner
