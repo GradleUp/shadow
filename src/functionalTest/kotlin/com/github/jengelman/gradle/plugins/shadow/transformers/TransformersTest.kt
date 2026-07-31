@@ -412,8 +412,14 @@ class TransformersTest : BaseTransformerTest() {
       listOf(
         "" to ApacheLicenseResourceTransformer::class,
         "" to ComponentsXmlResourceTransformer::class,
+        "" to Log4j2PluginsCacheFileTransformer::class,
         "" to ManifestAppenderTransformer::class,
         "" to ManifestResourceTransformer::class,
+        "{ resource = 'not-found' }" to DontIncludeResourceTransformer::class,
+        "{ resource = 'included-resource'; file = file('build.gradle') }" to
+          IncludeResourceTransformer::class,
+        "{ include('not-found') }" to PreserveFirstFoundResourceTransformer::class,
+        "{ resource = 'not-found' }" to XmlAppendingTransformer::class,
       )
   }
 }
