@@ -7,11 +7,16 @@ import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import java.util.jar.JarFile.MANIFEST_NAME
+import kotlin.io.path.createTempFile
+import kotlin.io.path.deleteExisting
+import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -163,6 +168,31 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       }
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    }
+
+  @Test // #856
+  fun mergedPropertiesWithoutComments() =
+    with(transformer) {
+      val path = "META-INF/test.properties"
+      paths.set(listOf(path))
+      mergeStrategy.set(MergeStrategy.Append)
+
+      val text1 = "# A comment from jar one.\nfoo=one"
+      val text2 = "# A comment from jar two.\nfoo=two"
+
+      transform(textContext(path, text1))
+      transform(textContext(path, text2))
+
+      val tempJar = createTempFile("shade.", ".jar")
+      try {
+        tempJar.outputStream().zipOutputStream().use { zos ->
+          modifyOutputStream(zos, false)
+        }
+        val content = JarPath(tempJar).use { it.getContent(path) }.trim().replace("\r\n", "\n")
+        assertThat(content).isEqualTo("foo=one,two")
+      } finally {
+        tempJar.deleteExisting()
+      }
     }
 
   private companion object {
