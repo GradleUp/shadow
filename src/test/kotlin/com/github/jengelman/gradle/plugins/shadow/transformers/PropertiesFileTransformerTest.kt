@@ -190,6 +190,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       listOf(
         Arguments.of("foo.properties", true),
         Arguments.of("foo/bar.properties", true),
+        Arguments.of("a/b/c/ButtonLabel_en.properties", true),
+        Arguments.of("a/b/c/ButtonLabel_en_US.properties", true),
+        Arguments.of("a/b/c/ButtonLabel_fr_CA_UNIX.properties", true),
         Arguments.of("foo.props", false),
       )
 
