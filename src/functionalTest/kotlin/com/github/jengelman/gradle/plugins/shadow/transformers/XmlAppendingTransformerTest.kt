@@ -51,6 +51,49 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       )
   }
 
+  @Test
+  fun appendXmlFilesWithUnreachableDtd() {
+    val xmlEntry = "properties_invalid_dtd.xml"
+    val xmlContent =
+      """
+      <?xml version="1.0" encoding="UTF-8"?>
+      <!DOCTYPE properties SYSTEM "http://example.invalid/dtd/properties.dtd">
+      <properties version="1.0">
+        <entry key="%s">%s</entry>
+      </properties>
+      """
+        .trimIndent()
+    val one = buildJarOne { insert(xmlEntry, xmlContent.format("key1", "val1")) }
+    val two = buildJarTwo { insert(xmlEntry, xmlContent.format("key2", "val2")) }
+
+    projectScript.appendText(
+      transform<XmlAppendingTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock =
+          """
+          resource = '$xmlEntry'
+        """
+            .trimIndent(),
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    val content = outputShadowedJar.use { it.getContent(xmlEntry) }.trimIndent()
+    assertThat(content)
+      .isEqualTo(
+        """
+        <?xml version="1.0" encoding="UTF-8"?>
+        <!DOCTYPE properties SYSTEM "http://example.invalid/dtd/properties.dtd">
+        <properties version="1.0">
+          <entry key="key1">val1</entry>
+          <entry key="key2">val2</entry>
+        </properties>
+        """
+          .trimIndent()
+      )
+  }
+
   @Issue("https://github.com/GradleUp/shadow/issues/168")
   @Test
   fun mergeNestedLevels() {
