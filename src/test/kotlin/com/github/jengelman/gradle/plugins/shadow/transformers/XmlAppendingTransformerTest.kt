@@ -36,7 +36,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       val xmlContent =
         """
         <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+        <!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
         <properties version="1.0">
           <entry key="%s">%s</entry>
         </properties>
@@ -56,7 +56,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
           .isEqualTo(
             """
             <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+            <!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
             <properties version="1.0">
               <entry key="key1">val1</entry>
               <entry key="key2">val2</entry>
@@ -77,7 +77,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       val xmlContent =
         """
         <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "http://example.invalid/dtd/properties.dtd">
+        <!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
         <properties version="1.0">
           <entry key="%s">%s</entry>
         </properties>
@@ -97,7 +97,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
           .isEqualTo(
             """
             <?xml version="1.0" encoding="UTF-8"?>
-            <!DOCTYPE properties SYSTEM "http://example.invalid/dtd/properties.dtd">
+            <!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
             <properties version="1.0">
               <entry key="key1">val1</entry>
               <entry key="key2">val2</entry>
