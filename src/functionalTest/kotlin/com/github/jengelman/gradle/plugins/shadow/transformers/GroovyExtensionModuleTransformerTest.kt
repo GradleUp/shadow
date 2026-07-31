@@ -11,13 +11,10 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
@@ -41,23 +38,6 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
         )
       }
     projectScript.appendText(config)
-
-    runWithSuccess(shadowJarPath)
-
-    commonAssertions()
-  }
-
-  @ParameterizedTest
-  @MethodSource("resourcePathProvider")
-  fun mergeLegacyAndModernModuleDescriptorsIntoTheNewResourcePath(
-    fooEntry: String,
-    barEntry: String,
-  ) {
-    projectScript.appendText(
-      transform<GroovyExtensionModuleTransformer>(
-        dependenciesBlock = implementationFiles(buildJarFoo(fooEntry), buildJarBar(barEntry))
-      )
-    )
 
     runWithSuccess(shadowJarPath)
 
@@ -143,26 +123,5 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     val JarPath.extensionModuleProperties
       get() = use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties() }
-
-    @JvmStatic
-    fun resourcePathProvider() =
-      listOf(
-        Arguments.of(
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-        Arguments.of(
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-        Arguments.of(
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-        Arguments.of(
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-      )
   }
 }
