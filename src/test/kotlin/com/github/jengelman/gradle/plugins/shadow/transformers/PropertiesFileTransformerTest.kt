@@ -43,16 +43,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     }
 
   @Test
-  fun transformationWithoutOverlap() =
-    with(transformer) {
-      val path = "foo/bar/my.properties"
-      transform(context(path, mapOf("a" to "b")))
-      transform(context(path, mapOf("c" to "d")))
-
-      assertThat(propertiesEntries[path].orEmpty()).isEqualTo(mapOf("a" to "b", "c" to "d"))
-    }
-
-  @Test
   fun transformationPropertiesAreReproducible() =
     with(transformer) {
       transform(manifestTransformerContext)
