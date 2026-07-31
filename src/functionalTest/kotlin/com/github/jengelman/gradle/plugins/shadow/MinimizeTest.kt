@@ -372,6 +372,79 @@ class MinimizeTest : BasePluginTest() {
   }
 
   @Test
+  fun minimizeKeepsServiceProvidersUnderMetaInfServices() {
+    settingsScript.writeText("include 'api', 'impl'$lineSeparator")
+    path("api/build.gradle")
+      .writeText(
+        """
+        plugins { id 'java' }
+        """
+          .trimIndent()
+      )
+    path("api/src/main/java/service/Greeter.java")
+      .writeText(
+        """
+        package service;
+        public interface Greeter {
+            String greet();
+        }
+        """
+          .trimIndent()
+      )
+    path("api/src/main/java/service/DefaultGreeter.java")
+      .writeText(
+        """
+        package service;
+        public class DefaultGreeter implements Greeter {
+            public String greet() { return "Hello"; }
+        }
+        """
+          .trimIndent()
+      )
+    path("api/src/main/resources/META-INF/services/service.Greeter")
+      .writeText("service.DefaultGreeter\n")
+
+    path("impl/build.gradle")
+      .writeText(
+        """
+        ${getDefaultProjectBuildScript("java")}
+        dependencies { implementation project(':api') }
+        shadowJar {
+          minimize {
+            exclude(project(':api'))
+          }
+        }
+        """
+          .trimIndent()
+      )
+    path("impl/src/main/java/impl/Main.java")
+      .writeText(
+        """
+        package impl;
+        import java.util.ServiceLoader;
+        import service.Greeter;
+        public class Main {
+            public static void main(String[] args) {
+                ServiceLoader.load(Greeter.class);
+            }
+        }
+        """
+          .trimIndent()
+      )
+
+    runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
+
+    assertThat(outputImplShadowedJar).useAll {
+      containsAtLeast(
+        "impl/Main.class",
+        "service/Greeter.class",
+        "service/DefaultGreeter.class",
+        "META-INF/services/service.Greeter",
+      )
+    }
+  }
+
+  @Test
   fun minimizeWithR8HonorsCustomProguardRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
