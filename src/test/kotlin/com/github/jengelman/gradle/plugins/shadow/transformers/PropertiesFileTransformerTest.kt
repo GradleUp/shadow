@@ -8,6 +8,7 @@ import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
@@ -17,7 +18,9 @@ import java.util.jar.JarFile.MANIFEST_NAME
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
+import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -87,6 +90,27 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
       assertThat(conflicts).isEqualTo(expectedConflicts)
+    }
+
+  @Test
+  fun failStrategyReportsConflicts() =
+    with(transformer) {
+      val path = "f.properties"
+      mergeStrategy.set(MergeStrategy.Fail)
+      transform(context(path, mapOf("foo" to "foo")))
+      transform(context(path, mapOf("foo" to "bar")))
+
+      val failure = assertThrows<GradleException> { transformToJar() }
+
+      assertThat(failure.message.orEmpty())
+        .contains(
+          """
+          The following properties files have conflicting property values and cannot be merged:
+           * f.properties
+             * Property foo is duplicated 2 times with different values
+          """
+            .trimIndent()
+        )
     }
 
   @ParameterizedTest
@@ -168,6 +192,10 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       }
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+      val content = transformToJar().use { it.getBytes(path).toString(Charset.forName(charset)) }
+      expectedOutput.forEach { (key, value) ->
+        assertThat(content).contains("$key=$value")
+      }
     }
 
   @Test // #856
