@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -109,8 +108,7 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1377")
-  @Test
+  @Test // #1377
   fun compatKmpForOtherNamedJvmTarget() {
     val jvmTargetName = "newJvm"
     val jvmTargetMain = "${jvmTargetName}Main"
@@ -146,8 +144,7 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1377")
-  @Test
+  @Test // #1377
   fun doNotCreateJvmTargetEagerly() {
     projectScript.appendText(
       """

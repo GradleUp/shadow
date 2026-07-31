@@ -23,7 +23,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
@@ -50,8 +49,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
-  @Issue("https://github.com/GradleUp/shadow/issues/1766")
-  @Test
+  @Test // #1766
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
     val kFunction =
       ShadowJar.Companion::class.declaredFunctions.single { it.name == "registerShadowJarCommon" }
@@ -92,8 +90,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.output).contains("task dependencies: $SHADOW_JAR_TASK_NAME")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1908")
-  @Test
+  @Test // #1908
   fun shadowJarNotAddedToAssembleWhenDisabled() {
     projectScript.appendText(
       """
@@ -192,8 +189,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1893")
-  @Test
+  @Test // #1893
   fun consumeShadowedProjectViaApiElementsAndRuntimeElements() {
     settingsScript.appendText(
       """
@@ -269,8 +265,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1893")
-  @Test
+  @Test // #1893
   fun excludeRulesPreventBundledDepsOnConsumerClasspath() {
     settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
     projectScript.writeText("")
@@ -324,8 +319,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1606")
-  @Test
+  @Test // #1606
   fun shadowExposedCustomSourceSetOutput() {
     writeClientAndServerModules()
     path("client/build.gradle")
@@ -375,8 +369,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/449")
-  @ParameterizedTest
+  @ParameterizedTest // #449
   @ValueSource(booleans = [false, true])
   fun containsMultiReleaseAttrIfAnyDependencyContainsIt(addAttribute: Boolean) {
     writeClientAndServerModules()
@@ -446,11 +439,7 @@ class JavaPluginsTest : BasePluginTest() {
       .isEqualTo(if (enable) "true" else null)
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/352",
-    "https://github.com/GradleUp/shadow/issues/729",
-  )
-  @Test
+  @Test // #352, #729
   fun excludeSomeResourcesByDefault() {
     val resJar =
       buildJar("meta-inf.jar") {
@@ -555,8 +544,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/65")
-  @ParameterizedTest
+  @ParameterizedTest // #65
   @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, IMPLEMENTATION_CONFIGURATION_NAME])
   fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
@@ -584,8 +572,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(actual).isEqualTo(expected)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/92")
-  @Test
+  @Test // #92
   fun doNotIncludeNullValueInClassPathWhenJarFileDoesNotContainClassPath() {
     projectScript.appendText(
       """
@@ -602,8 +589,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/203")
-  @ParameterizedTest
+  @ParameterizedTest // #203
   @EnumSource(ZipEntryCompression::class)
   fun supportZipCompressions(method: ZipEntryCompression) {
     projectScript.appendText(
@@ -624,11 +610,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll { containsOnly(*junitEntries, *manifestEntries) }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/459",
-    "https://github.com/GradleUp/shadow/issues/852",
-  )
-  @Test
+  @Test // #459, #852
   fun excludeGradleApiByDefault() {
     writeGradlePluginModule()
     projectScript.appendText(
@@ -665,8 +647,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1422")
-  @Test
+  @Test // #1422
   fun moveLocalGradleApiToCompileOnly() {
     projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
@@ -676,8 +657,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputCompileOnlyApi).contains("unspecified")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1422")
-  @ParameterizedTest
+  @ParameterizedTest // #1422
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doNotReAddSuppressedGradleApi(configuration: String) {
     projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
@@ -693,8 +673,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(output).doesNotContain("unspecified")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1070")
-  @Test
+  @Test // #1070
   fun registerCustomShadowJarTask() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
@@ -729,8 +708,7 @@ class JavaPluginsTest : BasePluginTest() {
       .contains("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1784")
-  @Test
+  @Test // #1784
   fun registerShadowJarTaskWithoutShadowPluginApplied() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
@@ -774,8 +752,7 @@ class JavaPluginsTest : BasePluginTest() {
       .contains("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/443")
-  @Test
+  @Test // #443
   fun registerCustomShadowJarThatContainsDependenciesOnly() {
     val mainClassEntry = writeClass()
     val dependencyShadowJar = "dependencyShadowJar"
@@ -829,8 +806,7 @@ class JavaPluginsTest : BasePluginTest() {
       )
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1975")
-  @Test
+  @Test // #1975
   fun skipNonExistentDependencyDirectory() {
     val nonExistentDir = projectRoot.resolve("non-existent-dir")
 
@@ -848,8 +824,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/915")
-  @Test
+  @Test // #915
   fun failBuildIfProcessingBadJar() {
     val badJarPath = path("bad.jar").apply { writeText("A bad jar.") }
 
@@ -954,8 +929,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/520")
-  @Test
+  @Test // #520
   fun onlyKeepFilesFromProjectWhenDuplicatesStrategyIsExclude() {
     val fooJar = buildJar("foo.jar") { insert("module-info.class", "module myModuleName {}") }
     val mainClassEntry = writeClass()
@@ -986,8 +960,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1441")
-  @Test
+  @Test // #1441
   fun includeFilesInTaskOutputDirectory() {
     // Create a build that has a task with jars in the output directory
     projectScript.appendText(
@@ -1135,8 +1108,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/882")
-  @Test
+  @Test // #882
   fun compatGradleArtifactTransform() {
     settingsScript.writeText("include('app', 'lib')\n")
     path("lib/build.gradle")
@@ -1240,8 +1212,7 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/2086")
-  @Test
+  @Test // #2086
   fun useToolchainWithoutTargetCompatibilityInKts() {
     projectScript.deleteExisting()
     path("build.gradle.kts")
@@ -1263,8 +1234,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/2099")
-  @Test
+  @Test // #2099
   fun doNotResolveR8WhenLockingAllConfigurations() {
     projectScript.appendText(
       """

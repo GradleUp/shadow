@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.squareup.moshi.JsonAdapter
@@ -138,8 +137,7 @@ class PublishingTest : BasePluginTest() {
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1665")
-  @Test
+  @Test // #1665
   fun dontInjectTargetJvmVersionWhenAutoTargetJvmDisabled() {
     projectScript.appendText(
       publishConfiguration(
@@ -367,12 +365,7 @@ class PublishingTest : BasePluginTest() {
     )
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/614",
-    "https://github.com/GradleUp/shadow/issues/860",
-    "https://github.com/GradleUp/shadow/issues/945",
-  )
-  @Test
+  @Test // #614, #860, #945
   fun publishShadowJarWithCustomArtifactName() {
     projectScript.appendText(
       publishConfiguration(
@@ -540,8 +533,7 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/651")
-  @ParameterizedTest
+  @ParameterizedTest // #651
   @ValueSource(booleans = [false, true])
   fun publishShadowVariantJar(addShadowVariant: Boolean) {
     projectScript.appendText(

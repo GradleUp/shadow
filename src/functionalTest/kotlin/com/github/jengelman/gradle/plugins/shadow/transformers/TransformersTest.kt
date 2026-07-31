@@ -16,7 +16,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContents
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
@@ -130,8 +129,7 @@ class TransformersTest : BaseTransformerTest() {
     commonAssertions()
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/427")
-  @Test
+  @Test // #427
   fun mergeLog4j2PluginCacheFiles() {
     val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
     val one = buildJarOne { insert(PLUGIN_CACHE_FILE, content) }
@@ -246,8 +244,7 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1626")
-  @Test
+  @Test // #1626
   fun useApacheNoticeTransformerWithoutProjectName() {
     val noticeEntry = "META-INF/NOTICE"
     val one = buildJarOne {

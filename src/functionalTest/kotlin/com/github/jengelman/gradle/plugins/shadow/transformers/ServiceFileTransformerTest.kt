@@ -5,7 +5,6 @@ import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
@@ -175,11 +174,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/70",
-    "https://github.com/GradleUp/shadow/issues/71",
-  )
-  @Test
+  @Test // #70, #71
   fun transformProjectResources() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne { insert(servicesBarEntry, CONTENT_ONE) }

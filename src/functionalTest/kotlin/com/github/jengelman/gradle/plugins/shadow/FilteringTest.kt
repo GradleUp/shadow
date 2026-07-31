@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -157,8 +156,7 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/671")
-  @Test
+  @Test // #671
   fun filterProjectThatVersionContainsPlus() {
     writeClientAndServerModules(
       serverShadowBlock =

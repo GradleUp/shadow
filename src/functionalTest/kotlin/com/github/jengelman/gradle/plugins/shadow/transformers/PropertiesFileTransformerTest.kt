@@ -6,7 +6,6 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Assertions.fail
@@ -158,8 +157,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/856")
-  @Test
+  @Test // #856
   fun mergedPropertiesWithoutComments() {
     val one = buildJarOne {
       insert(
