@@ -15,7 +15,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
@@ -114,8 +113,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/58")
-  @Test
+  @Test // #58
   fun relocateDependencyFiles() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -205,11 +203,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/53",
-    "https://github.com/GradleUp/shadow/issues/55",
-  )
-  @Test
+  @Test // #53, #55
   fun remapClassNamesForRelocatedFilesInProjectSource() {
     projectScript.appendText(
       """
@@ -259,11 +253,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/93",
-    "https://github.com/GradleUp/shadow/issues/114",
-  )
-  @Test
+  @Test // #93, #114
   fun relocateResourceFiles() {
     val depJar = buildJar("foo.jar") { insert("foo/dep.properties", "c") }
     writeClass(packageName = "foo", className = "Foo")
@@ -386,12 +376,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/295",
-    "https://github.com/GradleUp/shadow/issues/562",
-    "https://github.com/GradleUp/shadow/issues/884",
-  )
-  @Test
+  @Test // #295, #562, #884
   fun excludeKotlinBuiltinsFromRelocation() {
     val kotlinJar =
       buildJar("kotlin.jar") {
@@ -500,11 +485,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/232",
-    "https://github.com/GradleUp/shadow/issues/606",
-  )
-  @ParameterizedTest
+  @ParameterizedTest // #232, #606
   @ValueSource(booleans = [false, true])
   fun disableStringConstantsRelocation(skipStringConstants: Boolean) {
     writeClassWithStringRef()
@@ -532,8 +513,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1403")
-  @Test
+  @Test // #1403
   fun relocateMultiClassSignatureStringConstants() {
     writeClass {
       """
@@ -594,9 +574,8 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/843")
   @OptIn(UnstableMetadataApi::class)
-  @ParameterizedTest
+  @ParameterizedTest // #843
   @ValueSource(booleans = [false, true])
   fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
@@ -683,9 +662,8 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/843")
   @OptIn(UnstableMetadataApi::class)
-  @Test
+  @Test // #843
   fun relocateKotlinModuleFilesExplicitly() {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
     val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()

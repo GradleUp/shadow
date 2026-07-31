@@ -13,7 +13,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.Path
@@ -126,8 +125,7 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/613")
-  @Test
+  @Test // #613
   fun overrideMainClassAttrInManifestBlock() {
     val main2ClassEntry = writeClass(className = "Main2")
     prepare(

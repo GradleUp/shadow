@@ -11,7 +11,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import java.net.URLClassLoader
 import java.util.ServiceLoader
 import kotlin.io.path.appendText
@@ -147,8 +146,7 @@ class MinimizeTest : BasePluginTest() {
    * 'Client', 'Server' and 'junit' are independent. Unused classes of 'client' and theirs
    * dependencies shouldn't be removed.
    */
-  @Issue("https://github.com/GradleUp/shadow/issues/744")
-  @Test
+  @Test // #744
   fun excludeProjectFromMinimize() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -222,8 +220,7 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1610")
-  @Test
+  @Test // #1610
   fun excludeCircularDependencies() {
     val dependency = "'my:e:1.0'"
     projectScript.appendText(
@@ -275,8 +272,7 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1636")
-  @Test
+  @Test // #1636
   fun minimizeBomDependency() {
     writeApiLibAndImplModules()
     path("impl/build.gradle")

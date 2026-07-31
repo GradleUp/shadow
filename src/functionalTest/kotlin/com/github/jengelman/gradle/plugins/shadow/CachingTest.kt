@@ -11,7 +11,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -211,8 +210,7 @@ class CachingTest : BasePluginTest() {
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName) }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/717")
-  @Test
+  @Test // #717
   fun jarIncludesExcludesChanged() {
     val mainClassEntry = writeClass(className = "Main")
     val main2ClassEntry = writeClass(className = "Main2")
@@ -454,8 +452,7 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1932")
-  @Test
+  @Test // #1932
   fun relocatorPatternChanged() {
     projectScript.appendText(
       """

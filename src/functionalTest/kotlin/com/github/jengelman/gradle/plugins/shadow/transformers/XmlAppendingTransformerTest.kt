@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 
@@ -94,8 +93,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       )
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/168")
-  @Test
+  @Test // #168
   fun mergeNestedLevels() {
     val xmlEntry = "META-INF/nested.xml"
     val xmlContent =
