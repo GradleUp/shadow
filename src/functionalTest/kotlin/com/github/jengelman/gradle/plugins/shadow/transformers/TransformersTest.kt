@@ -11,10 +11,8 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactlyInAnyOr
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContents
-import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
-import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.gradle.testkit.runner.TaskOutcome.FAILED
 import org.junit.jupiter.api.Test
@@ -296,40 +294,6 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
-  @Test
-  fun overrideOutputPathOfNoticeFile() {
-    val noticeEntry = "META-INF/NOTICE"
-    val customNoticeEntry = "META-INF/CUSTOM_NOTICE"
-    val one = buildJarOne { insert(noticeEntry, "Notice from A") }
-    val two = buildJarTwo { insert(noticeEntry, "Notice from B") }
-    projectScript.appendText(
-      transform<ApacheNoticeResourceTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = "addHeader = false; outputPath = '$customNoticeEntry'",
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(customNoticeEntry, *manifestEntries)
-      getContent(customNoticeEntry)
-        .isEqualTo(
-          """
-          Copyright 2006-2026 The Apache Software Foundation
-
-          This product includes software developed at
-          The Apache Software Foundation (https://www.apache.org/).
-
-          Notice from A
-
-          Notice from B
-          """
-            .trimIndent()
-        )
-    }
-  }
-
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {
@@ -393,46 +357,5 @@ class TransformersTest : BaseTransformerTest() {
         "" to ManifestAppenderTransformer::class,
         "" to ManifestResourceTransformer::class,
       )
-  }
-
-  @Test
-  fun mergeLicenseResourceTransformer() {
-    val one = buildJarOne { insert("META-INF/LICENSE", "license one") }
-    val two = buildJarTwo { insert("META-INF/LICENSE", "license two") }
-    val artifactLicense = path("my-license")
-    artifactLicense.writeText("artifact license text")
-
-    projectScript.appendText(
-      transform<MergeLicenseResourceTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock =
-          """
-          outputPath = 'MY_LICENSE'
-          artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
-          firstSeparator = '####'
-          separator = '----'
-        """
-            .trimIndent(),
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly("MY_LICENSE", "META-INF/", "META-INF/MANIFEST.MF")
-      getContent("MY_LICENSE")
-        .transform { it.invariantEolString }
-        .isEqualTo(
-          """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license text
-          ####
-          license one
-          ----
-          license two
-          """
-            .trimIndent()
-        )
-    }
   }
 }

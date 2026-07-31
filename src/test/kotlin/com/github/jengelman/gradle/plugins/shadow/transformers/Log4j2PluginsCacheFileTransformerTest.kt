@@ -65,7 +65,7 @@ class Log4j2PluginsCacheFileTransformerTest :
         .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
     }
 
-  @Test
+  @Test // #427
   fun transformAndModifyOutputStream() =
     with(transformer) {
       assertThat(hasTransformedResource()).isFalse()

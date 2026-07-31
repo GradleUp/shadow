@@ -6,6 +6,7 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import java.nio.file.Path
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -141,5 +142,35 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(elements).isEmpty()
 
       assertThat(buildLicense()).isEqualTo("artifact license file content")
+    }
+
+  @Test
+  fun customOutput(@TempDir tempDir: Path) =
+    with(transformer) {
+      outputPath.set("MY_LICENSE")
+      firstSeparator.set("####")
+      separator.set("----")
+      transform(textContext("META-INF/LICENSE", "license one"))
+      transform(textContext("META-INF/LICENSE", "license two"))
+      artifactLicense.set(
+        tempDir.resolve("artifact-license").toFile().apply {
+          writeText("artifact license text")
+        }
+      )
+
+      val content = transformToJar().use { it.getContent("MY_LICENSE") }
+
+      assertThat(content)
+        .isEqualTo(
+          """
+          SPDX-License-Identifier: Apache-2.0
+          artifact license text
+          ####
+          license one
+          ----
+          license two
+          """
+            .trimIndent()
+        )
     }
 }
