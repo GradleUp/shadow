@@ -57,7 +57,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
     val xmlContent =
       """
       <?xml version="1.0" encoding="UTF-8"?>
-      <!DOCTYPE properties SYSTEM "http://invalid-dtd-host-123456789.org/dtd/properties.dtd">
+      <!DOCTYPE properties SYSTEM "http://example.invalid/dtd/properties.dtd">
       <properties version="1.0">
         <entry key="%s">%s</entry>
       </properties>
@@ -84,7 +84,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest() {
       .isEqualTo(
         """
         <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "http://invalid-dtd-host-123456789.org/dtd/properties.dtd">
+        <!DOCTYPE properties SYSTEM "http://example.invalid/dtd/properties.dtd">
         <properties version="1.0">
           <entry key="key1">val1</entry>
           <entry key="key2">val2</entry>
