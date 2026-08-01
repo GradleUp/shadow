@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test
 
 class AppendingTransformerTest : BaseTransformerTest() {
   @Test
-  fun appendTestPropertiesWithShortSyntax() {
+  fun appendTestProperties() {
     val one = buildJarOne { insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO) }
     projectScript.appendText(

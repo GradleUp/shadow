@@ -17,22 +17,35 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
-  @Test
-  fun serviceResourceTransformerWithShortSyntax() {
+  @ParameterizedTest
+  @ValueSource(booleans = [false, true])
+  fun serviceResourceTransformer(shortSyntax: Boolean) {
     val config =
-      """
-      dependencies {
-        ${implementationFiles(buildJarOne(), buildJarTwo())}
-      }
-      $shadowJarTask {
-        mergeServiceFiles {
-          exclude 'META-INF/services/com.acme.*'
+      if (shortSyntax) {
+        """
+        dependencies {
+          ${implementationFiles(buildJarOne(), buildJarTwo())}
         }
+        $shadowJarTask {
+          mergeServiceFiles {
+            exclude 'META-INF/services/com.acme.*'
+          }
+        }
+      """
+          .trimIndent()
+      } else {
+        transform<ServiceFileTransformer>(
+          dependenciesBlock = implementationFiles(buildJarOne(), buildJarTwo()),
+          transformerBlock =
+            """
+            exclude 'META-INF/services/com.acme.*'
+            """
+              .trimIndent(),
+        )
       }
-    """
-        .trimIndent()
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
@@ -44,7 +57,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun serviceResourceTransformerAlternatePathWithShortSyntax() {
+  fun serviceResourceTransformerAlternatePath() {
     val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
     val config =
@@ -66,7 +79,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test
-  fun serviceResourceTransformerWithRelocationWithShortSyntax() {
+  fun serviceResourceTransformerWithRelocation() {
     val one = buildJarOne {
       insert(
         "META-INF/services/java.sql.Driver",
@@ -150,7 +163,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   }
 
   @Test // #70, #71
-  fun transformProjectResourcesWithShortSyntax() {
+  fun transformProjectResources() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne { insert(servicesBarEntry, CONTENT_ONE) }
     val two = buildJarTwo { insert(servicesBarEntry, CONTENT_TWO) }
