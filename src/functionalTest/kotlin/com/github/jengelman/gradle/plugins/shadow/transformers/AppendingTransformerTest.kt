@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import kotlin.io.path.appendText
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -40,5 +41,27 @@ class AppendingTransformerTest : BaseTransformerTest() {
 
     val content = outputShadowedJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
+  }
+
+  @Test
+  fun appendWithCustomSeparator() {
+    val one = buildJarOne { insert("application.yml", CONTENT_ONE) }
+    val two = buildJarTwo { insert("application.yml", CONTENT_TWO) }
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(one, two)}
+        }
+        $shadowJarTask {
+          append('application.yml', '\n---\n')
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    val content = outputShadowedJar.use { it.getContent("application.yml") }
+    assertThat(content).isEqualTo("$CONTENT_ONE\n---\n$CONTENT_TWO")
   }
 }

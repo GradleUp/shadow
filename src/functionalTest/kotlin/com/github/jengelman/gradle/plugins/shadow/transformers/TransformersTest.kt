@@ -355,6 +355,7 @@ class TransformersTest : BaseTransformerTest() {
       listOf(
         "" to ApacheLicenseResourceTransformer::class,
         "" to ComponentsXmlResourceTransformer::class,
+        "" to GroovyExtensionModuleTransformer::class,
         "" to Log4j2PluginsCacheFileTransformer::class,
         "" to ManifestAppenderTransformer::class,
         "" to ManifestResourceTransformer::class,
