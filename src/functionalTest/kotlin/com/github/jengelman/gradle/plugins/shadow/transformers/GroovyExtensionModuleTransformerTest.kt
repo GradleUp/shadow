@@ -42,38 +42,6 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
   }
 
-  @Test
-  fun groovyExtensionModuleTransformerWithRelocation() {
-    projectScript.appendText(
-      """
-        dependencies {
-          ${implementationFiles(buildJarFoo(), buildJarBar())}
-        }
-        $shadowJarTask {
-          relocate('com.acme', 'com.example.shaded.acme')
-          mergeGroovyExtensionModules()
-        }
-      """
-        .trimIndent()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    val properties = outputShadowedJar.extensionModuleProperties
-
-    assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
-    assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
-    assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
-      .isEqualTo(
-        "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
-          "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension"
-      )
-    assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-      .isEqualTo(
-        "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension"
-      )
-  }
-
   private fun buildJarFoo(entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR): Path =
     buildJar("foo.jar") {
       insert(

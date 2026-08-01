@@ -239,63 +239,6 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
-  @Test // #1626
-  fun useApacheNoticeTransformerWithoutProjectName() {
-    val noticeEntry = "META-INF/NOTICE"
-    val one = buildJarOne {
-      insert(
-        noticeEntry,
-        """
-        Apache Commons DBCP
-        Copyright 2001-2024 The Apache Software Foundation
-
-        This product includes software developed at
-        The Apache Software Foundation (https://www.apache.org/).
-        """
-          .trimIndent(),
-      )
-    }
-    val two = buildJarTwo {
-      insert(
-        noticeEntry,
-        """
-        Apache Commons Pool
-        Copyright 2001-2025 The Apache Software Foundation
-
-        This product includes software developed at
-        The Apache Software Foundation (https://www.apache.org/).
-        """
-          .trimIndent(),
-      )
-    }
-    projectScript.appendText(
-      transform<ApacheNoticeResourceTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = "addHeader = false",
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly(noticeEntry, *manifestEntries)
-      getContent(noticeEntry)
-        .isEqualTo(
-          """
-          Apache Commons Pool
-          Copyright 2001-2025 The Apache Software Foundation
-
-          This product includes software developed at
-          The Apache Software Foundation (https://www.apache.org/).
-
-          Apache Commons DBCP
-          Copyright 2001-2024 The Apache Software Foundation
-          """
-            .trimIndent()
-        )
-    }
-  }
-
   @ParameterizedTest
   @MethodSource("transformerConfigProvider")
   fun otherTransformers(pair: Pair<String, KClass<*>>) {

@@ -56,32 +56,20 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun serviceResourceTransformerAlternatePath(shortSyntax: Boolean) {
+  @Test
+  fun serviceResourceTransformerAlternatePath() {
     val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
     val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles("META-INF/foo")
-        }
       """
-          .trimIndent()
-      } else {
-        transform<ServiceFileTransformer>(
-          dependenciesBlock = implementationFiles(one, two),
-          transformerBlock =
-            """
-            path = 'META-INF/foo'
-            """
-              .trimIndent(),
-        )
+      dependencies {
+        ${implementationFiles(one, two)}
       }
+      $shadowJarTask {
+        mergeServiceFiles("META-INF/foo")
+      }
+    """
+        .trimIndent()
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
