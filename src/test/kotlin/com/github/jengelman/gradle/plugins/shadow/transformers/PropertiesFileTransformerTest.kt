@@ -103,13 +103,13 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       val failure = assertThrows<GradleException> { transformToJar() }
 
       assertThat(failure.message.orEmpty())
-        .contains(
+        .isEqualTo(
           """
-          The following properties files have conflicting property values and cannot be merged:
-           * f.properties
-             * Property foo is duplicated 2 times with different values
+          |The following properties files have conflicting property values and cannot be merged:
+          | * f.properties
+          |   * Property foo is duplicated 2 times with different values
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
 

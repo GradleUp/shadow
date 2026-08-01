@@ -130,11 +130,15 @@ class DeduplicatingResourceTransformerTest :
         }
 
       assertThat(failure.message.orEmpty())
-        .contains(
-          "Found 1 path duplicate(s) with different content in the shadowed JAR:",
-          "  * differing-content",
-          hash1,
-          hash3,
+        .isEqualTo(
+          """
+            |Found 1 path duplicate(s) with different content in the shadowed JAR:
+            |  * differing-content
+            |    * $file1 (SHA256: d0b425e00e15a0d36b9b361f02bab63563aed6cb4665083905386c55d5b679fa)
+            |    * $file3 (SHA256: dab741b6289e7dccc1ed42330cae1accc2b755ce8079c2cd5d4b5366c9f769a6)
+            |
+          """
+            .trimMargin()
         )
     }
 }
