@@ -17,7 +17,7 @@ import org.junit.jupiter.api.Test
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   @Test
-  fun groovyExtensionModuleTransformer() {
+  fun groovyExtensionModuleTransformerWithShortSyntax() {
     projectScript.appendText(
       """
       dependencies {
