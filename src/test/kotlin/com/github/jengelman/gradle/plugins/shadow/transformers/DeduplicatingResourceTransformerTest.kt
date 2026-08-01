@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
@@ -32,14 +31,6 @@ class DeduplicatingResourceTransformerTest :
   private var hash1 = ""
   private var hash3 = ""
 
-  @Test
-  fun sha256Hex() {
-    val file = tempDir.resolve("sha256").toFile().apply { writeText("content") }
-
-    assertThat(file.sha256Hex())
-      .isEqualTo("ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73")
-  }
-
   @BeforeEach
   fun setupFiles() {
     val content1 = "content1"
@@ -51,6 +42,14 @@ class DeduplicatingResourceTransformerTest :
 
     hash1 = file1.sha256Hex()
     hash3 = file3.sha256Hex()
+  }
+
+  @Test
+  fun sha256Hex() {
+    val file = tempDir.resolve("sha256").toFile().apply { writeText("content") }
+
+    assertThat(file.sha256Hex())
+      .isEqualTo("ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73")
   }
 
   @ParameterizedTest

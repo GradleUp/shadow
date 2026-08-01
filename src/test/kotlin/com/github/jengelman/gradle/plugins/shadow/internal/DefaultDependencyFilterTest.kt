@@ -4,9 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
-import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.api.artifacts.ResolvedModuleVersion
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -64,7 +62,7 @@ class DefaultDependencyFilterTest {
     private val group: String,
     private val name: String,
     private val version: String,
-  ) : ResolvedDependency {
+  ) : ResolvedDependency by noOpDelegate() {
     override fun getName(): String = "$group:$name:$version"
 
     override fun getModuleGroup(): String = group
@@ -72,22 +70,6 @@ class DefaultDependencyFilterTest {
     override fun getModuleName(): String = name
 
     override fun getModuleVersion(): String = version
-
-    override fun getModule(): ResolvedModuleVersion = noOpDelegate()
-
-    override fun getChildren(): Set<ResolvedDependency> = emptySet()
-
-    override fun getParents(): Set<ResolvedDependency> = emptySet()
-
-    override fun getModuleArtifacts(): Set<ResolvedArtifact> = emptySet()
-
-    override fun getAllModuleArtifacts(): Set<ResolvedArtifact> = emptySet()
-
-    override fun getParentArtifacts(parent: ResolvedDependency): Set<ResolvedArtifact> = emptySet()
-
-    override fun getArtifacts(parent: ResolvedDependency): Set<ResolvedArtifact> = emptySet()
-
-    override fun getAllArtifacts(parent: ResolvedDependency): Set<ResolvedArtifact> = emptySet()
 
     override fun getConfiguration(): String = "default"
   }

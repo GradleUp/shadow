@@ -11,7 +11,7 @@ class PreserveFirstFoundResourceTransformerTest :
   @Test
   fun firstOccurrenceIsNotTransformed() =
     with(transformer) {
-      @Suppress("DEPRECATION") resources.add("foo/bar")
+      include("foo/bar")
 
       // First occurrence: not yet found → canTransformResource returns false (do not intercept)
       assertThat(canTransformResource("foo/bar")).isFalse()
@@ -20,7 +20,7 @@ class PreserveFirstFoundResourceTransformerTest :
   @Test
   fun subsequentOccurrencesAreTransformed() =
     with(transformer) {
-      @Suppress("DEPRECATION") resources.add("foo/bar")
+      include("foo/bar")
 
       canTransformResource("foo/bar") // first call — registers it
 
@@ -31,7 +31,7 @@ class PreserveFirstFoundResourceTransformerTest :
   @Test
   fun nonMatchingPathIsNotTransformed() =
     with(transformer) {
-      @Suppress("DEPRECATION") resources.add("foo/bar")
+      include("foo/bar")
 
       assertThat(canTransformResource("foo/baz")).isFalse()
     }
