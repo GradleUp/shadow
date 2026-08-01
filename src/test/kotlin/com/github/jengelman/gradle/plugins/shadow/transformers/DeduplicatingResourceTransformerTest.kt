@@ -1,16 +1,21 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.nio.file.Path
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.GradleException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -111,5 +116,25 @@ class DeduplicatingResourceTransformerTest :
         assertThat(duplicateContentViolations())
           .containsOnly("differing-content-2" to pathInfosDifferingContent2)
       }
+    }
+
+  @Test
+  fun modifyOutputStreamReportsDuplicateContent() =
+    with(transformer) {
+      canTransformResource("differing-content", file1)
+      canTransformResource("differing-content", file3)
+
+      val failure =
+        assertThrows<GradleException> {
+          ZipOutputStream(ByteArrayOutputStream()).use { modifyOutputStream(it, false) }
+        }
+
+      assertThat(failure.message.orEmpty())
+        .contains(
+          "Found 1 path duplicate(s) with different content in the shadowed JAR:",
+          "  * differing-content",
+          hash1,
+          hash3,
+        )
     }
 }
