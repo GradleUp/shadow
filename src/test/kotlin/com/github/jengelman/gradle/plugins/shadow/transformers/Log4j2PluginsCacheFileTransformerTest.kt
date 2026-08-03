@@ -10,14 +10,17 @@ import assertk.assertions.startsWith
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
-import java.net.URI
 import java.net.URL
 import java.util.Collections
 import java.util.jar.JarInputStream
+import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
+import kotlin.io.path.writeBytes
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
@@ -54,10 +57,13 @@ class Log4j2PluginsCacheFileTransformerTest :
         modifyOutputStream(zos, true)
       }
 
-      // Pull the data back out and make sure it was transformed
+      // Extract the .dat file bytes to a temp file to avoid JarURLConnection locking tempJar on
+      // Windows
+      val tempDat = createTempFile(directory = tempDir, suffix = ".dat")
+      tempDat.writeBytes(JarPath(tempJar).use { it.getBytes(PLUGIN_CACHE_FILE) })
+
       val cache = PluginCache()
-      val url = URI("jar:" + tempJar.toUri().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
-      cache.loadCacheFiles(Collections.enumeration(listOf(url)))
+      cache.loadCacheFiles(Collections.enumeration(listOf(tempDat.toUri().toURL())))
 
       assertThat(cache.getCategory("lookup")["date"]?.className)
         .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
