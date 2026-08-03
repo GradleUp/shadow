@@ -18,6 +18,10 @@ import org.gradle.api.tasks.Input
  *
  * @author John Engelman
  */
+@Deprecated(
+  message = "Use `ShadowJar.exclude` instead. This will be removed in Shadow 10.",
+  replaceWith = ReplaceWith("exclude"),
+)
 @CacheableTransformer
 public open class DontIncludeResourceTransformer
 @Inject
