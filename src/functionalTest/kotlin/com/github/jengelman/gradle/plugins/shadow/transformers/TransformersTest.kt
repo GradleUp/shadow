@@ -1,18 +1,24 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.KClass
+import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
@@ -73,51 +79,6 @@ class TransformersTest : BaseTransformerTest() {
       // Hash of the original plugin cache file.
       isNotEqualTo(-2114104185)
       isEqualTo(1911442937)
-    }
-  }
-
-  @Test
-  fun includeResource() {
-    val foo = path("foo").apply { writeText("foo") }
-    projectScript.appendText(
-      @Suppress("DEPRECATION")
-      transform<IncludeResourceTransformer>(
-        transformerBlock =
-          """
-          resource = 'bar'
-          file = file('${foo.invariantSeparatorsPathString}')
-        """
-            .trimIndent()
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly("bar", *manifestEntries)
-      getContent("bar").isEqualTo("foo")
-    }
-  }
-
-  @Test
-  fun excludeResource() {
-    val one = buildJarOne {
-      insert("foo", "bar")
-      insert("bar", "foo")
-    }
-    projectScript.appendText(
-      @Suppress("DEPRECATION")
-      transform<DontIncludeResourceTransformer>(
-        dependenciesBlock = implementationFiles(one),
-        transformerBlock = "resource = 'foo'",
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly("bar", *manifestEntries)
-      getContent("bar").isEqualTo("foo")
     }
   }
 
@@ -291,9 +252,6 @@ class TransformersTest : BaseTransformerTest() {
         "" to Log4j2PluginsCacheFileTransformer::class,
         "" to ManifestAppenderTransformer::class,
         "" to ManifestResourceTransformer::class,
-        "{ resource = 'not-found' }" to DontIncludeResourceTransformer::class,
-        "{ resource = 'included-resource'; file = file('build.gradle') }" to
-          IncludeResourceTransformer::class,
         "{ include('not-found') }" to PreserveFirstFoundResourceTransformer::class,
         "{ resource = 'not-found' }" to XmlAppendingTransformer::class,
       )
