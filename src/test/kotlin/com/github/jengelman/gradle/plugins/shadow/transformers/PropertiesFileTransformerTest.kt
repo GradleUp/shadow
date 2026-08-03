@@ -16,7 +16,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import java.util.jar.JarFile.MANIFEST_NAME
-import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
@@ -211,15 +210,11 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transform(textContext(path, text1))
       transform(textContext(path, text2))
 
-      try {
-        tempJar.outputStream().zipOutputStream().use { zos ->
-          modifyOutputStream(zos, false)
-        }
-        val content = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
-        assertThat(content).isEqualTo("foo=one,two\n")
-      } finally {
-        tempJar.deleteExisting()
+      tempJar.outputStream().zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
       }
+      val content = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
+      assertThat(content).isEqualTo("foo=one,two\n")
     }
 
   private companion object {

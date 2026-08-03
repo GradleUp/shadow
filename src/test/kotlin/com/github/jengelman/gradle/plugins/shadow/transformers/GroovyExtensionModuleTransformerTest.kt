@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.StringReader
 import java.util.Properties
-import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -43,23 +42,19 @@ class GroovyExtensionModuleTransformerTest :
       transform(textContext(fooEntry, FOO_DESCRIPTOR))
       transform(textContext(barEntry, BAR_DESCRIPTOR))
 
-      try {
-        tempJar.outputStream().zipOutputStream().use { zos ->
-          modifyOutputStream(zos, false)
-        }
-        val properties =
-          JarPath(tempJar)
-            .use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) }
-            .toProperties()
-        assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
-        assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
-        assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
-          .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
-        assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-          .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
-      } finally {
-        tempJar.deleteExisting()
+      tempJar.outputStream().zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
       }
+      val properties =
+        JarPath(tempJar)
+          .use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) }
+          .toProperties()
+      assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
+      assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
+      assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
+        .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
+      assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
+        .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
     }
 
   @Test
@@ -69,28 +64,24 @@ class GroovyExtensionModuleTransformerTest :
       transform(textContext(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, FOO_DESCRIPTOR, relocator))
       transform(textContext(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, BAR_DESCRIPTOR, relocator))
 
-      try {
-        tempJar.outputStream().zipOutputStream().use { zos ->
-          modifyOutputStream(zos, false)
-        }
-        val properties =
-          JarPath(tempJar)
-            .use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) }
-            .toProperties()
-        assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
-        assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
-        assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
-          .isEqualTo(
-            "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
-              "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension"
-          )
-        assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-          .isEqualTo(
-            "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension"
-          )
-      } finally {
-        tempJar.deleteExisting()
+      tempJar.outputStream().zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
       }
+      val properties =
+        JarPath(tempJar)
+          .use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR) }
+          .toProperties()
+      assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
+      assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
+      assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
+        .isEqualTo(
+          "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
+            "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension"
+        )
+      assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
+        .isEqualTo(
+          "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension"
+        )
     }
 
   private companion object {
