@@ -7,9 +7,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import java.nio.file.Path
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
 class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseResourceTransformer>() {
   @Test
@@ -41,7 +39,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun deduplicateLicenseTexts(@TempDir tempDir: Path) =
+  fun deduplicateLicenseTexts() =
     with(transformer) {
       transformInternal("license one".toByteArray())
       transformInternal("\r\nlicense one\r\n".toByteArray())
@@ -84,7 +82,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun singleAdditionalLicense(@TempDir tempDir: Path) =
+  fun singleAdditionalLicense() =
     with(transformer) {
       transformInternal("license one".toByteArray())
 
@@ -112,7 +110,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun noAdditionalLicenses(@TempDir tempDir: Path) =
+  fun noAdditionalLicenses() =
     with(transformer) {
       val artifactLicenseFile = tempDir.resolve("artifact-license").toFile()
       artifactLicenseFile.writeText("artifact license file content")
@@ -131,7 +129,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun noSpdxId(@TempDir tempDir: Path) =
+  fun noSpdxId() =
     with(transformer) {
       artifactLicenseSpdxId.unsetConvention()
 

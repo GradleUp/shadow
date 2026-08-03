@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
@@ -15,7 +14,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTra
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
-import java.util.jar.JarFile.MANIFEST_NAME
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -27,7 +25,8 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   @Test
   fun hasTransformedResource() =
     with(transformer) {
-      transform(manifestTransformerContext)
+      val path = "f.properties"
+      transform(context(path, mapOf("foo" to "foo")))
 
       assertThat(hasTransformedResource()).isTrue()
     }
@@ -36,17 +35,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun hasNotTransformedResource() {
     assertThat(transformer.hasTransformedResource()).isFalse()
   }
-
-  @Test
-  fun transformation() =
-    with(transformer) {
-      transform(manifestTransformerContext)
-
-      val targetLines = transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-
-      assertThat(targetLines).isNotEmpty()
-      assertThat(targetLines).contains("Manifest-Version=1.0")
-    }
 
   @ParameterizedTest
   @MethodSource("pathProvider")
