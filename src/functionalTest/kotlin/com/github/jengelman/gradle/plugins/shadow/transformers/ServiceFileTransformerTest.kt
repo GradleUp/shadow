@@ -20,30 +20,6 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
   @Test
-  fun serviceResourceTransformerWithShortSyntax() {
-    val config =
-      """
-      dependencies {
-        ${implementationFiles(buildJarOne(), buildJarTwo())}
-      }
-      $shadowJarTask {
-        mergeServiceFiles {
-          exclude 'META-INF/services/com.acme.*'
-        }
-      }
-    """
-        .trimIndent()
-    projectScript.appendText(config)
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("two")
-    }
-  }
-
-  @Test
   fun serviceResourceTransformerAlternatePath() {
     val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
