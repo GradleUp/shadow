@@ -23,6 +23,10 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
+@Deprecated(
+  message = "Use `ShadowJar.from` instead. This will be removed in Shadow 10.",
+  replaceWith = ReplaceWith("from"),
+)
 @CacheableTransformer
 public open class IncludeResourceTransformer
 @Inject

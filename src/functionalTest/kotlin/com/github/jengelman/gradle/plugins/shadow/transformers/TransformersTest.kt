@@ -156,6 +156,7 @@ class TransformersTest : BaseTransformerTest() {
   fun includeResource() {
     val foo = path("foo").apply { writeText("foo") }
     projectScript.appendText(
+      @Suppress("DEPRECATION")
       transform<IncludeResourceTransformer>(
         transformerBlock =
           """
@@ -181,6 +182,7 @@ class TransformersTest : BaseTransformerTest() {
       insert("bar", "foo")
     }
     projectScript.appendText(
+      @Suppress("DEPRECATION")
       transform<DontIncludeResourceTransformer>(
         dependenciesBlock = implementationFiles(one),
         transformerBlock = "resource = 'foo'",
