@@ -49,7 +49,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
         }
-        val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.trim().replace("\r\n", "\n")
+        val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
         assertThat(content)
           .isEqualTo(
             """
@@ -60,7 +60,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
               <entry key="key2">val2</entry>
             </properties>
             """
-              .trimIndent()
+              .trimIndent() + "\n"
           )
       } finally {
         tempJar.deleteExisting()
@@ -89,7 +89,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
         }
-        val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.trim().replace("\r\n", "\n")
+        val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
         assertThat(content)
           .isEqualTo(
             """
@@ -100,7 +100,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
               <entry key="key2">val2</entry>
             </properties>
             """
-              .trimIndent()
+              .trimIndent() + "\n"
           )
       } finally {
         tempJar.deleteExisting()
@@ -126,7 +126,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
         }
-        val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.trim().replace("\r\n", "\n")
+        val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
         assertThat(content)
           .isEqualTo(
             """
@@ -136,10 +136,21 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
               <c />
             </a>
             """
-              .trimIndent()
+              .trimIndent() + "\n"
           )
       } finally {
         tempJar.deleteExisting()
       }
     }
+
+  private companion object {
+    /**
+     * Normalizes line breaks in XML content produced by [XmlAppendingTransformer].
+     *
+     * JDOM2's [org.jdom2.output.Format.getPrettyFormat] defaults its line separator to `\r\n`
+     * (CRLF) across all platforms. Replacing `\r\n` with `\n` aligns the output with Kotlin's raw
+     * string literals (`"""...""".trimIndent()`) for cross-platform assertions.
+     */
+    fun String.normalizeXmlEol(): String = replace("\r\n", "\n")
+  }
 }

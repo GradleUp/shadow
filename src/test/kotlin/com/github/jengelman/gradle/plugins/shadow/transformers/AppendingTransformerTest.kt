@@ -6,6 +6,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
@@ -42,8 +43,7 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
         }
-        val content =
-          JarPath(tempJar).use { it.getContent("test.properties") }.trim().replace("\r\n", "\n")
+        val content = JarPath(tempJar).use { it.getContent("test.properties") }.invariantEolString
         assertThat(content).isEqualTo("foo=bar\nbaz=qux")
       } finally {
         tempJar.deleteExisting()
@@ -62,8 +62,7 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
         }
-        val content =
-          JarPath(tempJar).use { it.getContent("application.yml") }.trim().replace("\r\n", "\n")
+        val content = JarPath(tempJar).use { it.getContent("application.yml") }.invariantEolString
         assertThat(content).isEqualTo("key1: val1\n---\nkey2: val2")
       } finally {
         tempJar.deleteExisting()

@@ -7,10 +7,10 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
-import java.io.ByteArrayOutputStream
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.File
+import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -122,7 +122,9 @@ class DeduplicatingResourceTransformerTest :
 
       val failure =
         assertThrows<GradleException> {
-          ZipOutputStream(ByteArrayOutputStream()).use { modifyOutputStream(it, false) }
+          tempJar.outputStream().zipOutputStream().use {
+            modifyOutputStream(it, false)
+          }
         }
 
       assertThat(failure.message.orEmpty())
