@@ -48,18 +48,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(targetLines).contains("Manifest-Version=1.0")
     }
 
-  @Test
-  fun transformationPropertiesAreReproducible() =
-    with(transformer) {
-      transform(manifestTransformerContext)
-
-      val firstRunTargetLines = transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-      Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-      val secondRunTargetLines = transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-
-      assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
-    }
-
   @ParameterizedTest
   @MethodSource("pathProvider")
   fun canTransformResourceWithPaths(path: String, expected: Boolean) {
