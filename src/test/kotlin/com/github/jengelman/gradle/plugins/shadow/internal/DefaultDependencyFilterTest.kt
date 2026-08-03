@@ -20,7 +20,7 @@ class DefaultDependencyFilterTest {
   )
   fun matchesWildcardNotation(notation: String) {
     val spec = filter.dependency(notation)
-    val dep = testDependency("my", "d", "1.0")
+    val dep = TestResolvedDependency("my", "d", "1.0")
 
     assertThat(spec.isSatisfiedBy(dep)).isTrue()
   }
@@ -29,33 +29,25 @@ class DefaultDependencyFilterTest {
   fun matchesExactDependency() {
     val spec = filter.dependency("com.acme:foo:2.1.0")
 
-    assertThat(spec.isSatisfiedBy(testDependency("com.acme", "foo", "2.1.0"))).isTrue()
-    assertThat(spec.isSatisfiedBy(testDependency("com.acme", "bar", "2.1.0"))).isFalse()
-    assertThat(spec.isSatisfiedBy(testDependency("org.other", "foo", "2.1.0"))).isFalse()
+    assertThat(spec.isSatisfiedBy(TestResolvedDependency("com.acme", "foo", "2.1.0"))).isTrue()
+    assertThat(spec.isSatisfiedBy(TestResolvedDependency("com.acme", "bar", "2.1.0"))).isFalse()
+    assertThat(spec.isSatisfiedBy(TestResolvedDependency("org.other", "foo", "2.1.0"))).isFalse()
   }
 
   @Test
   fun matchesVersionWithPlusSpecialChar() {
     val spec = filter.dependency("org.foo:bar:1.0.0+1")
 
-    assertThat(spec.isSatisfiedBy(testDependency("org.foo", "bar", "1.0.0+1"))).isTrue()
-    assertThat(spec.isSatisfiedBy(testDependency("org.foo", "bar", "1.0.0+2"))).isFalse()
+    assertThat(spec.isSatisfiedBy(TestResolvedDependency("org.foo", "bar", "1.0.0+1"))).isTrue()
+    assertThat(spec.isSatisfiedBy(TestResolvedDependency("org.foo", "bar", "1.0.0+2"))).isFalse()
   }
 
   @Test
   fun excludeFilterMatchesDependency() {
     val excludeSpec = filter.dependency("my:b")
 
-    assertThat(excludeSpec.isSatisfiedBy(testDependency("my", "a", "1.0"))).isFalse()
-    assertThat(excludeSpec.isSatisfiedBy(testDependency("my", "b", "1.0"))).isTrue()
-  }
-
-  private companion object {
-    fun testDependency(
-      group: String,
-      name: String,
-      version: String,
-    ): ResolvedDependency = TestResolvedDependency(group, name, version)
+    assertThat(excludeSpec.isSatisfiedBy(TestResolvedDependency("my", "a", "1.0"))).isFalse()
+    assertThat(excludeSpec.isSatisfiedBy(TestResolvedDependency("my", "b", "1.0"))).isTrue()
   }
 
   private class TestResolvedDependency(

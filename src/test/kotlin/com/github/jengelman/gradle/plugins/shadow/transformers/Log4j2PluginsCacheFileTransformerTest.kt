@@ -17,7 +17,6 @@ import java.net.URI
 import java.net.URL
 import java.util.Collections
 import java.util.jar.JarInputStream
-import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
@@ -51,7 +50,6 @@ class Log4j2PluginsCacheFileTransformerTest :
       transform(context(relocator))
       assertThat(hasTransformedResource()).isTrue()
 
-      val tempJar = createTempFile("testable-zip-file-", ".jar")
       tempJar.outputStream().zipOutputStream().use { zos ->
         modifyOutputStream(zos, true)
       }

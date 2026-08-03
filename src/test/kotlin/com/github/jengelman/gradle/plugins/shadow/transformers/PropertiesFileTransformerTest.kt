@@ -15,7 +15,6 @@ import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import java.util.jar.JarFile.MANIFEST_NAME
-import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
 import org.gradle.api.GradleException
@@ -211,7 +210,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transform(textContext(path, text1))
       transform(textContext(path, text2))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)

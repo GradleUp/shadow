@@ -11,7 +11,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
 import kotlin.metadata.jvm.KotlinModuleMetadata
@@ -37,7 +36,6 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       val originalBytes = requireResourceAsStream(modulePath).readBytes()
       transform(resourceContext(modulePath))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
@@ -59,7 +57,6 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       val relocator = SimpleRelocator("kotlin", "my.kotlin")
       transform(resourceContext(modulePath, relocator))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)

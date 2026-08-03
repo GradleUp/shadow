@@ -7,7 +7,6 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
@@ -46,7 +45,6 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       transform(textContext(xmlEntry, xmlContent.format("key1", "val1")))
       transform(textContext(xmlEntry, xmlContent.format("key2", "val2")))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
@@ -87,7 +85,6 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       transform(textContext(xmlEntry, xmlContent.format("key1", "val1")))
       transform(textContext(xmlEntry, xmlContent.format("key2", "val2")))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
@@ -125,7 +122,6 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       transform(textContext(xmlEntry, xmlContent.format("<b />")))
       transform(textContext(xmlEntry, xmlContent.format("<c />")))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)

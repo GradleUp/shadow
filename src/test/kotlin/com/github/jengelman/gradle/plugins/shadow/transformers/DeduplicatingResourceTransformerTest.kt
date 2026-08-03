@@ -9,20 +9,17 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
 import java.io.ByteArrayOutputStream
 import java.io.File
-import java.nio.file.Path
+import kotlin.io.path.writeText
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
 class DeduplicatingResourceTransformerTest :
   BaseTransformerTest<DeduplicatingResourceTransformer>() {
-
-  @TempDir lateinit var tempDir: Path
 
   private lateinit var file1: File
   private lateinit var file2: File
@@ -32,23 +29,23 @@ class DeduplicatingResourceTransformerTest :
   private var hash3 = ""
 
   @BeforeEach
-  fun setupFiles() {
+  override fun beforeEach() {
+    super.beforeEach()
+
     val content1 = "content1"
     val content2 = "content2"
-
-    file1 = tempDir.resolve("file1").toFile().apply { writeText(content1) }
-    file2 = tempDir.resolve("file2").toFile().apply { writeText(content1) }
-    file3 = tempDir.resolve("file3").toFile().apply { writeText(content2) }
-
+    file1 = tempDir.resolve("file1").apply { writeText(content1) }.toFile()
+    file2 = tempDir.resolve("file2").apply { writeText(content1) }.toFile()
+    file3 = tempDir.resolve("file3").apply { writeText(content2) }.toFile()
     hash1 = file1.sha256Hex()
     hash3 = file3.sha256Hex()
   }
 
   @Test
   fun sha256Hex() {
-    val file = tempDir.resolve("sha256").toFile().apply { writeText("content") }
+    val file = tempDir.resolve("sha256").apply { writeText("content") }
 
-    assertThat(file.sha256Hex())
+    assertThat(file.toFile().sha256Hex())
       .isEqualTo("ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73")
   }
 

@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.StringReader
 import java.util.Properties
-import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
@@ -44,7 +43,6 @@ class GroovyExtensionModuleTransformerTest :
       transform(textContext(fooEntry, FOO_DESCRIPTOR))
       transform(textContext(barEntry, BAR_DESCRIPTOR))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
@@ -71,7 +69,6 @@ class GroovyExtensionModuleTransformerTest :
       transform(textContext(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, FOO_DESCRIPTOR, relocator))
       transform(textContext(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, BAR_DESCRIPTOR, relocator))
 
-      val tempJar = createTempFile("shade.", ".jar")
       try {
         tempJar.outputStream().zipOutputStream().use { zos ->
           modifyOutputStream(zos, false)
