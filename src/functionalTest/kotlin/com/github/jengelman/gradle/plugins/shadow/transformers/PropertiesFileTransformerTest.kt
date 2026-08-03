@@ -18,7 +18,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock =
           """
-          mergeStrategy = $mergeStrategyClassName.Append
+          mergeStrategy = ${MergeStrategy::class.java.canonicalName}.Append
           keyTransformer = { key -> key.toUpperCase() }
           paths = ["META-INF/test.properties"]
         """
@@ -30,9 +30,5 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
     val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
     assertThat(content).contains("FOO=bar,baz")
-  }
-
-  private companion object {
-    val mergeStrategyClassName = requireNotNull(MergeStrategy::class.java.canonicalName)
   }
 }
