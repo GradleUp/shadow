@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.StringReader
 import java.util.Properties
-import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -42,7 +41,7 @@ class GroovyExtensionModuleTransformerTest :
       transform(textContext(fooEntry, FOO_DESCRIPTOR))
       transform(textContext(barEntry, BAR_DESCRIPTOR))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val properties =
@@ -64,7 +63,7 @@ class GroovyExtensionModuleTransformerTest :
       transform(textContext(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, FOO_DESCRIPTOR, relocator))
       transform(textContext(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, BAR_DESCRIPTOR, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val properties =

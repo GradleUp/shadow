@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -67,7 +66,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
       transform(textContext(contentResource, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 
@@ -86,7 +85,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transform(textContext(contentResource, content, relocator))
       transform(textContext(contentResourceShaded, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 
@@ -103,7 +102,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
       transform(textContext(contentResource, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 
@@ -124,7 +123,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
       transform(textContext(contentResource, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 

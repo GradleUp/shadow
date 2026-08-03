@@ -9,7 +9,6 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.File
-import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.BeforeEach
@@ -122,7 +121,7 @@ class DeduplicatingResourceTransformerTest :
 
       val failure =
         assertThrows<GradleException> {
-          tempJar.outputStream().zipOutputStream().use {
+          tempJar.zipOutputStream().use {
             modifyOutputStream(it, false)
           }
         }

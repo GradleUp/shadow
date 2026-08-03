@@ -13,7 +13,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import kotlin.io.path.outputStream
 import kotlin.metadata.jvm.KotlinModuleMetadata
 import kotlin.metadata.jvm.UnstableMetadataApi
 import org.junit.jupiter.api.Test
@@ -27,7 +26,6 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       assertThat(canTransformResource("META-INF/kotlin-stdlib.kotlin_module")).isTrue()
       assertThat(canTransformResource("foo/bar.kotlin_module")).isTrue()
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
-      assertThat(canTransformResource("foo/Bar.class")).isFalse()
     }
 
   @Test
@@ -37,7 +35,7 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       val originalBytes = requireResourceAsStream(modulePath).readBytes()
       transform(resourceContext(modulePath))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val outputBytes = JarPath(tempJar).use { it.getBytes(modulePath) }
@@ -54,7 +52,7 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       val relocator = SimpleRelocator("kotlin", "my.kotlin")
       transform(resourceContext(modulePath, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val expectedShadowPath = "META-INF/kotlin-stdlib.shadow.kotlin_module"

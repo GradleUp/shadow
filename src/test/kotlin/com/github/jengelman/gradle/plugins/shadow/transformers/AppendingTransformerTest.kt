@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 
 /**
@@ -38,7 +37,7 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
       transform(textContext("test.properties", "foo=bar"))
       transform(textContext("test.properties", "baz=qux"))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val content = JarPath(tempJar).use { it.getContent("test.properties") }.invariantEolString
@@ -53,7 +52,7 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
       transform(textContext("application.yml", "key1: val1"))
       transform(textContext("application.yml", "key2: val2"))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val content = JarPath(tempJar).use { it.getContent("application.yml") }.invariantEolString

@@ -7,7 +7,6 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import kotlin.io.path.outputStream
 import org.junit.jupiter.api.Test
 
 class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>() {
@@ -44,7 +43,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       transform(textContext(xmlEntry, xmlContent.format("key1", "val1")))
       transform(textContext(xmlEntry, xmlContent.format("key2", "val2")))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
@@ -80,7 +79,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       transform(textContext(xmlEntry, xmlContent.format("key1", "val1")))
       transform(textContext(xmlEntry, xmlContent.format("key2", "val2")))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
@@ -113,7 +112,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       transform(textContext(xmlEntry, xmlContent.format("<b />")))
       transform(textContext(xmlEntry, xmlContent.format("<c />")))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
       val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
