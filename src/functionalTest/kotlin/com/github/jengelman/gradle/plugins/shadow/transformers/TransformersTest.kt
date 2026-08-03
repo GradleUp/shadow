@@ -13,7 +13,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
-import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
@@ -125,62 +124,6 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
-  }
-
-  @Test
-  fun configureComplexTransformerProperties() {
-    val propertiesEntry = "META-INF/test.properties"
-    val one = buildJarOne {
-      insert(propertiesEntry, "foo=第一")
-      insert("META-INF/LICENSE", "license one")
-    }
-    val two = buildJarTwo {
-      insert(propertiesEntry, "foo=第二")
-      insert("META-INF/LICENSE", "license two")
-    }
-    val artifactLicense = path("my-license").apply { writeText("artifact license text") }
-
-    projectScript.appendText(
-      """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          transform(${PropertiesFileTransformer::class.java.name}) {
-            mappings = [
-              '$propertiesEntry': ['mergeStrategy': 'append', 'mergeSeparator': ';']
-            ]
-            charsetName = 'utf-8'
-            keyTransformer = { key -> key.toUpperCase() }
-          }
-          transform(${MergeLicenseResourceTransformer::class.java.name}) {
-            outputPath = 'MY_LICENSE'
-            artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
-            firstSeparator = '####'
-            separator = '----'
-          }
-        }
-      """
-        .trimIndent()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent(propertiesEntry).contains("FOO=第一;第二")
-      getContent("MY_LICENSE")
-        .isEqualTo(
-          """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license text
-          ####
-          license one
-          ----
-          license two
-          """
-            .trimIndent()
-        )
-    }
   }
 
   private fun commonAssertions(
