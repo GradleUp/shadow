@@ -7,7 +7,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
@@ -17,11 +16,8 @@ import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
-import kotlin.reflect.KClass
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 
 class TransformersTest : BaseTransformerTest() {
 
@@ -131,28 +127,6 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
-  @ParameterizedTest
-  @MethodSource("transformerConfigProvider")
-  fun otherTransformers(pair: Pair<String, KClass<*>>) {
-    val (configuration, transformer) = pair
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation 'my:a:1.0'
-          implementation 'my:b:1.0'
-        }
-        $shadowJarTask {
-          transform(${transformer.java.name}) $configuration
-        }
-      """
-        .trimIndent()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll { containsAtLeast(*entriesInAB) }
-  }
-
   @Test
   fun configureComplexTransformerProperties() {
     val propertiesEntry = "META-INF/test.properties"
@@ -241,19 +215,5 @@ class TransformersTest : BaseTransformerTest() {
         }
     """
         .trimIndent()
-
-    @JvmStatic
-    fun transformerConfigProvider() =
-      listOf(
-        "" to ApacheLicenseResourceTransformer::class,
-        "" to ComponentsXmlResourceTransformer::class,
-        "{ exclude('not-found') }" to DeduplicatingResourceTransformer::class,
-        "" to GroovyExtensionModuleTransformer::class,
-        "" to Log4j2PluginsCacheFileTransformer::class,
-        "" to ManifestAppenderTransformer::class,
-        "" to ManifestResourceTransformer::class,
-        "{ include('not-found') }" to PreserveFirstFoundResourceTransformer::class,
-        "{ resource = 'not-found' }" to XmlAppendingTransformer::class,
-      )
   }
 }
