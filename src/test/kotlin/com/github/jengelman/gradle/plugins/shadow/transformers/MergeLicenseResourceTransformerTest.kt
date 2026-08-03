@@ -145,7 +145,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun customOutput(@TempDir tempDir: Path) =
+  fun customOutput() =
     with(transformer) {
       outputPath.set("MY_LICENSE")
       firstSeparator.set("####")
