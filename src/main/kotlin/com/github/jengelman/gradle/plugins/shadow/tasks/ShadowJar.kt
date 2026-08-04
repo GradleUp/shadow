@@ -177,8 +177,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
 
-  // The resolved result is tracked by includedDependencies.
-  @get:Internal
+  @get:Internal // The resolved result is tracked by includedDependencies.
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
