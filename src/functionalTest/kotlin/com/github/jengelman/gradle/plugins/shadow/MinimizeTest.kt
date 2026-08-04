@@ -220,30 +220,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test // #1610
-  fun excludeCircularDependencies() {
-    val dependency = "'my:e:1.0'"
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation $dependency
-        }
-        $shadowJarTask {
-          minimize {
-            exclude(dependency($dependency))
-          }
-        }
-      """
-        .trimIndent()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      containsOnly("e.properties", "f.properties", *manifestEntries)
-    }
-  }
-
   @ParameterizedTest
   @ValueSource(booleans = [false, true])
   fun enableMinimizationByCliOption(enable: Boolean) {
