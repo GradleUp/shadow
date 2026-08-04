@@ -25,16 +25,12 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   @Test
   fun hasTransformedResource() =
     with(transformer) {
-      val path = "f.properties"
-      transform(context(path, mapOf("foo" to "foo")))
+      assertThat(hasTransformedResource()).isFalse()
+
+      transform(context("f.properties", mapOf("foo" to "foo")))
 
       assertThat(hasTransformedResource()).isTrue()
     }
-
-  @Test
-  fun hasNotTransformedResource() {
-    assertThat(transformer.hasTransformedResource()).isFalse()
-  }
 
   @ParameterizedTest
   @MethodSource("pathProvider")

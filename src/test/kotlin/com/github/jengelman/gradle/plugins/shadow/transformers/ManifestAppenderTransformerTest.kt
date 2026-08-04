@@ -25,15 +25,12 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
   @Test
   fun hasTransformedResource() =
     with(transformer) {
+      assertThat(transformer.hasTransformedResource()).isFalse()
+
       append("Tag", "Something")
 
       assertThat(hasTransformedResource()).isTrue()
     }
-
-  @Test
-  fun hasNotTransformedResource() {
-    assertThat(transformer.hasTransformedResource()).isFalse()
-  }
 
   @Test
   fun transformation() =
