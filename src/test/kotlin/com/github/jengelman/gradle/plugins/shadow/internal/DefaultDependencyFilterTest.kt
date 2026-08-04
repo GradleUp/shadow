@@ -55,7 +55,7 @@ class DefaultDependencyFilterTest {
     val spec = filter.project(subproject.path)
     val dep =
       TestResolvedDependency(
-        group = projectDep.group ?: "",
+        group = projectDep.group.orEmpty(),
         name = projectDep.name,
         version = projectDep.version ?: "unspecified",
       )

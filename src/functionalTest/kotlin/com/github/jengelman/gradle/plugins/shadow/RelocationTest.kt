@@ -6,14 +6,17 @@ import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
+import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
+import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
@@ -565,6 +568,44 @@ class RelocationTest : BasePluginTest() {
     val originalBytes = outputJar.use { it.getBytes(mainClassEntry) }
     val relocatedBytes = outputShadowedJar.use { it.getBytes(mainClassEntry) }
     assertThat(relocatedBytes).isEqualTo(originalBytes)
+  }
+
+  @ParameterizedTest // #843
+  @ValueSource(booleans = [false, true])
+  fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
+    val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
+    val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()
+    val stdlibJar =
+      buildJar("stdlib.jar") { insert(originalModuleFilePath, originalModuleFileBytes) }
+    projectScript.appendText(
+      """
+        dependencies {
+          ${implementationFiles(stdlibJar)}
+        }
+        $shadowJarTask {
+          relocate('kotlin', 'my.kotlin')
+          enableKotlinModuleRemapping = $enableKotlinModuleRemapping
+        }
+      """
+        .trimIndent()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    val relocatedModuleFilePath = "META-INF/kotlin-stdlib.shadow.kotlin_module"
+
+    if (enableKotlinModuleRemapping) {
+      assertThat(outputShadowedJar).useAll {
+        containsOnly(relocatedModuleFilePath, *manifestEntries)
+        transform { it.getBytes(relocatedModuleFilePath) }.isNotEqualTo(originalModuleFileBytes)
+      }
+    } else {
+      assertThat(outputShadowedJar).useAll {
+        containsOnly(originalModuleFilePath, *manifestEntries)
+        transform { it.getBytes(originalModuleFilePath) }.isEqualTo(originalModuleFileBytes)
+      }
+      return
+    }
   }
 
   private fun writeClassWithStringRef() {
