@@ -4,7 +4,6 @@ import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -71,34 +70,6 @@ class CachingTest : BasePluginTest() {
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
     }
-  }
-
-  @Test
-  fun dependencyFilterChanged() {
-    projectScript.appendText(
-      """
-      dependencies {
-        implementation 'my:d:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
-    )
-    val assertions = {
-      assertCompositeExecutions { containsOnly("c.properties", "d.properties", *manifestEntries) }
-    }
-
-    assertions()
-
-    projectScript.appendText(
-      """
-        $shadowJarTask {
-          dependencyFilter = new ${MinimizeDependencyFilter::class.java.name}(project)
-        }
-      """
-        .trimIndent()
-    )
-
-    assertions()
   }
 
   @Test
