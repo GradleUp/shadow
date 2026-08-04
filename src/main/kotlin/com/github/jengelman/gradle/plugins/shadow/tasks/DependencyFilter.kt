@@ -10,6 +10,7 @@ import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Internal
 
 @ShadowDsl
 public interface DependencyFilter {
@@ -36,8 +37,12 @@ public interface DependencyFilter {
 
   public abstract class AbstractDependencyFilter(
     @Transient private val project: Project,
-    @Transient protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
-    @Transient protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+    @get:Internal
+    @Transient
+    protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+    @get:Internal
+    @Transient
+    protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
   ) : DependencyFilter {
 
     protected abstract fun resolve(
