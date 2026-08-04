@@ -597,12 +597,12 @@ class RelocationTest : BasePluginTest() {
     if (enableKotlinModuleRemapping) {
       assertThat(outputShadowedJar).useAll {
         containsOnly(relocatedModuleFilePath, *manifestEntries)
-        transform { it.getBytes(relocatedModuleFilePath) }.isNotEqualTo(originalModuleFileBytes)
+        getBytes(relocatedModuleFilePath).isNotEqualTo(originalModuleFileBytes)
       }
     } else {
       assertThat(outputShadowedJar).useAll {
         containsOnly(originalModuleFilePath, *manifestEntries)
-        transform { it.getBytes(originalModuleFilePath) }.isEqualTo(originalModuleFileBytes)
+        getBytes(originalModuleFilePath).isEqualTo(originalModuleFileBytes)
       }
       return
     }

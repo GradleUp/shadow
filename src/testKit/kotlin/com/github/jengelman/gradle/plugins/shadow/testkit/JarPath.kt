@@ -2,16 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.Assert
 import assertk.assertions.containsAtLeast
-import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import java.io.InputStream
 import java.nio.file.Path
 import java.util.jar.JarFile
-import java.util.jar.JarInputStream
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
-import kotlin.io.path.inputStream
 
 /**
  * A wrapper for [JarFile] that also implements [Path].
@@ -48,26 +44,9 @@ fun ZipFile.getStream(entryName: String): InputStream {
   return getInputStream(entry)
 }
 
-fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
+fun Assert<JarPath>.getBytes(entryName: String) = transform { it.getBytes(entryName) }
 
-/**
- * Scans the jar file for all entries that match the specified [entryName]. Unlike [getContent] or
- * [getStream], which return only one of the matching entries (which one is undefined), this
- * function returns all matching entries.
- */
-fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
-  JarInputStream(actual.path.inputStream()).use { jarInput ->
-    val contents = mutableListOf<String>()
-    while (true) {
-      val entry = jarInput.nextEntry ?: break
-      if (entry.name == entryName) {
-        contents.add(jarInput.readAllBytes().toString(Charsets.UTF_8))
-      }
-      jarInput.closeEntry()
-    }
-    contents
-  }
-}
+fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
 
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
@@ -88,23 +67,6 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
  * [containsNone].
  */
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
-
-/**
- * Ensures the JAR contains exactly the specified entries, including duplicates, in any order. Used
- * alone, without [containsAtLeast] or [containsNone].
- */
-fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) = transform { actual ->
-  ZipInputStream(actual.path.inputStream()).use { jarInput ->
-    val allEntries = mutableListOf<String>()
-    while (true) {
-      val entry = jarInput.nextEntry ?: break
-      allEntries.add(entry.name)
-      jarInput.closeEntry()
-    }
-    allEntries
-  }
-}
-  .containsExactlyInAnyOrder(*entries)
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }
