@@ -1,24 +1,25 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 
 class DefaultDependencyFilterTest {
-  private val project = ProjectBuilder.builder().build()
   private val filter = DefaultDependencyFilter(project)
 
   @ParameterizedTest
   @MethodSource("dependencyNotationProvider")
   fun matchesDependencyNotation(
-    notation: String,
+    notation: Any,
     group: String,
     name: String,
     version: String,
@@ -30,58 +31,34 @@ class DefaultDependencyFilterTest {
     assertThat(spec.isSatisfiedBy(dep)).isEqualTo(expected)
   }
 
-  @Test
-  fun matchesProviderDependencyNotation() {
-    val provider = project.provider { "foo:bar:1.0" }
-    val spec = filter.dependency(provider)
-    val dep = TestResolvedDependency("foo", "bar", "1.0")
-
-    assertThat(spec.isSatisfiedBy(dep)).isTrue()
-  }
-
-  @Test
-  fun matchesMapDependencyNotation() {
-    val mapNotation = mapOf("group" to "foo", "name" to "bar", "version" to "1.0")
-    val spec = filter.dependency(mapNotation)
-    val dep = TestResolvedDependency("foo", "bar", "1.0")
-
-    assertThat(spec.isSatisfiedBy(dep)).isTrue()
-  }
-
-  @Test
-  fun matchesProjectNotation() {
-    val subproject = ProjectBuilder.builder().withName("subproject").build()
-    val projectDep = project.dependencies.project(mapOf("path" to subproject.path))
-    val spec = filter.project(subproject.path)
+  @ParameterizedTest
+  @MethodSource("projectNotationProvider")
+  fun matchesProjectNotation(notation: Any) {
+    val spec = filter.project(notation)
     val dep =
       TestResolvedDependency(
-        group = projectDep.group.orEmpty(),
-        name = projectDep.name,
-        version = projectDep.version ?: "unspecified",
+        group = projectDependency.group.orEmpty(),
+        name = projectDependency.name,
+        version = projectDependency.version ?: "unspecified",
       )
 
     assertThat(spec.isSatisfiedBy(dep)).isTrue()
   }
 
-  private class TestResolvedDependency(
-    private val group: String,
-    private val name: String,
-    private val version: String,
-  ) : ResolvedDependency by noOpDelegate() {
-    override fun getName(): String = "$group:$name:$version"
+  @Test
+  fun rejectsUnsupportedProjectNotation() {
+    val failure = assertThrows<IllegalArgumentException> { filter.project(42) }
 
-    override fun getModuleGroup(): String = group
-
-    override fun getModuleName(): String = name
-
-    override fun getModuleVersion(): String = version
-
-    override fun getConfiguration(): String = "default"
+    assertThat(failure.message.orEmpty())
+      .contains("Unsupported notation type: class java.lang.Integer")
   }
 
   private companion object {
-    @JvmStatic
-    fun dependencyNotationProvider() =
+    val project = ProjectBuilder.builder().build()
+    val subproject = ProjectBuilder.builder().withName("subproject").withParent(project).build()
+    val projectDependency = project.dependencies.project(mapOf("path" to subproject.path))
+
+    val stringNotations =
       listOf(
         Arguments.of("foo:bar", "foo", "bar", "1.0", true),
         Arguments.of("f.*:bar", "foo", "bar", "1.0", true),
@@ -100,5 +77,47 @@ class DefaultDependencyFilterTest {
         Arguments.of("foo:bar:1.0", "foo", "bar", "2.0", false),
         Arguments.of("f.*:bar", "zoo", "bar", "1.0", false),
       )
+
+    val providerNotations =
+      listOf(Arguments.of(project.provider { "foo:bar:1.0" }, "foo", "bar", "1.0", true))
+
+    val mapNotations =
+      listOf(
+        Arguments.of(
+          mapOf("group" to "foo", "name" to "bar", "version" to "1.0"),
+          "foo",
+          "bar",
+          "1.0",
+          true,
+        ),
+        Arguments.of(mapOf("name" to "bar"), "any.group", "bar", "1.0", true),
+      )
+
+    @JvmStatic fun dependencyNotationProvider() = stringNotations + providerNotations + mapNotations
+
+    @JvmStatic
+    fun projectNotationProvider() =
+      listOf(
+        Arguments.of(subproject.path),
+        Arguments.of(project.provider { subproject.path }),
+        Arguments.of(mapOf("path" to subproject.path)),
+        Arguments.of(projectDependency),
+      )
   }
+}
+
+private class TestResolvedDependency(
+  private val group: String,
+  private val name: String,
+  private val version: String,
+) : ResolvedDependency by noOpDelegate() {
+  override fun getName(): String = "$group:$name:$version"
+
+  override fun getModuleGroup(): String = group
+
+  override fun getModuleName(): String = name
+
+  override fun getModuleVersion(): String = version
+
+  override fun getConfiguration(): String = "default"
 }
