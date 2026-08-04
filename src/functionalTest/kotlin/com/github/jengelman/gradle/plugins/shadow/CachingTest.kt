@@ -74,7 +74,7 @@ class CachingTest : BasePluginTest() {
   }
 
   @Test
-  fun dependencyFilterChanged() {
+  fun dependencyFilterWithSameResultChanged() {
     projectScript.appendText(
       """
       dependencies {
@@ -83,11 +83,9 @@ class CachingTest : BasePluginTest() {
       """
         .trimIndent() + lineSeparator
     )
-    val assertions = {
-      assertCompositeExecutions { containsOnly("c.properties", "d.properties", *manifestEntries) }
+    assertCompositeExecutions {
+      containsOnly("c.properties", "d.properties", *manifestEntries)
     }
-
-    assertions()
 
     projectScript.appendText(
       """
@@ -98,7 +96,7 @@ class CachingTest : BasePluginTest() {
         .trimIndent()
     )
 
-    assertions()
+    assertRunWithResult(TaskOutcome.UP_TO_DATE)
   }
 
   @Test

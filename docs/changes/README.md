@@ -11,6 +11,7 @@
 
 - Bump min Gradle requirement to 9.4.0. ([#2114](https://github.com/GradleUp/shadow/pull/2114))
 - Remove runtime dependencies on Commons Codec and Commons IO by using JDK APIs. ([#2136](https://github.com/GradleUp/shadow/pull/2136))
+- **POTENTIALLY BREAKING:** Remove `Serializable` from `DependencyFilter`.
 
 ### Deprecated
 
