@@ -6,9 +6,8 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import java.nio.file.Path
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
 class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseResourceTransformer>() {
   @Test
@@ -40,7 +39,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun deduplicateLicenseTexts(@TempDir tempDir: Path) =
+  fun deduplicateLicenseTexts() =
     with(transformer) {
       transformInternal("license one".toByteArray())
       transformInternal("\r\nlicense one\r\n".toByteArray())
@@ -83,7 +82,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun singleAdditionalLicense(@TempDir tempDir: Path) =
+  fun singleAdditionalLicense() =
     with(transformer) {
       transformInternal("license one".toByteArray())
 
@@ -111,7 +110,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun noAdditionalLicenses(@TempDir tempDir: Path) =
+  fun noAdditionalLicenses() =
     with(transformer) {
       val artifactLicenseFile = tempDir.resolve("artifact-license").toFile()
       artifactLicenseFile.writeText("artifact license file content")
@@ -130,7 +129,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
     }
 
   @Test
-  fun noSpdxId(@TempDir tempDir: Path) =
+  fun noSpdxId() =
     with(transformer) {
       artifactLicenseSpdxId.unsetConvention()
 
@@ -141,5 +140,35 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(elements).isEmpty()
 
       assertThat(buildLicense()).isEqualTo("artifact license file content")
+    }
+
+  @Test
+  fun customOutput() =
+    with(transformer) {
+      outputPath.set("MY_LICENSE")
+      firstSeparator.set("####")
+      separator.set("----")
+      transform(textContext("META-INF/LICENSE", "license one"))
+      transform(textContext("META-INF/LICENSE", "license two"))
+      artifactLicense.set(
+        tempDir.resolve("artifact-license").toFile().apply {
+          writeText("artifact license text")
+        }
+      )
+
+      val content = transformToJar().use { it.getContent("MY_LICENSE") }
+
+      assertThat(content)
+        .isEqualTo(
+          """
+          SPDX-License-Identifier: Apache-2.0
+          artifact license text
+          ####
+          license one
+          ----
+          license two
+          """
+            .trimIndent()
+        )
     }
 }

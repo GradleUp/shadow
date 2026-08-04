@@ -4,206 +4,66 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import kotlin.io.path.appendText
-import org.gradle.testkit.runner.TaskOutcome.FAILED
-import org.junit.jupiter.api.Assertions.fail
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.EnumSource
 
 class PropertiesFileTransformerTest : BaseTransformerTest() {
 
-  @ParameterizedTest
-  @EnumSource(MergeStrategy::class)
-  fun mergePropertiesWithDifferentStrategies(strategy: MergeStrategy) {
-    val one = buildJarOne { insert("META-INF/test.properties", "key1=one\nkey2=one") }
-    val two = buildJarTwo { insert("META-INF/test.properties", "key2=two\nkey3=two") }
-    projectScript.appendText(
-      transform<PropertiesFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock =
-          """
-          mergeStrategy = $mergeStrategyClassName.$strategy
-          mergeSeparator = ";"
-          paths = ["META-INF/test.properties"]
-        """
-            .trimIndent(),
-      )
-    )
-
-    if (strategy == MergeStrategy.Fail) {
-      val result = runWithFailure(shadowJarPath)
-
-      assertThat(result).taskOutcomeEquals(shadowJarPath, FAILED)
-      assertThat(result.output.invariantEolString)
-        .contains(
-          """
-          Caused by: org.gradle.api.GradleException: The following properties files have conflicting property values and cannot be merged:
-           * META-INF/test.properties
-             * Property key2 is duplicated 2 times with different values
-          """
-            .trimIndent()
-        )
-    } else {
-      runWithSuccess(shadowJarPath)
-
-      val expected =
-        when (strategy) {
-          MergeStrategy.First ->
-            """
-            |key1=one
-            |key2=one
-            |key3=two
-            |"""
-              .trimMargin()
-          MergeStrategy.Latest ->
-            """
-            |key1=one
-            |key2=two
-            |key3=two
-            |"""
-              .trimMargin()
-          MergeStrategy.Append ->
-            """
-            |key1=one
-            |key2=one;two
-            |key3=two
-            |"""
-              .trimMargin()
-          else -> fail("Unexpected strategy: $strategy")
-        }
-      val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-      assertThat(content.invariantEolString).isEqualTo(expected)
-    }
-  }
-
   @Test
-  fun mergePropertiesWithKeyTransformer() {
-    val one = buildJarOne { insert("META-INF/test.properties", "foo=bar") }
-    val two = buildJarTwo { insert("META-INF/test.properties", "FOO=baz") }
-    projectScript.appendText(
-      transform<PropertiesFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock =
-          """
-          mergeStrategy = $mergeStrategyClassName.Append
-          keyTransformer = { key -> key.toUpperCase() }
-          paths = ["META-INF/test.properties"]
-        """
-            .trimIndent(),
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-    assertThat(content).contains("FOO=bar,baz")
-  }
-
-  @Test
-  fun mergePropertiesWithSpecifiedCharset() {
-    val one = buildJarOne { insert("META-INF/utf8.properties", "foo=第一") }
-    val two = buildJarTwo { insert("META-INF/utf8.properties", "foo=第二") }
-    projectScript.appendText(
-      transform<PropertiesFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock =
-          """
-          mergeStrategy = $mergeStrategyClassName.Append
-                charsetName = "utf-8"
-                paths = ["META-INF/utf8.properties"]
-        """
-            .trimIndent(),
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    val content = outputShadowedJar.use { it.getContent("META-INF/utf8.properties") }
-    assertThat(content).contains("foo=第一,第二")
-  }
-
-  @Test
-  fun mergePropertiesWithMappings() {
+  fun configureComplexTransformerProperties() {
+    val propertiesEntry = "META-INF/test.properties"
     val one = buildJarOne {
-      insert("META-INF/foo.properties", "foo=1")
-      insert("META-INF/bar.properties", "bar=2")
+      insert(propertiesEntry, "foo=第一")
+      insert("META-INF/LICENSE", "license one")
     }
     val two = buildJarTwo {
-      insert("META-INF/foo.properties", "foo=3")
-      insert("META-INF/bar.properties", "bar=4")
+      insert(propertiesEntry, "foo=第二")
+      insert("META-INF/LICENSE", "license two")
     }
+    val artifactLicense = path("my-license").apply { writeText("artifact license text") }
+
     projectScript.appendText(
-      transform<PropertiesFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock =
-          """
-          mappings = [
-            "META-INF/foo.properties": ["mergeStrategy": "append", "mergeSeparator": ";"],
-            "META-INF/bar.properties": ["mergeStrategy": "latest"]
-          ]
-          """
-            .trimIndent(),
-      )
+      """
+        dependencies {
+          ${implementationFiles(one, two)}
+        }
+        $shadowJarTask {
+          transform(${PropertiesFileTransformer::class.java.name}) {
+            mappings = [
+              '$propertiesEntry': ['mergeStrategy': 'append', 'mergeSeparator': ';']
+            ]
+            charsetName = 'utf-8'
+            keyTransformer = { key -> key.toUpperCase() }
+          }
+          transform(${MergeLicenseResourceTransformer::class.java.name}) {
+            outputPath = 'MY_LICENSE'
+            artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
+            firstSeparator = '####'
+            separator = '----'
+          }
+        }
+      """
+        .trimIndent()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/foo.properties").contains("foo=1;3")
-      getContent("META-INF/bar.properties").contains("bar=4")
-    }
-  }
-
-  @Test // #856
-  fun mergedPropertiesWithoutComments() {
-    val one = buildJarOne {
-      insert(
-        "META-INF/test.properties",
-        """
-        # A comment from jar one.
-        foo=one
-        """
-          .trimIndent(),
-      )
-    }
-    val two = buildJarTwo {
-      insert(
-        "META-INF/test.properties",
-        """
-        # A comment from jar two.
-        foo=two
-        """
-          .trimIndent(),
-      )
-    }
-    projectScript.appendText(
-      transform<PropertiesFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two),
-        transformerBlock =
+      getContent(propertiesEntry).contains("FOO=第一;第二")
+      getContent("MY_LICENSE")
+        .isEqualTo(
           """
-          mergeStrategy = $mergeStrategyClassName.Append
-          paths = ["META-INF/test.properties"]
-        """
-            .trimIndent(),
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    val content = outputShadowedJar.use { it.getContent("META-INF/test.properties") }
-    assertThat(content.invariantEolString)
-      .isEqualTo(
-        """
-        |foo=one,two
-        |"""
-          .trimMargin()
-      )
-  }
-
-  private companion object {
-    val mergeStrategyClassName = requireNotNull(MergeStrategy::class.java.canonicalName)
+          SPDX-License-Identifier: Apache-2.0
+          artifact license text
+          ####
+          license one
+          ----
+          license two
+          """
+            .trimIndent()
+        )
+    }
   }
 }

@@ -2,8 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import java.util.zip.ZipInputStream
@@ -56,6 +58,34 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
       val output = zis.readAllBytes().toString(Charset.forName(charsetName.get()))
 
       assertThat(output).contains("in this case for test-project")
+    }
+
+  @Test
+  fun overrideOutputPath() =
+    with(transformer) {
+      val customNoticeEntry = "META-INF/CUSTOM_NOTICE"
+      addHeader.set(false)
+      copyright.set("Copyright 2006 The Apache Software Foundation\n")
+      outputPath.set(customNoticeEntry)
+      transform(textContext(NOTICE_RESOURCE, "Notice from A"))
+      transform(textContext(NOTICE_RESOURCE, "Notice from B"))
+
+      val content = transformToJar().use { it.getContent(customNoticeEntry) }
+
+      assertThat(content)
+        .isEqualTo(
+          """
+          Copyright 2006 The Apache Software Foundation
+
+          This product includes software developed at
+          The Apache Software Foundation (https://www.apache.org/).
+
+          Notice from A
+
+          Notice from B
+          """
+            .trimIndent()
+        )
     }
 
   private companion object {

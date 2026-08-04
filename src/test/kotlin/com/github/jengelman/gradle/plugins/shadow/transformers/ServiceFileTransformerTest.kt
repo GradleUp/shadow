@@ -8,12 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import java.nio.file.Path
-import kotlin.io.path.createTempFile
-import kotlin.io.path.deleteExisting
-import kotlin.io.path.outputStream
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -24,19 +18,6 @@ import org.junit.jupiter.params.provider.MethodSource
  * [org.apache.maven.plugins.shade.resource.ServiceResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
  */
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
-  private lateinit var tempJar: Path
-
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
-    tempJar = createTempFile("shade.", ".jar")
-  }
-
-  @AfterEach
-  fun afterEach() {
-    tempJar.deleteExisting()
-  }
-
   @ParameterizedTest
   @MethodSource("resourceProvider")
   fun canTransformResource(path: String, exclude: Boolean, expected: Boolean) =
@@ -85,7 +66,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
       transform(textContext(contentResource, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 
@@ -104,7 +85,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       transform(textContext(contentResource, content, relocator))
       transform(textContext(contentResourceShaded, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 
@@ -121,7 +102,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
       transform(textContext(contentResource, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 
@@ -142,7 +123,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
 
       transform(textContext(contentResource, content, relocator))
 
-      tempJar.outputStream().zipOutputStream().use { zos ->
+      tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
 

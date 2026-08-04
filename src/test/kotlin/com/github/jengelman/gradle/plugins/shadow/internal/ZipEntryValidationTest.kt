@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import java.util.Properties
@@ -115,7 +116,7 @@ class ZipEntryValidationTest {
     for (name in maliciousNames) {
       val exception =
         assertThrows<GradleException> {
-          ZipOutputStream(ByteArrayOutputStream()).use { it.writeEntry(name) }
+          ByteArrayOutputStream().zipOutputStream().use { it.writeEntry(name) }
         }
       assertThat(exception.message)
         .isEqualTo("Malicious ZIP entry containing path traversal sequence: $name")

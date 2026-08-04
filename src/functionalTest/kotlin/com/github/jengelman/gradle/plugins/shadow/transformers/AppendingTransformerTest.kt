@@ -4,119 +4,28 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import kotlin.io.path.appendText
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
+import org.junit.jupiter.api.Test
 
 class AppendingTransformerTest : BaseTransformerTest() {
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun appendTestProperties(shortSyntax: Boolean) {
+  @Test
+  fun appendTestProperties() {
     val one = buildJarOne { insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO) }
-    val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          append('$ENTRY_TEST_PROPERTIES')
-        }
+    projectScript.appendText(
       """
-          .trimIndent()
-      } else {
-        transform<AppendingTransformer>(
-          dependenciesBlock = implementationFiles(one, two),
-          transformerBlock =
-            """
-          resource = '$ENTRY_TEST_PROPERTIES'
-        """
-              .trimIndent(),
-        )
+      dependencies {
+        ${implementationFiles(one, two)}
       }
-    projectScript.appendText(config)
+      $shadowJarTask {
+        append('$ENTRY_TEST_PROPERTIES')
+      }
+    """
+        .trimIndent()
+    )
 
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun appendApplicationYaml(shortSyntax: Boolean) {
-    val one = buildJarOne {
-      insert("resources/$APPLICATION_YML_FILE", CONTENT_ONE)
-      insert("resources/config/$APPLICATION_YML_FILE", CONTENT_TWO)
-    }
-    val two = buildJarTwo {
-      insert("resources/$APPLICATION_YML_FILE", CONTENT_TWO)
-      insert("resources/config/$APPLICATION_YML_FILE", CONTENT_THREE)
-    }
-    val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          append('resources/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
-          append('resources/config/$APPLICATION_YML_FILE', '$APPLICATION_YML_SEPARATOR')
-        }
-      """
-          .trimIndent()
-      } else {
-        val block1 =
-          transform<AppendingTransformer>(
-            dependenciesBlock = implementationFiles(one, two),
-            transformerBlock =
-              """
-          resource = 'resources/$APPLICATION_YML_FILE'
-          separator = '$APPLICATION_YML_SEPARATOR'
-        """
-                .trimIndent(),
-          )
-        val block2 =
-          transform<AppendingTransformer>(
-            dependenciesBlock = implementationFiles(one, two),
-            transformerBlock =
-              """
-          resource = 'resources/config/$APPLICATION_YML_FILE'
-          separator = '$APPLICATION_YML_SEPARATOR'
-        """
-                .trimIndent(),
-          )
-        block1 + lineSeparator + block2
-      }
-
-    projectScript.appendText(config)
-
-    runWithSuccess(shadowJarPath)
-
-    val content1 = outputShadowedJar.use { it.getContent("resources/$APPLICATION_YML_FILE") }
-    assertThat(content1)
-      .isEqualTo(
-        """
-      $CONTENT_ONE
-      ---
-      $CONTENT_TWO
-      """
-          .trimIndent()
-      )
-    val content2 = outputShadowedJar.use { it.getContent("resources/config/$APPLICATION_YML_FILE") }
-    assertThat(content2)
-      .isEqualTo(
-        """
-      $CONTENT_TWO
-      ---
-      $CONTENT_THREE
-      """
-          .trimIndent()
-      )
-  }
-
-  private companion object {
-    const val APPLICATION_YML_FILE = "application.yml"
-    const val APPLICATION_YML_SEPARATOR = "\\n---\\n"
   }
 }

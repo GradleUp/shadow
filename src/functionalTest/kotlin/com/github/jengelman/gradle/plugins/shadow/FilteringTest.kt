@@ -82,28 +82,6 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
   }
 
-  @ParameterizedTest
-  @ValueSource(strings = ["my:d", "m.*:d", "my:d:.*", "m.*:d:.*", "m.*:d.*:.*", ".*:d:.*"])
-  fun excludeDependencyUsingWildcardSyntax(wildcard: String) {
-    projectScript.appendText(
-      """
-        dependencies {
-          implementation 'my:d:1.0'
-        }
-        $shadowJarTask {
-          dependencies {
-            exclude(dependency('$wildcard'))
-          }
-        }
-      """
-        .trimIndent()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    commonAssertions()
-  }
-
   @Test
   fun includeDependencyAndExcludeOthers() {
     projectScript.appendText(

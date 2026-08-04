@@ -4,15 +4,19 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNotEmpty
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
-import java.util.jar.JarFile.MANIFEST_NAME
+import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -21,37 +25,11 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   @Test
   fun hasTransformedResource() =
     with(transformer) {
-      transform(manifestTransformerContext)
+      assertThat(hasTransformedResource()).isFalse()
+
+      transform(context("f.properties", mapOf("foo" to "foo")))
 
       assertThat(hasTransformedResource()).isTrue()
-    }
-
-  @Test
-  fun hasNotTransformedResource() {
-    assertThat(transformer.hasTransformedResource()).isFalse()
-  }
-
-  @Test
-  fun transformation() =
-    with(transformer) {
-      transform(manifestTransformerContext)
-
-      val targetLines = transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-
-      assertThat(targetLines).isNotEmpty()
-      assertThat(targetLines).contains("Manifest-Version=1.0")
-    }
-
-  @Test
-  fun transformationPropertiesAreReproducible() =
-    with(transformer) {
-      transform(manifestTransformerContext)
-
-      val firstRunTargetLines = transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-      Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-      val secondRunTargetLines = transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-
-      assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
     }
 
   @ParameterizedTest
@@ -82,6 +60,27 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
       assertThat(conflicts).isEqualTo(expectedConflicts)
+    }
+
+  @Test
+  fun failStrategyReportsConflicts() =
+    with(transformer) {
+      val path = "f.properties"
+      mergeStrategy.set(MergeStrategy.Fail)
+      transform(context(path, mapOf("foo" to "foo")))
+      transform(context(path, mapOf("foo" to "bar")))
+
+      val failure = assertThrows<GradleException> { transformToJar() }
+
+      assertThat(failure.message.orEmpty())
+        .isEqualTo(
+          """
+          |The following properties files have conflicting property values and cannot be merged:
+          | * f.properties
+          |   * Property foo is duplicated 2 times with different values
+          """
+            .trimMargin()
+        )
     }
 
   @ParameterizedTest
@@ -163,6 +162,30 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       }
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+      val content = transformToJar().use { it.getBytes(path).toString(Charset.forName(charset)) }
+      expectedOutput.forEach { (key, value) ->
+        assertThat(content).contains("$key=$value")
+      }
+    }
+
+  @Test // #856
+  fun mergedPropertiesWithoutComments() =
+    with(transformer) {
+      val path = "META-INF/test.properties"
+      paths.set(listOf(path))
+      mergeStrategy.set(MergeStrategy.Append)
+
+      val text1 = "# A comment from jar one.\nfoo=one"
+      val text2 = "# A comment from jar two.\nfoo=two"
+
+      transform(textContext(path, text1))
+      transform(textContext(path, text2))
+
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
+      val content = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
+      assertThat(content).isEqualTo("foo=one,two\n")
     }
 
   private companion object {

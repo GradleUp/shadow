@@ -11,70 +11,21 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
-import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import java.nio.file.Path
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 
 class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun groovyExtensionModuleTransformer(shortSyntax: Boolean) {
-    val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(buildJarFoo(), buildJarBar())}
-        }
-        $shadowJarTask {
-          mergeGroovyExtensionModules()
-        }
-      """
-          .trimIndent()
-      } else {
-        transform<GroovyExtensionModuleTransformer>(
-          dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar())
-        )
-      }
-    projectScript.appendText(config)
-
-    runWithSuccess(shadowJarPath)
-
-    commonAssertions()
-  }
-
-  @ParameterizedTest
-  @MethodSource("resourcePathProvider")
-  fun mergeLegacyAndModernModuleDescriptorsIntoTheNewResourcePath(
-    fooEntry: String,
-    barEntry: String,
-  ) {
-    projectScript.appendText(
-      transform<GroovyExtensionModuleTransformer>(
-        dependenciesBlock = implementationFiles(buildJarFoo(fooEntry), buildJarBar(barEntry))
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    commonAssertions()
-  }
-
   @Test
-  fun groovyExtensionModuleTransformerWithRelocation() {
+  fun groovyExtensionModuleTransformer() {
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(buildJarFoo(), buildJarBar())}
-        }
-        $shadowJarTask {
-          relocate('com.acme', 'com.example.shaded.acme')
-          mergeGroovyExtensionModules()
-        }
+      dependencies {
+        ${implementationFiles(buildJarFoo(), buildJarBar())}
+      }
+      $shadowJarTask {
+        mergeGroovyExtensionModules()
+      }
       """
         .trimIndent()
     )
@@ -86,14 +37,9 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
     assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
     assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
     assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
-      .isEqualTo(
-        "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
-          "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension"
-      )
+      .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
     assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-      .isEqualTo(
-        "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension"
-      )
+      .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
   }
 
   private fun buildJarFoo(entry: String = PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR): Path =
@@ -124,17 +70,6 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       )
     }
 
-  private fun commonAssertions() {
-    val properties = outputShadowedJar.extensionModuleProperties
-
-    assertThat(properties.getProperty(KEY_MODULE_NAME)).isEqualTo(MERGED_MODULE_NAME)
-    assertThat(properties.getProperty(KEY_MODULE_VERSION)).isEqualTo(MERGED_MODULE_VERSION)
-    assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
-      .isEqualTo("$EXTENSION_CLASSES_FOO,$EXTENSION_CLASSES_BAR")
-    assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
-      .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
-  }
-
   private companion object {
     const val EXTENSION_CLASSES_FOO = "com.acme.foo.FooExtension,com.acme.foo.BarExtension"
     const val EXTENSION_CLASSES_BAR = "com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension"
@@ -143,26 +78,5 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
 
     val JarPath.extensionModuleProperties
       get() = use { it.getContent(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR).toProperties() }
-
-    @JvmStatic
-    fun resourcePathProvider() =
-      listOf(
-        Arguments.of(
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-        Arguments.of(
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-        Arguments.of(
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-        Arguments.of(
-          PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-          PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
-        ),
-      )
   }
 }

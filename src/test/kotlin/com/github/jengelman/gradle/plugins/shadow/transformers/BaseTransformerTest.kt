@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
 import java.lang.reflect.ParameterizedType
+import java.nio.file.Path
 import java.util.Locale
 import java.util.jar.JarFile.MANIFEST_NAME
 import kotlin.io.path.createTempFile
@@ -16,6 +17,7 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.io.TempDir
 
 abstract class BaseTransformerTest<T : ResourceTransformer> {
   lateinit var transformer: T
@@ -24,6 +26,13 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
   val manifestTransformerContext: TransformerContext
     get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
 
+  @TempDir
+  lateinit var tempDir: Path
+    private set
+
+  lateinit var tempJar: Path
+    private set
+
   @BeforeEach
   open fun beforeEach() {
     @Suppress("UNCHECKED_CAST")
@@ -31,6 +40,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
       (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.single()
         as Class<T>
     transformer = clazz.create(testObjectFactory)
+    tempJar = createTempFile(directory = tempDir, suffix = ".jar")
   }
 
   companion object {

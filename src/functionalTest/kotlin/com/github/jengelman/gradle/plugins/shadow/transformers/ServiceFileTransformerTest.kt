@@ -17,71 +17,22 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun serviceResourceTransformer(shortSyntax: Boolean) {
-    val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(buildJarOne(), buildJarTwo())}
-        }
-        $shadowJarTask {
-          mergeServiceFiles {
-            exclude 'META-INF/services/com.acme.*'
-          }
-        }
-      """
-          .trimIndent()
-      } else {
-        transform<ServiceFileTransformer>(
-          dependenciesBlock = implementationFiles(buildJarOne(), buildJarTwo()),
-          transformerBlock =
-            """
-            exclude 'META-INF/services/com.acme.*'
-            """
-              .trimIndent(),
-        )
-      }
-    projectScript.appendText(config)
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("two")
-    }
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun serviceResourceTransformerAlternatePath(shortSyntax: Boolean) {
+  @Test
+  fun serviceResourceTransformerAlternatePath() {
     val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
     val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles("META-INF/foo")
-        }
       """
-          .trimIndent()
-      } else {
-        transform<ServiceFileTransformer>(
-          dependenciesBlock = implementationFiles(one, two),
-          transformerBlock =
-            """
-            path = 'META-INF/foo'
-            """
-              .trimIndent(),
-        )
+      dependencies {
+        ${implementationFiles(one, two)}
       }
+      $shadowJarTask {
+        mergeServiceFiles("META-INF/foo")
+      }
+    """
+        .trimIndent()
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
