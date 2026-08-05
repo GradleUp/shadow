@@ -146,7 +146,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(servicesBarEntry) }
-    assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
+    assertThat(content).isEqualTo("$CONTENT_THREE\n$CONTENT_ONE_TWO")
   }
 
   @ParameterizedTest

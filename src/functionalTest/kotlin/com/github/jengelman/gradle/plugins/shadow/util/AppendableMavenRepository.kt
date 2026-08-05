@@ -214,7 +214,7 @@ class AppendableMavenRepository(val root: Path) {
     }
 
     fun buildJar(builder: JarBuilder.() -> Unit) {
-      val jarPath = jarsDir.resolve(coordinate.replace(":", "-") + ".jar")
+      val jarPath = jarsDir.resolve("${coordinate.replace(':', '-')}.jar")
       existingJar = JarBuilder(jarPath).apply(builder).write()
     }
   }
