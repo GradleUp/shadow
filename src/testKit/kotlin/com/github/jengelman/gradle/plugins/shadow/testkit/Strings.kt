@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 import java.nio.file.FileSystems
 
 val String.invariantEolString: String
-  get() = replace(System.lineSeparator(), "\n")
+  get() = replace("\r\n", "\n")
 
 val String.variantSeparatorsPathString: String
   get() = replace("/", fileSystem.separator)

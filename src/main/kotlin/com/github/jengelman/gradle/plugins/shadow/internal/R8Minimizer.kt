@@ -73,7 +73,7 @@ internal class R8Minimizer(
           inputJar = inputJar,
           r8Args = r8Args,
         )
-        .joinToString(System.lineSeparator())
+        .joinToString("\n")
     )
 
     val arguments = buildList {

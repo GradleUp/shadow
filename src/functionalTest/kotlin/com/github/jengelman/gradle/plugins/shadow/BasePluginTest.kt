@@ -394,8 +394,6 @@ abstract class BasePluginTest {
 
   @Suppress("ConstPropertyName")
   companion object {
-    val lineSeparator: String = System.lineSeparator()
-
     const val shadowPluginId = "com.gradleup.shadow"
     const val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
     const val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
@@ -428,7 +426,7 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(lineSeparator) {
+      return paths.joinToString("\n") {
         "implementation files('${it.invariantSeparatorsPathString}')"
       }
     }

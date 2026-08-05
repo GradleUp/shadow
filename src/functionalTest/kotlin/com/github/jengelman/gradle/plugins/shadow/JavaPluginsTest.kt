@@ -269,7 +269,7 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test // #1893
   fun excludeRulesPreventBundledDepsOnConsumerClasspath() {
-    settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
+    settingsScript.appendText("include 'foo', 'consumer'\n")
     projectScript.writeText("")
 
     path("foo/build.gradle")

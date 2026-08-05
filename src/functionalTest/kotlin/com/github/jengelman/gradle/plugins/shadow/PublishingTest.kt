@@ -53,7 +53,7 @@ class PublishingTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    settingsScript.appendText("rootProject.name = 'maven'$lineSeparator")
+    settingsScript.appendText("rootProject.name = 'maven'\n")
   }
 
   @Test

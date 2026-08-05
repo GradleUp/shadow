@@ -58,7 +58,7 @@ sealed class SnippetExecutable : Executable {
 
     val apiScript = buildString {
       append(pluginsBlock)
-      append(lineSeparator)
+      append('\n')
       append(assembleDependsOn)
     }
     projectRoot.addSubProject("api", apiScript)
@@ -66,20 +66,20 @@ sealed class SnippetExecutable : Executable {
     val (imports, withoutImports) = importsExtractor(snippet)
     val mainScript = buildString {
       append(imports)
-      append(lineSeparator)
+      append('\n')
       // All buildscript {} blocks must appear before any plugins {} blocks in the script.
       if (withoutImports.contains("buildscript {")) {
         append(withoutImports)
       } else {
         if (!withoutImports.contains("plugins {")) {
           append(pluginsBlock)
-          append(lineSeparator)
+          append('\n')
         }
         append(withoutImports)
       }
-      append(lineSeparator)
+      append('\n')
       append(assembleDependsOn)
-      append(lineSeparator)
+      append('\n')
     }
       .trimIndent()
     projectRoot.addSubProject("main", mainScript)
@@ -111,7 +111,7 @@ sealed class SnippetExecutable : Executable {
 
     snippet.lines().forEach { line ->
       val target = if (line.trim().startsWith("import ")) imports else withoutImports
-      target.append(line).append(lineSeparator)
+      target.append(line).append('\n')
     }
 
     return imports.toString() to
@@ -120,8 +120,6 @@ sealed class SnippetExecutable : Executable {
   }
 
   companion object {
-
-    private val lineSeparator = System.lineSeparator()
 
     fun create(
       lang: DslLang,

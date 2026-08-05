@@ -23,10 +23,7 @@ class AppendableMavenRepository(val root: Path) {
   init {
     check(root.exists()) { "Maven repository root directory does not exist: $root" }
 
-    root
-      .resolve("settings.gradle")
-      .createFile()
-      .writeText("rootProject.name = '${root.name}'$lineSeparator")
+    root.resolve("settings.gradle").createFile().writeText("rootProject.name = '${root.name}'\n")
     root.resolve("build.gradle").createFile()
     jarsDir = root.resolve("jars").createDirectory()
   }
@@ -75,7 +72,7 @@ class AppendableMavenRepository(val root: Path) {
     logger.info(
       """
         Publish modules to Maven repository at ${root.toUri()}:
-        ${modules.joinToString(lineSeparator) { it.coordinate }}
+        ${modules.joinToString("\n") { it.coordinate }}
       """
         .trimIndent()
     )
@@ -84,10 +81,10 @@ class AppendableMavenRepository(val root: Path) {
 
   private fun configureJarModules(jarModules: List<JarModule>) {
     val mavenPublications =
-      jarModules.joinToString(lineSeparator) { module ->
+      jarModules.joinToString("\n") { module ->
         var index = -1
         val nodes =
-          module.dependencies.joinToString(lineSeparator) {
+          module.dependencies.joinToString("\n") {
             index++
             val node = "dependencyNode$index"
             """
@@ -126,7 +123,7 @@ class AppendableMavenRepository(val root: Path) {
     """
         .trimIndent()
     val jarsModule = "jars-module"
-    root.resolve("settings.gradle").appendText("include '$jarsModule'$lineSeparator")
+    root.resolve("settings.gradle").appendText("include '$jarsModule'\n")
     root.resolve("$jarsModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
   }
 
@@ -141,7 +138,7 @@ class AppendableMavenRepository(val root: Path) {
         }
         dependencies {
           constraints {
-            ${module.dependencies.joinToString(lineSeparator) { "api '${it.coordinate}'" }}
+            ${module.dependencies.joinToString("\n") { "api '${it.coordinate}'" }}
           }
         }
         publishing {
@@ -155,7 +152,7 @@ class AppendableMavenRepository(val root: Path) {
       """
           .trimIndent()
       val pomModule = "pom-module-$index"
-      root.resolve("settings.gradle").appendText("include '$pomModule'$lineSeparator")
+      root.resolve("settings.gradle").appendText("include '$pomModule'\n")
       root.resolve("$pomModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
     }
   }
@@ -231,8 +228,6 @@ class AppendableMavenRepository(val root: Path) {
 }
 
 private val logger = Logging.getLogger(AppendableMavenRepository::class.java)
-
-private val lineSeparator = System.lineSeparator()
 
 val Dependency.coordinate: String
   get() = "$groupId:$artifactId:$version"
