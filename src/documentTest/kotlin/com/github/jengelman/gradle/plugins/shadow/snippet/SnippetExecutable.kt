@@ -38,48 +38,44 @@ sealed class SnippetExecutable : Executable {
       .resolve("settings.gradle")
       .writeText(
         """
-        dependencyResolutionManagement {
-          repositories {
-            mavenLocal()
-            mavenCentral()
-          }
-          versionCatalogs.create('libs') {
-            library('log4j-core', 'org.apache.logging.log4j:log4j-core:2.11.1')
-          }
-        }
-        include ':api', ':main'
-        rootProject.name = 'snippet'
-        $enableNoImplicitLookupInParentProjects
-        enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
-        enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+        |dependencyResolutionManagement {
+        |  repositories {
+        |    mavenLocal()
+        |    mavenCentral()
+        |  }
+        |  versionCatalogs.create('libs') {
+        |    library('log4j-core', 'org.apache.logging.log4j:log4j-core:2.11.1')
+        |  }
+        |}
+        |include ':api', ':main'
+        |rootProject.name = 'snippet'
+        |$enableNoImplicitLookupInParentProjects
+        |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+        |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     val apiScript = buildString {
-      append(pluginsBlock)
-      append(lineSeparator)
+      appendLine(pluginsBlock)
       append(assembleDependsOn)
     }
     projectRoot.addSubProject("api", apiScript)
 
     val (imports, withoutImports) = importsExtractor(snippet)
     val mainScript = buildString {
-      append(imports)
-      append(lineSeparator)
+      appendLine(imports)
       // All buildscript {} blocks must appear before any plugins {} blocks in the script.
       if (withoutImports.contains("buildscript {")) {
         append(withoutImports)
       } else {
         if (!withoutImports.contains("plugins {")) {
-          append(pluginsBlock)
-          append(lineSeparator)
+          appendLine(pluginsBlock)
         }
         append(withoutImports)
       }
-      append(lineSeparator)
-      append(assembleDependsOn)
-      append(lineSeparator)
+      appendLine()
+      appendLine(assembleDependsOn)
     }
       .trimIndent()
     projectRoot.addSubProject("main", mainScript)
@@ -111,7 +107,7 @@ sealed class SnippetExecutable : Executable {
 
     snippet.lines().forEach { line ->
       val target = if (line.trim().startsWith("import ")) imports else withoutImports
-      target.append(line).append(lineSeparator)
+      target.appendLine(line)
     }
 
     return imports.toString() to
@@ -120,8 +116,6 @@ sealed class SnippetExecutable : Executable {
   }
 
   companion object {
-
-    private val lineSeparator = System.lineSeparator()
 
     fun create(
       lang: DslLang,

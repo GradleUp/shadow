@@ -26,26 +26,26 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          transform(${PropertiesFileTransformer::class.java.name}) {
-            mappings = [
-              '$propertiesEntry': ['mergeStrategy': 'append', 'mergeSeparator': ';']
-            ]
-            charsetName = 'utf-8'
-            keyTransformer = { key -> key.toUpperCase() }
-          }
-          transform(${MergeLicenseResourceTransformer::class.java.name}) {
-            outputPath = 'MY_LICENSE'
-            artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
-            firstSeparator = '####'
-            separator = '----'
-          }
-        }
+        |dependencies {
+        |  ${implementationFiles(one, two)}
+        |}
+        |$shadowJarTask {
+        |  transform(${PropertiesFileTransformer::class.java.name}) {
+        |    mappings = [
+        |      '$propertiesEntry': ['mergeStrategy': 'append', 'mergeSeparator': ';']
+        |    ]
+        |    charsetName = 'utf-8'
+        |    keyTransformer = { key -> key.toUpperCase() }
+        |  }
+        |  transform(${MergeLicenseResourceTransformer::class.java.name}) {
+        |    outputPath = 'MY_LICENSE'
+        |    artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
+        |    firstSeparator = '####'
+        |    separator = '----'
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -55,14 +55,14 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       getContent("MY_LICENSE")
         .isEqualTo(
           """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license text
-          ####
-          license one
-          ----
-          license two
+          |SPDX-License-Identifier: Apache-2.0
+          |artifact license text
+          |####
+          |license one
+          |----
+          |license two
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
   }

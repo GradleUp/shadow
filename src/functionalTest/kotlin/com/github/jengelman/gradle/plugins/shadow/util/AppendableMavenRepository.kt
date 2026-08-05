@@ -23,10 +23,7 @@ class AppendableMavenRepository(val root: Path) {
   init {
     check(root.exists()) { "Maven repository root directory does not exist: $root" }
 
-    root
-      .resolve("settings.gradle")
-      .createFile()
-      .writeText("rootProject.name = '${root.name}'$lineSeparator")
+    root.resolve("settings.gradle").createFile().writeText("rootProject.name = '${root.name}'\n")
     root.resolve("build.gradle").createFile()
     jarsDir = root.resolve("jars").createDirectory()
   }
@@ -74,59 +71,59 @@ class AppendableMavenRepository(val root: Path) {
 
     logger.info(
       """
-        Publish modules to Maven repository at ${root.toUri()}:
-        ${modules.joinToString(lineSeparator) { it.coordinate }}
+        |Publish modules to Maven repository at ${root.toUri()}:
+        |${modules.joinToString("\n") { it.coordinate }}
       """
-        .trimIndent()
+        .trimMargin()
     )
     modules.clear()
   }
 
   private fun configureJarModules(jarModules: List<JarModule>) {
     val mavenPublications =
-      jarModules.joinToString(lineSeparator) { module ->
+      jarModules.joinToString("\n") { module ->
         var index = -1
         val nodes =
-          module.dependencies.joinToString(lineSeparator) {
+          module.dependencies.joinToString("\n") {
             index++
             val node = "dependencyNode$index"
             """
-          def $node = dependenciesNode.appendNode('dependency')
-          $node.appendNode('groupId', '${it.groupId}')
-          $node.appendNode('artifactId', '${it.artifactId}')
-          $node.appendNode('version', '${it.version}')
-          $node.appendNode('scope', '${it.scope}')
+          |def $node = dependenciesNode.appendNode('dependency')
+          |$node.appendNode('groupId', '${it.groupId}')
+          |$node.appendNode('artifactId', '${it.artifactId}')
+          |$node.appendNode('version', '${it.version}')
+          |$node.appendNode('scope', '${it.scope}')
         """
-              .trimIndent()
+              .trimMargin()
           }
         module.createMavenPublication(
           """
-          artifact '${module.artifactPath}'
-          pom.withXml { xml ->
-            def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
-            $nodes
-          }
+          |artifact '${module.artifactPath}'
+          |pom.withXml { xml ->
+          |  def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
+          |  $nodes
+          |}
         """
-            .trimIndent()
+            .trimMargin()
         )
       }
     val scriptContent =
       """
-      plugins {
-        id 'maven-publish'
-      }
-      publishing {
-        publications {
-          $mavenPublications
-        }
-        repositories {
-          maven { url = '${root.toUri()}' }
-        }
-      }
+      |plugins {
+      |  id 'maven-publish'
+      |}
+      |publishing {
+      |  publications {
+      |    $mavenPublications
+      |  }
+      |  repositories {
+      |    maven { url = '${root.toUri()}' }
+      |  }
+      |}
     """
-        .trimIndent()
+        .trimMargin()
     val jarsModule = "jars-module"
-    root.resolve("settings.gradle").appendText("include '$jarsModule'$lineSeparator")
+    root.resolve("settings.gradle").appendText("include '$jarsModule'\n")
     root.resolve("$jarsModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
   }
 
@@ -135,41 +132,41 @@ class AppendableMavenRepository(val root: Path) {
     bomModules.forEachIndexed { index, module ->
       val scriptContent =
         """
-        plugins {
-          id 'maven-publish'
-          id 'java-platform'
-        }
-        dependencies {
-          constraints {
-            ${module.dependencies.joinToString(lineSeparator) { "api '${it.coordinate}'" }}
-          }
-        }
-        publishing {
-          publications {
-            ${module.createMavenPublication("from components.javaPlatform")}
-          }
-          repositories {
-            maven { url = '${root.toUri()}' }
-          }
-        }
+        |plugins {
+        |  id 'maven-publish'
+        |  id 'java-platform'
+        |}
+        |dependencies {
+        |  constraints {
+        |    ${module.dependencies.joinToString("\n") { "api '${it.coordinate}'" }}
+        |  }
+        |}
+        |publishing {
+        |  publications {
+        |    ${module.createMavenPublication("from components.javaPlatform")}
+        |  }
+        |  repositories {
+        |    maven { url = '${root.toUri()}' }
+        |  }
+        |}
       """
-          .trimIndent()
+          .trimMargin()
       val pomModule = "pom-module-$index"
-      root.resolve("settings.gradle").appendText("include '$pomModule'$lineSeparator")
+      root.resolve("settings.gradle").appendText("include '$pomModule'\n")
       root.resolve("$pomModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
     }
   }
 
   private fun Module.createMavenPublication(block: String): String {
     return """
-      create('${coordinate.replace(":", "")}', MavenPublication) {
-        artifactId = '$artifactId'
-        groupId = '$groupId'
-        version = '$version'
-        $block
-      }
+      |create('${coordinate.replace(":", "")}', MavenPublication) {
+      |  artifactId = '$artifactId'
+      |  groupId = '$groupId'
+      |  version = '$version'
+      |  $block
+      |}
     """
-      .trimIndent()
+      .trimMargin()
   }
 
   sealed class Module(groupId: String, artifactId: String, version: String) : Model() {
@@ -217,7 +214,7 @@ class AppendableMavenRepository(val root: Path) {
     }
 
     fun buildJar(builder: JarBuilder.() -> Unit) {
-      val jarPath = jarsDir.resolve(coordinate.replace(":", "-") + ".jar")
+      val jarPath = jarsDir.resolve("${coordinate.replace(':', '-')}.jar")
       existingJar = JarBuilder(jarPath).apply(builder).write()
     }
   }
@@ -231,8 +228,6 @@ class AppendableMavenRepository(val root: Path) {
 }
 
 private val logger = Logging.getLogger(AppendableMavenRepository::class.java)
-
-private val lineSeparator = System.lineSeparator()
 
 val Dependency.coordinate: String
   get() = "$groupId:$artifactId:$version"

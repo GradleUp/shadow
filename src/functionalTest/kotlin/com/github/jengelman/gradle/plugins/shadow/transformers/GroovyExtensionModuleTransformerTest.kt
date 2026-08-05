@@ -20,14 +20,14 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   fun groovyExtensionModuleTransformer() {
     projectScript.appendText(
       """
-      dependencies {
-        ${implementationFiles(buildJarFoo(), buildJarBar())}
-      }
-      $shadowJarTask {
-        mergeGroovyExtensionModules()
-      }
+      |dependencies {
+      |  ${implementationFiles(buildJarFoo(), buildJarBar())}
+      |}
+      |$shadowJarTask {
+      |  mergeGroovyExtensionModules()
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -47,12 +47,12 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       insert(
         entry,
         """
-        $KEY_MODULE_NAME=foo
-        $KEY_MODULE_VERSION=1.0.5
-        $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
-        $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
+        |$KEY_MODULE_NAME=foo
+        |$KEY_MODULE_VERSION=1.0.5
+        |$KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
+        |$KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
       """
-          .trimIndent(),
+          .trimMargin(),
       )
     }
 
@@ -61,12 +61,12 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       insert(
         entry,
         """
-        $KEY_MODULE_NAME=bar
-        $KEY_MODULE_VERSION=2.3.5
-        $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
-        $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
+        |$KEY_MODULE_NAME=bar
+        |$KEY_MODULE_VERSION=2.3.5
+        |$KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
+        |$KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
       """
-          .trimIndent(),
+          .trimMargin(),
       )
     }
 

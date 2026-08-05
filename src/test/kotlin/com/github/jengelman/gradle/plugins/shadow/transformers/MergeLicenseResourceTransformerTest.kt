@@ -59,25 +59,25 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(buildLicense())
         .isEqualTo(
           """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license file content
-
-          ------------------------------------------------------------------------------------------------------------------------
-
-          This artifact includes dependencies with the following licenses:
-          ----------------------------------------------------------------
-
-          license one
-
-          ------------------------------------------------------------------------------------------------------------------------
-
-             license two
-
-          ------------------------------------------------------------------------------------------------------------------------
-
-          license three
+          |SPDX-License-Identifier: Apache-2.0
+          |artifact license file content
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |This artifact includes dependencies with the following licenses:
+          |----------------------------------------------------------------
+          |
+          |license one
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |   license two
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |license three
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
 
@@ -95,17 +95,17 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(buildLicense())
         .isEqualTo(
           """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license file content
-
-          ------------------------------------------------------------------------------------------------------------------------
-
-          This artifact includes dependencies with the following licenses:
-          ----------------------------------------------------------------
-
-          license one
+          |SPDX-License-Identifier: Apache-2.0
+          |artifact license file content
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |This artifact includes dependencies with the following licenses:
+          |----------------------------------------------------------------
+          |
+          |license one
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
 
@@ -121,10 +121,10 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(buildLicense())
         .isEqualTo(
           """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license file content
+          |SPDX-License-Identifier: Apache-2.0
+          |artifact license file content
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
 
@@ -161,14 +161,14 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(content)
         .isEqualTo(
           """
-          SPDX-License-Identifier: Apache-2.0
-          artifact license text
-          ####
-          license one
-          ----
-          license two
+          |SPDX-License-Identifier: Apache-2.0
+          |artifact license text
+          |####
+          |license one
+          |----
+          |license two
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
 }

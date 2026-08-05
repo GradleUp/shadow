@@ -25,14 +25,14 @@ class TransformersTest : BaseTransformerTest() {
     writeClass()
     projectScript.appendText(
       """
-        $jarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-            attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
-          }
-        }
+        |$jarTask {
+        |  manifest {
+        |    attributes '$mainClassAttributeKey': 'my.Main'
+        |    attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -109,16 +109,16 @@ class TransformersTest : BaseTransformerTest() {
   fun useCustomTransformer() {
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'my:a:1.0'
-          implementation 'my:b:1.0'
-        }
-        $shadowJarTask {
-          // Use Transformer.Companion (no-op) to mock a custom transformer here.
-          transform(${ResourceTransformer.Companion::class.java.name})
-        }
+        |dependencies {
+        |  implementation 'my:a:1.0'
+        |  implementation 'my:b:1.0'
+        |}
+        |$shadowJarTask {
+        |  // Use Transformer.Companion (no-op) to mock a custom transformer here.
+        |  transform(${ResourceTransformer.Companion::class.java.name})
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -144,19 +144,19 @@ class TransformersTest : BaseTransformerTest() {
 
     val MANIFEST_ATTRS =
       """
-        $jarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-            attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'
-          }
-        }
-        $shadowJarTask {
-          manifest {
-            attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
-            attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
-          }
-        }
+        |$jarTask {
+        |  manifest {
+        |    attributes '$mainClassAttributeKey': 'my.Main'
+        |    attributes '$TEST_ENTRY_ATTR_KEY': 'FAILED'
+        |  }
+        |}
+        |$shadowJarTask {
+        |  manifest {
+        |    attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
+        |    attributes '$TEST_ENTRY_ATTR_KEY': 'PASSED'
+        |  }
+        |}
     """
-        .trimIndent()
+        .trimMargin()
   }
 }

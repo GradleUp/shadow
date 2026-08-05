@@ -281,7 +281,7 @@ class BytecodeRemappingTest {
 
   private fun KClass<*>.toFileCopyDetails() =
     object : FileCopyDetails by noOpDelegate() {
-      private val _path = java.name.replace('.', '/') + ".class"
+      private val _path = "${java.name.replace('.', '/')}.class"
       private val _file =
         tempDir
           .resolve(_path)

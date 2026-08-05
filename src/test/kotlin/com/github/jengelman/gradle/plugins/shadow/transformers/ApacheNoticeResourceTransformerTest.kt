@@ -75,16 +75,16 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
       assertThat(content)
         .isEqualTo(
           """
-          Copyright 2006 The Apache Software Foundation
-
-          This product includes software developed at
-          The Apache Software Foundation (https://www.apache.org/).
-
-          Notice from A
-
-          Notice from B
+          |Copyright 2006 The Apache Software Foundation
+          |
+          |This product includes software developed at
+          |The Apache Software Foundation (https://www.apache.org/).
+          |
+          |Notice from A
+          |
+          |Notice from B
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
 

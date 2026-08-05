@@ -12,12 +12,13 @@ abstract class BaseTransformerTest : BasePluginTest() {
     super.beforeEach()
     projectScript.appendText(
       """
-        $shadowJarTask {
-          // Most transformers in tests require this to handle duplicate resources.
-          duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        }
+      |$shadowJarTask {
+      |  // Most transformers in tests require this to handle duplicate resources.
+      |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
   }
 

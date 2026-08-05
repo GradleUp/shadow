@@ -32,13 +32,13 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       resource.set(xmlEntry)
       val xmlContent =
         """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
-        <properties version="1.0">
-          <entry key="%s">%s</entry>
-        </properties>
+        |<?xml version="1.0" encoding="UTF-8"?>
+        |<!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
+        |<properties version="1.0">
+        |  <entry key="%s">%s</entry>
+        |</properties>
         """
-          .trimIndent()
+          .trimMargin()
 
       transform(textContext(xmlEntry, xmlContent.format("key1", "val1")))
       transform(textContext(xmlEntry, xmlContent.format("key2", "val2")))
@@ -50,14 +50,14 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(content)
         .isEqualTo(
           """
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
-          <properties version="1.0">
-            <entry key="key1">val1</entry>
-            <entry key="key2">val2</entry>
-          </properties>
-          """
-            .trimIndent() + "\n"
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
+          |<properties version="1.0">
+          |  <entry key="key1">val1</entry>
+          |  <entry key="key2">val2</entry>
+          |</properties>
+          |"""
+            .trimMargin()
         )
     }
 
@@ -68,13 +68,13 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       resource.set(xmlEntry)
       val xmlContent =
         """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
-        <properties version="1.0">
-          <entry key="%s">%s</entry>
-        </properties>
+        |<?xml version="1.0" encoding="UTF-8"?>
+        |<!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
+        |<properties version="1.0">
+        |  <entry key="%s">%s</entry>
+        |</properties>
         """
-          .trimIndent()
+          .trimMargin()
 
       transform(textContext(xmlEntry, xmlContent.format("key1", "val1")))
       transform(textContext(xmlEntry, xmlContent.format("key2", "val2")))
@@ -86,14 +86,14 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(content)
         .isEqualTo(
           """
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
-          <properties version="1.0">
-            <entry key="key1">val1</entry>
-            <entry key="key2">val2</entry>
-          </properties>
-          """
-            .trimIndent() + "\n"
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
+          |<properties version="1.0">
+          |  <entry key="key1">val1</entry>
+          |  <entry key="key2">val2</entry>
+          |</properties>
+          |"""
+            .trimMargin()
         )
     }
 
@@ -104,10 +104,10 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       resource.set(xmlEntry)
       val xmlContent =
         """
-        <?xml version="1.0" encoding="UTF-8"?>
-        <a>%s</a>
+        |<?xml version="1.0" encoding="UTF-8"?>
+        |<a>%s</a>
         """
-          .trimIndent()
+          .trimMargin()
 
       transform(textContext(xmlEntry, xmlContent.format("<b />")))
       transform(textContext(xmlEntry, xmlContent.format("<c />")))
@@ -119,13 +119,13 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(content)
         .isEqualTo(
           """
-          <?xml version="1.0" encoding="UTF-8"?>
-          <a>
-            <b />
-            <c />
-          </a>
-          """
-            .trimIndent() + "\n"
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<a>
+          |  <b />
+          |  <c />
+          |</a>
+          |"""
+            .trimMargin()
         )
     }
 
@@ -135,7 +135,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
      *
      * JDOM2's [org.jdom2.output.Format.getPrettyFormat] defaults its line separator to `\r\n`
      * (CRLF) across all platforms. Replacing `\r\n` with `\n` aligns the output with Kotlin's raw
-     * string literals (`"""...""".trimIndent()`) for cross-platform assertions.
+     * string literals (`"""|...""".trimMargin()`) for cross-platform assertions.
      */
     fun String.normalizeXmlEol(): String = replace("\r\n", "\n")
   }
