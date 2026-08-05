@@ -72,7 +72,7 @@ private fun getTransformerClasses(): List<Class<out ResourceTransformer>> {
             .filter { it.isRegularFile() && it.extension == "class" }
             .forEach { file ->
               val relativePath = directory.relativize(file).toString().removeSuffix(".class")
-              val className = packageName + "." + relativePath.replace(File.separatorChar, '.')
+              val className = "$packageName.${relativePath.replace(File.separatorChar, '.')}"
               block(className)
             }
         }
