@@ -62,10 +62,10 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent()
+            .trimMargin()
       )
     )
 
@@ -143,17 +143,17 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          java {
-            disableAutoTargetJvm()
-          }
+          |java {
+          |  disableAutoTargetJvm()
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -178,17 +178,17 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          shadow {
-            addTargetJvmVersionAttribute = false
-          }
+          |shadow {
+          |  addTargetJvmVersionAttribute = false
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -213,17 +213,17 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          shadow {
-            bundlingAttribute = Bundling.EMBEDDED
-          }
+          |shadow {
+          |  bundlingAttribute = Bundling.EMBEDDED
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -246,16 +246,16 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         shadowBlock =
           """
-          archiveClassifier = ''
+          |archiveClassifier = ''
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            from components.shadow
-          }
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -291,26 +291,26 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
-            description = 'Create a combined JAR of project and test dependencies'
-            archiveClassifier = 'tests'
-            from sourceSets.named('test').map { it.output }
-            configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
-          }
+          |def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
+          |  description = 'Create a combined JAR of project and test dependencies'
+          |  archiveClassifier = 'tests'
+          |  from sourceSets.named('test').map { it.output }
+          |  configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+          |}
         """
-            .trimIndent(),
+            .trimMargin(),
         dependenciesBlock =
           """
-          testImplementation 'junit:junit:3.8.2'
+          |testImplementation 'junit:junit:3.8.2'
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            artifact testShadowJar
-          }
+          |shadow(MavenPublication) {
+          |  artifact testShadowJar
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -328,23 +328,23 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          apply plugin: 'com.gradle.plugin-publish'
-          group = 'my.plugin'
-          version = '1.0'
+          |apply plugin: 'com.gradle.plugin-publish'
+          |group = 'my.plugin'
+          |version = '1.0'
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
+          |archiveClassifier = ''
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          pluginMaven(MavenPublication) {
-            artifactId = 'my-gradle-plugin'
-          }
+          |pluginMaven(MavenPublication) {
+          |  artifactId = 'my-gradle-plugin'
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -371,25 +371,25 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          group = 'my-group'
-          version = '2.0'
+          |group = 'my-group'
+          |version = '2.0'
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = 'my-classifier'
-          archiveExtension = 'my-ext'
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = 'my-classifier'
+          |archiveExtension = 'my-ext'
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            from components.shadow
-            artifactId = 'my-artifact'
-          }
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |  artifactId = 'my-artifact'
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -426,22 +426,22 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         dependenciesBlock =
           """
-          implementation 'my:a:1.0'
-          implementation 'my:b:1.0'
-          shadow 'my:b:1.0'
+          |implementation 'my:a:1.0'
+          |implementation 'my:b:1.0'
+          |shadow 'my:b:1.0'
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          java(MavenPublication) {
-            from components.java
-          }
-          shadow(MavenPublication) {
-            from components.shadow
-            artifactId = "maven-all"
-          }
+          |java(MavenPublication) {
+          |  from components.java
+          |}
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |  artifactId = "maven-all"
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -540,22 +540,22 @@ class PublishingTest : BasePluginTest() {
       publishingBlock(
         projectBlock =
           """
-          dependencies {
-            implementation 'my:a:1.0'
-            shadow 'my:b:1.0'
-          }
-          shadow {
-            addShadowVariantIntoJavaComponent = $addShadowVariant
-          }
+          |dependencies {
+          |  implementation 'my:a:1.0'
+          |  shadow 'my:b:1.0'
+          |}
+          |shadow {
+          |  addShadowVariantIntoJavaComponent = $addShadowVariant
+          |}
         """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            from components.java
-          }
+          |shadow(MavenPublication) {
+          |  from components.java
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -656,19 +656,19 @@ class PublishingTest : BasePluginTest() {
     projectBlock: String = "",
     dependenciesBlock: String =
       """
-      implementation 'my:a:1.0'
-      shadow 'my:b:1.0'
+      |implementation 'my:a:1.0'
+      |shadow 'my:b:1.0'
       """
-        .trimIndent(),
+        .trimMargin(),
     shadowBlock: String = "",
     publicationsBlock: String =
       """
-      shadow(MavenPublication) {
-        from components.shadow
-        artifactId = 'maven-all'
-      }
+      |shadow(MavenPublication) {
+      |  from components.shadow
+      |  artifactId = 'maven-all'
+      |}
       """
-        .trimIndent(),
+        .trimMargin(),
   ): String {
     return """
       |dependencies {
@@ -685,18 +685,18 @@ class PublishingTest : BasePluginTest() {
 
   private fun publishingBlock(projectBlock: String, publicationsBlock: String): String {
     return """
-      apply plugin: 'maven-publish'
-      $projectBlock
-      publishing {
-        publications {
-          $publicationsBlock
-        }
-        repositories {
-          maven { url = '${remoteRepoPath.toUri()}' }
-        }
-      }
+      |apply plugin: 'maven-publish'
+      |$projectBlock
+      |publishing {
+      |  publications {
+      |    $publicationsBlock
+      |  }
+      |  repositories {
+      |    maven { url = '${remoteRepoPath.toUri()}' }
+      |  }
+      |}
     """
-      .trimIndent()
+      .trimMargin()
   }
 
   private fun assertPomCommon(pomPath: Path, coordinates: Array<String> = arrayOf("my:b:1.0")) {

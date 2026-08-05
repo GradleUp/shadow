@@ -27,12 +27,12 @@ class CachingTest : BasePluginTest() {
   fun dependenciesChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly(*entriesInAB, *manifestEntries) }
@@ -59,11 +59,11 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          archiveBaseName = "foo"
-        }
+        |$shadowJarTask {
+        |  archiveBaseName = "foo"
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertExecutionsFromCacheAndUpToDate()
@@ -78,12 +78,12 @@ class CachingTest : BasePluginTest() {
       .forEach { strategy ->
         projectScript.writeText(
           """
-            ${getDefaultProjectBuildScript()}
-            $shadowJarTask {
-              duplicatesStrategy = DuplicatesStrategy.$strategy
-            }
+            |${getDefaultProjectBuildScript()}
+            |$shadowJarTask {
+            |  duplicatesStrategy = DuplicatesStrategy.$strategy
+            |}
         """
-            .trimIndent()
+            .trimMargin()
         )
 
         assertCompositeExecutions()
@@ -94,18 +94,18 @@ class CachingTest : BasePluginTest() {
   fun manifestAttrsChanged() {
     projectScript.appendText(
       """
-        $jarTask {
-          manifest {
-            attributes 'Foo': 'Foo1'
-          }
-        }
-        $shadowJarTask {
-          manifest {
-            attributes 'Bar': 'Bar1'
-          }
-        }
+        |$jarTask {
+        |  manifest {
+        |    attributes 'Foo': 'Foo1'
+        |  }
+        |}
+        |$shadowJarTask {
+        |  manifest {
+        |    attributes 'Bar': 'Bar1'
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val assertions = { valueFoo: String, valueBar: String ->
@@ -140,14 +140,14 @@ class CachingTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
-        kotlin {
-          jvm().mainRun {
-            it.mainClass.set('$mainClassName')
-          }
-        }
+        |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
+        |kotlin {
+        |  jvm().mainRun {
+        |    it.mainClass.set('$mainClassName')
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName) }
@@ -165,12 +165,12 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        apply plugin: 'application'
-        application {
-          mainClass = '$mainClassName'
-        }
+        |apply plugin: 'application'
+        |application {
+        |  mainClass = '$mainClassName'
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName) }
@@ -258,13 +258,13 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          dependencies {
-            exclude(dependency('junit:junit'))
-          }
-        }
+        |$shadowJarTask {
+        |  dependencies {
+        |    exclude(dependency('junit:junit'))
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
@@ -278,10 +278,10 @@ class CachingTest : BasePluginTest() {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        public class Server {}
+        |package server;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
@@ -298,13 +298,13 @@ class CachingTest : BasePluginTest() {
     path("server/build.gradle")
       .appendText(
         """
-        $shadowJarTask {
-          minimize {
-            exclude(dependency('junit:junit:.*'))
-          }
-        }
+        |$shadowJarTask {
+        |  minimize {
+        |    exclude(dependency('junit:junit:.*'))
+        |  }
+        |}
       """
-          .trimIndent()
+          .trimMargin()
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
@@ -412,11 +412,11 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          relocate 'junit.framework', 'foo.junit.framework'
-        }
+        |$shadowJarTask {
+        |  relocate 'junit.framework', 'foo.junit.framework'
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val relocatedEntries =
       junitEntries.map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
@@ -471,9 +471,9 @@ class CachingTest : BasePluginTest() {
       transform<ServiceFileTransformer>(
         transformerBlock =
           """
-          path = 'META-INF/foo'
+          |path = 'META-INF/foo'
           """
-            .trimIndent()
+            .trimMargin()
       )
     )
 
@@ -513,12 +513,12 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
-          transform(${ResourceTransformer.Companion::class.java.name})
-        }
+        |$shadowJarTask {
+        |  // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
+        |  transform(${ResourceTransformer.Companion::class.java.name})
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertExecutionSuccess()
@@ -579,39 +579,39 @@ class CachingTest : BasePluginTest() {
   private fun writeR8ClientAndServerModules() {
     settingsScript.appendText(
       """
-      include 'client', 'server'
+      |include 'client', 'server'
       """
-        .trimIndent()
+        .trimMargin()
     )
     projectScript.writeText("")
 
     path("client/src/main/java/client/Used.java")
       .writeText(
         """
-        package client;
-        public class Used {
-          public static String name() {
-            return "used";
-          }
-        }
+        |package client;
+        |public class Used {
+        |  public static String name() {
+        |    return "used";
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/main/java/client/Unused.java")
       .writeText(
         """
-        package client;
-        public class Unused {}
+        |package client;
+        |public class Unused {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/main/java/client/Reflective.java")
       .writeText(
         """
-        package client;
-        public class Reflective {}
+        |package client;
+        |public class Reflective {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/build.gradle")
       .writeText(
@@ -625,15 +625,15 @@ class CachingTest : BasePluginTest() {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Used;
-        public class Server {
-          public String name() {
-            return Used.name();
-          }
-        }
+        |package server;
+        |import client.Used;
+        |public class Server {
+        |  public String name() {
+        |    return Used.name();
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("server/build.gradle")
       .writeText(

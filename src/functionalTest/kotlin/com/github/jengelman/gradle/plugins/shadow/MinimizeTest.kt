@@ -60,14 +60,14 @@ class MinimizeTest : BasePluginTest() {
     path("api/build.gradle")
       .writeText(
         """
-        plugins {
-          id 'java-library'
-        }
-        dependencies {
-          api project(':lib')
-        }
+        |plugins {
+        |  id 'java-library'
+        |}
+        |dependencies {
+        |  api project(':lib')
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
@@ -93,21 +93,21 @@ class MinimizeTest : BasePluginTest() {
     writeClientAndServerModules(
       serverShadowBlock =
         """
-        minimize()
+        |minimize()
         """
-          .trimIndent()
+          .trimMargin()
     )
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Client;
-        public class Server {
-          // This is to make sure that 'Client' is not removed.
-          private final String client = Client.class.getName();
-        }
+        |package server;
+        |import client.Client;
+        |public class Server {
+        |  // This is to make sure that 'Client' is not removed.
+        |  private final String client = Client.class.getName();
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(serverShadowJarPath)
@@ -127,11 +127,11 @@ class MinimizeTest : BasePluginTest() {
     writeClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          exclude(dependency('junit:junit:.*'))
-        }
+        |minimize {
+        |  exclude(dependency('junit:junit:.*'))
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -151,11 +151,11 @@ class MinimizeTest : BasePluginTest() {
     writeClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          exclude(project(':client'))
-        }
+        |minimize {
+        |  exclude(project(':client'))
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -181,22 +181,22 @@ class MinimizeTest : BasePluginTest() {
     writeClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          exclude(project(':client'))
-        }
+        |minimize {
+        |  exclude(project(':client'))
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
     path("client/src/main/java/client/Client.java")
       .writeText(
         """
-        package client;
-        import junit.framework.TestCase;
-        public class Client extends TestCase {
-          public static void main(String[] args) {}
-        }
+        |package client;
+        |import junit.framework.TestCase;
+        |public class Client extends TestCase {
+        |  public static void main(String[] args) {}
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(serverShadowJarPath)
@@ -208,10 +208,10 @@ class MinimizeTest : BasePluginTest() {
     path("client/src/main/java/client/Client.java")
       .writeText(
         """
-        package client;
-        public class Client {}
+        |package client;
+        |public class Client {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     runWithSuccess(serverShadowJarPath)
 
@@ -225,16 +225,16 @@ class MinimizeTest : BasePluginTest() {
     val dependency = "'my:e:1.0'"
     projectScript.appendText(
       """
-        dependencies {
-          implementation $dependency
-        }
-        $shadowJarTask {
-          minimize {
-            exclude(dependency($dependency))
-          }
-        }
+        |dependencies {
+        |  implementation $dependency
+        |}
+        |$shadowJarTask {
+        |  minimize {
+        |    exclude(dependency($dependency))
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -278,11 +278,11 @@ class MinimizeTest : BasePluginTest() {
     path("impl/build.gradle")
       .appendText(
         """
-        dependencies {
-          api platform('my:bom:1.0')
-        }
+        |dependencies {
+        |  api platform('my:bom:1.0')
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
@@ -307,11 +307,11 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {}
-        }
+        |minimize {
+        |  r8 {}
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -373,14 +373,14 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            proguardRules.add("-keep class client.Reflective { *; }")
-            configurationFile.set(layout.buildDirectory.file("r8/config/final-configuration.txt"))
-          }
-        }
+        |minimize {
+        |  r8 {
+        |    proguardRules.add("-keep class client.Reflective { *; }")
+        |    configurationFile.set(layout.buildDirectory.file("r8/config/final-configuration.txt"))
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -417,19 +417,19 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            enableObfuscation()
-            configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
-            proguardRules.addAll(
-              "-printmapping reports/mapping.txt",
-              "-printseeds reports/seeds.txt",
-              "-printusage reports/usage.txt",
-            )
-          }
-        }
+        |minimize {
+        |  r8 {
+        |    enableObfuscation()
+        |    configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+        |    proguardRules.addAll(
+        |      "-printmapping reports/mapping.txt",
+        |      "-printseeds reports/seeds.txt",
+        |      "-printusage reports/usage.txt",
+        |    )
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -462,11 +462,11 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {}
-        }
+        |minimize {
+        |  r8 {}
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
     path("client/src/main/resources/META-INF/proguard/client.pro")
       .writeText("-keep class client.Reflective { *; }")
@@ -511,23 +511,23 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {}
-        }
+        |minimize {
+        |  r8 {}
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
     path("client/src/main/resources/META-INF/proguard/client.pro")
       .writeText(
         """
-        -keep class client.Reflective {
-          public <init>();
-        }
-        -keep class client.Unused {
-          public <init>();
-        }
+        |-keep class client.Reflective {
+        |  public <init>();
+        |}
+        |-keep class client.Unused {
+        |  public <init>();
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(serverShadowJarPath)
@@ -553,13 +553,13 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            enableObfuscation()
-          }
-        }
+        |minimize {
+        |  r8 {
+        |    enableObfuscation()
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -581,13 +581,13 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          r8 {
-            enableOptimization()
-          }
-        }
+        |minimize {
+        |  r8 {
+        |    enableOptimization()
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -607,12 +607,12 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverShadowBlock =
         """
-        minimize {
-          exclude(project(':client'))
-          r8 {}
-        }
+        |minimize {
+        |  exclude(project(':client'))
+        |  r8 {}
+        |}
         """
-          .trimIndent()
+          .trimMargin()
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -636,21 +636,21 @@ class MinimizeTest : BasePluginTest() {
     writeR8ClientAndServerModules(
       serverProjectBlock =
         """
-        java {
-          toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
-        }
+        |java {
+        |  toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
+        |}
         """
-          .trimIndent(),
+          .trimMargin(),
       serverShadowBlock =
         """
-        doFirst {
-          logger.lifecycle("R8 launcher JDK " + javaLauncher.get().metadata.languageVersion.asInt())
-        }
-        minimize {
-          r8 {}
-        }
+        |doFirst {
+        |  logger.lifecycle("R8 launcher JDK " + javaLauncher.get().metadata.languageVersion.asInt())
+        |}
+        |minimize {
+        |  r8 {}
+        |}
         """
-          .trimIndent(),
+          .trimMargin(),
     )
 
     val result = runWithSuccess(serverShadowJarPath)
@@ -670,18 +670,18 @@ class MinimizeTest : BasePluginTest() {
     path("lib/src/main/java/lib/LibEntity.java")
       .writeText(
         """
-        package lib;
-        public interface LibEntity {}
+        |package lib;
+        |public interface LibEntity {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("lib/src/main/java/lib/UnusedLibEntity.java")
       .writeText(
         """
-        package lib;
-        public class UnusedLibEntity implements LibEntity {}
+        |package lib;
+        |public class UnusedLibEntity implements LibEntity {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("lib/build.gradle")
       .writeText(
@@ -696,19 +696,19 @@ class MinimizeTest : BasePluginTest() {
     path("api/src/main/java/api/Entity.java")
       .writeText(
         """
-        package api;
-        public interface Entity {}
+        |package api;
+        |public interface Entity {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("api/src/main/java/api/UnusedEntity.java")
       .writeText(
         """
-        package api;
-        import lib.LibEntity;
-        public class UnusedEntity implements LibEntity {}
+        |package api;
+        |import lib.LibEntity;
+        |public class UnusedEntity implements LibEntity {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("api/build.gradle")
       .writeText(
@@ -727,11 +727,11 @@ class MinimizeTest : BasePluginTest() {
     path("impl/src/main/java/impl/SimpleEntity.java")
       .writeText(
         """
-        package impl;
-        import api.Entity;
-        public class SimpleEntity implements Entity {}
+        |package impl;
+        |import api.Entity;
+        |public class SimpleEntity implements Entity {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("impl/build.gradle")
       .writeText(
@@ -761,39 +761,39 @@ class MinimizeTest : BasePluginTest() {
   ) {
     settingsScript.appendText(
       """
-      include 'client', 'server'
+      |include 'client', 'server'
       """
-        .trimIndent()
+        .trimMargin()
     )
     projectScript.writeText("")
 
     path("client/src/main/java/client/Used.java")
       .writeText(
         """
-        package client;
-        public class Used {
-          public static String name() {
-            return "used";
-          }
-        }
+        |package client;
+        |public class Used {
+        |  public static String name() {
+        |    return "used";
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/main/java/client/Unused.java")
       .writeText(
         """
-        package client;
-        public class Unused {}
+        |package client;
+        |public class Unused {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/main/java/client/Reflective.java")
       .writeText(
         """
-        package client;
-        public class Reflective {}
+        |package client;
+        |public class Reflective {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/build.gradle")
       .writeText(
@@ -807,15 +807,15 @@ class MinimizeTest : BasePluginTest() {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Used;
-        public class Server {
-          public String name() {
-            return Used.name();
-          }
-        }
+        |package server;
+        |import client.Used;
+        |public class Server {
+        |  public String name() {
+        |    return Used.name();
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("server/build.gradle")
       .writeText(
@@ -837,33 +837,33 @@ class MinimizeTest : BasePluginTest() {
   private fun writeR8ServiceModules() {
     settingsScript.appendText(
       """
-      include 'service', 'server'
+      |include 'service', 'server'
       """
-        .trimIndent()
+        .trimMargin()
     )
     projectScript.writeText("")
 
     path("service/src/main/java/service/Greeter.java")
       .writeText(
         """
-        package service;
-        public interface Greeter {
-          String greet();
-        }
+        |package service;
+        |public interface Greeter {
+        |  String greet();
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("service/src/main/java/service/DefaultGreeter.java")
       .writeText(
         """
-        package service;
-        public class DefaultGreeter implements Greeter {
-          public String greet() {
-            return "hello";
-          }
-        }
+        |package service;
+        |public class DefaultGreeter implements Greeter {
+        |  public String greet() {
+        |    return "hello";
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("service/src/main/resources/META-INF/services/service.Greeter")
       .writeText("service.DefaultGreeter")
@@ -879,10 +879,10 @@ class MinimizeTest : BasePluginTest() {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        public class Server {}
+        |package server;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("server/build.gradle")
       .writeText(

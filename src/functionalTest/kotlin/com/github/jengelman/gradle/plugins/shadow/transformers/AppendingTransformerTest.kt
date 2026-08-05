@@ -13,14 +13,14 @@ class AppendingTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo { insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO) }
     projectScript.appendText(
       """
-      dependencies {
-        ${implementationFiles(one, two)}
-      }
-      $shadowJarTask {
-        append('$ENTRY_TEST_PROPERTIES')
-      }
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  append('$ENTRY_TEST_PROPERTIES')
+      |}
     """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)

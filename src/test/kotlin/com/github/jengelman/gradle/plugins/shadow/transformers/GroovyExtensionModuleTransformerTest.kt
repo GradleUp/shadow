@@ -91,21 +91,21 @@ class GroovyExtensionModuleTransformerTest :
 
     val FOO_DESCRIPTOR =
       """
-      $KEY_MODULE_NAME=foo
-      $KEY_MODULE_VERSION=1.0.5
-      $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
-      $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
+      |$KEY_MODULE_NAME=foo
+      |$KEY_MODULE_VERSION=1.0.5
+      |$KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
+      |$KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
       """
-        .trimIndent()
+        .trimMargin()
 
     val BAR_DESCRIPTOR =
       """
-      $KEY_MODULE_NAME=bar
-      $KEY_MODULE_VERSION=2.3.5
-      $KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
-      $KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
+      |$KEY_MODULE_NAME=bar
+      |$KEY_MODULE_VERSION=2.3.5
+      |$KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
+      |$KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
       """
-        .trimIndent()
+        .trimMargin()
 
     fun String.toProperties() = Properties().apply { load(StringReader(this@toProperties)) }
 

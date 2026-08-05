@@ -234,34 +234,34 @@ abstract class BasePluginTest {
           val imports = if (withImports) "import junit.framework.Test;" else ""
           val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
           """
-            package $packageName;
-            $imports
-            public class $className {
-              public static void main(String[] args) {
-                if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
-                String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
-                System.out.println(content);
-                System.out.println($classRef);
-              }
-            }
+            |package $packageName;
+            |$imports
+            |public class $className {
+            |  public static void main(String[] args) {
+            |    if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
+            |    String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
+            |    System.out.println(content);
+            |    System.out.println($classRef);
+            |  }
+            |}
           """
-            .trimIndent()
+            .trimMargin()
         }
         JvmLang.Kotlin -> {
           val imports = if (withImports) "import junit.framework.Test" else ""
           val classRef = if (withImports) "\"Refs: \" + Test::class.java.name" else "\"Refs: null\""
           """
-            @file:JvmName("$className")
-            package $packageName
-            $imports
-            fun main(vararg args: String) {
-              if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
-              val content ="Hello, World! (%s) from $className".format(*args)
-              println(content)
-              println($classRef)
-            }
+            |@file:JvmName("$className")
+            |package $packageName
+            |$imports
+            |fun main(vararg args: String) {
+            |  if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
+            |  val content ="Hello, World! (%s) from $className".format(*args)
+            |  println(content)
+            |  println($classRef)
+            |}
           """
-            .trimIndent()
+            .trimMargin()
         }
       }
     },
@@ -274,19 +274,19 @@ abstract class BasePluginTest {
   fun writeClientAndServerModules(clientShadowed: Boolean = false, serverShadowBlock: String = "") {
     settingsScript.appendText(
       """
-      include 'client', 'server'
+      |include 'client', 'server'
       """
-        .trimIndent()
+        .trimMargin()
     )
     projectScript.writeText("")
 
     path("client/src/main/java/client/Client.java")
       .writeText(
         """
-        package client;
-        public class Client {}
+        |package client;
+        |public class Client {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/build.gradle")
       .writeText(
@@ -303,11 +303,11 @@ abstract class BasePluginTest {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Client;
-        public class Server {}
+        |package server;
+        |import client.Client;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("server/build.gradle")
       .writeText(
@@ -338,12 +338,12 @@ abstract class BasePluginTest {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Client;
-        import client.junit.framework.Test;
-        public class Server {}
+        |package server;
+        |import client.Client;
+        |import client.junit.framework.Test;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     val replaced =
       path("server/build.gradle")
@@ -371,16 +371,16 @@ abstract class BasePluginTest {
     path("src/main/java/my/plugin/MyPlugin.java")
       .writeText(
         """
-        package my.plugin;
-        import org.gradle.api.Plugin;
-        import org.gradle.api.Project;
-        public class MyPlugin implements Plugin<Project> {
-          public void apply(Project project) {
-            System.out.println("MyPlugin: Hello, World!");
-          }
-        }
+        |package my.plugin;
+        |import org.gradle.api.Plugin;
+        |import org.gradle.api.Project;
+        |public class MyPlugin implements Plugin<Project> {
+        |  public void apply(Project project) {
+        |    System.out.println("MyPlugin: Hello, World!");
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
   }
 
@@ -436,16 +436,16 @@ abstract class BasePluginTest {
       transformerBlock: String = "",
     ): String {
       return """
-        dependencies {
-          $dependenciesBlock
-        }
-        $shadowJarTask {
-          transform(${T::class.java.name}) {
-            $transformerBlock
-          }
-        }
+        |dependencies {
+        |  $dependenciesBlock
+        |}
+        |$shadowJarTask {
+        |  transform(${T::class.java.name}) {
+        |    $transformerBlock
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     }
 
     fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {

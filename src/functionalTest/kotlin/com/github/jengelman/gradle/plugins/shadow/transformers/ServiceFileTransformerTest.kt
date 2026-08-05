@@ -25,14 +25,14 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
     val config =
       """
-      dependencies {
-        ${implementationFiles(one, two)}
-      }
-      $shadowJarTask {
-        mergeServiceFiles("META-INF/foo")
-      }
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles("META-INF/foo")
+      |}
     """
-        .trimIndent()
+        .trimMargin()
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
@@ -47,10 +47,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       insert(
         "META-INF/services/java.sql.Driver",
         """
-        oracle.jdbc.OracleDriver
-        org.apache.hive.jdbc.HiveDriver
+        |oracle.jdbc.OracleDriver
+        |org.apache.hive.jdbc.HiveDriver
         """
-          .trimIndent(),
+          .trimMargin(),
       )
       insert(
         "META-INF/services/org.apache.axis.components.compiler.Compiler",
@@ -65,10 +65,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       insert(
         "META-INF/services/java.sql.Driver",
         """
-        org.apache.derby.jdbc.AutoloadedDriver
-        com.mysql.jdbc.Driver
+        |org.apache.derby.jdbc.AutoloadedDriver
+        |com.mysql.jdbc.Driver
         """
-          .trimIndent(),
+          .trimMargin(),
       )
       insert(
         "META-INF/services/org.apache.axis.components.compiler.Compiler",
@@ -79,18 +79,18 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles()
-          relocate("org.apache", "myapache") {
-            exclude 'org.apache.axis.components.compiler.Jikes'
-            exclude 'org.apache.commons.logging.LogFactory'
-          }
-        }
+        |dependencies {
+        |  ${implementationFiles(one, two)}
+        |}
+        |$shadowJarTask {
+        |  mergeServiceFiles()
+        |  relocate("org.apache", "myapache") {
+        |    exclude 'org.apache.axis.components.compiler.Jikes'
+        |    exclude 'org.apache.commons.logging.LogFactory'
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -99,28 +99,28 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       getContent("META-INF/services/java.sql.Driver")
         .isEqualTo(
           """
-          oracle.jdbc.OracleDriver
-          myapache.hive.jdbc.HiveDriver
-          myapache.derby.jdbc.AutoloadedDriver
-          com.mysql.jdbc.Driver
+          |oracle.jdbc.OracleDriver
+          |myapache.hive.jdbc.HiveDriver
+          |myapache.derby.jdbc.AutoloadedDriver
+          |com.mysql.jdbc.Driver
           """
-            .trimIndent()
+            .trimMargin()
         )
       getContent("META-INF/services/myapache.axis.components.compiler.Compiler")
         .isEqualTo(
           """
-          myapache.axis.components.compiler.Javac
-          org.apache.axis.components.compiler.Jikes
+          |myapache.axis.components.compiler.Javac
+          |org.apache.axis.components.compiler.Jikes
           """
-            .trimIndent()
+            .trimMargin()
         )
       getContent("META-INF/services/org.apache.commons.logging.LogFactory")
         .isEqualTo(
           """
-          myapache.commons.logging.impl.LogFactoryImpl
-          org.mortbay.log.Factory
+          |myapache.commons.logging.impl.LogFactoryImpl
+          |org.mortbay.log.Factory
           """
-            .trimIndent()
+            .trimMargin()
         )
     }
   }
@@ -132,14 +132,14 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo { insert(servicesBarEntry, CONTENT_TWO) }
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles()
-        }
+        |dependencies {
+        |  ${implementationFiles(one, two)}
+        |}
+        |$shadowJarTask {
+        |  mergeServiceFiles()
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
@@ -189,13 +189,13 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(EXCLUDE)
     projectScript.appendText(
       """
-        $shadowJarTask {
-          filesMatching('$ENTRY_SERVICES_SHADE') {
-            duplicatesStrategy = DuplicatesStrategy.INCLUDE
-          }
-        }
+        |$shadowJarTask {
+        |  filesMatching('$ENTRY_SERVICES_SHADE') {
+        |    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -211,13 +211,13 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(INCLUDE)
     projectScript.appendText(
       """
-        $shadowJarTask {
-          filesNotMatching('$ENTRY_SERVICES_SHADE') {
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-          }
-        }
+        |$shadowJarTask {
+        |  filesNotMatching('$ENTRY_SERVICES_SHADE') {
+        |    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -238,15 +238,15 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(default)
     projectScript.appendText(
       """
-        $shadowJarTask {
-          eachFile {
-            if (path == '$matchPath') {
-              duplicatesStrategy = DuplicatesStrategy.$override
-            }
-          }
-        }
+        |$shadowJarTask {
+        |  eachFile {
+        |    if (path == '$matchPath') {
+        |      duplicatesStrategy = DuplicatesStrategy.$override
+        |    }
+        |  }
+        |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)

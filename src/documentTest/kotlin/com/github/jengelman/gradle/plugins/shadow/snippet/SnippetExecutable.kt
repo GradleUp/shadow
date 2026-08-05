@@ -38,22 +38,22 @@ sealed class SnippetExecutable : Executable {
       .resolve("settings.gradle")
       .writeText(
         """
-        dependencyResolutionManagement {
-          repositories {
-            mavenLocal()
-            mavenCentral()
-          }
-          versionCatalogs.create('libs') {
-            library('log4j-core', 'org.apache.logging.log4j:log4j-core:2.11.1')
-          }
-        }
-        include ':api', ':main'
-        rootProject.name = 'snippet'
-        $enableNoImplicitLookupInParentProjects
-        enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
-        enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+        |dependencyResolutionManagement {
+        |  repositories {
+        |    mavenLocal()
+        |    mavenCentral()
+        |  }
+        |  versionCatalogs.create('libs') {
+        |    library('log4j-core', 'org.apache.logging.log4j:log4j-core:2.11.1')
+        |  }
+        |}
+        |include ':api', ':main'
+        |rootProject.name = 'snippet'
+        |$enableNoImplicitLookupInParentProjects
+        |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+        |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     val apiScript = buildString {

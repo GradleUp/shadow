@@ -12,18 +12,18 @@ class KotlinBuildExecutable(
 
   override val pluginsBlock: String =
     """
-    plugins {
-      java
-      id("com.gradleup.shadow")
-    }
+    |plugins {
+    |  java
+    |  id("com.gradleup.shadow")
+    |}
     """
-      .trimIndent()
+      .trimMargin()
 
   override val assembleDependsOn: String =
     """
-    tasks.named("assemble") {
-      dependsOn(tasks.withType(Jar::class.java)) // ShadowJar is a subtype of Jar.
-    }
+    |tasks.named("assemble") {
+    |  dependsOn(tasks.withType(Jar::class.java)) // ShadowJar is a subtype of Jar.
+    |}
     """
-      .trimIndent()
+      .trimMargin()
 }
