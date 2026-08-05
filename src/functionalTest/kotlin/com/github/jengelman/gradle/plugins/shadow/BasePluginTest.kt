@@ -148,14 +148,15 @@ abstract class BasePluginTest {
     val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
-      plugins {
-        id '$plugin'
-        id '$shadowPluginId' apply $applyShadowPlugin
-      }
-      $groupInfo
-      $versionInfo
+      |plugins {
+      |  id '$plugin'
+      |  id '$shadowPluginId' apply $applyShadowPlugin
+      |}
+      |$groupInfo
+      |$versionInfo
+      |
     """
-      .trimIndent() + lineSeparator
+      .trimMargin()
   }
 
   fun getDefaultSettingsBuildScript(
@@ -169,22 +170,23 @@ abstract class BasePluginTest {
     endBlock: String = "rootProject.name = 'my'",
   ): String {
     return """
-      $startBlock
-      dependencyResolutionManagement {
-        repositories {
-          maven { url = '${localRepo.root.toUri()}' }
-          mavenCentral()
-        }
-      }
-      buildCache {
-        $buildCacheBlock
-      }
-      $enableNoImplicitLookupInParentProjects
-      enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
-      enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
-      $endBlock
+      |$startBlock
+      |dependencyResolutionManagement {
+      |  repositories {
+      |    maven { url = '${localRepo.root.toUri()}' }
+      |    mavenCentral()
+      |  }
+      |}
+      |buildCache {
+      |  $buildCacheBlock
+      |}
+      |$enableNoImplicitLookupInParentProjects
+      |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+      |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+      |$endBlock
+      |
     """
-      .trimIndent() + lineSeparator
+      .trimMargin()
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
@@ -289,12 +291,13 @@ abstract class BasePluginTest {
     path("client/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation 'junit:junit:3.8.2'
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
@@ -309,26 +312,28 @@ abstract class BasePluginTest {
     path("server/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        dependencies {
-          implementation project(':client')
-        }
-        $shadowJarTask {
-          $serverShadowBlock
-        }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation project(':client')
+        |}
+        |$shadowJarTask {
+        |  $serverShadowBlock
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     if (!clientShadowed) return
     path("client/build.gradle")
       .appendText(
         """
-        $shadowJarTask {
-          relocate 'junit.framework', 'client.junit.framework'
-        }
-      """
-          .trimIndent() + lineSeparator
+        |$shadowJarTask {
+        |  relocate 'junit.framework', 'client.junit.framework'
+        |}
+        |
+        """
+          .trimMargin()
       )
     path("server/src/main/java/server/Server.java")
       .writeText(
@@ -350,16 +355,17 @@ abstract class BasePluginTest {
   fun writeGradlePluginModule() {
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-        gradlePlugin {
-          plugins {
-            create('my.plugin') {
-              implementationClass = 'my.plugin.MyPlugin'
-            }
-          }
-        }
+      |${getDefaultProjectBuildScript("java-gradle-plugin")}
+      |gradlePlugin {
+      |  plugins {
+      |    create('my.plugin') {
+      |      implementationClass = 'my.plugin.MyPlugin'
+      |    }
+      |  }
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     path("src/main/java/my/plugin/MyPlugin.java")

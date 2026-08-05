@@ -661,9 +661,9 @@ class MinimizeTest : BasePluginTest() {
   private fun writeApiLibAndImplModules() {
     settingsScript.appendText(
       """
-      include 'api', 'lib', 'impl'
-      """
-        .trimIndent() + lineSeparator
+      |include 'api', 'lib', 'impl'
+      |"""
+        .trimMargin()
     )
     projectScript.writeText("")
 
@@ -686,11 +686,11 @@ class MinimizeTest : BasePluginTest() {
     path("lib/build.gradle")
       .writeText(
         """
-        plugins {
-          id 'java'
-        }
-        """
-          .trimIndent() + lineSeparator
+        |plugins {
+        |  id 'java'
+        |}
+        |"""
+          .trimMargin()
       )
 
     path("api/src/main/java/api/Entity.java")
@@ -713,15 +713,15 @@ class MinimizeTest : BasePluginTest() {
     path("api/build.gradle")
       .writeText(
         """
-        plugins {
-          id 'java'
-        }
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-          implementation project(':lib')
-        }
-        """
-          .trimIndent() + lineSeparator
+        |plugins {
+        |  id 'java'
+        |}
+        |dependencies {
+        |  implementation 'junit:junit:3.8.2'
+        |  implementation project(':lib')
+        |}
+        |"""
+          .trimMargin()
       )
 
     path("impl/src/main/java/impl/SimpleEntity.java")
@@ -736,15 +736,16 @@ class MinimizeTest : BasePluginTest() {
     path("impl/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java-library")}
-        dependencies {
-          api project(':api')
-        }
-        $shadowJarTask {
-          minimize()
-        }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java-library")}
+        |dependencies {
+        |  api project(':api')
+        |}
+        |$shadowJarTask {
+        |  minimize()
+        |}
+        |
+        """
+          .trimMargin()
       )
   }
 
@@ -797,9 +798,10 @@ class MinimizeTest : BasePluginTest() {
     path("client/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
+        |${getDefaultProjectBuildScript("java")}
+        |
         """
-          .trimIndent() + lineSeparator
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
@@ -818,16 +820,17 @@ class MinimizeTest : BasePluginTest() {
     path("server/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        $serverProjectBlock
-        dependencies {
-          implementation project(':client')
-        }
-        $shadowJarTask {
-          $serverShadowBlock
-        }
+        |${getDefaultProjectBuildScript("java")}
+        |$serverProjectBlock
+        |dependencies {
+        |  implementation project(':client')
+        |}
+        |$shadowJarTask {
+        |  $serverShadowBlock
+        |}
+        |
         """
-          .trimIndent() + lineSeparator
+          .trimMargin()
       )
   }
 
@@ -867,9 +870,10 @@ class MinimizeTest : BasePluginTest() {
     path("service/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
+        |${getDefaultProjectBuildScript("java")}
+        |
         """
-          .trimIndent() + lineSeparator
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
@@ -883,17 +887,18 @@ class MinimizeTest : BasePluginTest() {
     path("server/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        dependencies {
-          implementation project(':service')
-        }
-        $shadowJarTask {
-          minimize {
-            r8 {}
-          }
-        }
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation project(':service')
+        |}
+        |$shadowJarTask {
+        |  minimize {
+        |    r8 {}
+        |  }
+        |}
+        |
         """
-          .trimIndent() + lineSeparator
+          .trimMargin()
       )
   }
 }

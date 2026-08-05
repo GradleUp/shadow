@@ -260,15 +260,16 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   private fun writeDuplicatesStrategy(strategy: DuplicatesStrategy) {
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(buildJarOne(), buildJarTwo())}
-        }
-        $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.$strategy
-          mergeServiceFiles()
-        }
+      |dependencies {
+      |  ${implementationFiles(buildJarOne(), buildJarTwo())}
+      |}
+      |$shadowJarTask {
+      |  duplicatesStrategy = DuplicatesStrategy.$strategy
+      |  mergeServiceFiles()
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
   }
 

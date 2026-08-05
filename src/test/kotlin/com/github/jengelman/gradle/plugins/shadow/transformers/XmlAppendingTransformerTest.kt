@@ -50,14 +50,14 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(content)
         .isEqualTo(
           """
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
-          <properties version="1.0">
-            <entry key="key1">val1</entry>
-            <entry key="key2">val2</entry>
-          </properties>
-          """
-            .trimIndent() + "\n"
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<!DOCTYPE properties SYSTEM "https://java.sun.com/dtd/properties.dtd">
+          |<properties version="1.0">
+          |  <entry key="key1">val1</entry>
+          |  <entry key="key2">val2</entry>
+          |</properties>
+          |"""
+            .trimMargin()
         )
     }
 
@@ -86,14 +86,14 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(content)
         .isEqualTo(
           """
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
-          <properties version="1.0">
-            <entry key="key1">val1</entry>
-            <entry key="key2">val2</entry>
-          </properties>
-          """
-            .trimIndent() + "\n"
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<!DOCTYPE properties SYSTEM "https://example.invalid/dtd/properties.dtd">
+          |<properties version="1.0">
+          |  <entry key="key1">val1</entry>
+          |  <entry key="key2">val2</entry>
+          |</properties>
+          |"""
+            .trimMargin()
         )
     }
 
@@ -119,13 +119,13 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(content)
         .isEqualTo(
           """
-          <?xml version="1.0" encoding="UTF-8"?>
-          <a>
-            <b />
-            <c />
-          </a>
-          """
-            .trimIndent() + "\n"
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<a>
+          |  <b />
+          |  <c />
+          |</a>
+          |"""
+            .trimMargin()
         )
     }
 

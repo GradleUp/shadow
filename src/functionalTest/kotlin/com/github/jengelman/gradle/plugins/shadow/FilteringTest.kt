@@ -15,12 +15,12 @@ class FilteringTest : BasePluginTest() {
     super.beforeEach()
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
+      |"""
+        .trimMargin()
     )
   }
 

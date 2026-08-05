@@ -66,7 +66,7 @@ class PublishingTest : BasePluginTest() {
           archiveBaseName = 'maven-all'
           """
             .trimIndent()
-      ) + lineSeparator
+      )
     )
 
     val assertions = { variantAttrs: Array<Pair<String, String>> ->
@@ -88,50 +88,50 @@ class PublishingTest : BasePluginTest() {
 
     settingsScript.prependText(
       """
-      plugins {
-        id 'org.gradle.toolchains.foojay-resolver-convention'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |plugins {
+      |  id 'org.gradle.toolchains.foojay-resolver-convention'
+      |}
+      |"""
+        .trimMargin()
     )
     projectScript.appendText(
       """
-      java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-      }
-      """
-        .trimIndent() + lineSeparator
+      |java {
+      |  toolchain.languageVersion = JavaLanguageVersion.of(17)
+      |}
+      |"""
+        .trimMargin()
     )
     assertions(attrsWithoutTargetJvm + targetJvmAttr17)
 
     projectScript.appendText(
       """
-      java {
-        targetCompatibility = JavaVersion.VERSION_11
-      }
-      """
-        .trimIndent() + lineSeparator
+      |java {
+      |  targetCompatibility = JavaVersion.VERSION_11
+      |}
+      |"""
+        .trimMargin()
     )
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
     projectScript.appendText(
       """
-      java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-      }
-      """
-        .trimIndent() + lineSeparator
+      |java {
+      |  sourceCompatibility = JavaVersion.VERSION_1_8
+      |}
+      |"""
+        .trimMargin()
     )
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
     projectScript.appendText(
       """
-      tasks.named('compileJava') {
-        options.release = 8
-      }
-      """
-        .trimIndent() + lineSeparator
+      |tasks.named('compileJava') {
+      |  options.release = 8
+      |}
+      |"""
+        .trimMargin()
     )
     // options.release flag is honored.
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
@@ -671,15 +671,16 @@ class PublishingTest : BasePluginTest() {
         .trimIndent(),
   ): String {
     return """
-      dependencies {
-        $dependenciesBlock
-      }
-      $shadowJarTask {
-        $shadowBlock
-      }
-      ${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
+      |dependencies {
+      |  $dependenciesBlock
+      |}
+      |$shadowJarTask {
+      |  $shadowBlock
+      |}
+      |${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
+      |
     """
-      .trimIndent()
+      .trimMargin()
   }
 
   private fun publishingBlock(projectBlock: String, publicationsBlock: String): String {

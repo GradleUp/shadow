@@ -210,27 +210,28 @@ class JavaPluginsTest : BasePluginTest() {
     path("client/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java-library")}
-      dependencies {
-        api 'junit:junit:3.8.2'
-      }
-      $shadowJarTask {
-        relocate 'junit.framework', 'client.junit.framework'
-      }
-      configurations {
-        apiElements {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact($shadowJarTask)
-        }
-        runtimeElements {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact($shadowJarTask)
-        }
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java-library")}
+        |dependencies {
+        |  api 'junit:junit:3.8.2'
+        |}
+        |$shadowJarTask {
+        |  relocate 'junit.framework', 'client.junit.framework'
+        |}
+        |configurations {
+        |  apiElements {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact($shadowJarTask)
+        |  }
+        |  runtimeElements {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact($shadowJarTask)
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
@@ -246,13 +247,14 @@ class JavaPluginsTest : BasePluginTest() {
     path("server/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
-      dependencies {
-        // No `configuration: "shadow"` needed!
-        implementation project(':client')
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
+        |dependencies {
+        |  // No `configuration: "shadow"` needed!
+        |  implementation project(':client')
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     // Running server:jar to ensure it compiles against the shadowed client
@@ -273,43 +275,45 @@ class JavaPluginsTest : BasePluginTest() {
     path("foo/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java-library")}
-      dependencies {
-        implementation 'my:a:1.0'
-      }
-      configurations {
-        named('apiElements') {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
-          exclude(group: 'my', module: 'a')
-        }
-        named('runtimeElements') {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
-          exclude(group: 'my', module: 'a')
-        }
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java-library")}
+        |dependencies {
+        |  implementation 'my:a:1.0'
+        |}
+        |configurations {
+        |  named('apiElements') {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact(tasks.named('shadowJar'))
+        |    exclude(group: 'my', module: 'a')
+        |  }
+        |  named('runtimeElements') {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact(tasks.named('shadowJar'))
+        |    exclude(group: 'my', module: 'a')
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     path("consumer/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
-      dependencies {
-        implementation project(':foo')
-      }
-      tasks.register('printClasspathFiles') {
-        def cp = configurations.runtimeClasspath
-        doLast {
-          cp.files.each { logger.lifecycle(it.name) }
-        }
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
+        |dependencies {
+        |  implementation project(':foo')
+        |}
+        |tasks.register('printClasspathFiles') {
+        |  def cp = configurations.runtimeClasspath
+        |  doLast {
+        |    cp.files.each { logger.lifecycle(it.name) }
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     val result = runWithSuccess(":consumer:printClasspathFiles")
@@ -376,13 +380,14 @@ class JavaPluginsTest : BasePluginTest() {
     path("client/build.gradle")
       .appendText(
         """
-        $jarTask {
-          manifest {
-            attributes '$multiReleaseAttributeKey': 'true'
-          }
-        }
-      """
-          .trimIndent() + lineSeparator
+        |$jarTask {
+        |  manifest {
+        |    attributes '$multiReleaseAttributeKey': 'true'
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
     path("server/build.gradle")
       .appendText(
@@ -415,13 +420,14 @@ class JavaPluginsTest : BasePluginTest() {
     path("client/build.gradle")
       .appendText(
         """
-        $jarTask {
-          manifest {
-            attributes '$multiReleaseAttributeKey': 'true'
-          }
-        }
-      """
-          .trimIndent() + lineSeparator
+        |$jarTask {
+        |  manifest {
+        |    attributes '$multiReleaseAttributeKey': 'true'
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     val arg = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
@@ -1001,11 +1007,11 @@ class JavaPluginsTest : BasePluginTest() {
     writeClientAndServerModules()
     settingsScript.prependText(
       """
-      plugins {
-        id 'com.gradle.develocity'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |plugins {
+      |  id 'com.gradle.develocity'
+      |}
+      |"""
+        .trimMargin()
     )
 
     val result =

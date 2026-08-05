@@ -47,12 +47,12 @@ class CachingTest : BasePluginTest() {
   fun outputFileChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
+      |"""
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly(*entriesInAB, *manifestEntries) }
@@ -187,12 +187,12 @@ class CachingTest : BasePluginTest() {
     val main2ClassEntry = writeClass(className = "Main2")
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
+      |"""
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -201,11 +201,12 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          exclude '**.properties'
-        }
+      |$shadowJarTask {
+      |  exclude '**.properties'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -214,22 +215,24 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          include '$mainClassEntry'
-        }
+      |$shadowJarTask {
+      |  include '$mainClassEntry'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          include '$main2ClassEntry'
-        }
+      |$shadowJarTask {
+      |  include '$main2ClassEntry'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -242,11 +245,11 @@ class CachingTest : BasePluginTest() {
     val mainClassEntry = writeClass(withImports = true)
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |"""
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -395,11 +398,11 @@ class CachingTest : BasePluginTest() {
   fun relocatorChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |"""
+        .trimMargin()
     )
     val mainClassEntry = writeClass(withImports = true)
 
@@ -427,14 +430,15 @@ class CachingTest : BasePluginTest() {
   fun relocatorPatternChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
-      $shadowJarTask {
-        relocate 'junit.framework', 'foo.junit.framework'
-      }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate 'junit.framework', 'foo.junit.framework'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
     val mainClassEntry = writeClass(withImports = true)
     val fooEntries =
@@ -485,22 +489,24 @@ class CachingTest : BasePluginTest() {
   fun disableCacheIfAnyTransformerIsNotCacheable() {
     projectScript.appendText(
       """
-        $shadowJarTask {
-          mergeServiceFiles()
-        }
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions()
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          mergeGroovyExtensionModules()
-        }
+      |$shadowJarTask {
+      |  mergeGroovyExtensionModules()
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions()
@@ -610,9 +616,10 @@ class CachingTest : BasePluginTest() {
     path("client/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
+        |${getDefaultProjectBuildScript("java")}
+        |
         """
-          .trimIndent() + lineSeparator
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
@@ -631,19 +638,20 @@ class CachingTest : BasePluginTest() {
     path("server/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        dependencies {
-          implementation project(':client')
-        }
-        $shadowJarTask {
-          minimize {
-            r8 {
-              proguardRuleFiles.from(file("r8-rules.pro"))
-            }
-          }
-        }
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation project(':client')
+        |}
+        |$shadowJarTask {
+        |  minimize {
+        |    r8 {
+        |      proguardRuleFiles.from(file("r8-rules.pro"))
+        |    }
+        |  }
+        |}
+        |
         """
-          .trimIndent() + lineSeparator
+          .trimMargin()
       )
   }
 }
