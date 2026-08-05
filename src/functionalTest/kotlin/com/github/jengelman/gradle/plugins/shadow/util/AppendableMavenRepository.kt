@@ -159,13 +159,13 @@ class AppendableMavenRepository(val root: Path) {
 
   private fun Module.createMavenPublication(block: String): String {
     return """
- |create('${coordinate.replace(":", "")}', MavenPublication) {
- |  artifactId = '$artifactId'
- |  groupId = '$groupId'
- |  version = '$version'
- |  $block
- |}
- """
+           |create('${coordinate.replace(":", "")}', MavenPublication) {
+           |  artifactId = '$artifactId'
+           |  groupId = '$groupId'
+           |  version = '$version'
+           |  $block
+           |}
+           """
       .trimMargin()
   }
 

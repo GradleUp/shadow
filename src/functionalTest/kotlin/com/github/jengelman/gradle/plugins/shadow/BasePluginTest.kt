@@ -148,14 +148,14 @@ abstract class BasePluginTest {
     val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
- |plugins {
- |  id '$plugin'
- |  id '$shadowPluginId' apply $applyShadowPlugin
- |}
- |$groupInfo
- |$versionInfo
- |
- """
+           |plugins {
+           |  id '$plugin'
+           |  id '$shadowPluginId' apply $applyShadowPlugin
+           |}
+           |$groupInfo
+           |$versionInfo
+           |
+           """
       .trimMargin()
   }
 
@@ -170,22 +170,22 @@ abstract class BasePluginTest {
     endBlock: String = "rootProject.name = 'my'",
   ): String {
     return """
- |$startBlock
- |dependencyResolutionManagement {
- |  repositories {
- |    maven { url = '${localRepo.root.toUri()}' }
- |    mavenCentral()
- |  }
- |}
- |buildCache {
- |  $buildCacheBlock
- |}
- |$enableNoImplicitLookupInParentProjects
- |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
- |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
- |$endBlock
- |
- """
+           |$startBlock
+           |dependencyResolutionManagement {
+           |  repositories {
+           |    maven { url = '${localRepo.root.toUri()}' }
+           |    mavenCentral()
+           |  }
+           |}
+           |buildCache {
+           |  $buildCacheBlock
+           |}
+           |$enableNoImplicitLookupInParentProjects
+           |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+           |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+           |$endBlock
+           |
+           """
       .trimMargin()
   }
 
@@ -436,15 +436,15 @@ abstract class BasePluginTest {
       transformerBlock: String = "",
     ): String {
       return """
- |dependencies {
- |  $dependenciesBlock
- |}
- |$shadowJarTask {
- |  transform(${T::class.java.name}) {
- |    $transformerBlock
- |  }
- |}
- """
+             |dependencies {
+             |  $dependenciesBlock
+             |}
+             |$shadowJarTask {
+             |  transform(${T::class.java.name}) {
+             |    $transformerBlock
+             |  }
+             |}
+             """
         .trimMargin()
     }
 
