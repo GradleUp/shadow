@@ -306,19 +306,19 @@ class ApplicationPluginTest : BasePluginTest() {
     mainClass = writeClass(withImports = mainClassWithImports)
     projectScript.appendText(
       """
-      |  apply plugin: 'application'
-      |  $projectBlock
-      |  application {
-      |    $mainClassBlock
-      |    $applicationBlock
-      |  }
-      |  dependencies {
-      |    $dependenciesBlock
-      |  }
-      |  $runShadowTask {
-      |    args 'foo'
-      |    $runShadowBlock
-      |  }
+      |apply plugin: 'application'
+      |$projectBlock
+      |application {
+      |  $mainClassBlock
+      |  $applicationBlock
+      |}
+      |dependencies {
+      |  $dependenciesBlock
+      |}
+      |$runShadowTask {
+      |  args 'foo'
+      |  $runShadowBlock
+      |}
       |
       """
         .trimMargin()
