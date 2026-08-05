@@ -59,9 +59,9 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  archiveBaseName = "foo"
-        |}
+      |$shadowJarTask {
+      |  archiveBaseName = "foo"
+      |}
       """
         .trimMargin()
     )
@@ -78,11 +78,11 @@ class CachingTest : BasePluginTest() {
       .forEach { strategy ->
         projectScript.writeText(
           """
-            |${getDefaultProjectBuildScript()}
-            |$shadowJarTask {
-            |  duplicatesStrategy = DuplicatesStrategy.$strategy
-            |}
-        """
+          |${getDefaultProjectBuildScript()}
+          |$shadowJarTask {
+          |  duplicatesStrategy = DuplicatesStrategy.$strategy
+          |}
+          """
             .trimMargin()
         )
 
@@ -94,16 +94,16 @@ class CachingTest : BasePluginTest() {
   fun manifestAttrsChanged() {
     projectScript.appendText(
       """
-        |$jarTask {
-        |  manifest {
-        |    attributes 'Foo': 'Foo1'
-        |  }
-        |}
-        |$shadowJarTask {
-        |  manifest {
-        |    attributes 'Bar': 'Bar1'
-        |  }
-        |}
+      |$jarTask {
+      |  manifest {
+      |    attributes 'Foo': 'Foo1'
+      |  }
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes 'Bar': 'Bar1'
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -140,12 +140,12 @@ class CachingTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
-        |kotlin {
-        |  jvm().mainRun {
-        |    it.mainClass.set('$mainClassName')
-        |  }
-        |}
+      |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
+      |kotlin {
+      |  jvm().mainRun {
+      |    it.mainClass.set('$mainClassName')
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -165,10 +165,10 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |apply plugin: 'application'
-        |application {
-        |  mainClass = '$mainClassName'
-        |}
+      |apply plugin: 'application'
+      |application {
+      |  mainClass = '$mainClassName'
+      |}
       """
         .trimMargin()
     )
@@ -258,11 +258,11 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  dependencies {
-        |    exclude(dependency('junit:junit'))
-        |  }
-        |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency('junit:junit'))
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -303,7 +303,7 @@ class CachingTest : BasePluginTest() {
         |    exclude(dependency('junit:junit:.*'))
         |  }
         |}
-      """
+        """
           .trimMargin()
       )
 
@@ -412,9 +412,9 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  relocate 'junit.framework', 'foo.junit.framework'
-        |}
+      |$shadowJarTask {
+      |  relocate 'junit.framework', 'foo.junit.framework'
+      |}
       """
         .trimMargin()
     )
@@ -513,10 +513,10 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
-        |  transform(${ResourceTransformer.Companion::class.java.name})
-        |}
+      |$shadowJarTask {
+      |  // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
+      |  transform(${ResourceTransformer.Companion::class.java.name})
+      |}
       """
         .trimMargin()
     )

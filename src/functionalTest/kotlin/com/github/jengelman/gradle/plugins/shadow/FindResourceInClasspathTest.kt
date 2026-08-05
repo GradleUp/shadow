@@ -15,20 +15,20 @@ class FindResourceInClasspathTest : BasePluginTest() {
     val taskClassName = FindResourceInClasspath::class.java.name
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'my:a:1.0'
-        |}
-        |tasks.register('find1', $taskClassName) {
-        |  classpath = configurations.runtimeClasspath
-        |}
-        |tasks.register('find2', $taskClassName) {
-        |  classpath = configurations.runtimeClasspath
-        |  include("a.properties")
-        |}
-        |tasks.register('find3', $taskClassName) {
-        |  classpath = configurations.runtimeClasspath
-        |  exclude("a.properties")
-        |}
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |}
+      |tasks.register('find1', $taskClassName) {
+      |  classpath = configurations.runtimeClasspath
+      |}
+      |tasks.register('find2', $taskClassName) {
+      |  classpath = configurations.runtimeClasspath
+      |  include("a.properties")
+      |}
+      |tasks.register('find3', $taskClassName) {
+      |  classpath = configurations.runtimeClasspath
+      |  exclude("a.properties")
+      |}
       """
         .trimMargin()
     )

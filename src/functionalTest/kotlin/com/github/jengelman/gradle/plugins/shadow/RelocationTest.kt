@@ -33,13 +33,13 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  enableAutoRelocation = true
-        |  relocationPrefix = '$relocationPrefix'
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  enableAutoRelocation = true
+      |  relocationPrefix = '$relocationPrefix'
+      |}
       """
         .trimMargin()
     )
@@ -114,13 +114,13 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  relocate 'junit.runner', 'a'
-        |  relocate 'junit.framework', 'b'
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate 'junit.runner', 'a'
+      |  relocate 'junit.framework', 'b'
+      |}
       """
         .trimMargin()
     )
@@ -155,17 +155,17 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  relocate('junit.runner', 'a') {
-        |    exclude 'junit.runner.BaseTestRunner'
-        |  }
-        |  relocate('junit.framework', 'b') {
-        |    include 'junit.framework.Test*'
-        |  }
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate('junit.runner', 'a') {
+      |    exclude 'junit.runner.BaseTestRunner'
+      |  }
+      |  relocate('junit.framework', 'b') {
+      |    include 'junit.framework.Test*'
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -203,12 +203,12 @@ class RelocationTest : BasePluginTest() {
   fun remapClassNamesForRelocatedFilesInProjectSource() {
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  relocate 'junit.framework', 'shadow.junit'
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate 'junit.framework', 'shadow.junit'
+      |}
       """
         .trimMargin()
     )
@@ -257,12 +257,12 @@ class RelocationTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(depJar)}
-        |}
-        |$shadowJarTask {
-        |  relocate 'foo', 'bar'
-        |}
+      |dependencies {
+      |  ${implementationFiles(depJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate 'foo', 'bar'
+      |}
       """
         .trimMargin()
     )
@@ -292,13 +292,13 @@ class RelocationTest : BasePluginTest() {
     writeClass(withImports = true)
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  enableAutoRelocation = $enableAutoRelocation
-        |  preserveFileTimestamps = $preserveFileTimestamps
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  enableAutoRelocation = $enableAutoRelocation
+      |  preserveFileTimestamps = $preserveFileTimestamps
+      |}
       """
         .trimMargin()
     )
@@ -380,14 +380,14 @@ class RelocationTest : BasePluginTest() {
       }
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(kotlinJar)}
-        |}
-        |$shadowJarTask {
-        |  relocate('kotlin.', 'foo.kotlin.') {
-        |    exclude('kotlin/kotlin.kotlin_builtins')
-        |  }
-        |}
+      |dependencies {
+      |  ${implementationFiles(kotlinJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate('kotlin.', 'foo.kotlin.') {
+      |    exclude('kotlin/kotlin.kotlin_builtins')
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -414,14 +414,14 @@ class RelocationTest : BasePluginTest() {
       }
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  relocate('', 'foo/') {
-        |    $relocateConfig
-        |  }
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate('', 'foo/') {
+      |    $relocateConfig
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -442,13 +442,13 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  configurations = []
-        |  relocate('', 'foo/')
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  configurations = []
+      |  relocate('', 'foo/')
+      |}
       """
         .trimMargin()
     )
@@ -465,12 +465,12 @@ class RelocationTest : BasePluginTest() {
     writeClassWithStringRef()
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  manifest {
-        |    attributes '$mainClassAttributeKey': 'my.Main'
-        |  }
-        |  relocate('foo', 'shadow.foo')
-        |}
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |  relocate('foo', 'shadow.foo')
+      |}
       """
         .trimMargin()
     )
@@ -487,14 +487,14 @@ class RelocationTest : BasePluginTest() {
     writeClassWithStringRef()
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  manifest {
-        |    attributes '$mainClassAttributeKey': 'my.Main'
-        |  }
-        |  relocate('foo', 'shadow.foo') {
-        |    skipStringConstants = $skipStringConstants
-        |  }
-        |}
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |  relocate('foo', 'shadow.foo') {
+      |    skipStringConstants = $skipStringConstants
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -526,12 +526,12 @@ class RelocationTest : BasePluginTest() {
     }
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  manifest {
-        |    attributes '$mainClassAttributeKey': 'my.Main'
-        |  }
-        |  relocate('org.package', 'shadow.org.package')
-        |}
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |  relocate('org.package', 'shadow.org.package')
+      |}
       """
         .trimMargin()
     )
@@ -553,12 +553,12 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  enableAutoRelocation = true
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  enableAutoRelocation = true
+      |}
       """
         .trimMargin()
     )
@@ -579,13 +579,13 @@ class RelocationTest : BasePluginTest() {
       buildJar("stdlib.jar") { insert(originalModuleFilePath, originalModuleFileBytes) }
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(stdlibJar)}
-        |}
-        |$shadowJarTask {
-        |  relocate('kotlin', 'my.kotlin')
-        |  enableKotlinModuleRemapping = $enableKotlinModuleRemapping
-        |}
+      |dependencies {
+      |  ${implementationFiles(stdlibJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate('kotlin', 'my.kotlin')
+      |  enableKotlinModuleRemapping = $enableKotlinModuleRemapping
+      |}
       """
         .trimMargin()
     )

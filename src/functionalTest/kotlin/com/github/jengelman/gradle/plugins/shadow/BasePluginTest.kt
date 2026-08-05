@@ -148,14 +148,14 @@ abstract class BasePluginTest {
     val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
-      |plugins {
-      |  id '$plugin'
-      |  id '$shadowPluginId' apply $applyShadowPlugin
-      |}
-      |$groupInfo
-      |$versionInfo
-      |
-    """
+ |plugins {
+ |  id '$plugin'
+ |  id '$shadowPluginId' apply $applyShadowPlugin
+ |}
+ |$groupInfo
+ |$versionInfo
+ |
+ """
       .trimMargin()
   }
 
@@ -170,22 +170,22 @@ abstract class BasePluginTest {
     endBlock: String = "rootProject.name = 'my'",
   ): String {
     return """
-      |$startBlock
-      |dependencyResolutionManagement {
-      |  repositories {
-      |    maven { url = '${localRepo.root.toUri()}' }
-      |    mavenCentral()
-      |  }
-      |}
-      |buildCache {
-      |  $buildCacheBlock
-      |}
-      |$enableNoImplicitLookupInParentProjects
-      |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
-      |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
-      |$endBlock
-      |
-    """
+ |$startBlock
+ |dependencyResolutionManagement {
+ |  repositories {
+ |    maven { url = '${localRepo.root.toUri()}' }
+ |    mavenCentral()
+ |  }
+ |}
+ |buildCache {
+ |  $buildCacheBlock
+ |}
+ |$enableNoImplicitLookupInParentProjects
+ |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+ |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+ |$endBlock
+ |
+ """
       .trimMargin()
   }
 
@@ -234,16 +234,16 @@ abstract class BasePluginTest {
           val imports = if (withImports) "import junit.framework.Test;" else ""
           val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
           """
-            |package $packageName;
-            |$imports
-            |public class $className {
-            |  public static void main(String[] args) {
-            |    if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
-            |    String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
-            |    System.out.println(content);
-            |    System.out.println($classRef);
-            |  }
-            |}
+          |package $packageName;
+          |$imports
+          |public class $className {
+          |  public static void main(String[] args) {
+          |    if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
+          |    String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
+          |    System.out.println(content);
+          |    System.out.println($classRef);
+          |  }
+          |}
           """
             .trimMargin()
         }
@@ -251,15 +251,15 @@ abstract class BasePluginTest {
           val imports = if (withImports) "import junit.framework.Test" else ""
           val classRef = if (withImports) "\"Refs: \" + Test::class.java.name" else "\"Refs: null\""
           """
-            |@file:JvmName("$className")
-            |package $packageName
-            |$imports
-            |fun main(vararg args: String) {
-            |  if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
-            |  val content ="Hello, World! (%s) from $className".format(*args)
-            |  println(content)
-            |  println($classRef)
-            |}
+          |@file:JvmName("$className")
+          |package $packageName
+          |$imports
+          |fun main(vararg args: String) {
+          |  if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
+          |  val content ="Hello, World! (%s) from $className".format(*args)
+          |  println(content)
+          |  println($classRef)
+          |}
           """
             .trimMargin()
         }
@@ -436,15 +436,15 @@ abstract class BasePluginTest {
       transformerBlock: String = "",
     ): String {
       return """
-        |dependencies {
-        |  $dependenciesBlock
-        |}
-        |$shadowJarTask {
-        |  transform(${T::class.java.name}) {
-        |    $transformerBlock
-        |  }
-        |}
-      """
+ |dependencies {
+ |  $dependenciesBlock
+ |}
+ |$shadowJarTask {
+ |  transform(${T::class.java.name}) {
+ |    $transformerBlock
+ |  }
+ |}
+ """
         .trimMargin()
     }
 

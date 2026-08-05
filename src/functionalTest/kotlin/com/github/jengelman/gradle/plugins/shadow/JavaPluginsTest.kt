@@ -57,25 +57,25 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        |plugins {
-        |  id '$shadowPluginId'
-        |}
-|
-        |def testJar = tasks.register('testJar', Jar)
-        |// Must use `@Companion` to access the companion object instance instead of the class.
-        |def companion = ${ShadowJar::class.qualifiedName}.@Companion
-        |companion.$jvmName(project, testJar) {
-        |  it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
-        |}
-|
-        |afterEvaluate {
-        |  tasks.register('$ASSEMBLE_TASK_NAME') {
-        |  def taskDependencies = provider { dependsOn.collect { it.name }.join(', ') }
-        |    doFirst {
-        |      logger.lifecycle('task dependencies: ' + taskDependencies.get())
-        |    }
-        |  }
-        |}
+      |plugins {
+      |  id '$shadowPluginId'
+      |}
+      |
+      |def testJar = tasks.register('testJar', Jar)
+      |// Must use `@Companion` to access the companion object instance instead of the class.
+      |def companion = ${ShadowJar::class.qualifiedName}.@Companion
+      |companion.$jvmName(project, testJar) {
+      |  it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
+      |}
+      |
+      |afterEvaluate {
+      |  tasks.register('$ASSEMBLE_TASK_NAME') {
+      |  def taskDependencies = provider { dependsOn.collect { it.name }.join(', ') }
+      |    doFirst {
+      |      logger.lifecycle('task dependencies: ' + taskDependencies.get())
+      |    }
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -395,7 +395,7 @@ class JavaPluginsTest : BasePluginTest() {
         |$shadowJarTask {
         |  addMultiReleaseAttribute = $addAttribute
         |}
-      """
+        """
           .trimMargin()
       )
 
@@ -461,9 +461,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(resJar)}
-        |}
+      |dependencies {
+      |  ${implementationFiles(resJar)}
+      |}
       """
         .trimMargin()
     )
@@ -508,12 +508,12 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        |${getDefaultProjectBuildScript("java-library")}
-        |dependencies {
-        |  api 'my:api:1.0'
-        |  implementation 'my:implementation:1.0'
-        |  runtimeOnly 'my:runtime-only:1.0'
-        |}
+      |${getDefaultProjectBuildScript("java-library")}
+      |dependencies {
+      |  api 'my:api:1.0'
+      |  implementation 'my:implementation:1.0'
+      |  runtimeOnly 'my:runtime-only:1.0'
+      |}
       """
         .trimMargin()
     )
@@ -555,14 +555,14 @@ class JavaPluginsTest : BasePluginTest() {
   fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
       """
-        |dependencies {
-        |  $configuration 'junit:junit:3.8.2'
-        |}
-        |$jarTask {
-        |  manifest {
-        |    attributes '$classPathAttributeKey': '/libs/foo.jar'
-        |  }
-        |}
+      |dependencies {
+      |  $configuration 'junit:junit:3.8.2'
+      |}
+      |$jarTask {
+      |  manifest {
+      |    attributes '$classPathAttributeKey': '/libs/foo.jar'
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -600,13 +600,13 @@ class JavaPluginsTest : BasePluginTest() {
   fun supportZipCompressions(method: ZipEntryCompression) {
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |$shadowJarTask {
-        |  zip64 = true
-        |  entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  zip64 = true
+      |  entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
+      |}
       """
         .trimMargin()
     )
@@ -685,18 +685,18 @@ class JavaPluginsTest : BasePluginTest() {
     val testShadowJarTask = "testShadowJar"
     projectScript.appendText(
       """
-        |dependencies {
-        |  testImplementation 'junit:junit:3.8.2'
-        |}
-        |def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
-        |  description = 'Create a combined JAR of project and test dependencies'
-        |  archiveClassifier = 'test'
-        |  from sourceSets.named('test').map { it.output }
-        |  configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
-        |  manifest {
-        |    attributes '$mainClassAttributeKey': 'my.Main'
-        |  }
-        |}
+      |dependencies {
+      |  testImplementation 'junit:junit:3.8.2'
+      |}
+      |def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a combined JAR of project and test dependencies'
+      |  archiveClassifier = 'test'
+      |  from sourceSets.named('test').map { it.output }
+      |  configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -720,25 +720,25 @@ class JavaPluginsTest : BasePluginTest() {
     val testShadowJarTask = "testShadowJar"
     projectScript.writeText(
       """
-        |${getDefaultProjectBuildScript(applyShadowPlugin = false)}
-        |dependencies {
-        |  testImplementation 'junit:junit:3.8.2'
-        |}
-        |def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
-        |  description = 'Create a combined JAR of project and test dependencies'
-        |  archiveClassifier = 'test'
-        |  from sourceSets.named('test').map { it.output }
-        |  configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
-        |  manifest {
-        |    attributes '$mainClassAttributeKey': 'my.Main'
-        |  }
-        |}
-        |afterEvaluate {
-        |  def hasShadowPlugin = plugins.hasPlugin('${ShadowPlugin::class.qualifiedName}')
-        |  def hasShadowBasePlugin = plugins.hasPlugin('${ShadowBasePlugin::class.qualifiedName}')
-        |  logger.lifecycle("Has ShadowPlugin: " + hasShadowPlugin)
-        |  logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
-        |}
+      |${getDefaultProjectBuildScript(applyShadowPlugin = false)}
+      |dependencies {
+      |  testImplementation 'junit:junit:3.8.2'
+      |}
+      |def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a combined JAR of project and test dependencies'
+      |  archiveClassifier = 'test'
+      |  from sourceSets.named('test').map { it.output }
+      |  configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |}
+      |afterEvaluate {
+      |  def hasShadowPlugin = plugins.hasPlugin('${ShadowPlugin::class.qualifiedName}')
+      |  def hasShadowBasePlugin = plugins.hasPlugin('${ShadowBasePlugin::class.qualifiedName}')
+      |  logger.lifecycle("Has ShadowPlugin: " + hasShadowPlugin)
+      |  logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
+      |}
       """
         .trimMargin()
     )
@@ -765,14 +765,14 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |}
-        |def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
-        |  description = 'Create a shadow JAR of all dependencies'
-        |  archiveClassifier = 'dep'
-        |  configurations = project.configurations.named('runtimeClasspath').map { [it] }
-        |}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a shadow JAR of all dependencies'
+      |  archiveClassifier = 'dep'
+      |  configurations = project.configurations.named('runtimeClasspath').map { [it] }
+      |}
       """
         .trimMargin()
     )
@@ -794,12 +794,12 @@ class JavaPluginsTest : BasePluginTest() {
     val customShadowJar = "customShadowJar"
     projectScript.writeText(
       """
-        |${getDefaultProjectBuildScript(applyShadowPlugin = false)}
-        |def $customShadowJar = tasks.register('$customShadowJar', ${ShadowJar::class.java.name}) {
-        |  minimize {
-        |    r8 {}
-        |  }
-        |}
+      |${getDefaultProjectBuildScript(applyShadowPlugin = false)}
+      |def $customShadowJar = tasks.register('$customShadowJar', ${ShadowJar::class.java.name}) {
+      |  minimize {
+      |    r8 {}
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -818,9 +818,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(nonExistentDir)}
-        |}
+      |dependencies {
+      |  ${implementationFiles(nonExistentDir)}
+      |}
       """
         .trimMargin()
     )
@@ -836,9 +836,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(badJarPath)}
-        |}
+      |dependencies {
+      |  ${implementationFiles(badJarPath)}
+      |}
       """
         .trimMargin()
     )
@@ -854,9 +854,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(fooAarPath)}
-        |}
+      |dependencies {
+      |  ${implementationFiles(fooAarPath)}
+      |}
       """
         .trimMargin()
     )
@@ -873,17 +873,17 @@ class JavaPluginsTest : BasePluginTest() {
     path("Foo").writeText("Foo")
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  from(file('${artifactAJar.invariantSeparatorsPathString}')) { // Without unzipping.
-        |    into('META-INF')
-        |  }
-        |  from(zipTree(file('${artifactBJar.invariantSeparatorsPathString}'))) { // With unzipping.
-        |    into('META-INF')
-        |  }
-        |  from('Foo') {
-        |    into('Bar')
-        |  }
-        |}
+      |$shadowJarTask {
+      |  from(file('${artifactAJar.invariantSeparatorsPathString}')) { // Without unzipping.
+      |    into('META-INF')
+      |  }
+      |  from(zipTree(file('${artifactBJar.invariantSeparatorsPathString}'))) { // With unzipping.
+      |    into('META-INF')
+      |  }
+      |  from('Foo') {
+      |    into('Bar')
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -916,14 +916,14 @@ class JavaPluginsTest : BasePluginTest() {
   fun addDependenciesViaCustomConfigurationWithoutUnzipping() {
     projectScript.appendText(
       """
-        |def nonJar = configurations.create('nonJar')
-        |dependencies {
-        |  add('nonJar', 'my:a:1.0')
-        |  add('nonJar', 'my:b:1.0')
-        |}
-        |$shadowJarTask {
-        |  from(nonJar)
-        |}
+      |def nonJar = configurations.create('nonJar')
+      |dependencies {
+      |  add('nonJar', 'my:a:1.0')
+      |  add('nonJar', 'my:b:1.0')
+      |}
+      |$shadowJarTask {
+      |  from(nonJar)
+      |}
       """
         .trimMargin()
     )
@@ -942,14 +942,14 @@ class JavaPluginsTest : BasePluginTest() {
     writeClass(className = "module-info") { "module myModuleName {}" }
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(fooJar)}
-        |}
-        |$shadowJarTask {
-        |  excludes.remove(
-        |    'module-info.class'
-        |  )
-        |}
+      |dependencies {
+      |  ${implementationFiles(fooJar)}
+      |}
+      |$shadowJarTask {
+      |  excludes.remove(
+      |    'module-info.class'
+      |  )
+      |}
       """
         .trimMargin()
     )
@@ -1035,13 +1035,13 @@ class JavaPluginsTest : BasePluginTest() {
     path("src/main/resources/a.properties").writeText("invalid a")
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'my:a:1.0'
-        |}
-        |$shadowJarTask {
-        |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        |  failOnDuplicateEntries = $enable
-        |}
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |}
+      |$shadowJarTask {
+      |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |  failOnDuplicateEntries = $enable
+      |}
       """
         .trimMargin()
     )
@@ -1063,12 +1063,12 @@ class JavaPluginsTest : BasePluginTest() {
     path("src/main/resources/a.properties").writeText("project a")
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'my:a:1.0'
-        |}
-        |$shadowJarTask {
-        |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        |}
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |}
+      |$shadowJarTask {
+      |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |}
       """
         .trimMargin()
     )
@@ -1089,9 +1089,9 @@ class JavaPluginsTest : BasePluginTest() {
   fun fallbackMainClassByProperty(input: String, expected: String?, message: String) {
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  mainClass = '$input'
-        |}
+      |$shadowJarTask {
+      |  mainClass = '$input'
+      |}
       """
         .trimMargin()
     )
@@ -1148,53 +1148,53 @@ class JavaPluginsTest : BasePluginTest() {
         |import org.gradle.api.artifacts.transform.InputArtifact
         |import org.gradle.api.file.FileSystemLocation
         |import org.gradle.api.provider.Provider
-|
+        |
         |plugins {
         |  id 'application'
         |  id '$shadowPluginId'
         |}
-|
+        |
         |application {
         |  mainClass = 'com.company.Main'
         |}
-|
+        |
         |dependencies {
         |  implementation project(':lib')
         |}
-|
+        |
         |def transformedAttribute = Attribute.of('custom-transformed', Boolean)
-|
+        |
         |dependencies {
         |  attributesSchema {
         |    attribute(transformedAttribute)
         |  }
         |  artifactTypes.maybeCreate('jar').attributes.attribute(transformedAttribute, false)
         |}
-|
+        |
         |dependencies {
         |  registerTransform(CustomTransformAction) {
         |    from.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, false)
         |    to.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, true)
         |  }
         |}
-|
+        |
         |$shadowJarTask {
         |  configurations = [project.configurations.runtimeClasspath]
         |}
-|
+        |
         |configurations.runtimeClasspath {
         |  attributes.attribute(transformedAttribute, true)
         |}
-|
+        |
         |abstract class CustomTransformAction implements TransformAction<TransformParameters.None> {
         |  @InputArtifact abstract Provider<FileSystemLocation> getInputArtifact()
-|
+        |
         |  @Override
         |  void transform(TransformOutputs outputs) {
         |    outputs.file(inputArtifact.get().asFile)
         |  }
         |}
-      """
+        """
           .trimMargin()
       )
     path("app/src/main/java/com/company/Main.java")
@@ -1231,7 +1231,7 @@ class JavaPluginsTest : BasePluginTest() {
         |java {
         |  toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
         |}
-      """
+        """
           .trimMargin()
       )
 

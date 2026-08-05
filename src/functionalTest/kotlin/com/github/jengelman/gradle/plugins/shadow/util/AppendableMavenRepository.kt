@@ -71,8 +71,8 @@ class AppendableMavenRepository(val root: Path) {
 
     logger.info(
       """
-        |Publish modules to Maven repository at ${root.toUri()}:
-        |${modules.joinToString("\n") { it.coordinate }}
+      |Publish modules to Maven repository at ${root.toUri()}:
+      |${modules.joinToString("\n") { it.coordinate }}
       """
         .trimMargin()
     )
@@ -88,12 +88,12 @@ class AppendableMavenRepository(val root: Path) {
             index++
             val node = "dependencyNode$index"
             """
-          |def $node = dependenciesNode.appendNode('dependency')
-          |$node.appendNode('groupId', '${it.groupId}')
-          |$node.appendNode('artifactId', '${it.artifactId}')
-          |$node.appendNode('version', '${it.version}')
-          |$node.appendNode('scope', '${it.scope}')
-        """
+            |def $node = dependenciesNode.appendNode('dependency')
+            |$node.appendNode('groupId', '${it.groupId}')
+            |$node.appendNode('artifactId', '${it.artifactId}')
+            |$node.appendNode('version', '${it.version}')
+            |$node.appendNode('scope', '${it.scope}')
+            """
               .trimMargin()
           }
         module.createMavenPublication(
@@ -103,7 +103,7 @@ class AppendableMavenRepository(val root: Path) {
           |  def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
           |  $nodes
           |}
-        """
+          """
             .trimMargin()
         )
       }
@@ -120,7 +120,7 @@ class AppendableMavenRepository(val root: Path) {
       |    maven { url = '${root.toUri()}' }
       |  }
       |}
-    """
+      """
         .trimMargin()
     val jarsModule = "jars-module"
     root.resolve("settings.gradle").appendText("include '$jarsModule'\n")
@@ -149,7 +149,7 @@ class AppendableMavenRepository(val root: Path) {
         |    maven { url = '${root.toUri()}' }
         |  }
         |}
-      """
+        """
           .trimMargin()
       val pomModule = "pom-module-$index"
       root.resolve("settings.gradle").appendText("include '$pomModule'\n")
@@ -159,13 +159,13 @@ class AppendableMavenRepository(val root: Path) {
 
   private fun Module.createMavenPublication(block: String): String {
     return """
-      |create('${coordinate.replace(":", "")}', MavenPublication) {
-      |  artifactId = '$artifactId'
-      |  groupId = '$groupId'
-      |  version = '$version'
-      |  $block
-      |}
-    """
+ |create('${coordinate.replace(":", "")}', MavenPublication) {
+ |  artifactId = '$artifactId'
+ |  groupId = '$groupId'
+ |  version = '$version'
+ |  $block
+ |}
+ """
       .trimMargin()
   }
 

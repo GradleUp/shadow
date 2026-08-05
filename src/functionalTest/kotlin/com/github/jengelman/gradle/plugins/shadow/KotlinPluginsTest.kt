@@ -32,11 +32,11 @@ class KotlinPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
-        |dependencies {
-        |  implementation 'junit:junit:3.8.2'
-        |  $stdlib
-        |}
+      |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |  $stdlib
+      |}
       """
         .trimMargin()
     )
@@ -69,22 +69,22 @@ class KotlinPluginsTest : BasePluginTest() {
     val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
     projectScript.appendText(
       """
-        |kotlin {
-        |  jvm()
-        |  sourceSets {
-        |    commonMain {
-        |      dependencies {
-        |        implementation 'my:b:1.0'
-        |        $stdlib
-        |      }
-        |    }
-        |    jvmMain {
-        |      dependencies {
-        |        implementation 'my:a:1.0'
-        |      }
-        |    }
-        |  }
-        |}
+      |kotlin {
+      |  jvm()
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:b:1.0'
+      |        $stdlib
+      |      }
+      |    }
+      |    jvmMain {
+      |      dependencies {
+      |        implementation 'my:a:1.0'
+      |      }
+      |    }
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -116,22 +116,22 @@ class KotlinPluginsTest : BasePluginTest() {
     val mainClassEntry = writeClass(sourceSet = jvmTargetMain, jvmLang = JvmLang.Kotlin)
     projectScript.appendText(
       """
-        |kotlin {
-        |  jvm('$jvmTargetName')
-        |  sourceSets {
-        |    commonMain {
-        |      dependencies {
-        |        implementation 'my:b:1.0'
-        |        $stdlib
-        |      }
-        |    }
-        |    $jvmTargetMain {
-        |      dependencies {
-        |        implementation 'my:a:1.0'
-        |      }
-        |    }
-        |  }
-        |}
+      |kotlin {
+      |  jvm('$jvmTargetName')
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:b:1.0'
+      |        $stdlib
+      |      }
+      |    }
+      |    $jvmTargetMain {
+      |      dependencies {
+      |        implementation 'my:a:1.0'
+      |      }
+      |    }
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -172,16 +172,16 @@ class KotlinPluginsTest : BasePluginTest() {
       if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
     projectScript.appendText(
       """
-        |kotlin {
-        |  jvm().mainRun {
-        |    it.mainClass.set('$mainClassName')
-        |  }
-        |}
-        |$shadowJarTask {
-        |  manifest {
-        |    $mainAttr
-        |  }
-        |}
+      |kotlin {
+      |  jvm().mainRun {
+      |    it.mainClass.set('$mainClassName')
+      |  }
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    $mainAttr
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -203,19 +203,19 @@ class KotlinPluginsTest : BasePluginTest() {
       if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
     projectScript.appendText(
       """
-        |kotlin {
-        |  jvm()
-        |}
-        |tasks.named('jvmJar', Jar) {
-        |  manifest {
-        |    attributes '$mainClassAttributeKey': '$mainClassName'
-        |  }
-        |}
-        |$shadowJarTask {
-        |  manifest {
-        |    $mainAttr
-        |  }
-        |}
+      |kotlin {
+      |  jvm()
+      |}
+      |tasks.named('jvmJar', Jar) {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': '$mainClassName'
+      |  }
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    $mainAttr
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -233,27 +233,27 @@ class KotlinPluginsTest : BasePluginTest() {
     val jvmTargetName = "newJvm"
     projectScript.appendText(
       """
-        |kotlin {
-        |  jvm() // Default JVM target.
-        |  jvm('$jvmTargetName')
-        |  sourceSets {
-        |    commonMain {
-        |      dependencies {
-        |        implementation 'my:a:1.0'
-        |      }
-        |    }
-        |    jvmMain {
-        |      dependencies {
-        |        implementation 'my:b:1.0'
-        |      }
-        |    }
-        |    ${jvmTargetName}Main {
-        |      dependencies {
-        |        implementation 'my:c:1.0'
-        |      }
-        |    }
-        |  }
-        |}
+      |kotlin {
+      |  jvm() // Default JVM target.
+      |  jvm('$jvmTargetName')
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:a:1.0'
+      |      }
+      |    }
+      |    jvmMain {
+      |      dependencies {
+      |        implementation 'my:b:1.0'
+      |      }
+      |    }
+      |    ${jvmTargetName}Main {
+      |      dependencies {
+      |        implementation 'my:c:1.0'
+      |      }
+      |    }
+      |  }
+      |}
       """
         .trimMargin()
     )
