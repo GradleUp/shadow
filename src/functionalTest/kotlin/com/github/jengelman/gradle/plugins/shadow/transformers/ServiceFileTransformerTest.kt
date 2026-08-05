@@ -31,7 +31,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |$shadowJarTask {
       |  mergeServiceFiles("META-INF/foo")
       |}
-    """
+      """
         .trimMargin()
     projectScript.appendText(config)
 
@@ -79,16 +79,16 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(one, two)}
-        |}
-        |$shadowJarTask {
-        |  mergeServiceFiles()
-        |  relocate("org.apache", "myapache") {
-        |    exclude 'org.apache.axis.components.compiler.Jikes'
-        |    exclude 'org.apache.commons.logging.LogFactory'
-        |  }
-        |}
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |  relocate("org.apache", "myapache") {
+      |    exclude 'org.apache.axis.components.compiler.Jikes'
+      |    exclude 'org.apache.commons.logging.LogFactory'
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -132,12 +132,12 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     val two = buildJarTwo { insert(servicesBarEntry, CONTENT_TWO) }
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(one, two)}
-        |}
-        |$shadowJarTask {
-        |  mergeServiceFiles()
-        |}
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |}
       """
         .trimMargin()
     )
@@ -189,11 +189,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(EXCLUDE)
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  filesMatching('$ENTRY_SERVICES_SHADE') {
-        |    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        |  }
-        |}
+      |$shadowJarTask {
+      |  filesMatching('$ENTRY_SERVICES_SHADE') {
+      |    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -211,11 +211,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(INCLUDE)
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  filesNotMatching('$ENTRY_SERVICES_SHADE') {
-        |    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-        |  }
-        |}
+      |$shadowJarTask {
+      |  filesNotMatching('$ENTRY_SERVICES_SHADE') {
+      |    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -238,13 +238,13 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(default)
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  eachFile {
-        |    if (path == '$matchPath') {
-        |      duplicatesStrategy = DuplicatesStrategy.$override
-        |    }
-        |  }
-        |}
+      |$shadowJarTask {
+      |  eachFile {
+      |    if (path == '$matchPath') {
+      |      duplicatesStrategy = DuplicatesStrategy.$override
+      |    }
+      |  }
+      |}
       """
         .trimMargin()
     )

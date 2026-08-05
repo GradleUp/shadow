@@ -225,14 +225,14 @@ class MinimizeTest : BasePluginTest() {
     val dependency = "'my:e:1.0'"
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation $dependency
-        |}
-        |$shadowJarTask {
-        |  minimize {
-        |    exclude(dependency($dependency))
-        |  }
-        |}
+      |dependencies {
+      |  implementation $dependency
+      |}
+      |$shadowJarTask {
+      |  minimize {
+      |    exclude(dependency($dependency))
+      |  }
+      |}
       """
         .trimMargin()
     )

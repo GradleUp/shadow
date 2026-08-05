@@ -19,7 +19,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
       |$shadowJarTask {
       |  append('$ENTRY_TEST_PROPERTIES')
       |}
-    """
+      """
         .trimMargin()
     )
 

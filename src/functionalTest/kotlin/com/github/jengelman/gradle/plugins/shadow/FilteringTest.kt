@@ -35,9 +35,9 @@ class FilteringTest : BasePluginTest() {
   fun excludeFiles() {
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  exclude 'a2.properties'
-        |}
+      |$shadowJarTask {
+      |  exclude 'a2.properties'
+      |}
       """
         .trimMargin()
     )
@@ -65,14 +65,14 @@ class FilteringTest : BasePluginTest() {
     val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation $dependency
-        |}
-        |$shadowJarTask {
-        |  dependencies {
-        |    exclude(dependency($dependency))
-        |  }
-        |}
+      |dependencies {
+      |  implementation $dependency
+      |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency($dependency))
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -86,14 +86,14 @@ class FilteringTest : BasePluginTest() {
   fun includeDependencyAndExcludeOthers() {
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation 'my:d:1.0'
-        |}
-        |$shadowJarTask {
-        |  dependencies {
-        |    include(dependency('my:d:1.0'))
-        |  }
-        |}
+      |dependencies {
+      |  implementation 'my:d:1.0'
+      |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    include(dependency('my:d:1.0'))
+      |  }
+      |}
       """
         .trimMargin()
     )
@@ -123,7 +123,7 @@ class FilteringTest : BasePluginTest() {
         |dependencies {
         |  exclude($clientProject)
         |}
-      """
+        """
           .trimMargin()
     )
 
@@ -183,11 +183,11 @@ class FilteringTest : BasePluginTest() {
   fun verifyExcludePrecedenceOverInclude() {
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  include '*.jar'
-        |  include '*.properties'
-        |  exclude 'a2.properties'
-        |}
+      |$shadowJarTask {
+      |  include '*.jar'
+      |  include '*.properties'
+      |  exclude 'a2.properties'
+      |}
       """
         .trimMargin()
     )
@@ -204,14 +204,14 @@ class FilteringTest : BasePluginTest() {
     val dependency = "'my:e:1.0'"
     projectScript.appendText(
       """
-        |dependencies {
-        |  implementation $dependency
-        |}
-        |$shadowJarTask {
-        |  dependencies {
-        |    exclude(dependency($dependency))
-        |  }
-        |}
+      |dependencies {
+      |  implementation $dependency
+      |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency($dependency))
+      |  }
+      |}
       """
         .trimMargin()
     )

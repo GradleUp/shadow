@@ -26,24 +26,24 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
 
     projectScript.appendText(
       """
-        |dependencies {
-        |  ${implementationFiles(one, two)}
-        |}
-        |$shadowJarTask {
-        |  transform(${PropertiesFileTransformer::class.java.name}) {
-        |    mappings = [
-        |      '$propertiesEntry': ['mergeStrategy': 'append', 'mergeSeparator': ';']
-        |    ]
-        |    charsetName = 'utf-8'
-        |    keyTransformer = { key -> key.toUpperCase() }
-        |  }
-        |  transform(${MergeLicenseResourceTransformer::class.java.name}) {
-        |    outputPath = 'MY_LICENSE'
-        |    artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
-        |    firstSeparator = '####'
-        |    separator = '----'
-        |  }
-        |}
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  transform(${PropertiesFileTransformer::class.java.name}) {
+      |    mappings = [
+      |      '$propertiesEntry': ['mergeStrategy': 'append', 'mergeSeparator': ';']
+      |    ]
+      |    charsetName = 'utf-8'
+      |    keyTransformer = { key -> key.toUpperCase() }
+      |  }
+      |  transform(${MergeLicenseResourceTransformer::class.java.name}) {
+      |    outputPath = 'MY_LICENSE'
+      |    artifactLicense = file('${artifactLicense.invariantSeparatorsPathString}')
+      |    firstSeparator = '####'
+      |    separator = '----'
+      |  }
+      |}
       """
         .trimMargin()
     )

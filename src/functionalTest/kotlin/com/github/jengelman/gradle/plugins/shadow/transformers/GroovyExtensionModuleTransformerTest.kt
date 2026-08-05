@@ -51,7 +51,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
         |$KEY_MODULE_VERSION=1.0.5
         |$KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_FOO
         |$KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_FOO
-      """
+        """
           .trimMargin(),
       )
     }
@@ -65,7 +65,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
         |$KEY_MODULE_VERSION=2.3.5
         |$KEY_EXTENSION_CLASSES=$EXTENSION_CLASSES_BAR
         |$KEY_STATIC_EXTENSION_CLASSES=$STATIC_EXTENSION_CLASSES_BAR
-      """
+        """
           .trimMargin(),
       )
     }

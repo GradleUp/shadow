@@ -297,7 +297,7 @@ class PublishingTest : BasePluginTest() {
           |  from sourceSets.named('test').map { it.output }
           |  configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
           |}
-        """
+          """
             .trimMargin(),
         dependenciesBlock =
           """
@@ -547,7 +547,7 @@ class PublishingTest : BasePluginTest() {
           |shadow {
           |  addShadowVariantIntoJavaComponent = $addShadowVariant
           |}
-        """
+          """
             .trimMargin(),
         publicationsBlock =
           """
@@ -671,31 +671,31 @@ class PublishingTest : BasePluginTest() {
         .trimMargin(),
   ): String {
     return """
-      |dependencies {
-      |  $dependenciesBlock
-      |}
-      |$shadowJarTask {
-      |  $shadowBlock
-      |}
-      |${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
-      |
-    """
+           |dependencies {
+           |  $dependenciesBlock
+           |}
+           |$shadowJarTask {
+           |  $shadowBlock
+           |}
+           |${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
+           |
+           """
       .trimMargin()
   }
 
   private fun publishingBlock(projectBlock: String, publicationsBlock: String): String {
     return """
-      |apply plugin: 'maven-publish'
-      |$projectBlock
-      |publishing {
-      |  publications {
-      |    $publicationsBlock
-      |  }
-      |  repositories {
-      |    maven { url = '${remoteRepoPath.toUri()}' }
-      |  }
-      |}
-    """
+           |apply plugin: 'maven-publish'
+           |$projectBlock
+           |publishing {
+           |  publications {
+           |    $publicationsBlock
+           |  }
+           |  repositories {
+           |    maven { url = '${remoteRepoPath.toUri()}' }
+           |  }
+           |}
+           """
       .trimMargin()
   }
 

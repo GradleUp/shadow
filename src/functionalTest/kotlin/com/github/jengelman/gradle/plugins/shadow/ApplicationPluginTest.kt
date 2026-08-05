@@ -136,7 +136,7 @@ class ApplicationPluginTest : BasePluginTest() {
         |    attributes '$mainClassAttributeKey': 'my.Main2'
         |  }
         |}
-      """
+        """
           .trimMargin()
     )
 
@@ -175,9 +175,9 @@ class ApplicationPluginTest : BasePluginTest() {
     prepare()
     projectScript.appendText(
       """
-        |$shadowJarTask {
-        |  mainClass = 'my.Main2' // Different from application.mainClass.
-        |}
+      |$shadowJarTask {
+      |  mainClass = 'my.Main2' // Different from application.mainClass.
+      |}
       """
         .trimMargin()
     )
@@ -210,7 +210,7 @@ class ApplicationPluginTest : BasePluginTest() {
         |    into 'extra'
         |  }
         |}
-      """
+        """
           .trimMargin(),
       applicationBlock =
         """
@@ -270,7 +270,7 @@ class ApplicationPluginTest : BasePluginTest() {
         """
         |applicationName = '${applicationNames.first}'
         |executableDir = '${executableDirs.first}'
-      """
+        """
           .trimMargin()
     )
 
@@ -306,19 +306,19 @@ class ApplicationPluginTest : BasePluginTest() {
     mainClass = writeClass(withImports = mainClassWithImports)
     projectScript.appendText(
       """
-      |  apply plugin: 'application'
-      |  $projectBlock
-      |  application {
-      |    $mainClassBlock
-      |    $applicationBlock
-      |  }
-      |  dependencies {
-      |    $dependenciesBlock
-      |  }
-      |  $runShadowTask {
-      |    args 'foo'
-      |    $runShadowBlock
-      |  }
+      |apply plugin: 'application'
+      |$projectBlock
+      |application {
+      |  $mainClassBlock
+      |  $applicationBlock
+      |}
+      |dependencies {
+      |  $dependenciesBlock
+      |}
+      |$runShadowTask {
+      |  args 'foo'
+      |  $runShadowBlock
+      |}
       |
       """
         .trimMargin()
