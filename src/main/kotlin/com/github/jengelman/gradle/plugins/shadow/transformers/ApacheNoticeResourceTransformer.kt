@@ -148,7 +148,7 @@ public open class ApacheNoticeResourceTransformer(
               sb.setLength(0)
             }
           }
-          sb.append(line).append("\n")
+          sb.appendLine(line)
           lineCount++
         } else {
           val entry = sb.toString()
@@ -187,21 +187,18 @@ public open class ApacheNoticeResourceTransformer(
       count++
       if (line == copyright && count != 2) continue
       if (count == 2 && copyright != null) {
-        sb.append(copyright)
-        sb.append('\n')
+        sb.appendLine(copyright)
       } else {
-        sb.append(line)
-        sb.append('\n')
+        sb.appendLine(line)
       }
       if (count == 3) {
         // Do org stuff.
         for ((key, value) in organizationEntries) {
-          sb.append(key)
-          sb.append('\n')
+          sb.appendLine(key)
           for (l in value) {
             sb.append(l)
           }
-          sb.append('\n')
+          sb.appendLine()
         }
       }
     }
