@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.snippet
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
+import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
@@ -89,7 +90,7 @@ sealed class SnippetExecutable : Executable {
     }
 
     try {
-      gradleRunner(projectDir = projectRoot, arguments = listOf("build", "--stacktrace"))
+      gradleRunner(projectDir = projectRoot, arguments = commonGradleArgs + "build")
         .build()
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
