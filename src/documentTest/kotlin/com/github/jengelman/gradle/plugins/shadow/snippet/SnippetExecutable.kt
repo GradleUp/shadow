@@ -42,6 +42,7 @@ sealed class SnippetExecutable : Executable {
         |dependencyResolutionManagement {
         |  repositories {
         |    mavenLocal()
+        |    maven { url = 'https://maven-central.storage-download.googleapis.com/maven2/' }
         |    mavenCentral()
         |  }
         |  versionCatalogs.create('libs') {
@@ -89,12 +90,26 @@ sealed class SnippetExecutable : Executable {
       JarOutputStream(it.outputStream()).use {}
     }
 
+    val runnerArgs =
+      if (withoutImports.contains("class ")) {
+        commonGradleArgs.filterNot {
+          it == "--configuration-cache" || it.contains("isolated-projects")
+        }
+      } else {
+        commonGradleArgs.toList()
+      }
+
     try {
-      gradleRunner(projectDir = projectRoot, arguments = commonGradleArgs + "build")
+      gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
         .build()
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
-      throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
+      val output =
+        (t as? org.gradle.testkit.runner.UnexpectedBuildFailure)?.buildResult?.output ?: ""
+      throw RuntimeException(
+        "Failed to execute snippet:\n\n$mainScript\n\nBuild output:\n$output",
+        t,
+      )
     }
   }
 
