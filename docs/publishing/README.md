@@ -179,7 +179,7 @@ be manually configured.
 
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
-      implementation("com.squareup.retrofit2:retrofit:<version>")
+      implementation("com.squareup.retrofit2:retrofit:version")
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
       // file's `Class-Path` entry, and also in the POM file.
       shadow("com.squareup.retrofit2:converter-java8:<version>")
