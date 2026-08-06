@@ -101,7 +101,7 @@ class AppendableMavenRepository(val root: Path) {
           """
           |artifact '${module.artifactPath}'
           |pom.withXml { xml ->
-          |  def dependenciesNode = xml.asNode().children().find { it.name() == 'dependencies' } ?: xml.asNode().appendNode('dependencies')
+          |  def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
           |  $nodes
           |}
           """
