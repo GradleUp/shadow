@@ -42,7 +42,6 @@ sealed class SnippetExecutable : Executable {
         |dependencyResolutionManagement {
         |  repositories {
         |    mavenLocal()
-        |    maven { url = 'https://maven-central.storage-download.googleapis.com/maven2/' }
         |    mavenCentral()
         |  }
         |  versionCatalogs.create('libs') {
