@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
 import kotlin.io.path.appendText
@@ -50,6 +49,8 @@ class AppendableMavenRepository(val root: Path) {
     return bomModule.coordinate
   }
 
+  private var publishCounter = 0
+
   fun publish() {
     check(modules.isNotEmpty()) { "No modules to publish. Please add at least one module." }
     modules
@@ -67,7 +68,7 @@ class AppendableMavenRepository(val root: Path) {
         }
       }
 
-    gradleRunner(projectDir = root, arguments = commonGradleArgs + "publish").build()
+    gradleRunner(projectDir = root, arguments = listOf("publish", "--stacktrace")).build()
 
     logger.info(
       """
@@ -100,7 +101,7 @@ class AppendableMavenRepository(val root: Path) {
           """
           |artifact '${module.artifactPath}'
           |pom.withXml { xml ->
-          |  def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
+          |  def dependenciesNode = xml.asNode().children().find { it.name() == 'dependencies' } ?: xml.asNode().appendNode('dependencies')
           |  $nodes
           |}
           """
@@ -122,14 +123,14 @@ class AppendableMavenRepository(val root: Path) {
       |}
       """
         .trimMargin()
-    val jarsModule = "jars-module"
+    val jarsModule = "jars-module-${publishCounter++}"
     root.resolve("settings.gradle").appendText("include '$jarsModule'\n")
     root.resolve("$jarsModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
   }
 
   private fun configureBomModules(bomModules: List<BomModule>) {
     // BOM modules are published one by one.
-    bomModules.forEachIndexed { index, module ->
+    bomModules.forEach { module ->
       val scriptContent =
         """
         |plugins {
@@ -151,7 +152,7 @@ class AppendableMavenRepository(val root: Path) {
         |}
         """
           .trimMargin()
-      val pomModule = "pom-module-$index"
+      val pomModule = "pom-module-${publishCounter++}"
       root.resolve("settings.gradle").appendText("include '$pomModule'\n")
       root.resolve("$pomModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
     }
