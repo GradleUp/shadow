@@ -10,6 +10,7 @@ import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.function.Executable
 
 sealed class SnippetExecutable : Executable {
@@ -68,18 +69,16 @@ sealed class SnippetExecutable : Executable {
       appendLine(imports)
       // All buildscript {} blocks must appear before any plugins {} blocks in the script.
       if (withoutImports.contains("buildscript {")) {
-        append(withoutImports)
+        appendLine(withoutImports)
       } else {
         if (!withoutImports.contains("plugins {")) {
           appendLine(pluginsBlock)
         }
-        append(withoutImports)
+        appendLine(withoutImports)
       }
-      appendLine()
-      appendLine(assembleDependsOn)
     }
       .trimIndent()
-    projectRoot.addSubProject("main", mainScript)
+    projectRoot.addSubProject("main", mainScript + assembleDependsOn)
     projectRoot.resolve("main/foo.jar").createFile().also {
       // Dummy JAR file to ensure the project can be built.
       JarOutputStream(it.outputStream()).use {}
@@ -105,7 +104,19 @@ sealed class SnippetExecutable : Executable {
         .build()
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
-      throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
+      val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
+      val message = buildString {
+        appendLine("--- Snippet ---")
+        appendLine()
+        appendLine(mainScript)
+        if (!buildOutput.isNullOrBlank()) {
+          appendLine()
+          appendLine("--- Gradle Build Output ---")
+          appendLine()
+          appendLine(buildOutput.trim())
+        }
+      }
+      throw RuntimeException(message, t)
     }
   }
 
