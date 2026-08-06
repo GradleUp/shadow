@@ -106,7 +106,7 @@ sealed class SnippetExecutable : Executable {
     } catch (t: Throwable) {
       val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
       val message = buildString {
-        appendLine("Failed to execute snippet:")
+        appendLine("--- Snippet ---")
         appendLine()
         appendLine(mainScript)
         if (!buildOutput.isNullOrBlank()) {
