@@ -167,6 +167,12 @@ testing.suites {
           "--add-opens=java.base/java.lang.invoke=ALL-UNNAMED",
           "--add-opens=java.base/java.net=ALL-UNNAMED",
         )
+        develocity {
+          testRetry {
+            maxRetries = 2
+            maxFailures = 10
+          }
+        }
       }
     }
     dependencies {
@@ -181,16 +187,6 @@ testing.suites {
     dependencies {
       implementation(testKit.get().output)
       implementation(libs.assertk)
-    }
-    targets.configureEach {
-      testTask {
-        develocity {
-          testRetry {
-            maxRetries = 2
-            maxFailures = 10
-          }
-        }
-      }
     }
   }
 }
