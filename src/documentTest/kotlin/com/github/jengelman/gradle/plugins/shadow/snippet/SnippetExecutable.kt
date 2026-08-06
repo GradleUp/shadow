@@ -69,18 +69,16 @@ sealed class SnippetExecutable : Executable {
       appendLine(imports)
       // All buildscript {} blocks must appear before any plugins {} blocks in the script.
       if (withoutImports.contains("buildscript {")) {
-        append(withoutImports)
+        appendLine(withoutImports)
       } else {
         if (!withoutImports.contains("plugins {")) {
           appendLine(pluginsBlock)
         }
-        append(withoutImports)
+        appendLine(withoutImports)
       }
-      appendLine()
-      appendLine(assembleDependsOn)
     }
       .trimIndent()
-    projectRoot.addSubProject("main", mainScript)
+    projectRoot.addSubProject("main", mainScript + assembleDependsOn)
     projectRoot.resolve("main/foo.jar").createFile().also {
       // Dummy JAR file to ensure the project can be built.
       JarOutputStream(it.outputStream()).use {}
