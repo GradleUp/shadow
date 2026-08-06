@@ -90,8 +90,7 @@ sealed class SnippetExecutable : Executable {
     }
 
     // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
-    // Configuration Cache / Isolated Projects because transient script classloaders cannot be
-    // serialized.
+    // CC/IP because transient script classloaders cannot be serialized.
     val runnerArgs =
       if (withoutImports.contains("class ")) {
         commonGradleArgs.filterNot {
@@ -106,12 +105,7 @@ sealed class SnippetExecutable : Executable {
         .build()
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
-      val output =
-        (t as? org.gradle.testkit.runner.UnexpectedBuildFailure)?.buildResult?.output ?: ""
-      throw RuntimeException(
-        "Failed to execute snippet:\n\n$mainScript\n\nBuild output:\n$output",
-        t,
-      )
+      throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
     }
   }
 
