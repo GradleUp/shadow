@@ -89,6 +89,9 @@ sealed class SnippetExecutable : Executable {
       JarOutputStream(it.outputStream()).use {}
     }
 
+    // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
+    // Configuration Cache / Isolated Projects because transient script classloaders cannot be
+    // serialized.
     val runnerArgs =
       if (withoutImports.contains("class ")) {
         commonGradleArgs.filterNot {
