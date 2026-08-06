@@ -15,7 +15,7 @@ to make sure compilations success and avoid shadowing as follows:
 
     ```kotlin
     dependencies {
-      compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+      compileOnly("org.jetbrains.kotlin:kotlin-stdlib:<version>")
     }
     ```
 
@@ -23,7 +23,7 @@ to make sure compilations success and avoid shadowing as follows:
 
     ```groovy
     dependencies {
-      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:<version>'
     }
     ```
 
