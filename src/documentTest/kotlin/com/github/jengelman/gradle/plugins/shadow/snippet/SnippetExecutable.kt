@@ -10,6 +10,7 @@ import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
+import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.junit.jupiter.api.function.Executable
 
 sealed class SnippetExecutable : Executable {
@@ -105,7 +106,19 @@ sealed class SnippetExecutable : Executable {
         .build()
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
-      throw RuntimeException("Failed to execute snippet:\n\n$mainScript", t)
+      val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
+      val message = buildString {
+        appendLine("Failed to execute snippet:")
+        appendLine()
+        appendLine(mainScript)
+        if (!buildOutput.isNullOrBlank()) {
+          appendLine()
+          appendLine("--- Gradle Build Output ---")
+          appendLine()
+          appendLine(buildOutput.trim())
+        }
+      }
+      throw RuntimeException(message, t)
     }
   }
 
