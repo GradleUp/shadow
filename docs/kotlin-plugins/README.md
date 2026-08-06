@@ -77,8 +77,6 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       id("com.gradleup.shadow")
     }
 
-    val ktorVersion = "3.1.0"
-
     kotlin {
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`.
@@ -87,12 +85,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       sourceSets {
         commonMain {
           dependencies {
-            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-core:<version>")
           }
         }
         jvmMain {
           dependencies {
-            implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+            implementation("io.ktor:ktor-client-okhttp:<version>")
           }
         }
       }
@@ -115,8 +113,6 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       id 'com.gradleup.shadow'
     }
 
-    def ktorVersion = "3.1.0"
-
     kotlin {
       jvm().mainRun {
         // Optionally, set the main class for `runJvm`.
@@ -125,12 +121,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       sourceSets {
         commonMain {
           dependencies {
-            implementation "io.ktor:ktor-client-core:$ktorVersion"
+            implementation "io.ktor:ktor-client-core:<version>"
           }
         }
         jvmMain {
           dependencies {
-            implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
+            implementation "io.ktor:ktor-client-okhttp:<version>"
           }
         }
       }
