@@ -146,11 +146,6 @@ testing.suites {
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
-        val docsDir =
-          file("docs").also {
-            if (!it.exists() || !it.isDirectory)
-              error("Docs dir $it does not exist or is not a directory.")
-          }
         inputs.files(
           fileTree(docsDir) {
             // Changelog file doesn't contain code snippet to run.
@@ -221,6 +216,8 @@ kotlin.target.compilations {
   }
 }
 
+val docsDir = file("docs")
+
 buildConfig {
   packageName = "com.github.jengelman.gradle.plugins.shadow"
   generateAtSync = true
@@ -232,11 +229,6 @@ buildConfig {
     buildConfigField("TEST_GRADLE_VERSION", testGradleVersion)
   }
   sourceSets.named("documentTest") {
-    val docsDir =
-      file("docs").also {
-        if (!it.exists() || !it.isDirectory)
-          error("Docs dir $it does not exist or is not a directory.")
-      }
     buildConfigField("DOCS_DIR", docsDir.absolutePath)
   }
 }
