@@ -40,6 +40,7 @@ val commonGradleArgs =
     "--configuration-cache",
     "--build-cache",
     "--stacktrace",
+    "--warning-mode=fail",
     // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
     "-Dorg.gradle.configuration-cache.parallel=true",
     // https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
@@ -49,7 +50,6 @@ val commonGradleArgs =
 fun gradleRunner(
   projectDir: Path,
   arguments: Iterable<String>,
-  warningsAsErrors: Boolean = true,
   block: GradleRunner.() -> Unit = {},
 ): GradleRunner =
   GradleRunner.create()
@@ -57,14 +57,7 @@ fun gradleRunner(
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
-    .withArguments(
-      buildList {
-        addAll(arguments)
-        if (warningsAsErrors) {
-          add("--warning-mode=fail")
-        }
-      }
-    )
+    .withArguments(arguments.toList())
     .withProjectDir(projectDir.toFile())
     .apply(block)
 
