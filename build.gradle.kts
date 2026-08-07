@@ -141,18 +141,19 @@ dependencies {
   lintChecks(libs.androidx.gradlePluginLints)
 }
 
+val docsDir = file("docs")
+
 testing.suites {
   getByName<JvmTestSuite>("test") { dependencies { implementation(libs.xmlunit) } }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
-        val docsDir =
-          file("docs").also {
-            if (!it.exists() || !it.isDirectory)
-              error("Docs dir $it does not exist or is not a directory.")
+        inputs.files(
+          fileTree(docsDir) {
+            // Changelog file doesn't contain code snippet to run.
+            exclude("changes/README.md")
           }
-        // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
-        inputs.dir(docsDir)
+        )
       }
     }
   }
@@ -232,11 +233,6 @@ buildConfig {
     buildConfigField("TEST_GRADLE_VERSION", testGradleVersion)
   }
   sourceSets.named("documentTest") {
-    val docsDir =
-      file("docs").also {
-        if (!it.exists() || !it.isDirectory)
-          error("Docs dir $it does not exist or is not a directory.")
-      }
     buildConfigField("DOCS_DIR", docsDir.absolutePath)
   }
 }
