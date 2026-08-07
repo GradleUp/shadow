@@ -13,13 +13,7 @@ object CodeSnippetExtractor {
   private val docRoot = Path(DOCS_DIR)
 
   private val markdownPaths =
-    docRoot
-      .walk()
-      .filter { path ->
-        path.name.endsWith(".md", ignoreCase = true) &&
-          path.relativeTo(docRoot) != Path("changes", "README.md")
-      }
-      .toList()
+    docRoot.walk().filter { it.name.endsWith(".md", ignoreCase = true) }.toList()
 
   fun extract(lang: DslLang): List<SnippetExecutable> {
     return markdownPaths.flatMap { path -> createExecutables(lang, path) }

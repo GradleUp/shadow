@@ -151,8 +151,12 @@ testing.suites {
             if (!it.exists() || !it.isDirectory)
               error("Docs dir $it does not exist or is not a directory.")
           }
-        // Add docs as an input directory to trigger ManualCodeSnippetTests re-run on changes.
-        inputs.files(fileTree(docsDir) { exclude("changes/README.md") })
+        inputs.files(
+          fileTree(docsDir) {
+            // Changelog file doesn't contain code snippet to run.
+            exclude("changes/README.md")
+          }
+        )
       }
     }
   }
