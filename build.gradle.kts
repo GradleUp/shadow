@@ -141,6 +141,8 @@ dependencies {
   lintChecks(libs.androidx.gradlePluginLints)
 }
 
+val docsDir = file("docs")
+
 testing.suites {
   getByName<JvmTestSuite>("test") { dependencies { implementation(libs.xmlunit) } }
   register<JvmTestSuite>("documentTest") {
@@ -219,8 +221,6 @@ kotlin.target.compilations {
     associateWith(main)
   }
 }
-
-val docsDir = file("docs")
 
 buildConfig {
   packageName = "com.github.jengelman.gradle.plugins.shadow"
