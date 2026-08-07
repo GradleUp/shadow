@@ -64,8 +64,7 @@ fun gradleRunner(
 fun BuildResult.assertNoDeprecationWarnings() = apply {
   assertThat(output)
     .doesNotContain(
-      "has been deprecated and is scheduled to be removed in Gradle",
-      "has been deprecated. This is scheduled to be removed in Gradle",
+      "has been deprecated",
       "will fail with an error in Gradle",
     )
 }
