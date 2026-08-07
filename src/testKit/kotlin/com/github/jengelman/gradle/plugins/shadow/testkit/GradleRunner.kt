@@ -17,13 +17,11 @@ private val testKitDir by lazy {
   Path(gradleUserHome, "testkit")
 }
 
-const val testGradleVersion: String = TEST_GRADLE_VERSION
-
 // TODO: this could be inlined after bumping the min Gradle requirement to 9.6 or above.
 val enableNoImplicitLookupInParentProjects: String
   get() =
     when {
-      GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.6.0") ->
+      GradleVersion.version(TEST_GRADLE_VERSION) >= GradleVersion.version("9.6.0") ->
         "enableFeaturePreview 'NO_IMPLICIT_LOOKUP_IN_PARENT_PROJECTS'"
       else -> ""
     }
@@ -32,7 +30,7 @@ val enableNoImplicitLookupInParentProjects: String
 private val isolatedProjectsFlag: String
   get() =
     when {
-      GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.7.0-rc-1") ->
+      GradleVersion.version(TEST_GRADLE_VERSION) >= GradleVersion.version("9.7.0-rc-1") ->
         "--isolated-projects"
       else -> "-Dorg.gradle.unsafe.isolated-projects=true"
     }
@@ -55,7 +53,7 @@ fun gradleRunner(
   block: GradleRunner.() -> Unit = {},
 ): GradleRunner =
   GradleRunner.create()
-    .withGradleVersion(testGradleVersion)
+    .withGradleVersion(TEST_GRADLE_VERSION)
     .forwardOutput()
     .withPluginClasspath()
     .withTestKitDir(testKitDir.toFile())
