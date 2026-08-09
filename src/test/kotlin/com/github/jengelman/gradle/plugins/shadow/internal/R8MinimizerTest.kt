@@ -6,16 +6,11 @@ import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.file.Path
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.ZipFile
-import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.tasks.bundling.ZipEntryCompression
-import org.gradle.process.ExecOperations
-import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 class R8MinimizerTest {
-  private val project = ProjectBuilder.builder().build()
-
   @Test
   fun normalizeJarPreservesUnixPermissions(@TempDir tempDir: Path) {
     val inputJar = tempDir.resolve("input.jar")
@@ -34,26 +29,15 @@ class R8MinimizerTest {
       }
     }
 
-    val execOperations = (project as ProjectInternal).services.get(ExecOperations::class.java)
-    val r8Spec = project.objects.newInstance(DefaultR8Spec::class.java)
-    val minimizer =
-      R8Minimizer(
-        execOperations = execOperations,
-        logger = project.logger,
-        r8Classpath = project.files(),
-        r8Spec = r8Spec,
-        javaLauncher = project.provider { null },
-        sourceSetsClassesDirs = emptyList(),
-        keptDependencyFiles = emptyList(),
-        relocators = emptyList(),
-        preserveFileTimestamps = true,
-        reproducibleFileOrder = true,
-        zip64 = false,
-        entryCompression = ZipEntryCompression.DEFLATED,
-        metadataCharset = Charsets.UTF_8.toString(),
-      )
-
-    minimizer.normalizeJar(inputJar.toFile(), outputJar.toFile())
+    normalizeJar(
+      inputJar = inputJar.toFile(),
+      outputJar = outputJar.toFile(),
+      preserveFileTimestamps = true,
+      reproducibleFileOrder = true,
+      zip64 = false,
+      entryCompression = ZipEntryCompression.DEFLATED,
+      metadataCharset = Charsets.UTF_8.toString(),
+    )
 
     ZipFile(outputJar.toFile()).use { zipFile ->
       // Executable unix mode must be preserved
