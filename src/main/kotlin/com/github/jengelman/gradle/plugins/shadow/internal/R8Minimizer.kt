@@ -127,14 +127,15 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
+  val (jarClasses, serviceRules) = scanInputJar(inputJar)
   return buildList {
     add(baseDirectory.toBaseDirectoryRule())
     if (shouldDisableOptimization(r8Spec, r8Args)) {
       add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
     }
-    addAll(sourceProguardRules(inputJar, sourceSetsClassesDirs, relocators))
-    addAll(keptDependencyRules(inputJar, keptDependencyFiles, relocators))
-    addAll(serviceProguardRules(inputJar))
+    addAll(sourceProguardRules(jarClasses, sourceSetsClassesDirs, relocators))
+    addAll(keptDependencyRules(jarClasses, keptDependencyFiles, relocators))
+    addAll(serviceRules)
     r8Spec.proguardRuleFiles.files
       .sortedBy { it.absolutePath }
       .forEach { file ->
@@ -154,11 +155,10 @@ private fun shouldDisableOptimization(r8Spec: DefaultR8Spec, r8Args: List<String
 // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
 // refers to every class directly.
 private fun sourceProguardRules(
-  inputJar: File,
+  jarClasses: Set<String>,
   sourceSetsClassesDirs: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
   return sourceSetsClassesDirs
     .asSequence()
     .filter(File::isDirectory)
@@ -182,11 +182,10 @@ private fun sourceProguardRules(
 // Keep dependencies users explicitly excluded from minimization, matching the existing
 // minimize { exclude(...) } contract for the default analyzer.
 private fun keptDependencyRules(
-  inputJar: File,
+  jarClasses: Set<String>,
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
   return keptDependencyFiles
     .asSequence()
     .flatMap { it.classNames() }
@@ -199,41 +198,39 @@ private fun keptDependencyRules(
     .toList()
 }
 
-// Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
-// interface and every listed provider even if R8 sees no direct references.
-private fun serviceProguardRules(inputJar: File): List<String> {
-  val rules = linkedSetOf<String>()
+private data class InputJarInfo(
+  val jarClasses: Set<String>,
+  val serviceRules: List<String>,
+)
+
+private fun scanInputJar(inputJar: File): InputJarInfo {
+  val jarClasses = mutableSetOf<String>()
+  val serviceRules = linkedSetOf<String>()
+
   JarFile(inputJar).use { jarFile ->
-    jarFile
-      .entries()
-      .asSequence()
+    val entries = jarFile.entries().asSequence().toList()
+    entries
       .filter { !it.isDirectory && it.name.startsWith(SERVICES_PATH) }
       .sortedBy { it.name }
       .forEach { entry ->
         val serviceClass = entry.name.removePrefix(SERVICES_PATH).replace('/', '.')
         if (serviceClass.isJavaTypeName()) {
-          rules += "-keep class $serviceClass { *; }"
+          serviceRules += "-keep class $serviceClass { *; }"
         }
         jarFile.getInputStream(entry).bufferedReader().useLines { lines ->
           lines
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() && it.isJavaTypeName() }
-            .forEach { provider -> rules += "-keep class $provider { *; }" }
+            .forEach { provider -> serviceRules += "-keep class $provider { *; }" }
         }
       }
+    entries.forEach { entry ->
+      if (!entry.isDirectory && entry.name.endsWith(".class")) {
+        jarClasses += entry.name
+      }
+    }
   }
-  return rules.toList()
-}
-
-private fun jarClassEntries(inputJar: File): Set<String> {
-  return JarFile(inputJar).use { jarFile ->
-    jarFile
-      .entries()
-      .asSequence()
-      .filter { !it.isDirectory && it.name.endsWith(".class") }
-      .map { it.name }
-      .toSet()
-  }
+  return InputJarInfo(jarClasses, serviceRules.toList())
 }
 
 private fun File.toClassName(relativeTo: File): String? {
