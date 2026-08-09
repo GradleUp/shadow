@@ -219,9 +219,12 @@ public open class ShadowCopyAction(
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
+    private val entriesField by lazy {
+      ZipOutputStream::class.java.getDeclaredField("entries").apply { isAccessible = true }
+    }
+
     private val ZipOutputStream.entries: List<ZipEntry>
-      get() =
-        this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
+      get() = entriesField.get(this).cast()
 
     @Deprecated(
       message =
