@@ -340,7 +340,7 @@ internal fun normalizeJar(
               unixMode = unixMode,
             ) {
               zipFile.getInputStream(zipEntry).use { input ->
-                input.copyTo(this)
+                input.copyTo(this, bufferSize = 64 * 1024)
               }
             }
           }
