@@ -89,7 +89,6 @@ If Shadow detects a resource matched by a built-in [`ResourceTransformer`][Resou
 
     'META-INF/services/foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
     Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
-    See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
 
 Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several common
 steps to take:
