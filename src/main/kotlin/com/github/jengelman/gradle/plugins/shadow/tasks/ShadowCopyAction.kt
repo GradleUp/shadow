@@ -160,7 +160,12 @@ public open class ShadowCopyAction(
           } else {
             with(fileDetails) {
               // Temporarily remove the multi-release prefix.
-              val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
+              val multiReleasePrefix =
+                if (path.startsWith("META-INF/versions/")) {
+                  multiReleaseRegex.find(path)?.value.orEmpty()
+                } else {
+                  ""
+                }
               val pathSuffix = path.removePrefix(multiReleasePrefix)
               val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
               writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
