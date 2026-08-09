@@ -270,7 +270,12 @@ internal class R8Minimizer(
           }
           .toList()
       }
-    val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
+    val manifestEntry = entries.firstOrNull { it.name == MANIFEST_PATH }
+    val otherEntries = entries.filter { it.name != MANIFEST_PATH }
+    val sortedOthers =
+      if (reproducibleFileOrder) otherEntries.sortedBy { it.name } else otherEntries
+    val orderedEntries =
+      if (manifestEntry != null) listOf(manifestEntry) + sortedOthers else sortedOthers
     ZipFile(inputJar).use { zipFile ->
       createZipOutputStream(outputJar, entryCompression, zip64).use { zos ->
         if (metadataCharset != null) {
@@ -311,6 +316,7 @@ internal class R8Minimizer(
 
   private companion object {
     const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
+    const val MANIFEST_PATH = "META-INF/MANIFEST.MF"
     const val SERVICES_PATH = "META-INF/services/"
     // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
     // service lines, comments, malformed providers, and JVM-only names R8 would reject.
