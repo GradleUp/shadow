@@ -257,8 +257,8 @@ internal class R8Minimizer(
   // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
   // reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
   internal fun normalizeJar(inputJar: File, outputJar: File) {
-    val entries =
-      ZipFile(inputJar).use { zipFile ->
+    ZipFile(inputJar).use { zipFile ->
+      val entries =
         zipFile.entries
           .asSequence()
           .filter { !it.isDirectory }
@@ -270,14 +270,14 @@ internal class R8Minimizer(
             )
           }
           .toList()
-      }
-    val manifestEntry = entries.firstOrNull { it.name == MANIFEST_PATH }
-    val otherEntries = entries.filter { it.name != MANIFEST_PATH }
-    val sortedOthers =
-      if (reproducibleFileOrder) otherEntries.sortedBy { it.name } else otherEntries
-    val orderedEntries =
-      if (manifestEntry != null) listOf(manifestEntry) + sortedOthers else sortedOthers
-    ZipFile(inputJar).use { zipFile ->
+
+      val manifestEntry = entries.firstOrNull { it.name == MANIFEST_PATH }
+      val otherEntries = entries.filter { it.name != MANIFEST_PATH }
+      val sortedOthers =
+        if (reproducibleFileOrder) otherEntries.sortedBy { it.name } else otherEntries
+      val orderedEntries =
+        if (manifestEntry != null) listOf(manifestEntry) + sortedOthers else sortedOthers
+
       createZipOutputStream(outputJar, entryCompression, zip64).use { zos ->
         if (metadataCharset != null) {
           zos.setEncoding(metadataCharset)
