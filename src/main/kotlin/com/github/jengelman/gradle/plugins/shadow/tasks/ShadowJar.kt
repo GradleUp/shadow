@@ -7,7 +7,6 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
-import com.github.jengelman.gradle.plugins.shadow.internal.R8Minimizer
 import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
@@ -16,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.minimizeWithR8
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -504,7 +504,7 @@ public abstract class ShadowJar : Jar() {
     addIncludedDependencies()
     injectManifestAttributes()
     super.copy()
-    minimizeWithR8()
+    runR8Minimization()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
@@ -705,25 +705,26 @@ public abstract class ShadowJar : Jar() {
     }
   }
 
-  private fun minimizeWithR8() {
+  private fun runR8Minimization() {
     if (!isR8Enabled) return
     val keptDependencyFiles = includedDependencies.files - toMinimize.files
-    R8Minimizer(
-        execOperations = execOperations,
-        logger = logger,
-        r8Classpath = r8Classpath,
-        r8Spec = defaultMinimizeSpec.r8Spec,
-        javaLauncher = javaLauncher,
-        sourceSetsClassesDirs = sourceSetsClassesDirs.files,
-        keptDependencyFiles = keptDependencyFiles,
-        relocators = relocators.get() + packageRelocators,
-        preserveFileTimestamps = isPreserveFileTimestamps,
-        reproducibleFileOrder = isReproducibleFileOrder,
-        zip64 = isZip64,
-        entryCompression = entryCompression,
-        metadataCharset = metadataCharset,
-      )
-      .minimize(archiveFile.get().asFile, temporaryDir)
+    minimizeWithR8(
+      inputJar = archiveFile.get().asFile,
+      temporaryDir = temporaryDir,
+      execOperations = execOperations,
+      logger = logger,
+      r8Classpath = r8Classpath,
+      r8Spec = defaultMinimizeSpec.r8Spec,
+      javaLauncher = javaLauncher,
+      sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+      keptDependencyFiles = keptDependencyFiles,
+      relocators = relocators.get() + packageRelocators,
+      preserveFileTimestamps = isPreserveFileTimestamps,
+      reproducibleFileOrder = isReproducibleFileOrder,
+      zip64 = isZip64,
+      entryCompression = entryCompression,
+      metadataCharset = metadataCharset,
+    )
   }
 
   public companion object {
