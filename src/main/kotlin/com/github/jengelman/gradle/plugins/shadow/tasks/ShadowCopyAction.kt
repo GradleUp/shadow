@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
+import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
@@ -219,7 +220,7 @@ public open class ShadowCopyAction(
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
-    private val entriesField by lazy {
+    private val entriesField by unsafeLazy {
       ZipOutputStream::class.java.getDeclaredField("entries").apply { isAccessible = true }
     }
 

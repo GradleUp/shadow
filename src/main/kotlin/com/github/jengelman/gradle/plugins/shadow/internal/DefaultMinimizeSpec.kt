@@ -19,7 +19,7 @@ constructor(
   objectFactory: ObjectFactory,
 ) : MinimizeDependencyFilter(project), MinimizeSpec {
   @get:Internal
-  internal val r8Spec: DefaultR8Spec by lazy {
+  internal val r8Spec: DefaultR8Spec by unsafeLazy {
     objectFactory.newInstance(DefaultR8Spec::class.java)
   }
 

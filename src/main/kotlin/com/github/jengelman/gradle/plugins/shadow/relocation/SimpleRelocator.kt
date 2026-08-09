@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
+import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import java.util.Objects
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
@@ -86,9 +87,9 @@ constructor(
     }
   }
 
-  private val pathPatternPattern: Pattern by lazy { Pattern.compile(this.pathPattern) }
-  private val pathPatternRegex: Regex by lazy { this.pathPattern.toRegex() }
-  private val patternRegex: Regex by lazy { this.pattern.toRegex() }
+  private val pathPatternPattern: Pattern by unsafeLazy { Pattern.compile(this.pathPattern) }
+  private val pathPatternRegex: Regex by unsafeLazy { this.pathPattern.toRegex() }
+  private val patternRegex: Regex by unsafeLazy { this.pattern.toRegex() }
 
   public open fun include(pattern: String) {
     includes.addAll(normalizePatterns(listOf(pattern)))
