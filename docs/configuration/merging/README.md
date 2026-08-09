@@ -55,8 +55,13 @@ Different strategies will lead to different results for `foo/bar` files in the J
   `Entry .* is a duplicate but no duplicate handling strategy has been set`.
 - `WARN`: **Warn** about duplicates in the build log, this behaves exactly as `INHERIT` otherwise.
 
-**NOTE:** The `duplicatesStrategy` takes precedence over transforming and relocating. If you mix the usages of
-`duplicatesStrategy` and [`ResourceTransformer`][ResourceTransformer] like below:
+**NOTE:** The `duplicatesStrategy` evaluation takes precedence over transforming and relocating.
+Because `ShadowJar` is a subclass of Gradle's `AbstractCopyTask`, duplicate filtering configured via
+`duplicatesStrategy` is performed at Gradle's `CopySpec` processing layer **before** entries are passed to Shadow's
+internal [`ResourceTransformer`][ResourceTransformer] engine.
+
+If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
+[`ResourceTransformer`][ResourceTransformer] like below:
 
 === "Kotlin"
 
@@ -77,8 +82,13 @@ Different strategies will lead to different results for `foo/bar` files in the J
     ```
 
 The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
-as expected as the duplicate resource files fed for them are excluded beforehand. However, this behavior might be what
-you expected for duplicate `foo/bar` files, preventing them from being included.
+as expected because duplicate resource files are filtered out and dropped by Gradle before reaching the transformer.
+
+If Shadow detects a resource matched by a built-in [`ResourceTransformer`][ResourceTransformer] while its
+`duplicatesStrategy` is `EXCLUDE`, it will log a warning during the build:
+
+    'META-INF/services/foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+    Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
 
 Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several common
 steps to take:
