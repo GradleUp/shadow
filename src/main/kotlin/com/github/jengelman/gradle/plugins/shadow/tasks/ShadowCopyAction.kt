@@ -136,9 +136,6 @@ public open class ShadowCopyAction(
     CopyActionProcessingStreamAction {
     init {
       logger.info("Relocator count: {}.", relocators.size)
-      if (encoding != null) {
-        zipOutStr.setEncoding(encoding)
-      }
     }
 
     override fun processFile(details: FileCopyDetailsInternal) {

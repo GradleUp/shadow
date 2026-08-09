@@ -26,6 +26,7 @@ internal fun createZipOutputStream(
   destination: File,
   entryCompression: ZipEntryCompression,
   zip64: Boolean,
+  encoding: String?,
 ): ZipOutputStream {
   val method =
     when (entryCompression) {
@@ -43,6 +44,7 @@ internal fun createZipOutputStream(
   return stream.apply {
     setUseZip64(if (zip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
     setMethod(method)
+    setEncoding(encoding)
   }
 }
 

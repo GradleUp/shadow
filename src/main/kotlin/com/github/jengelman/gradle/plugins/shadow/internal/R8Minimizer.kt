@@ -278,38 +278,41 @@ internal class R8Minimizer(
       val orderedEntries =
         if (manifestEntry != null) listOf(manifestEntry) + sortedOthers else sortedOthers
 
-      createZipOutputStream(outputJar, entryCompression, zip64).use { zos ->
-        if (metadataCharset != null) {
-          zos.setEncoding(metadataCharset)
-        }
-        val added = mutableSetOf<String>()
+      createZipOutputStream(
+          destination = outputJar,
+          entryCompression = entryCompression,
+          zip64 = zip64,
+          encoding = metadataCharset,
+        )
+        .use { zos ->
+          val added = mutableSetOf<String>()
 
-        orderedEntries.forEach { entry ->
-          entry.name.parentDirectoryEntries().forEach { entryName ->
-            if (!added.add(entryName)) return@forEach
-            zos.writeEntry(
-              name = entryName,
-              preserveLastModified = preserveFileTimestamps,
-              unixMode = UnixMode.directory(),
-            )
-          }
-          if (added.add(entry.name)) {
-            val zipEntry = zipFile.getEntry(entry.name)
-            val unixMode =
-              if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
-            zos.writeEntry(
-              name = entry.name,
-              preserveLastModified = preserveFileTimestamps,
-              lastModified = entry.time,
-              unixMode = unixMode,
-            ) {
-              zipFile.getInputStream(zipEntry).use { input ->
-                input.copyTo(this)
+          orderedEntries.forEach { entry ->
+            entry.name.parentDirectoryEntries().forEach { entryName ->
+              if (!added.add(entryName)) return@forEach
+              zos.writeEntry(
+                name = entryName,
+                preserveLastModified = preserveFileTimestamps,
+                unixMode = UnixMode.directory(),
+              )
+            }
+            if (added.add(entry.name)) {
+              val zipEntry = zipFile.getEntry(entry.name)
+              val unixMode =
+                if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
+              zos.writeEntry(
+                name = entry.name,
+                preserveLastModified = preserveFileTimestamps,
+                lastModified = entry.time,
+                unixMode = unixMode,
+              ) {
+                zipFile.getInputStream(zipEntry).use { input ->
+                  input.copyTo(this)
+                }
               }
             }
           }
         }
-      }
     }
   }
 
