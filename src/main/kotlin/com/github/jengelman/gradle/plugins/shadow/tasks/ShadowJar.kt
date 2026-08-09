@@ -66,6 +66,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -508,9 +509,15 @@ public abstract class ShadowJar : Jar() {
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
+    val actionEntryCompression =
+      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8) {
+        ZipEntryCompression.STORED
+      } else {
+        entryCompression
+      }
     val zosProvider = { destination: File ->
       try {
-        createZipOutputStream(destination, entryCompression, isZip64)
+        createZipOutputStream(destination, actionEntryCompression, isZip64)
       } catch (e: Exception) {
         throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
