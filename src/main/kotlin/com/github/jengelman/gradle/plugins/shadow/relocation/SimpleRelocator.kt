@@ -86,6 +86,10 @@ constructor(
     }
   }
 
+  private val pathPatternPattern: Pattern by lazy { Pattern.compile(this.pathPattern) }
+  private val pathPatternRegex: Regex by lazy { this.pathPattern.toRegex() }
+  private val patternRegex: Regex by lazy { this.pattern.toRegex() }
+
   public open fun include(pattern: String) {
     includes.addAll(normalizePatterns(listOf(pattern)))
   }
@@ -95,7 +99,7 @@ constructor(
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
+    if (rawString) return pathPatternPattern.matcher(path).find()
     // If string is too short - no need to perform expensive string operations.
     if (path.length < pathPattern.length) return false
     var adjustedPath = path.removeSuffix(".class")
@@ -116,15 +120,15 @@ constructor(
   override fun relocatePath(context: RelocatePathContext): String {
     val path = context.path
     return if (rawString) {
-      path.replace(pathPattern.toRegex(), shadedPathPattern)
+      path.replace(pathPatternRegex, shadedPathPattern)
     } else {
-      path.replaceFirst(pathPattern.toRegex(), shadedPathPattern)
+      path.replaceFirst(pathPatternRegex, shadedPathPattern)
     }
   }
 
   override fun relocateClass(context: RelocateClassContext): String {
     val clazz = context.className
-    return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
+    return if (rawString) clazz else clazz.replaceFirst(patternRegex, shadedPattern)
   }
 
   /**
