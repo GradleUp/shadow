@@ -2,11 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import java.io.File
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import java.nio.file.Path
 import org.apache.tools.zip.UnixStat
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipFile
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.process.ExecOperations
@@ -18,29 +17,21 @@ class R8MinimizerTest {
   private val project = ProjectBuilder.builder().build()
 
   @Test
-  fun normalizeJarPreservesUnixPermissions(@TempDir tempDir: File) {
+  fun normalizeJarPreservesUnixPermissions(@TempDir tempDir: Path) {
     val inputJar = tempDir.resolve("input.jar")
     val outputJar = tempDir.resolve("output.jar")
     val expectedExecutableMode = UnixStat.FILE_FLAG or 493 // 0755 octal
 
-    ZipOutputStream(inputJar.outputStream()).use { zos ->
-      val scriptEntry =
-        ZipEntry("bin/script.sh").apply {
-          unixMode = expectedExecutableMode
-        }
-      zos.putNextEntry(scriptEntry)
-      zos.write("echo hello\n".toByteArray())
-      zos.closeEntry()
-
-      val classEntry = ZipEntry("com/example/Foo.class")
-      zos.putNextEntry(classEntry)
-      zos.write("class bytes".toByteArray())
-      zos.closeEntry()
-
-      val manifestEntry = ZipEntry("META-INF/MANIFEST.MF")
-      zos.putNextEntry(manifestEntry)
-      zos.write("Manifest-Version: 1.0\n".toByteArray())
-      zos.closeEntry()
+    inputJar.zipOutputStream().use { zos ->
+      zos.writeEntry("bin/script.sh", unixMode = UnixMode.raw(expectedExecutableMode)) {
+        write("echo hello\n".toByteArray())
+      }
+      zos.writeEntry("com/example/Foo.class") {
+        write("class bytes".toByteArray())
+      }
+      zos.writeEntry("META-INF/MANIFEST.MF") {
+        write("Manifest-Version: 1.0\n".toByteArray())
+      }
     }
 
     val execOperations = (project as ProjectInternal).services.get(ExecOperations::class.java)
@@ -59,12 +50,12 @@ class R8MinimizerTest {
         reproducibleFileOrder = true,
         zip64 = false,
         entryCompression = ZipEntryCompression.DEFLATED,
-        metadataCharset = "UTF-8",
+        metadataCharset = Charsets.UTF_8.toString(),
       )
 
-    minimizer.normalizeJar(inputJar, outputJar)
+    minimizer.normalizeJar(inputJar.toFile(), outputJar.toFile())
 
-    ZipFile(outputJar).use { zipFile ->
+    ZipFile(outputJar.toFile()).use { zipFile ->
       // Executable unix mode must be preserved
       val scriptEntry = zipFile.getEntry("bin/script.sh")
       assertThat(scriptEntry.unixMode).isEqualTo(expectedExecutableMode)
