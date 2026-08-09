@@ -165,7 +165,7 @@ Here are the options that can be passed to the `shadowJar`:
 
 Also, you can view more information about the [`ShadowJar`][ShadowJar] task by running the following command:
 
-```sh
+```shell
 ./gradlew -q help --task shadowJar
 ```
 
