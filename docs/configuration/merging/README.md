@@ -82,16 +82,15 @@ If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
     ```
 
 The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
-as expected because duplicate resource files are filtered out and dropped by Gradle beforehand before reaching the
+as expected because duplicate resource files are filtered out and dropped by Gradle before reaching the
 transformer.
 
 If Shadow detects a resource matched by a built-in [`ResourceTransformer`][ResourceTransformer] while its
 `duplicatesStrategy` is `EXCLUDE`, it will log a warning during the build:
 
-```
-'META-INF/services/foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
-Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
-```
+    'META-INF/services/foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+    Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
+    See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
 
 Want [`ResourceTransformer`][ResourceTransformer]s and `duplicatesStrategy` to work together? There are several common
 steps to take:
