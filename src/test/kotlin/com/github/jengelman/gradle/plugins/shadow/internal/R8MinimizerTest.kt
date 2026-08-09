@@ -18,7 +18,7 @@ class R8MinimizerTest {
   private val project = ProjectBuilder.builder().build()
 
   @Test
-  fun `normalizeJar preserves manifest first and unix permissions`(@TempDir tempDir: File) {
+  fun normalizeJarPreservesManifestFirstAndUnixPermissions(@TempDir tempDir: File) {
     val inputJar = tempDir.resolve("input.jar")
     val outputJar = tempDir.resolve("output.jar")
     val expectedExecutableMode = UnixStat.FILE_FLAG or 493 // 0755 octal
