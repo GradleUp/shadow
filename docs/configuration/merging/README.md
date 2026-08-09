@@ -82,8 +82,7 @@ If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
     ```
 
 The [`ResourceTransformer`][ResourceTransformer]s like [`ServiceFileTransformer`][ServiceFileTransformer] will not work
-as expected because duplicate resource files are filtered out and dropped by Gradle before reaching the
-transformer.
+as expected because duplicate resource files are filtered out and dropped by Gradle before reaching the transformer.
 
 If Shadow detects a resource matched by a built-in [`ResourceTransformer`][ResourceTransformer] while its
 `duplicatesStrategy` is `EXCLUDE`, it will log a warning during the build:
