@@ -191,7 +191,7 @@ public open class ShadowCopyAction(
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.file.inputStream().use { inputStream ->
+      fileDetails.file.inputStream().buffered().use { inputStream ->
         transformer.transform(
           TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
         )
