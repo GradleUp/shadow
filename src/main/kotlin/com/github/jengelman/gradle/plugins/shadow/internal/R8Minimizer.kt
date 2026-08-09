@@ -257,6 +257,8 @@ internal class R8Minimizer(
   // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
   // reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
   internal fun normalizeJar(inputJar: File, outputJar: File) {
+    // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
+    // permissions and ensure uniform Zip structure handling.
     ZipFile(inputJar).use { zipFile ->
       val entries =
         zipFile.entries
