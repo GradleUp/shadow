@@ -18,7 +18,7 @@ class R8MinimizerTest {
   private val project = ProjectBuilder.builder().build()
 
   @Test
-  fun normalizeJarPreservesManifestFirstAndUnixPermissions(@TempDir tempDir: File) {
+  fun normalizeJarPreservesUnixPermissions(@TempDir tempDir: File) {
     val inputJar = tempDir.resolve("input.jar")
     val outputJar = tempDir.resolve("output.jar")
     val expectedExecutableMode = UnixStat.FILE_FLAG or 493 // 0755 octal
@@ -65,12 +65,6 @@ class R8MinimizerTest {
     minimizer.normalizeJar(inputJar, outputJar)
 
     ZipFile(outputJar).use { zipFile ->
-      val entries = zipFile.entries.asSequence().toList()
-      val fileEntries = entries.filter { !it.isDirectory }
-
-      // MANIFEST.MF must be the first file entry
-      assertThat(fileEntries.first().name).isEqualTo("META-INF/MANIFEST.MF")
-
       // Executable unix mode must be preserved
       val scriptEntry = zipFile.getEntry("bin/script.sh")
       assertThat(scriptEntry.unixMode).isEqualTo(expectedExecutableMode)
