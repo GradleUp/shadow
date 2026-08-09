@@ -30,11 +30,13 @@ private fun Set<Relocator>.realMap(name: String, mapLiterals: Boolean): String {
   var prefix = ""
   var suffix = ""
 
-  val matcher = classPattern.matcher(newName)
-  if (matcher.matches()) {
-    prefix = matcher.group(1) + "L"
-    suffix = ""
-    newName = matcher.group(2)
+  if (newName.indexOf('L') >= 0) {
+    val matcher = classPattern.matcher(newName)
+    if (matcher.matches()) {
+      prefix = matcher.group(1) + "L"
+      suffix = ""
+      newName = matcher.group(2)
+    }
   }
 
   for (relocator in this) {
