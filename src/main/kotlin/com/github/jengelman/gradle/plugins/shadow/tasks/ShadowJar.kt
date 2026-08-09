@@ -511,6 +511,7 @@ public abstract class ShadowJar : Jar() {
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val actionEntryCompression =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8) {
+        // R8 will compress the final JAR, disabling compression makes the Shadow step faster.
         ZipEntryCompression.STORED
       } else {
         entryCompression
