@@ -518,7 +518,12 @@ public abstract class ShadowJar : Jar() {
       }
     val zosProvider = { destination: File ->
       try {
-        createZipOutputStream(destination, actionEntryCompression, isZip64)
+        createZipOutputStream(
+          destination = destination,
+          entryCompression = actionEntryCompression,
+          zip64 = isZip64,
+          encoding = metadataCharset,
+        )
       } catch (e: Exception) {
         throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
@@ -557,7 +562,7 @@ public abstract class ShadowJar : Jar() {
       enableKotlinModuleRemapping = false, // Unused param.
       preserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
-      metadataCharset,
+      encoding = metadataCharset,
     )
   }
 

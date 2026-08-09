@@ -6,6 +6,7 @@ import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
 import kotlin.io.path.moveTo
+import org.apache.tools.zip.ZipFile
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
@@ -255,80 +256,66 @@ internal class R8Minimizer(
 
   // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
   // reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
-  private fun normalizeJar(inputJar: File, outputJar: File) {
-    val entries =
-      JarFile(inputJar).use { jarFile ->
-        jarFile
-          .entries()
+  internal fun normalizeJar(inputJar: File, outputJar: File) {
+    // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
+    // permissions and ensure uniform Zip structure handling.
+    ZipFile(inputJar).use { zipFile ->
+      val entries =
+        zipFile.entries
           .asSequence()
           .filter { !it.isDirectory }
           .map { entry ->
             R8JarEntry(
               name = entry.name,
               time = entry.time,
-              bytes = jarFile.getInputStream(entry).use { it.readBytes() },
+              unixMode = entry.unixMode,
             )
           }
           .toList()
-      }
-    val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
-    createZipOutputStream(outputJar, entryCompression, zip64).use { zos ->
-      if (metadataCharset != null) {
-        zos.setEncoding(metadataCharset)
-      }
-      val added = mutableSetOf<String>()
 
-      orderedEntries.forEach { entry ->
-        entry.name.parentDirectoryEntries().forEach { entryName ->
-          if (!added.add(entryName)) return@forEach
-          zos.writeEntry(
-            name = entryName,
-            preserveLastModified = preserveFileTimestamps,
-            unixMode = UnixMode.directory(),
-          )
-        }
-        if (added.add(entry.name)) {
-          zos.writeEntry(
-            name = entry.name,
-            preserveLastModified = preserveFileTimestamps,
-            lastModified = entry.time,
-            unixMode = UnixMode.file(),
-          ) {
-            write(entry.bytes)
+      val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
+
+      createZipOutputStream(
+          destination = outputJar,
+          entryCompression = entryCompression,
+          zip64 = zip64,
+          encoding = metadataCharset,
+        )
+        .use { zos ->
+          val added = mutableSetOf<String>()
+
+          orderedEntries.forEach { entry ->
+            entry.name.parentDirectoryEntries().forEach { entryName ->
+              if (!added.add(entryName)) return@forEach
+              zos.writeEntry(
+                name = entryName,
+                preserveLastModified = preserveFileTimestamps,
+                unixMode = UnixMode.directory(),
+              )
+            }
+            if (added.add(entry.name)) {
+              val zipEntry = zipFile.getEntry(entry.name)
+              val unixMode =
+                if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
+              zos.writeEntry(
+                name = entry.name,
+                preserveLastModified = preserveFileTimestamps,
+                lastModified = entry.time,
+                unixMode = unixMode,
+              ) {
+                zipFile.getInputStream(zipEntry).use { input ->
+                  input.copyTo(this)
+                }
+              }
+            }
           }
         }
-      }
     }
   }
 
   private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
-  // Not a data class because of the bytearray
-  private class R8JarEntry(val name: String, val time: Long, val bytes: ByteArray) {
-    override fun equals(other: Any?): Boolean {
-      if (this === other) return true
-      if (javaClass != other?.javaClass) return false
-
-      other as R8JarEntry
-
-      if (time != other.time) return false
-      if (name != other.name) return false
-      if (!bytes.contentEquals(other.bytes)) return false
-
-      return true
-    }
-
-    override fun hashCode(): Int {
-      var result = time.hashCode()
-      result = 31 * result + name.hashCode()
-      result = 31 * result + bytes.contentHashCode()
-      return result
-    }
-
-    override fun toString(): String {
-      return "R8JarEntry(name='$name', time=$time, bytes=${bytes.toHexString()})"
-    }
-  }
+  private data class R8JarEntry(val name: String, val time: Long, val unixMode: Int)
 
   private companion object {
     const val R8_MAIN_CLASS = "com.android.tools.r8.R8"

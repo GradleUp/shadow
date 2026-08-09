@@ -17,6 +17,8 @@ internal value class UnixMode private constructor(internal val value: Int) {
 
     fun file(permissions: Int = UnixStat.DEFAULT_FILE_PERM): UnixMode =
       UnixMode(UnixStat.FILE_FLAG or permissions)
+
+    fun raw(mode: Int): UnixMode = UnixMode(mode)
   }
 }
 
@@ -24,6 +26,7 @@ internal fun createZipOutputStream(
   destination: File,
   entryCompression: ZipEntryCompression,
   zip64: Boolean,
+  encoding: String?,
 ): ZipOutputStream {
   val method =
     when (entryCompression) {
@@ -41,6 +44,7 @@ internal fun createZipOutputStream(
   return stream.apply {
     setUseZip64(if (zip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
     setMethod(method)
+    encoding?.let(::setEncoding)
   }
 }
 
