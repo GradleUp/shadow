@@ -66,6 +66,7 @@ import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
+import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
@@ -508,9 +509,16 @@ public abstract class ShadowJar : Jar() {
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
+    val actionEntryCompression =
+      if (isR8Enabled) {
+        // R8 rewrites the final JAR; disabling compression makes the copy action faster.
+        ZipEntryCompression.STORED
+      } else {
+        entryCompression
+      }
     val zosProvider = { destination: File ->
       try {
-        createZipOutputStream(destination, entryCompression, isZip64)
+        createZipOutputStream(destination, actionEntryCompression, isZip64)
       } catch (e: Exception) {
         throw IOException("Unable to create ZIP output stream for file $destination.", e)
       }
@@ -565,6 +573,9 @@ public abstract class ShadowJar : Jar() {
 
   private val _minimizeJar
     get() = @Suppress("DEPRECATION") minimizeJar
+
+  private val isR8Enabled: Boolean
+    get() = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
@@ -690,8 +701,7 @@ public abstract class ShadowJar : Jar() {
   }
 
   private fun minimizeWithR8() {
-    val useR8 = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
-    if (!useR8) return
+    if (!isR8Enabled) return
     val keptDependencyFiles = includedDependencies.files - toMinimize.files
     R8Minimizer(
         execOperations = execOperations,
