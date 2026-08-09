@@ -510,7 +510,7 @@ public abstract class ShadowJar : Jar() {
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val actionEntryCompression =
-      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8) {
+      if (isR8Enabled) {
         // R8 will compress the final JAR, disabling compression makes the Shadow step faster.
         ZipEntryCompression.STORED
       } else {
@@ -573,6 +573,9 @@ public abstract class ShadowJar : Jar() {
 
   private val _minimizeJar
     get() = @Suppress("DEPRECATION") minimizeJar
+
+  private val isR8Enabled: Boolean
+    get() = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
@@ -698,8 +701,7 @@ public abstract class ShadowJar : Jar() {
   }
 
   private fun minimizeWithR8() {
-    val useR8 = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
-    if (!useR8) return
+    if (!isR8Enabled) return
     val keptDependencyFiles = includedDependencies.files - toMinimize.files
     R8Minimizer(
         execOperations = execOperations,
