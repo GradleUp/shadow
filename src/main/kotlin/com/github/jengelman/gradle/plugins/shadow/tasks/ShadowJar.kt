@@ -7,10 +7,10 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
-import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
@@ -530,14 +530,12 @@ public abstract class ShadowJar : Jar() {
     }
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
-        val unusedTracker =
-          UnusedTracker(
-            sourceSetsClassesDirs = sourceSetsClassesDirs.files,
-            classJars = apiJars,
-            toMinimize = toMinimize,
-          )
-        includedDependencies.files.forEach { unusedTracker.addDependency(it) }
-        unusedTracker.findUnused()
+        findUnusedClasses(
+          sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+          classJars = apiJars,
+          toMinimize = toMinimize,
+          dependencies = includedDependencies.files,
+        )
       } else {
         emptySet()
       }

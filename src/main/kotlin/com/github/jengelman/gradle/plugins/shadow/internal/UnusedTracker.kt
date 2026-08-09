@@ -9,9 +9,7 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.InputFiles
 import org.vafer.jdependency.Clazzpath
-import org.vafer.jdependency.ClazzpathUnit
 
 internal fun Project.getApiJars(): Provider<List<File>> {
   val apiConfiguration =
@@ -47,33 +45,28 @@ internal fun Project.getApiJars(): Provider<List<File>> {
   }
 }
 
-/** Tracks unused classes in the project classpath. */
-internal class UnusedTracker(
+/** Finds unused classes in the project classpath. */
+internal fun findUnusedClasses(
   sourceSetsClassesDirs: Iterable<File>,
   classJars: FileCollection,
-  @get:InputFiles val toMinimize: FileCollection,
-) {
-  private val projectUnits: List<ClazzpathUnit>
-  private val cp = Clazzpath()
+  toMinimize: FileCollection,
+  dependencies: Iterable<File>,
+): Set<String> {
+  val cp = Clazzpath()
+  val projectUnits =
+    sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } +
+      classJars.map { cp.addClazzpathUnit(it) }
 
-  init {
-    projectUnits =
-      sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } +
-        classJars.map { cp.addClazzpathUnit(it) }
-  }
-
-  fun findUnused(): Set<String> {
-    val unused = cp.clazzes.toMutableSet()
-    for (cpu in projectUnits) {
-      unused.removeAll(cpu.clazzes)
-      unused.removeAll(cpu.transitiveDependencies)
-    }
-    return unused.map { it.name }.toSet()
-  }
-
-  fun addDependency(jarOrDir: File) {
+  dependencies.forEach { jarOrDir ->
     if (toMinimize.contains(jarOrDir)) {
       cp.addClazzpathUnit(jarOrDir)
     }
   }
+
+  val unused = cp.clazzes.toMutableSet()
+  for (cpu in projectUnits) {
+    unused.removeAll(cpu.clazzes)
+    unused.removeAll(cpu.transitiveDependencies)
+  }
+  return unused.map { it.name }.toSet()
 }
