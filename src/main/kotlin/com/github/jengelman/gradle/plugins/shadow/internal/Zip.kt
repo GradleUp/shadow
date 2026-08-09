@@ -44,7 +44,7 @@ internal fun createZipOutputStream(
   return stream.apply {
     setUseZip64(if (zip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
     setMethod(method)
-    setEncoding(encoding)
+    encoding?.let { setEncoding(it) }
   }
 }
 
