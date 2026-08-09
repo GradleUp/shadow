@@ -1,3 +1,5 @@
+@file:Suppress("DEPRECATION")
+
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.all
@@ -21,8 +23,12 @@ import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.io.File
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Named
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -268,6 +274,44 @@ class ShadowPropertiesTest {
       assertThat(api.dependencies).containsNone(gradleApi)
       assertThat(compileOnly.dependencies).containsNone(gradleApi)
       assertThat(compileOnlyApi.dependencies).containsOnly(gradleApi)
+    }
+
+  @Suppress("DEPRECATION")
+  @Test
+  fun createCopyActionEntryCompressionWithR8() =
+    with(project) {
+      plugins.apply(JavaPlugin::class.java)
+      val tempFile =
+        layout.buildDirectory.file("test.zip").get().asFile.also { it.parentFile.mkdirs() }
+      val shadowJarTask = tasks.shadowJar.get()
+
+      fun getMethodForCopyAction(): Int {
+        val createCopyActionMethod =
+          ShadowJar::class.java.getDeclaredMethod("createCopyAction").apply {
+            isAccessible = true
+          }
+        @Suppress("DEPRECATION")
+        val copyAction = createCopyActionMethod.invoke(shadowJarTask) as ShadowCopyAction
+        val zosProviderField =
+          ShadowCopyAction::class.java.getDeclaredField("zosProvider").apply {
+            isAccessible = true
+          }
+        @Suppress("UNCHECKED_CAST")
+        val zosProvider = zosProviderField.get(copyAction) as (File) -> ZipOutputStream
+        val zos = zosProvider(tempFile)
+        val methodField =
+          ZipOutputStream::class.java.getDeclaredField("method").apply { isAccessible = true }
+        val method = methodField.getInt(zos)
+        zos.close()
+        tempFile.delete()
+        return method
+      }
+
+      assertThat(getMethodForCopyAction()).isEqualTo(ZipOutputStream.DEFLATED)
+
+      shadowJarTask.minimize { it.r8 {} }
+
+      assertThat(getMethodForCopyAction()).isEqualTo(ZipOutputStream.STORED)
     }
 
   private companion object {
