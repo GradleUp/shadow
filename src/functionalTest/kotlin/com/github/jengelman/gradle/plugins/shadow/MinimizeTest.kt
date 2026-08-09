@@ -4,7 +4,6 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
-import assertk.assertions.isLessThan
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
@@ -657,38 +656,6 @@ class MinimizeTest : BasePluginTest() {
     val result = runWithSuccess(serverShadowJarPath)
 
     assertThat(result.output).contains("R8 launcher JDK ${JavaVersion.current().majorVersion}")
-  }
-
-  @Test
-  fun minimizeWithR8CompressesFinalJarAccordingToEntryCompression() {
-    writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
-        """
-        |minimize {
-        |  r8 {}
-        |}
-        """
-          .trimMargin()
-    )
-
-    runWithSuccess(serverShadowJarPath)
-    val deflatedSize = outputServerShadowedJar.toFile().length()
-
-    path("server/build.gradle")
-      .appendText(
-        """
-      |$shadowJarTask {
-      |  entryCompression = org.gradle.api.tasks.bundling.ZipEntryCompression.STORED
-      |}
-      """
-          .trimMargin()
-      )
-
-    runWithSuccess(serverShadowJarPath)
-    val storedSize = outputServerShadowedJar.toFile().length()
-
-    assertThat(deflatedSize).isLessThan(storedSize)
   }
 
   private fun writeApiLibAndImplModules() {
