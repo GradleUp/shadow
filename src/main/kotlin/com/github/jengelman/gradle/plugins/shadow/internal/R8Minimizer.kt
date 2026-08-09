@@ -256,7 +256,7 @@ internal class R8Minimizer(
 
   // R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
   // reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
-  private fun normalizeJar(inputJar: File, outputJar: File) {
+  internal fun normalizeJar(inputJar: File, outputJar: File) {
     val entries =
       ZipFile(inputJar).use { zipFile ->
         zipFile.entries
@@ -266,6 +266,7 @@ internal class R8Minimizer(
             R8JarEntry(
               name = entry.name,
               time = entry.time,
+              unixMode = entry.unixMode,
             )
           }
           .toList()
@@ -294,11 +295,13 @@ internal class R8Minimizer(
           }
           if (added.add(entry.name)) {
             val zipEntry = zipFile.getEntry(entry.name)
+            val unixMode =
+              if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
             zos.writeEntry(
               name = entry.name,
               preserveLastModified = preserveFileTimestamps,
               lastModified = entry.time,
-              unixMode = UnixMode.file(),
+              unixMode = unixMode,
             ) {
               zipFile.getInputStream(zipEntry).use { input ->
                 input.copyTo(this)
@@ -312,7 +315,7 @@ internal class R8Minimizer(
 
   private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
-  private data class R8JarEntry(val name: String, val time: Long)
+  private data class R8JarEntry(val name: String, val time: Long, val unixMode: Int)
 
   private companion object {
     const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
