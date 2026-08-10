@@ -509,25 +509,6 @@ public abstract class ShadowJar : Jar() {
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
-    val actionEntryCompression =
-      if (isR8Enabled) {
-        // R8 rewrites the final JAR; disabling compression makes the copy action faster.
-        ZipEntryCompression.STORED
-      } else {
-        entryCompression
-      }
-    val zosProvider = { destination: File ->
-      try {
-        createZipOutputStream(
-          destination = destination,
-          entryCompression = actionEntryCompression,
-          zip64 = isZip64,
-          encoding = metadataCharset,
-        )
-      } catch (e: Exception) {
-        throw IOException("Unable to create ZIP output stream for file $destination.", e)
-      }
-    }
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         findUnusedClasses(
@@ -550,17 +531,33 @@ public abstract class ShadowJar : Jar() {
           set
         }
       }
+    val zipFile = archiveFile.get().asFile
+    val zipOutStream =
+      try {
+        createZipOutputStream(
+          destination = zipFile,
+          entryCompression =
+            if (isR8Enabled) {
+              // R8 rewrites the final JAR; disabling compression makes the whole action faster.
+              ZipEntryCompression.STORED
+            } else {
+              entryCompression
+            },
+          zip64 = isZip64,
+          encoding = metadataCharset,
+        )
+      } catch (e: Exception) {
+        throw IOException("Unable to create ZIP output stream for file $zipFile.", e)
+      }
     @Suppress("DEPRECATION")
     return ShadowCopyAction(
-      zipFile = archiveFile.get().asFile,
-      zosProvider = zosProvider,
+      zipFile = zipFile,
+      zipOutStream = zipOutStream,
       transformers = actualTransformers,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      enableKotlinModuleRemapping = false, // Unused param.
-      preserveFileTimestamps = isPreserveFileTimestamps,
+      isPreserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
-      encoding = metadataCharset,
     )
   }
 

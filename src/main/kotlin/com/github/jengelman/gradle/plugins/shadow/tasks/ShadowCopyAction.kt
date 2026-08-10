@@ -32,27 +32,45 @@ import org.gradle.api.tasks.WorkResults
  * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
 @Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
-public open class ShadowCopyAction(
+public open class ShadowCopyAction
+internal constructor(
   private val zipFile: File,
-  private val zosProvider: (File) -> ZipOutputStream,
+  private val zipOutStream: ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
-  private val enableKotlinModuleRemapping: Boolean,
-  private val preserveFileTimestamps: Boolean,
+  private val isPreserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
-  private val encoding: String?,
 ) : CopyAction {
-  private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
-
-  override fun execute(stream: CopyActionProcessingStream): WorkResult {
-    val zipOutStream =
+  @Suppress("unused") // For binary compatibility.
+  public constructor(
+    zipFile: File,
+    zosProvider: (File) -> ZipOutputStream,
+    transformers: Set<ResourceTransformer>,
+    relocators: Set<Relocator>,
+    unusedClasses: Set<String>,
+    enableKotlinModuleRemapping: Boolean,
+    preserveFileTimestamps: Boolean,
+    failOnDuplicateEntries: Boolean,
+    encoding: String?,
+  ) : this(
+    zipFile = zipFile,
+    zipOutStream =
       try {
         zosProvider(zipFile)
       } catch (e: Exception) {
         throw GradleException("Could not create ZIP '$zipFile'.", e)
-      }
+      },
+    transformers = transformers,
+    relocators = relocators,
+    unusedClasses = unusedClasses,
+    isPreserveFileTimestamps = preserveFileTimestamps,
+    failOnDuplicateEntries = failOnDuplicateEntries,
+  )
 
+  private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
+
+  override fun execute(stream: CopyActionProcessingStream): WorkResult {
     try {
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
@@ -87,7 +105,7 @@ public open class ShadowCopyAction(
   private fun processTransformers(zos: ZipOutputStream) {
     transformers.forEach { transformer ->
       if (transformer.hasTransformedResource()) {
-        transformer.modifyOutputStream(zos, preserveFileTimestamps)
+        transformer.modifyOutputStream(zos, isPreserveFileTimestamps)
       }
     }
   }
@@ -109,7 +127,7 @@ public open class ShadowCopyAction(
           }
         zos.writeEntry(
           name = entryName,
-          preserveLastModified = preserveFileTimestamps,
+          preserveLastModified = isPreserveFileTimestamps,
           lastModified = lastModified,
           unixMode = unixMode,
         )
@@ -197,7 +215,7 @@ public open class ShadowCopyAction(
     private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
       zipOutStr.writeEntry(
         name = entryName,
-        preserveLastModified = preserveFileTimestamps,
+        preserveLastModified = isPreserveFileTimestamps,
         lastModified = lastModified,
         unixMode = UnixMode.file(permissions.toUnixNumeric()),
       ) {
