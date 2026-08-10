@@ -516,18 +516,18 @@ public abstract class ShadowJar : Jar() {
       } else {
         entryCompression
       }
-    val zosProvider = { destination: File ->
+    val zipFile = archiveFile.get().asFile
+    val zipOutStream =
       try {
         createZipOutputStream(
-          destination = destination,
+          destination = zipFile,
           entryCompression = actionEntryCompression,
           zip64 = isZip64,
           encoding = metadataCharset,
         )
       } catch (e: Exception) {
-        throw IOException("Unable to create ZIP output stream for file $destination.", e)
+        throw IOException("Unable to create ZIP output stream for file $zipFile.", e)
       }
-    }
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         findUnusedClasses(
@@ -552,8 +552,8 @@ public abstract class ShadowJar : Jar() {
       }
     @Suppress("DEPRECATION")
     return ShadowCopyAction(
-      zipFile = archiveFile.get().asFile,
-      zosProvider = zosProvider,
+      zipFile = zipFile,
+      zipOutStream = zipOutStream,
       transformers = actualTransformers,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,

@@ -35,7 +35,7 @@ import org.gradle.api.tasks.WorkResults
 public open class ShadowCopyAction
 internal constructor(
   private val zipFile: File,
-  private val zosProvider: (File) -> ZipOutputStream,
+  private val zipOutStream: ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
@@ -55,7 +55,12 @@ internal constructor(
     encoding: String?,
   ) : this(
     zipFile = zipFile,
-    zosProvider = zosProvider,
+    zipOutStream =
+      try {
+        zosProvider(zipFile)
+      } catch (e: Exception) {
+        throw GradleException("Could not create ZIP '$zipFile'.", e)
+      },
     transformers = transformers,
     relocators = relocators,
     unusedClasses = unusedClasses,
@@ -66,13 +71,6 @@ internal constructor(
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
-    val zipOutStream =
-      try {
-        zosProvider(zipFile)
-      } catch (e: Exception) {
-        throw GradleException("Could not create ZIP '$zipFile'.", e)
-      }
-
     try {
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
