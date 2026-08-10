@@ -106,8 +106,10 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     </p>
     </details>
 
-**NOTE:** The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin
-documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
+!!! note
+
+    The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin
+    documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
 
 Shadow is a reactive plugin.
 This means that applying Shadow by itself will perform no configuration on your project.

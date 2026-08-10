@@ -656,8 +656,10 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ## [8.1.1](https://github.com/GradleUp/shadow/releases/tag/8.1.1) - 2023-03-20
 
-**NOTE:** As of this version, the GitHub repository has migrated to the `main` branch as the default branch for
-releases.
+!!! note
+
+    As of this version, the GitHub repository has migrated to the `main` branch as the default branch for
+    releases.
 
 ### What's Changed
 
