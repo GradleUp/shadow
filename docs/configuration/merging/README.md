@@ -116,7 +116,7 @@ Alternatively, you can follow these steps:
 
 !!! warning "Build Cache Impact"
 
-    Functions inherited from [`CopySpec`][CopySpec], such as [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching],  [`eachFile`][Jar.eachFile], or others, disable the output caching.
+    Functions inherited from [`CopySpec`][CopySpec], such as [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], [`eachFile`][Jar.eachFile], or others, disable the output caching.
 
 Optional steps:
 

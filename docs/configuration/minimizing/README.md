@@ -73,7 +73,7 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 
 !!! note
 
-    When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from 
+    When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
     minimization as well.
 
 ## Minimizing with R8
