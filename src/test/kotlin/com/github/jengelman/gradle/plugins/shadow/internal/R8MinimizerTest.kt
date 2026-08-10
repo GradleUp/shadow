@@ -37,9 +37,9 @@ class R8MinimizerTest {
       zosProvider = { destination ->
         createZipOutputStream(
           destination = destination,
-          entryCompression = ZipEntryCompression.DEFLATED,
+          entryCompression = ZipEntryCompression.STORED,
           isZip64 = false,
-          encoding = Charsets.UTF_8.toString(),
+          encoding = null,
         )
       },
     )
