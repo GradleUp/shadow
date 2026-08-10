@@ -538,7 +538,7 @@ public abstract class ShadowJar : Jar() {
           destination = zipFile,
           entryCompression =
             if (isR8Enabled) {
-              // R8 rewrites the final JAR; disabling compression makes the copy action faster.
+              // R8 rewrites the final JAR; disabling compression makes the whole action faster.
               ZipEntryCompression.STORED
             } else {
               entryCompression
