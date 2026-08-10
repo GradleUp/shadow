@@ -1,7 +1,7 @@
 # Shadow
 
 Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications
-with R8/ProGuard. The Gradle counterpart to Maven’s Shade plugin.
+with R8/ProGuard. The Gradle counterpart to Maven's Shade plugin.
 
 > [!NOTE]\
 > Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the
