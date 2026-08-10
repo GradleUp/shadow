@@ -7,11 +7,11 @@ import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
 import kotlin.io.path.moveTo
 import org.apache.tools.zip.ZipFile
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.process.ExecOperations
 
@@ -46,9 +46,7 @@ internal fun minimizeWithR8(
   relocators: Iterable<Relocator>,
   preserveFileTimestamps: Boolean,
   reproducibleFileOrder: Boolean,
-  zip64: Boolean,
-  entryCompression: ZipEntryCompression,
-  encoding: String?,
+  zosProvider: ZosProvider,
 ) {
   if (r8Classpath.isEmpty) {
     throw GradleException(
@@ -111,9 +109,7 @@ internal fun minimizeWithR8(
     outputJar = normalizedOutput,
     preserveFileTimestamps = preserveFileTimestamps,
     reproducibleFileOrder = reproducibleFileOrder,
-    zip64 = zip64,
-    entryCompression = entryCompression,
-    encoding = encoding,
+    zosProvider = zosProvider,
   )
   normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
 }
@@ -292,9 +288,7 @@ internal fun normalizeJar(
   outputJar: File,
   preserveFileTimestamps: Boolean,
   reproducibleFileOrder: Boolean,
-  zip64: Boolean,
-  entryCompression: ZipEntryCompression,
-  encoding: String?,
+  zosProvider: ZosProvider,
 ) {
   // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
   // permissions and ensure uniform Zip structure handling.
@@ -314,41 +308,34 @@ internal fun normalizeJar(
 
     val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
 
-    createZipOutputStream(
-        destination = outputJar,
-        entryCompression = entryCompression,
-        zip64 = zip64,
-        encoding = encoding,
-      )
-      .use { zos ->
-        val added = mutableSetOf<String>()
+    zosProvider(outputJar).use { zos ->
+      val added = mutableSetOf<String>()
 
-        orderedEntries.forEach { entry ->
-          entry.name.parentDirectoryEntries().forEach { entryName ->
-            if (!added.add(entryName)) return@forEach
-            zos.writeEntry(
-              name = entryName,
-              preserveLastModified = preserveFileTimestamps,
-              unixMode = UnixMode.directory(),
-            )
-          }
-          if (added.add(entry.name)) {
-            val zipEntry = zipFile.getEntry(entry.name)
-            val unixMode =
-              if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
-            zos.writeEntry(
-              name = entry.name,
-              preserveLastModified = preserveFileTimestamps,
-              lastModified = entry.time,
-              unixMode = unixMode,
-            ) {
-              zipFile.getInputStream(zipEntry).use { input ->
-                input.copyTo(this)
-              }
+      orderedEntries.forEach { entry ->
+        entry.name.parentDirectoryEntries().forEach { entryName ->
+          if (!added.add(entryName)) return@forEach
+          zos.writeEntry(
+            name = entryName,
+            preserveLastModified = preserveFileTimestamps,
+            unixMode = UnixMode.directory(),
+          )
+        }
+        if (added.add(entry.name)) {
+          val zipEntry = zipFile.getEntry(entry.name)
+          val unixMode = if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
+          zos.writeEntry(
+            name = entry.name,
+            preserveLastModified = preserveFileTimestamps,
+            lastModified = entry.time,
+            unixMode = unixMode,
+          ) {
+            zipFile.getInputStream(zipEntry).use { input ->
+              input.copyTo(this)
             }
           }
         }
       }
+    }
   }
 }
 
@@ -359,3 +346,5 @@ private const val SERVICES_PATH = "META-INF/services/"
 private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
 
 private data class R8JarEntry(val name: String, val time: Long, val unixMode: Int)
+
+private typealias ZosProvider = (destination: File) -> ZipOutputStream

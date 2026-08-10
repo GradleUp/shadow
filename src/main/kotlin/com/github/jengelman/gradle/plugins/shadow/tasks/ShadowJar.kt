@@ -534,8 +534,7 @@ public abstract class ShadowJar : Jar() {
     val zipFile = archiveFile.get().asFile
     val zipOutStream =
       try {
-        createZipOutputStream(
-          destination = zipFile,
+        zipFile.createZipOutputStream(
           entryCompression =
             if (isR8Enabled) {
               // R8 rewrites the final JAR; disabling compression makes the whole action faster.
@@ -543,7 +542,7 @@ public abstract class ShadowJar : Jar() {
             } else {
               entryCompression
             },
-          zip64 = isZip64,
+          isZip64 = isZip64,
           encoding = metadataCharset,
         )
       } catch (e: Exception) {
@@ -714,9 +713,13 @@ public abstract class ShadowJar : Jar() {
       relocators = relocators.get() + packageRelocators,
       preserveFileTimestamps = isPreserveFileTimestamps,
       reproducibleFileOrder = isReproducibleFileOrder,
-      zip64 = isZip64,
-      entryCompression = entryCompression,
-      encoding = metadataCharset,
+      zosProvider = { destination ->
+        destination.createZipOutputStream(
+          entryCompression = entryCompression,
+          isZip64 = isZip64,
+          encoding = metadataCharset,
+        )
+      },
     )
   }
 
