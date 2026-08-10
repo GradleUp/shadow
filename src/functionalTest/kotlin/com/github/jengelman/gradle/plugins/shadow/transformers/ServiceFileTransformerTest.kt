@@ -45,37 +45,19 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   @Test
   fun serviceResourceTransformerWithRelocation() {
     val one = buildJarOne {
+      insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
+      insert("foo/FooDriver.class", createEmptyClassBytes("foo/FooDriver"))
       insert(
-        "META-INF/services/java.sql.Driver",
-        """
-        |oracle.jdbc.OracleDriver
-        |org.apache.hive.jdbc.HiveDriver
-        """
-          .trimMargin(),
-      )
-      insert(
-        "META-INF/services/org.apache.axis.components.compiler.Compiler",
-        "org.apache.axis.components.compiler.Javac",
-      )
-      insert(
-        "META-INF/services/org.apache.commons.logging.LogFactory",
-        "org.apache.commons.logging.impl.LogFactoryImpl",
+        "META-INF/services/com.example.Driver",
+        "foo.FooDriver",
       )
     }
     val two = buildJarTwo {
+      insert("bar/BarDriver.class", createEmptyClassBytes("bar/BarDriver"))
       insert(
-        "META-INF/services/java.sql.Driver",
-        """
-        |org.apache.derby.jdbc.AutoloadedDriver
-        |com.mysql.jdbc.Driver
-        """
-          .trimMargin(),
+        "META-INF/services/com.example.Driver",
+        "bar.BarDriver",
       )
-      insert(
-        "META-INF/services/org.apache.axis.components.compiler.Compiler",
-        "org.apache.axis.components.compiler.Jikes",
-      )
-      insert("META-INF/services/org.apache.commons.logging.LogFactory", "org.mortbay.log.Factory")
     }
 
     projectScript.appendText(
@@ -85,10 +67,9 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |}
       |$shadowJarTask {
       |  mergeServiceFiles()
-      |  relocate("org.apache", "myapache") {
-      |    exclude 'org.apache.axis.components.compiler.Jikes'
-      |    exclude 'org.apache.commons.logging.LogFactory'
-      |  }
+      |  relocate("com.example", "relocated.com.example")
+      |  relocate("foo", "relocated.foo")
+      |  relocate("bar", "relocated.bar")
       |}
       """
         .trimMargin()
@@ -97,29 +78,24 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/services/java.sql.Driver")
+      containsOnly(
+        "relocated/",
+        "relocated/bar/",
+        "relocated/bar/BarDriver.class",
+        "relocated/com/",
+        "relocated/com/example/",
+        "relocated/com/example/Driver.class",
+        "relocated/foo/",
+        "relocated/foo/FooDriver.class",
+        "META-INF/services/",
+        "META-INF/services/relocated.com.example.Driver",
+        *manifestEntries,
+      )
+      getContent("META-INF/services/relocated.com.example.Driver")
         .isEqualTo(
           """
-          |oracle.jdbc.OracleDriver
-          |myapache.hive.jdbc.HiveDriver
-          |myapache.derby.jdbc.AutoloadedDriver
-          |com.mysql.jdbc.Driver
-          """
-            .trimMargin()
-        )
-      getContent("META-INF/services/myapache.axis.components.compiler.Compiler")
-        .isEqualTo(
-          """
-          |myapache.axis.components.compiler.Javac
-          |org.apache.axis.components.compiler.Jikes
-          """
-            .trimMargin()
-        )
-      getContent("META-INF/services/org.apache.commons.logging.LogFactory")
-        .isEqualTo(
-          """
-          |myapache.commons.logging.impl.LogFactoryImpl
-          |org.mortbay.log.Factory
+          |relocated.foo.FooDriver
+          |relocated.bar.BarDriver
           """
             .trimMargin()
         )
@@ -168,22 +144,23 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "bar/",
-        "bar/BarDriver.class",
-        "com/",
-        "com/example/",
-        "com/example/Driver.class",
-        "foo/",
-        "foo/FooDriver.class",
+        "relocated/",
+        "relocated/bar/",
+        "relocated/bar/BarDriver.class",
+        "relocated/com/",
+        "relocated/com/example/",
+        "relocated/com/example/Driver.class",
+        "relocated/foo/",
+        "relocated/foo/FooDriver.class",
         "META-INF/services/",
-        "META-INF/services/com.example.Driver",
+        "META-INF/services/relocated.com.example.Driver",
         *manifestEntries,
       )
-      getContent("META-INF/services/com.example.Driver")
+      getContent("META-INF/services/relocated.com.example.Driver")
         .isEqualTo(
           """
-          |foo.FooDriver
-          |bar.BarDriver
+          |relocated.foo.FooDriver
+          |relocated.bar.BarDriver
           |"""
             .trimMargin()
         )

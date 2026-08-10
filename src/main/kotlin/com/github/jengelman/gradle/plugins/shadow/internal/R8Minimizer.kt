@@ -208,13 +208,13 @@ private fun serviceProguardRules(inputJar: File): List<String> {
       .forEach { entry ->
         val serviceClass = entry.name.removePrefix(SERVICES_PATH).replace('/', '.')
         if (serviceClass.isJavaTypeName()) {
-          rules += "-keep class $serviceClass { *; }"
+          rules += "-keep,allowrepackage class $serviceClass { *; }"
         }
         jarFile.getInputStream(entry).bufferedReader().useLines { lines ->
           lines
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() && it.isJavaTypeName() }
-            .forEach { provider -> rules += "-keep class $provider { *; }" }
+            .forEach { provider -> rules += "-keep,allowrepackage class $provider { *; }" }
         }
       }
   }
