@@ -22,12 +22,12 @@ internal value class UnixMode private constructor(internal val value: Int) {
   }
 }
 
-internal fun createZipOutputStream(
-  destination: File,
+internal fun File.createZipOutputStream(
   entryCompression: ZipEntryCompression,
   isZip64: Boolean,
   encoding: String?,
 ): ZipOutputStream {
+  val destination = this
   val method =
     when (entryCompression) {
       ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED

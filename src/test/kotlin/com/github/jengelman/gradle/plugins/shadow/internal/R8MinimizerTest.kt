@@ -35,8 +35,7 @@ class R8MinimizerTest {
       preserveFileTimestamps = true,
       reproducibleFileOrder = true,
       zosProvider = { destination ->
-        createZipOutputStream(
-          destination = destination,
+        destination.createZipOutputStream(
           entryCompression = ZipEntryCompression.STORED,
           isZip64 = false,
           encoding = null,
