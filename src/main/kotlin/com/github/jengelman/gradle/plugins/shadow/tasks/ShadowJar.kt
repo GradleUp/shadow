@@ -531,10 +531,10 @@ public abstract class ShadowJar : Jar() {
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         findUnusedClasses(
-          sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+          sourceSetsClassesDirs = sourceSetsClassesDirs,
           classJars = apiJars,
           toMinimize = toMinimize,
-          dependencies = includedDependencies.files,
+          dependencies = includedDependencies,
         )
       } else {
         emptySet()
@@ -592,7 +592,7 @@ public abstract class ShadowJar : Jar() {
         return emptyList()
       }
       val prefix = relocationPrefix.get()
-      return includedDependencies.files.flatMap { file ->
+      return includedDependencies.flatMap { file ->
         JarFile(file).use { jarFile ->
           jarFile
             .entries()
@@ -616,7 +616,7 @@ public abstract class ShadowJar : Jar() {
       }
     }
 
-    includedDependencies.files.forEach { file ->
+    includedDependencies.forEach { file ->
       when {
         !file.exists() -> {
           logger.info("Skipping non-existent dependency: {}", file)
@@ -685,19 +685,18 @@ public abstract class ShadowJar : Jar() {
       )
       return
     }
-    val includeMultiReleaseAttr =
-      includedDependencies.files.any {
-        try {
-          JarFile(it).use { jarFile ->
-            // Manifest might be null or the attribute name is invalid, or any other case.
-            runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }
-              .getOrNull()
-          } == "true"
-        } catch (_: IOException) {
-          // If the jar file is not valid, ignore it.
-          false
-        }
+    val includeMultiReleaseAttr = includedDependencies.any {
+      try {
+        JarFile(it).use { jarFile ->
+          // Manifest might be null or the attribute name is invalid, or any other case.
+          runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }
+            .getOrNull()
+        } == "true"
+      } catch (_: IOException) {
+        // If the jar file is not valid, ignore it.
+        false
       }
+    }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
     }
@@ -705,7 +704,6 @@ public abstract class ShadowJar : Jar() {
 
   private fun runR8Minimization() {
     if (!isR8Enabled) return
-    val keptDependencyFiles = includedDependencies.files - toMinimize.files
     minimizeWithR8(
       inputJar = archiveFile.get().asFile,
       temporaryDir = temporaryDir,
@@ -714,8 +712,8 @@ public abstract class ShadowJar : Jar() {
       r8Classpath = r8Classpath,
       r8Spec = defaultMinimizeSpec.r8Spec,
       javaLauncher = javaLauncher,
-      sourceSetsClassesDirs = sourceSetsClassesDirs.files,
-      keptDependencyFiles = keptDependencyFiles,
+      sourceSetsClassesDirs = sourceSetsClassesDirs,
+      keptDependencyFiles = includedDependencies - toMinimize,
       relocators = relocators.get() + packageRelocators,
       preserveFileTimestamps = isPreserveFileTimestamps,
       reproducibleFileOrder = isReproducibleFileOrder,

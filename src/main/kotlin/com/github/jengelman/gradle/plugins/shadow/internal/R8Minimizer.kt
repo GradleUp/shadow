@@ -135,7 +135,7 @@ private fun createRules(
     addAll(sourceProguardRules(inputJar, sourceSetsClassesDirs, relocators))
     addAll(keptDependencyRules(inputJar, keptDependencyFiles, relocators))
     addAll(serviceProguardRules(inputJar))
-    r8Spec.proguardRuleFiles.files
+    r8Spec.proguardRuleFiles
       .sortedBy { it.absolutePath }
       .forEach { file ->
         if (file.isFile) {

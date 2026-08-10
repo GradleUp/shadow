@@ -6,7 +6,6 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.provider.Provider
 import org.vafer.jdependency.Clazzpath
@@ -48,8 +47,8 @@ internal fun Project.getApiJars(): Provider<List<File>> {
 /** Finds unused classes in the project classpath. */
 internal fun findUnusedClasses(
   sourceSetsClassesDirs: Iterable<File>,
-  classJars: FileCollection,
-  toMinimize: FileCollection,
+  classJars: Iterable<File>,
+  toMinimize: Iterable<File>,
   dependencies: Iterable<File>,
 ): Set<String> {
   val cp = Clazzpath()
