@@ -42,7 +42,7 @@ internal constructor(
   private val preserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
 ) : CopyAction {
-  @Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
+  @Suppress("unused") // For binary compatibility.
   public constructor(
     zipFile: File,
     zosProvider: (File) -> ZipOutputStream,
