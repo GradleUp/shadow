@@ -25,7 +25,7 @@ internal value class UnixMode private constructor(internal val value: Int) {
 internal fun createZipOutputStream(
   destination: File,
   entryCompression: ZipEntryCompression,
-  zip64: Boolean,
+  isZip64: Boolean,
   encoding: String?,
 ): ZipOutputStream {
   val method =
@@ -42,7 +42,7 @@ internal fun createZipOutputStream(
       ZipOutputStream(destination.outputStream().buffered())
     }
   return stream.apply {
-    setUseZip64(if (zip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
+    setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
     setMethod(method)
     encoding?.let(::setEncoding)
   }

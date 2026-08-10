@@ -38,7 +38,7 @@ class R8MinimizerTest {
         createZipOutputStream(
           destination = destination,
           entryCompression = ZipEntryCompression.DEFLATED,
-          zip64 = false,
+          isZip64 = false,
           encoding = Charsets.UTF_8.toString(),
         )
       },

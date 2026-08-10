@@ -543,7 +543,7 @@ public abstract class ShadowJar : Jar() {
             } else {
               entryCompression
             },
-          zip64 = isZip64,
+          isZip64 = isZip64,
           encoding = metadataCharset,
         )
       } catch (e: Exception) {
@@ -718,7 +718,7 @@ public abstract class ShadowJar : Jar() {
         createZipOutputStream(
           destination = destination,
           entryCompression = entryCompression,
-          zip64 = isZip64,
+          isZip64 = isZip64,
           encoding = metadataCharset,
         )
       },
