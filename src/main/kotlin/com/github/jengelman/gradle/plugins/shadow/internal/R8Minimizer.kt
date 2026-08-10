@@ -46,7 +46,7 @@ internal fun minimizeWithR8(
   relocators: Iterable<Relocator>,
   preserveFileTimestamps: Boolean,
   reproducibleFileOrder: Boolean,
-  createZipOutputStream: (destination: File) -> ZipOutputStream,
+  zosProvider: (destination: File) -> ZipOutputStream,
 ) {
   if (r8Classpath.isEmpty) {
     throw GradleException(
@@ -109,7 +109,7 @@ internal fun minimizeWithR8(
     outputJar = normalizedOutput,
     preserveFileTimestamps = preserveFileTimestamps,
     reproducibleFileOrder = reproducibleFileOrder,
-    createZipOutputStream = createZipOutputStream,
+    zosProvider = zosProvider,
   )
   normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
 }
@@ -288,7 +288,7 @@ internal fun normalizeJar(
   outputJar: File,
   preserveFileTimestamps: Boolean,
   reproducibleFileOrder: Boolean,
-  createZipOutputStream: (destination: File) -> ZipOutputStream,
+  zosProvider: (destination: File) -> ZipOutputStream,
 ) {
   // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
   // permissions and ensure uniform Zip structure handling.
@@ -308,7 +308,7 @@ internal fun normalizeJar(
 
     val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
 
-    createZipOutputStream(outputJar).use { zos ->
+    zosProvider(outputJar).use { zos ->
       val added = mutableSetOf<String>()
 
       orderedEntries.forEach { entry ->

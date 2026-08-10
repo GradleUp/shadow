@@ -34,7 +34,7 @@ class R8MinimizerTest {
       outputJar = outputJar.toFile(),
       preserveFileTimestamps = true,
       reproducibleFileOrder = true,
-      createZipOutputStream = { destination ->
+      zosProvider = { destination ->
         createZipOutputStream(
           destination = destination,
           entryCompression = ZipEntryCompression.DEFLATED,
