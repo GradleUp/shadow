@@ -4,10 +4,8 @@
 
 # Introduction
 
-Shadow is a Gradle plugin for combining a project's dependency classes and resources into a single
-output Jar. The combined Jar is often referred to a _fat-jar_ or _uber-jar_.
-Shadow utilizes [`JarInputStream`][JarInputStream] and [`JarOutputStream`][JarOutputStream] to efficiently process
-dependent libraries into the output jar without incurring the I/O overhead of expanding the jars to disk.
+Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications
+with R8/ProGuard. The Gradle counterpart to Maven’s Shade plugin.
 
 !!! warning "Plugin ID Change"
 
@@ -68,7 +66,5 @@ library's dependencies will not conflict with the same dependency being declared
 
 
 
-[JarInputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html
-[JarOutputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html
 [johnrengelman's]: https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 [gradleup's]: https://plugins.gradle.org/plugin/com.gradleup.shadow
