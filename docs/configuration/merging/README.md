@@ -6,13 +6,15 @@ Maven Shade implementation. A [`ResourceTransformer`][ResourceTransformer] is in
 being written to the final output JAR. This allows a [`ResourceTransformer`][ResourceTransformer] to determine if it
 should process a particular entry and apply any modifications before writing the stream to the output.
 
-**Important**: [`ResourceTransformer`][ResourceTransformer] follows a guaranteed processing order:
+!!! important "Guaranteed Processing Order"
 
-1. **Project files first**: All files in projects are processed before any dependency files.
-2. **Dependency files second**: Files from configurations (runtime dependencies) or added via [`ShadowJar.from`][ShadowJar.from] are processed after project files.
+    [`ResourceTransformer`][ResourceTransformer] follows a guaranteed processing order:
 
-This ordering is crucial when merging configuration files where you want to preserve project-specific values while
-merging in additional data from dependencies.
+    1. **Project files first**: All files in projects are processed before any dependency files.
+    2. **Dependency files second**: Files from configurations (runtime dependencies) or added via [`ShadowJar.from`][ShadowJar.from] are processed after project files.
+
+    This ordering is crucial when merging configuration files where you want to preserve project-specific values while
+    merging in additional data from dependencies.
 
 ## Handling Duplicates Strategy
 
@@ -55,10 +57,12 @@ Different strategies will lead to different results for `foo/bar` files in the J
   `Entry .* is a duplicate but no duplicate handling strategy has been set`.
 - `WARN`: **Warn** about duplicates in the build log, this behaves exactly as `INHERIT` otherwise.
 
-**NOTE:** The `duplicatesStrategy` evaluation takes precedence over transforming and relocating.
-Because `ShadowJar` is a subclass of Gradle's `AbstractCopyTask`, duplicate filtering configured via
-`duplicatesStrategy` is performed at Gradle's `CopySpec` processing layer **before** entries are passed to Shadow's
-internal [`ResourceTransformer`][ResourceTransformer] engine.
+!!! note "Precedence of DuplicatesStrategy"
+
+    The `duplicatesStrategy` evaluation takes precedence over transforming and relocating.
+    Because `ShadowJar` is a subclass of Gradle's `AbstractCopyTask`, duplicate filtering configured via
+    `duplicatesStrategy` is performed at Gradle's `CopySpec` processing layer **before** entries are passed to Shadow's
+    internal [`ResourceTransformer`][ResourceTransformer] engine.
 
 If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
 [`ResourceTransformer`][ResourceTransformer] like below:
@@ -110,7 +114,9 @@ Alternatively, you can follow these steps:
     [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile] functions
     to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
-Note, however that functions inherited from [`CopySpec`][CopySpec], such as [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching],  [`eachFile`][Jar.eachFile], or others, disable the output caching.
+!!! warning "Build Cache Impact"
+
+    Functions inherited from [`CopySpec`][CopySpec], such as [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], [`eachFile`][Jar.eachFile], or others, disable the output caching.
 
 Optional steps:
 
@@ -345,11 +351,13 @@ method [`transform`][ShadowJar.transform] to add the [`ServiceFileTransformer`][
     }
     ```
 
-> Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
-> are ignored by the [`ServiceFileTransformer`][ServiceFileTransformer].
-> This is due to these files having a different syntax than standard service descriptor files.
-> Use the [`mergeGroovyExtensionModules()`][mergeGroovyExtensionModules] method to merge
-> these files if your dependencies contain them.
+!!! note "Groovy Extension Modules"
+
+    Groovy Extension Module descriptor files (located at `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`)
+    are ignored by the [`ServiceFileTransformer`][ServiceFileTransformer].
+    This is due to these files having a different syntax than standard service descriptor files.
+    Use the [`mergeGroovyExtensionModules()`][mergeGroovyExtensionModules] method to merge
+    these files if your dependencies contain them.
 
 ### Configuring the Location of Service Descriptor Files
 

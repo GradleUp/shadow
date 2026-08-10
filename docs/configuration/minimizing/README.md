@@ -44,8 +44,10 @@ a `dependency` is interpreted as a regular expression.
     }
     ```
 
-> Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on
-> minimization.
+!!! note
+
+    Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on
+    minimization.
 
 Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also be excluded.
 
@@ -69,8 +71,10 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
     }
     ```
 
-> When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from 
-> minimization as well.
+!!! note
+
+    When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
+    minimization as well.
 
 ## Minimizing with R8
 
