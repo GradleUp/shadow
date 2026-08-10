@@ -245,8 +245,84 @@ relocating), you can try out the trick like:
 This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See
 [Configuring Shadowed Dependencies](../dependencies/README.md) for more information about `configurations`.
 
+## Relocating with R8
+
+As an alternative to Shadow's built-in `relocate` configuration (which uses ASM to rename package prefixes during
+JAR merging), you can use [R8][r8-minimizing] to handle package relocation (also referred to as *repackaging*).
+
+R8 performs whole-program analysis during its minimization pass to safely relocate classes while respecting Java
+access visibility constraints (such as package-private and `protected` members). For more details on R8 rules, see
+the [Global options for additional optimization][android-r8-global-options] and ProGuard manual for
+[-repackageclasses][repackageclasses], [-allowaccessmodification][allowaccessmodification]
+and [-keeppackagenames][keeppackagenames].
+
+### Configuring R8 Repackaging
+
+To use R8 for package relocation, enable R8 under `minimize` and provide ProGuard repackaging directives via
+`proguardRules` or an external rule file:
+
+=== "Kotlin"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          proguardRules.addAll(
+            // Repackage all relocatable classes into a single destination package
+            "-repackageclasses 'shadow.repackaged'",
+            // Optional: widen access to public to allow R8 to relocate more classes
+            "-allowaccessmodification",
+            // Optional: preserve specific package names if needed
+            "-keeppackagenames com.example.keep.**",
+          )
+        }
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          proguardRules.addAll(
+            // Repackage all relocatable classes into a single destination package
+            "-repackageclasses 'shadow.repackaged'",
+            // Optional: widen access to public to allow R8 to relocate more classes
+            "-allowaccessmodification",
+            // Optional: preserve specific package names if needed
+            "-keeppackagenames com.example.keep.**",
+          )
+        }
+      }
+    }
+    ```
+
+### Comparison: Shadow `relocate` vs. R8 Repackaging
+
+| Feature                     | Shadow `relocate` (`SimpleRelocator`)             | R8 Repackaging (`-repackageclasses`)                |
+|:----------------------------|:--------------------------------------------------|:----------------------------------------------------|
+| **Execution Stage**         | During JAR merging (ASM bytecode transformation)  | Post-merge whole-program optimization               |
+| **Relocation Scope**        | Explicit per-prefix or per-class pattern matching | Whole-program automatic relocation                  |
+| **Visibility Handling**     | Direct string/type renaming (no visibility check) | Analyzes package-private & protected constraints    |
+| **Shrinking / Obfuscation** | Relocation only                                   | Combined with shrinking (optional name obfuscation) |
+
 
 
 [#1622]: https://github.com/GradleUp/shadow/issues/1622
 [kotlin-metadata]: https://kotlinlang.org/docs/metadata-jvm.html
 [kotlin-reflection]: https://kotlinlang.org/docs/reflection.html
+[r8-minimizing]: ../minimizing/README.md#minimizing-with-r8
+[android-r8-global-options]: https://developer.android.com/topic/performance/app-optimization/global-options#global-options
+[repackageclasses]: https://www.guardsquare.com/manual/configuration/usage#repackageclasses
+[allowaccessmodification]: https://www.guardsquare.com/manual/configuration/usage#allowaccessmodification
+[keeppackagenames]: https://www.guardsquare.com/manual/configuration/usage#keeppackagenames

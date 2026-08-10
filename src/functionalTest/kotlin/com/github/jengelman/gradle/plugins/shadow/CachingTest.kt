@@ -570,12 +570,6 @@ class CachingTest : BasePluginTest() {
     assertThat(result).taskOutcomeEquals(taskPath, expectedOutcome)
   }
 
-  private fun writeR8Repository() {
-    settingsScript.writeText(
-      settingsScript.readText().replace("mavenCentral()", "mavenCentral()\n          google()")
-    )
-  }
-
   private fun writeR8ClientAndServerModules() {
     settingsScript.appendText(
       """

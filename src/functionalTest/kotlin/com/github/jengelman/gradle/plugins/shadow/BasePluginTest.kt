@@ -42,6 +42,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
+import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
@@ -187,6 +189,12 @@ abstract class BasePluginTest {
            |
            """
       .trimMargin()
+  }
+
+  fun writeR8Repository() {
+    settingsScript.writeText(
+      settingsScript.readText().replace("mavenCentral()", "mavenCentral()\n          google()")
+    )
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
@@ -429,6 +437,15 @@ abstract class BasePluginTest {
       return paths.joinToString("\n") {
         "implementation files('${it.invariantSeparatorsPathString}')"
       }
+    }
+
+    fun createEmptyClassBytes(internalName: String): ByteArray {
+      return ClassWriter(0)
+        .apply {
+          visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+          visitEnd()
+        }
+        .toByteArray()
     }
 
     inline fun <reified T : ResourceTransformer> transform(
