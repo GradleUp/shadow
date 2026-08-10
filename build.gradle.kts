@@ -205,7 +205,7 @@ gradlePlugin {
       implementationClass = "com.github.jengelman.gradle.plugins.shadow.ShadowPlugin"
       displayName = providers.gradleProperty("POM_NAME").get()
       description = providers.gradleProperty("POM_DESCRIPTION").get()
-      tags = listOf("onejar", "shade", "fatjar", "uberjar")
+      tags = listOf("onejar", "shade", "fatjar", "uberjar", "r8", "proguard")
       compatibility { features { configurationCache = true } }
     }
   }
