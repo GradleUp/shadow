@@ -39,7 +39,7 @@ internal constructor(
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
-  private val preserveFileTimestamps: Boolean,
+  private val isPreserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
 ) : CopyAction {
   @Suppress("unused") // For binary compatibility.
@@ -64,7 +64,7 @@ internal constructor(
     transformers = transformers,
     relocators = relocators,
     unusedClasses = unusedClasses,
-    preserveFileTimestamps = preserveFileTimestamps,
+    isPreserveFileTimestamps = preserveFileTimestamps,
     failOnDuplicateEntries = failOnDuplicateEntries,
   )
 
@@ -105,7 +105,7 @@ internal constructor(
   private fun processTransformers(zos: ZipOutputStream) {
     transformers.forEach { transformer ->
       if (transformer.hasTransformedResource()) {
-        transformer.modifyOutputStream(zos, preserveFileTimestamps)
+        transformer.modifyOutputStream(zos, isPreserveFileTimestamps)
       }
     }
   }
@@ -127,7 +127,7 @@ internal constructor(
           }
         zos.writeEntry(
           name = entryName,
-          preserveLastModified = preserveFileTimestamps,
+          preserveLastModified = isPreserveFileTimestamps,
           lastModified = lastModified,
           unixMode = unixMode,
         )
@@ -215,7 +215,7 @@ internal constructor(
     private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
       zipOutStr.writeEntry(
         name = entryName,
-        preserveLastModified = preserveFileTimestamps,
+        preserveLastModified = isPreserveFileTimestamps,
         lastModified = lastModified,
         unixMode = UnixMode.file(permissions.toUnixNumeric()),
       ) {

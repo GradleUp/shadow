@@ -557,7 +557,7 @@ public abstract class ShadowJar : Jar() {
       transformers = actualTransformers,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      preserveFileTimestamps = isPreserveFileTimestamps,
+      isPreserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
     )
   }
