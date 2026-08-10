@@ -3,9 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.File
-import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
-import kotlin.io.path.moveTo
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
@@ -35,7 +33,7 @@ import org.gradle.process.ExecOperations
  */
 internal fun minimizeWithR8(
   inputJar: File,
-  temporaryDir: File,
+  outputJar: File,
   execOperations: ExecOperations,
   logger: Logger,
   r8Classpath: FileCollection,
@@ -44,9 +42,6 @@ internal fun minimizeWithR8(
   sourceSetsClassesDirs: Iterable<File>,
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
-  preserveFileTimestamps: Boolean,
-  reproducibleFileOrder: Boolean,
-  zosProvider: (destination: File) -> ZipOutputStream,
 ) {
   if (r8Classpath.isEmpty) {
     throw GradleException(
@@ -54,11 +49,9 @@ internal fun minimizeWithR8(
     )
   }
 
-  val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
+  val r8Dir = outputJar.parentFile.also { it.mkdirs() }
   val rulesFile = r8Dir.resolve("rules.pro")
   val configurationFile = r8Spec.configurationFile.get().asFile
-  val r8Output = r8Dir.resolve("output.jar")
-  val normalizedOutput = r8Dir.resolve("normalized-output.jar")
   val launcher = javaLauncher.orNull
   val javaHome =
     launcher?.metadata?.installationPath?.asFile?.absolutePath ?: System.getProperty("java.home")
@@ -83,7 +76,7 @@ internal fun minimizeWithR8(
   val arguments = buildList {
     add("--classfile")
     add("--output")
-    add(r8Output.absolutePath)
+    add(outputJar.absolutePath)
     add("--pg-conf")
     add(rulesFile.absolutePath)
     add("--pg-conf-output")
@@ -103,15 +96,6 @@ internal fun minimizeWithR8(
     }
     it.args(arguments)
   }
-
-  normalizeJar(
-    inputJar = r8Output,
-    outputJar = normalizedOutput,
-    preserveFileTimestamps = preserveFileTimestamps,
-    reproducibleFileOrder = reproducibleFileOrder,
-    zosProvider = zosProvider,
-  )
-  normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
 }
 
 private fun createRules(

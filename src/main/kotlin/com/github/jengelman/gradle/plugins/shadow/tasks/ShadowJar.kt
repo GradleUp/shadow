@@ -17,6 +17,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.minimizeWithR8
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.normalizeJar
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
@@ -32,11 +33,13 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.io.File
 import java.io.IOException
+import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.GregorianCalendar
 import java.util.jar.JarFile
 import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
+import kotlin.io.path.moveTo
 import kotlin.reflect.full.hasAnnotation
 import org.gradle.api.Action
 import org.gradle.api.GradleException
@@ -701,9 +704,14 @@ public abstract class ShadowJar : Jar() {
 
   private fun runR8Minimization() {
     if (!isR8Enabled) return
+    val r8Dir = temporaryDir.resolve("r8").also { it.mkdirs() }
+    val outputJar = r8Dir.resolve("output.jar")
+    val normalizedOutput = r8Dir.resolve("normalized-output.jar")
+    val targetJar = archiveFile.get().asFile
+
     minimizeWithR8(
-      inputJar = archiveFile.get().asFile,
-      temporaryDir = temporaryDir,
+      inputJar = targetJar,
+      outputJar = outputJar,
       execOperations = execOperations,
       logger = logger,
       r8Classpath = r8Classpath,
@@ -712,6 +720,10 @@ public abstract class ShadowJar : Jar() {
       sourceSetsClassesDirs = sourceSetsClassesDirs,
       keptDependencyFiles = includedDependencies - toMinimize,
       relocators = relocators.get() + packageRelocators,
+    )
+    normalizeJar(
+      inputJar = outputJar,
+      outputJar = normalizedOutput,
       preserveFileTimestamps = isPreserveFileTimestamps,
       reproducibleFileOrder = isReproducibleFileOrder,
       zosProvider = { destination ->
@@ -723,6 +735,7 @@ public abstract class ShadowJar : Jar() {
         )
       },
     )
+    normalizedOutput.toPath().moveTo(targetJar.toPath(), REPLACE_EXISTING)
   }
 
   public companion object {
