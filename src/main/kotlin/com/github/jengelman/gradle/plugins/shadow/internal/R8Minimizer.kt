@@ -48,7 +48,7 @@ internal fun minimizeWithR8(
   reproducibleFileOrder: Boolean,
   zip64: Boolean,
   entryCompression: ZipEntryCompression,
-  metadataCharset: String?,
+  encoding: String?,
 ) {
   if (r8Classpath.isEmpty) {
     throw GradleException(
@@ -113,7 +113,7 @@ internal fun minimizeWithR8(
     reproducibleFileOrder = reproducibleFileOrder,
     zip64 = zip64,
     entryCompression = entryCompression,
-    metadataCharset = metadataCharset,
+    encoding = encoding,
   )
   normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
 }
@@ -294,7 +294,7 @@ internal fun normalizeJar(
   reproducibleFileOrder: Boolean,
   zip64: Boolean,
   entryCompression: ZipEntryCompression,
-  metadataCharset: String?,
+  encoding: String?,
 ) {
   // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
   // permissions and ensure uniform Zip structure handling.
@@ -318,7 +318,7 @@ internal fun normalizeJar(
         destination = outputJar,
         entryCompression = entryCompression,
         zip64 = zip64,
-        encoding = metadataCharset,
+        encoding = encoding,
       )
       .use { zos ->
         val added = mutableSetOf<String>()

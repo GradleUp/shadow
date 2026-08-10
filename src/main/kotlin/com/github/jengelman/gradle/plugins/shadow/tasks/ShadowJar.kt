@@ -719,7 +719,7 @@ public abstract class ShadowJar : Jar() {
       reproducibleFileOrder = isReproducibleFileOrder,
       zip64 = isZip64,
       entryCompression = entryCompression,
-      metadataCharset = metadataCharset,
+      encoding = metadataCharset,
     )
   }
 

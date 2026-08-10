@@ -36,7 +36,7 @@ class R8MinimizerTest {
       reproducibleFileOrder = true,
       zip64 = false,
       entryCompression = ZipEntryCompression.DEFLATED,
-      metadataCharset = Charsets.UTF_8.toString(),
+      encoding = Charsets.UTF_8.toString(),
     )
 
     ZipFile(outputJar.toFile()).use { zipFile ->
