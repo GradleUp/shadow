@@ -46,7 +46,7 @@ internal fun minimizeWithR8(
   relocators: Iterable<Relocator>,
   preserveFileTimestamps: Boolean,
   reproducibleFileOrder: Boolean,
-  zosProvider: (destination: File) -> ZipOutputStream,
+  zosProvider: ZosProvider,
 ) {
   if (r8Classpath.isEmpty) {
     throw GradleException(
@@ -288,7 +288,7 @@ internal fun normalizeJar(
   outputJar: File,
   preserveFileTimestamps: Boolean,
   reproducibleFileOrder: Boolean,
-  zosProvider: (destination: File) -> ZipOutputStream,
+  zosProvider: ZosProvider,
 ) {
   // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
   // permissions and ensure uniform Zip structure handling.
@@ -346,3 +346,5 @@ private const val SERVICES_PATH = "META-INF/services/"
 private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
 
 private data class R8JarEntry(val name: String, val time: Long, val unixMode: Int)
+
+private typealias ZosProvider = (destination: File) -> ZipOutputStream
