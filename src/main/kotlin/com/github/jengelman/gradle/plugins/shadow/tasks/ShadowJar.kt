@@ -38,6 +38,7 @@ import java.util.zip.ZipException
 import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -543,8 +544,6 @@ public abstract class ShadowJar : Jar() {
             } else {
               entryCompression
             },
-          zip64 = isZip64,
-          encoding = metadataCharset,
         )
       } catch (e: Exception) {
         throw IOException("Unable to create ZIP output stream for file $zipFile.", e)
@@ -714,8 +713,18 @@ public abstract class ShadowJar : Jar() {
       relocators = relocators.get() + packageRelocators,
       preserveFileTimestamps = isPreserveFileTimestamps,
       reproducibleFileOrder = isReproducibleFileOrder,
-      zip64 = isZip64,
+      createZipOutputStream = ::createZipOutputStream,
+    )
+  }
+
+  private fun createZipOutputStream(
+    destination: File,
+    entryCompression: ZipEntryCompression = this.entryCompression,
+  ): ZipOutputStream {
+    return createZipOutputStream(
+      destination = destination,
       entryCompression = entryCompression,
+      zip64 = isZip64,
       encoding = metadataCharset,
     )
   }

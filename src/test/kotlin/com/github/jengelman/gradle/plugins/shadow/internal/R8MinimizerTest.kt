@@ -34,9 +34,14 @@ class R8MinimizerTest {
       outputJar = outputJar.toFile(),
       preserveFileTimestamps = true,
       reproducibleFileOrder = true,
-      zip64 = false,
-      entryCompression = ZipEntryCompression.DEFLATED,
-      encoding = Charsets.UTF_8.toString(),
+      createZipOutputStream = { destination ->
+        createZipOutputStream(
+          destination = destination,
+          entryCompression = ZipEntryCompression.DEFLATED,
+          zip64 = false,
+          encoding = Charsets.UTF_8.toString(),
+        )
+      },
     )
 
     ZipFile(outputJar.toFile()).use { zipFile ->
