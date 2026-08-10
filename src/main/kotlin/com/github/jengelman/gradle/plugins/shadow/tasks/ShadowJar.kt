@@ -531,10 +531,10 @@ public abstract class ShadowJar : Jar() {
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         findUnusedClasses(
-          sourceSetsClassesDirs = sourceSetsClassesDirs.files,
+          sourceSetsClassesDirs = sourceSetsClassesDirs,
           classJars = apiJars,
           toMinimize = toMinimize,
-          dependencies = includedDependencies.files,
+          dependencies = includedDependencies,
         )
       } else {
         emptySet()
