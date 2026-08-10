@@ -509,25 +509,6 @@ public abstract class ShadowJar : Jar() {
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
-    val actionEntryCompression =
-      if (isR8Enabled) {
-        // R8 rewrites the final JAR; disabling compression makes the copy action faster.
-        ZipEntryCompression.STORED
-      } else {
-        entryCompression
-      }
-    val zipFile = archiveFile.get().asFile
-    val zipOutStream =
-      try {
-        createZipOutputStream(
-          destination = zipFile,
-          entryCompression = actionEntryCompression,
-          zip64 = isZip64,
-          encoding = metadataCharset,
-        )
-      } catch (e: Exception) {
-        throw IOException("Unable to create ZIP output stream for file $zipFile.", e)
-      }
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
         findUnusedClasses(
@@ -549,6 +530,24 @@ public abstract class ShadowJar : Jar() {
         } else {
           set
         }
+      }
+    val zipFile = archiveFile.get().asFile
+    val zipOutStream =
+      try {
+        createZipOutputStream(
+          destination = zipFile,
+          entryCompression =
+            if (isR8Enabled) {
+              // R8 rewrites the final JAR; disabling compression makes the copy action faster.
+              ZipEntryCompression.STORED
+            } else {
+              entryCompression
+            },
+          zip64 = isZip64,
+          encoding = metadataCharset,
+        )
+      } catch (e: Exception) {
+        throw IOException("Unable to create ZIP output stream for file $zipFile.", e)
       }
     @Suppress("DEPRECATION")
     return ShadowCopyAction(
