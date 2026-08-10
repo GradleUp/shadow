@@ -658,6 +658,49 @@ class MinimizeTest : BasePluginTest() {
     assertThat(result.output).contains("R8 launcher JDK ${JavaVersion.current().majorVersion}")
   }
 
+  @Test
+  fun minimizeWithR8UsesGradleDaemonMaxHeapSize() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        |minimize {
+        |  r8 {}
+        |}
+        """
+          .trimMargin()
+    )
+    path("gradle.properties").writeText("org.gradle.jvmargs=-Xmx768m")
+
+    val result = runWithSuccess(serverShadowJarPath, infoArgument)
+
+    val workerCommand =
+      result.output.lineSequence().single { "Starting process 'Gradle Worker Daemon" in it }
+    assertThat(workerCommand).contains("-Xmx${768L * 1024 * 1024}")
+  }
+
+  @Test
+  fun minimizeWithR8CanConfigureMaxHeapSize() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        |minimize {
+        |  r8 {
+        |    maxHeapSize.set("640m")
+        |  }
+        |}
+        """
+          .trimMargin()
+    )
+
+    val result = runWithSuccess(serverShadowJarPath, infoArgument)
+
+    val workerCommand =
+      result.output.lineSequence().single { "Starting process 'Gradle Worker Daemon" in it }
+    assertThat(workerCommand).contains("-Xmx640m")
+  }
+
   private fun writeApiLibAndImplModules() {
     settingsScript.appendText(
       """

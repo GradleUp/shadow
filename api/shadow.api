@@ -229,6 +229,7 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun getConfigurationFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getKeepRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getKeepRules ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getMaxHeapSize ()Lorg/gradle/api/provider/Property;
 	public abstract fun getProguardRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public abstract fun getProguardRules ()Lorg/gradle/api/provider/ListProperty;
 }
@@ -279,6 +280,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
+	protected abstract fun getWorkerExecutor ()Lorg/gradle/workers/WorkerExecutor;
 	public fun mergeGroovyExtensionModules ()V
 	public final fun mergeServiceFiles ()V
 	public fun mergeServiceFiles (Ljava/lang/String;)V

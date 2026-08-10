@@ -11,9 +11,12 @@ import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.jvm.toolchain.JavaLauncher
-import org.gradle.process.ExecOperations
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
+import org.gradle.workers.WorkerExecutor
 
 /**
  * Runs R8 as a final-archive shrinker.
@@ -36,7 +39,7 @@ import org.gradle.process.ExecOperations
 internal fun minimizeWithR8(
   inputJar: File,
   temporaryDir: File,
-  execOperations: ExecOperations,
+  workerExecutor: WorkerExecutor,
   logger: Logger,
   r8Classpath: FileCollection,
   r8Spec: DefaultR8Spec,
@@ -95,14 +98,15 @@ internal fun minimizeWithR8(
   }
 
   logger.info("Running R8 to minimize {}.", inputJar)
-  execOperations.javaexec {
-    it.classpath = r8Classpath
-    it.mainClass.set(R8_MAIN_CLASS)
+  val workQueue = workerExecutor.processIsolation {
+    it.classpath.from(r8Classpath)
+    it.forkOptions.maxHeapSize = r8Spec.maxHeapSize.get()
     if (launcher != null) {
-      it.executable = launcher.executablePath.asFile.absolutePath
+      it.forkOptions.executable = launcher.executablePath.asFile.absolutePath
     }
-    it.args(arguments)
   }
+  workQueue.submit(R8WorkAction::class.java) { it.r8Args.set(arguments) }
+  workQueue.await()
 
   normalizeJar(
     inputJar = r8Output,
@@ -336,6 +340,19 @@ internal fun normalizeJar(
         }
       }
     }
+  }
+}
+
+internal abstract class R8WorkAction : WorkAction<R8WorkAction.Parameters> {
+  override fun execute() {
+    val args = parameters.r8Args.get().toTypedArray()
+    val r8Class = Class.forName(R8_MAIN_CLASS, true, javaClass.classLoader)
+    val mainMethod = r8Class.getMethod("main", Array<String>::class.java)
+    mainMethod(null, args)
+  }
+
+  interface Parameters : WorkParameters {
+    val r8Args: ListProperty<String>
   }
 }
 

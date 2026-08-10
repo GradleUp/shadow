@@ -22,6 +22,9 @@ constructor(
 
   @get:Input val optimizationEnabled: Property<Boolean> = objectFactory.property(false)
 
+  override val maxHeapSize: Property<String> =
+    objectFactory.property(Runtime.getRuntime().maxMemory().toString())
+
   override val args: ListProperty<String> = objectFactory.listProperty(defaultArgs)
 
   override val proguardRules: ListProperty<String> = objectFactory.listProperty()

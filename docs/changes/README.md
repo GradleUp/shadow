@@ -6,6 +6,7 @@
 ### Added
 
 - Allow configuring the final R8 configuration file with `R8Spec.configurationFile`. ([#2133](https://github.com/GradleUp/shadow/pull/2133))
+- Allow configuring the R8 worker maximum heap size with `R8Spec.maxHeapSize`. ([#2172](https://github.com/GradleUp/shadow/pull/2172))
 
 ### Changed
 
@@ -13,6 +14,7 @@
 - Remove runtime dependencies on Commons Codec and Commons IO by using JDK APIs. ([#2136](https://github.com/GradleUp/shadow/pull/2136))
 - **POTENTIALLY BREAKING:** Remove `Serializable` from `DependencyFilter`. ([#2144](https://github.com/GradleUp/shadow/pull/2144))
 - Bump default R8 from `9.1.31` to `9.2.23`. ([#2157](https://github.com/GradleUp/shadow/pull/2157))
+- Use Gradle Worker API for R8 minimization. ([#2172](https://github.com/GradleUp/shadow/pull/2172))
 - Allow repackaging Service file classes with R8. ([#2174](https://github.com/GradleUp/shadow/pull/2174))
 
 ### Deprecated

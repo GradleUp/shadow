@@ -71,6 +71,7 @@ import org.gradle.api.tasks.options.Option
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
+import org.gradle.workers.WorkerExecutor
 
 @ShadowDsl
 @CacheableTask
@@ -330,9 +331,13 @@ public abstract class ShadowJar : Jar() {
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
-  @get:Inject protected abstract val execOperations: ExecOperations
+  @Deprecated("Replace the logic with `workerExecutor`. This will be removed in Shadow 10.")
+  @get:Inject
+  protected abstract val execOperations: ExecOperations
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
+
+  @get:Inject protected abstract val workerExecutor: WorkerExecutor
 
   /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
@@ -703,7 +708,7 @@ public abstract class ShadowJar : Jar() {
     minimizeWithR8(
       inputJar = archiveFile.get().asFile,
       temporaryDir = temporaryDir,
-      execOperations = execOperations,
+      workerExecutor = workerExecutor,
       logger = logger,
       r8Classpath = r8Classpath,
       r8Spec = defaultMinimizeSpec.r8Spec,

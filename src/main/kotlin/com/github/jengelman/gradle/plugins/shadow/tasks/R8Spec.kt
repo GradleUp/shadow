@@ -4,8 +4,10 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
@@ -13,6 +15,15 @@ import org.gradle.api.tasks.PathSensitivity
 /** Minimal R8 configuration for [ShadowJar.minimize]. */
 @ShadowDsl
 public interface R8Spec {
+  /**
+   * The maximum heap size for the R8 worker process.
+   *
+   * Defaults to the effective maximum heap size of the Gradle daemon. The value uses JVM memory
+   * notation, such as `2g` or `512m`.
+   */
+  @get:Internal // Doesn't affect the output.
+  public val maxHeapSize: Property<String>
+
   /**
    * Additional R8 command line arguments.
    *
