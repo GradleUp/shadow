@@ -557,10 +557,8 @@ public abstract class ShadowJar : Jar() {
       transformers = actualTransformers,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      enableKotlinModuleRemapping = false, // Unused param.
       preserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
-      encoding = metadataCharset,
     )
   }
 

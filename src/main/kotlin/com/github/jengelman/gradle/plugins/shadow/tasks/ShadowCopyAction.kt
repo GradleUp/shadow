@@ -32,17 +32,37 @@ import org.gradle.api.tasks.WorkResults
  * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
 @Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
-public open class ShadowCopyAction(
+public open class ShadowCopyAction
+internal constructor(
   private val zipFile: File,
   private val zosProvider: (File) -> ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
-  private val enableKotlinModuleRemapping: Boolean,
   private val preserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
-  private val encoding: String?,
 ) : CopyAction {
+  @Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
+  public constructor(
+    zipFile: File,
+    zosProvider: (File) -> ZipOutputStream,
+    transformers: Set<ResourceTransformer>,
+    relocators: Set<Relocator>,
+    unusedClasses: Set<String>,
+    enableKotlinModuleRemapping: Boolean,
+    preserveFileTimestamps: Boolean,
+    failOnDuplicateEntries: Boolean,
+    encoding: String?,
+  ) : this(
+    zipFile = zipFile,
+    zosProvider = zosProvider,
+    transformers = transformers,
+    relocators = relocators,
+    unusedClasses = unusedClasses,
+    preserveFileTimestamps = preserveFileTimestamps,
+    failOnDuplicateEntries = failOnDuplicateEntries,
+  )
+
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
