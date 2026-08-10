@@ -627,6 +627,58 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun relocateWithR8() {
+    writeClass(packageName = "my", withImports = false) {
+      """
+      |package my;
+      |import foo.Foo;
+      |public class Main {
+      |  public static void main(String[] args) {
+      |    System.out.println(Foo.class);
+      |  }
+      |}
+      """
+        .trimMargin()
+    }
+    val fooJar =
+      buildJar("foo.jar") {
+        insert("foo/Foo.class", createEmptyClassBytes("foo/Foo"))
+      }
+
+    writeR8Repository()
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(fooJar)}
+      |}
+      |$shadowJarTask {
+      |  minimize {
+      |    r8 {
+      |      proguardRules.addAll(
+      |        "-repackageclasses 'relocated'",
+      |      )
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.class",
+        "relocated/",
+        "relocated/foo/",
+        "relocated/foo/Foo.class",
+        *manifestEntries,
+      )
+    }
+  }
+
   private companion object {
     @JvmStatic
     fun preserveLastModifiedProvider() =

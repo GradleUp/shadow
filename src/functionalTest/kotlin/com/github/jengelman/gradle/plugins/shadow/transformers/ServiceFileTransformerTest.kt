@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -120,6 +121,70 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           |myapache.commons.logging.impl.LogFactoryImpl
           |org.mortbay.log.Factory
           """
+            .trimMargin()
+        )
+    }
+  }
+
+  @Test
+  fun serviceResourceTransformerWithR8Relocation() {
+    val one = buildJarOne {
+      insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
+      insert("foo/FooDriver.class", createEmptyClassBytes("foo/FooDriver"))
+      insert(
+        "META-INF/services/com.example.Driver",
+        "foo.FooDriver",
+      )
+    }
+    val two = buildJarTwo {
+      insert("bar/BarDriver.class", createEmptyClassBytes("bar/BarDriver"))
+      insert(
+        "META-INF/services/com.example.Driver",
+        "bar.BarDriver",
+      )
+    }
+
+    writeR8Repository()
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |  minimize {
+      |    r8 {
+      |      proguardRules.addAll(
+      |        "-repackageclasses 'relocated'",
+      |      )
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "bar/",
+        "bar/BarDriver.class",
+        "com/",
+        "com/example/",
+        "com/example/Driver.class",
+        "foo/",
+        "foo/FooDriver.class",
+        "META-INF/services/",
+        "META-INF/services/com.example.Driver",
+        *manifestEntries,
+      )
+      getContent("META-INF/services/com.example.Driver")
+        .isEqualTo(
+          """
+          |foo.FooDriver
+          |bar.BarDriver
+          |"""
             .trimMargin()
         )
     }

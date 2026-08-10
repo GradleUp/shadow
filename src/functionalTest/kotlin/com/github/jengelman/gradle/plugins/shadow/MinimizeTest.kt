@@ -749,12 +749,6 @@ class MinimizeTest : BasePluginTest() {
       )
   }
 
-  private fun writeR8Repository() {
-    settingsScript.writeText(
-      settingsScript.readText().replace("mavenCentral()", "mavenCentral()\n          google()")
-    )
-  }
-
   private fun writeR8ClientAndServerModules(
     serverShadowBlock: String,
     serverProjectBlock: String = "",
