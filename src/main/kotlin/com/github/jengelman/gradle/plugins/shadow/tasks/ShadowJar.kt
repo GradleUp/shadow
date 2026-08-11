@@ -75,7 +75,7 @@ import org.gradle.process.ExecOperations
 @ShadowDsl
 @CacheableTask
 public abstract class ShadowJar : Jar() {
-  private val defaultMinimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
+  private val _minimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
 
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
@@ -114,12 +114,12 @@ public abstract class ShadowJar : Jar() {
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
   /** Options for [minimize]. */
-  @get:Nested public open val minimizeSpec: MinimizeSpec = defaultMinimizeSpec
+  @get:Nested public open val minimizeSpec: MinimizeSpec = _minimizeSpec
 
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
     _minimizeJar.map {
-      if (it) (defaultMinimizeSpec.resolve(configurations.get()) - apiJars) else emptySet()
+      if (it) (_minimizeSpec.resolve(configurations.get()) - apiJars) else emptySet()
     }
   }
 
@@ -706,7 +706,7 @@ public abstract class ShadowJar : Jar() {
       execOperations = execOperations,
       logger = logger,
       r8Classpath = r8Classpath,
-      r8Spec = defaultMinimizeSpec.r8Spec,
+      r8Spec = _minimizeSpec.r8Spec,
       javaLauncher = javaLauncher,
       sourceSetsClassesDirs = sourceSetsClassesDirs,
       keptDependencyFiles = includedDependencies - toMinimize,
