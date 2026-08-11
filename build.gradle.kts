@@ -144,7 +144,9 @@ dependencies {
 val docsDir = file("docs")
 
 testing.suites {
-  getByName<JvmTestSuite>("test") { dependencies { implementation(libs.xmlunit) } }
+  getByName<JvmTestSuite>("test") {
+    dependencies { implementation(libs.xmlunit) }
+  }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
