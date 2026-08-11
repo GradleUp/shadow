@@ -40,6 +40,12 @@ sealed class SnippetExecutable : Executable {
       .resolve("settings.gradle")
       .writeText(
         """
+        |gradle.beforeProject {
+        |  buildscript.configurations.configureEach {
+        |    // Snippet version placeholders resolve to '+', so avoid frequent remote version checks.
+        |    resolutionStrategy.cacheDynamicVersionsFor(30, java.util.concurrent.TimeUnit.DAYS)
+        |  }
+        |}
         |dependencyResolutionManagement {
         |  repositories {
         |    mavenLocal()
