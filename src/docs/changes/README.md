@@ -22,6 +22,7 @@
 - Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 - Fix formatting and copyright handling in `ApacheNoticeResourceTransformer`. ([#1623](https://github.com/GradleUp/shadow/pull/1623), [#1627](https://github.com/GradleUp/shadow/pull/1627), [#1628](https://github.com/GradleUp/shadow/pull/1628))
 - Fix ShadowJar not being re-executed after includes or excludes are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
+- Respect `executableDir` in application extension when configuring start scripts and distribution. ([#1738](https://github.com/GradleUp/shadow/pull/1738))
 
 
 **Deprecated**

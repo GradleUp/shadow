@@ -94,7 +94,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
         project.tasks.named(SHADOW_INSTALL_TASK_NAME, Sync).configure { task ->
             task.doFirst {
                 if (task.destinationDir.directory) {
-                    if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory)) {
+                    if (task.destinationDir.listFiles().size() != 0 && (!new File(task.destinationDir, 'lib').directory || !new File(task.destinationDir, 'bin').directory || !new File(task.destinationDir, javaApplication.executableDir).directory)) {
                         throw new GradleException("The specified installation directory '${task.destinationDir}' is neither empty nor does it contain an installation for '${javaApplication.applicationName}'.\n" +
                             "If you really want to install to this directory, delete it and run the install task again.\n" +
                             "Alternatively, choose a different installation directory."
@@ -104,7 +104,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
             }
             task.doLast {
                 task.eachFile {
-                    if (it.path == "bin/${javaApplication.applicationName}") {
+                    if (it.path == "${javaApplication.executableDir}/${javaApplication.applicationName}") {
                         it.mode = 0x755
                     }
                 }
@@ -122,7 +122,7 @@ class ShadowApplicationPlugin implements Plugin<Project> {
                 from(jar)
                 from(project.configurations.shadow)
             }
-            into("bin") {
+            into({ javaApplication.executableDir }) {
                 from(startScripts)
                 filePermissions { it.unix(493) }
             }
