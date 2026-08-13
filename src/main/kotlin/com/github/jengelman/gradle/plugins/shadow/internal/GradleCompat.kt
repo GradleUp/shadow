@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
-import org.gradle.api.NamedDomainObjectSet
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.distribution.DistributionContainer
@@ -21,10 +20,10 @@ import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
 
 /** Return `runtimeClasspath` or `runtime` configuration. */
-internal inline val Project.runtimeConfiguration: NamedDomainObjectSet<Configuration>
-  get() = configurations.named { name ->
-    name == JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME || name == "runtime"
-  }
+internal inline val Project.runtimeConfiguration: Configuration
+  get() =
+    configurations.findByName(JavaPlugin.RUNTIME_CLASSPATH_CONFIGURATION_NAME)
+      ?: configurations.getByName("runtime")
 
 internal inline val Project.sourceSets: SourceSetContainer
   get() = extensions.getByType(SourceSetContainer::class.java)
