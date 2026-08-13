@@ -7,15 +7,6 @@ class GroovyBuildExecutable(
 ) : SnippetExecutable {
   override val buildScriptName: String = "build.gradle"
 
-  override val pluginsBlock: String =
-    """
-    |plugins {
-    |  id 'java'
-    |  id 'com.gradleup.shadow'
-    |}
-    """
-      .trimMargin()
-
   override val assembleDependsOn: String =
     """
     |tasks.named('assemble') {

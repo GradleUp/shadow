@@ -7,15 +7,6 @@ class KotlinBuildExecutable(
 ) : SnippetExecutable {
   override val buildScriptName: String = "build.gradle.kts"
 
-  override val pluginsBlock: String =
-    """
-    |plugins {
-    |  java
-    |  id("com.gradleup.shadow")
-    |}
-    """
-      .trimMargin()
-
   override val assembleDependsOn: String =
     """
     |tasks.named("assemble") {

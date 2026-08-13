@@ -13,7 +13,6 @@ import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 sealed interface SnippetExecutable {
   val buildScriptName: String
-  val pluginsBlock: String
   val assembleDependsOn: String
   val snippet: String
   /** Unique name for the test, formatted as `publishing/README.md:10`. */
@@ -54,7 +53,14 @@ sealed interface SnippetExecutable {
         """
             .trimMargin()
         )
-
+      val pluginsBlock =
+        """
+        |plugins {
+        |  id("java")
+        |  id("com.gradleup.shadow")
+        |}
+        """
+          .trimMargin()
       val apiScript = buildString {
         appendLine(pluginsBlock)
         append(assembleDependsOn)
