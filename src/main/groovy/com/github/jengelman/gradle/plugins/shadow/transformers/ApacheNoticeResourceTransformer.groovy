@@ -214,9 +214,9 @@ class ApacheNoticeResourceTransformer implements Transformer {
 
         byte[] bytes
         if (StringUtils.isNotEmpty(encoding)) {
-            bytes = sb.toString().trim().getBytes(encoding)
+            bytes = sb.toString().stripTrailing().getBytes(encoding)
         } else {
-            bytes = sb.toString().trim().getBytes()
+            bytes = sb.toString().stripTrailing().getBytes()
         }
         os.write(bytes)
 
