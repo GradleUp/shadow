@@ -477,7 +477,8 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * @deprecated Use {@link #minimize()} instead.
+     * @deprecated This legacy boolean property is deprecated. Use {@link #minimize()} to enable minimization;
+     * omitting the call keeps minimization disabled.
      */
     @Deprecated
     @Input
@@ -486,7 +487,8 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
     }
 
     /**
-     * @deprecated Use {@link #minimize()} instead.
+     * @deprecated This legacy boolean property is deprecated. Use {@link #minimize()} when enabling minimization;
+     * setting {@code false} is equivalent to not calling {@code minimize()}.
      */
     @Deprecated
     public void setMinimizeJar(boolean minimizeJar) {
