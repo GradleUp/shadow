@@ -150,6 +150,10 @@ testing.suites {
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
+        systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+        systemProperty("junit.jupiter.execution.parallel.config.strategy", "fixed")
+        systemProperty("junit.jupiter.execution.parallel.config.fixed.parallelism", "4")
+        systemProperty("junit.jupiter.execution.parallel.config.fixed.max-pool-size", "4")
         inputs.files(
           fileTree(docsDir) {
             // Changelog file doesn't contain code snippet to run.
