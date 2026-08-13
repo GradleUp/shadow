@@ -44,6 +44,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 @CacheableTask
@@ -81,6 +82,9 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
         relocators = new ArrayList<>();
         configurations = new ArrayList<>();
 
+        this.getInputs().property("minimize", (Callable<Boolean>) () -> minimizeJar);
+        this.getInputs().property("includes", (Callable<Set<String>>) () -> getIncludes());
+        this.getInputs().property("excludes", (Callable<Set<String>>) () -> getExcludes());
         this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable", task -> {
             for (Transformer transformer : transformers) {
                 if (!isCacheableTransform(transformer.getClass())) {

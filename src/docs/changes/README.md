@@ -21,6 +21,7 @@
 - Fix excluding dependencies whose versions contain `+`. ([#1597](https://github.com/GradleUp/shadow/pull/1597))
 - Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 - Fix formatting and copyright handling in `ApacheNoticeResourceTransformer`. ([#1623](https://github.com/GradleUp/shadow/pull/1623), [#1627](https://github.com/GradleUp/shadow/pull/1627), [#1628](https://github.com/GradleUp/shadow/pull/1628))
+- Fix ShadowJar not being re-executed after includes or excludes are changed. ([#1200](https://github.com/GradleUp/shadow/pull/1200))
 
 
 **Deprecated**
