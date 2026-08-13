@@ -22,7 +22,7 @@ sealed class SnippetExecutable {
 
   /** Unique name for the test, formatted as `publishing/README.md:10`. */
   abstract val displayName: String
-  abstract val exceptionTransformer: (Throwable) -> Throwable
+  abstract val sourceLocation: String
 
   override fun toString(): String = displayName
 
@@ -30,7 +30,10 @@ sealed class SnippetExecutable {
     try {
       executeSnippet(projectRoot, snippet)
     } catch (t: Throwable) {
-      throw exceptionTransformer(t)
+      throw RuntimeException(
+        "The error line in the doc is near $sourceLocation\n\n${t.message}",
+        t,
+      )
     }
   }
 
@@ -152,11 +155,11 @@ sealed class SnippetExecutable {
       lang: DslLang,
       snippet: String,
       testName: String,
-      exceptionTransformer: (Throwable) -> Throwable,
+      sourceLocation: String,
     ): SnippetExecutable =
       when (lang) {
-        DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, exceptionTransformer)
-        DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, exceptionTransformer)
+        DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, sourceLocation)
+        DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, sourceLocation)
       }
   }
 }

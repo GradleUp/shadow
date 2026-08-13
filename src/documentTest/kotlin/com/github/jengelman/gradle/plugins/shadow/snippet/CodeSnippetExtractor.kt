@@ -22,12 +22,12 @@ object CodeSnippetExtractor {
   private fun createExecutables(lang: DslLang, markdownPath: Path): List<SnippetExecutable> {
     val relativeDocPath = markdownPath.relativeTo(docRoot).toString()
     return createSnippets(markdownPath.readText(), lang).map { (lineNumber, snippet) ->
-      SnippetExecutable.create(lang, snippet, "$relativeDocPath:$lineNumber") { cause ->
-        RuntimeException(
-          "The error line in the doc is near ${markdownPath.toUri()}:$lineNumber\n\n${cause.message}",
-          cause,
-        )
-      }
+      SnippetExecutable.create(
+        lang = lang,
+        snippet = snippet,
+        testName = "$relativeDocPath:$lineNumber",
+        sourceLocation = "${markdownPath.toUri()}:$lineNumber",
+      )
     }
   }
 

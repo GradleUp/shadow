@@ -3,7 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.snippet
 class GroovyBuildExecutable(
   override val snippet: String,
   override val displayName: String,
-  override val exceptionTransformer: (Throwable) -> Throwable,
+  override val sourceLocation: String,
 ) : SnippetExecutable() {
 
   override val lang: DslLang = DslLang.Groovy
