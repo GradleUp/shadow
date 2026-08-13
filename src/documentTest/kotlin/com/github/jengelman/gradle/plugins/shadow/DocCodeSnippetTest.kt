@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.snippet.CodeSnippetExtractor
 import com.github.jengelman.gradle.plugins.shadow.snippet.DslLang
 import com.github.jengelman.gradle.plugins.shadow.snippet.SnippetExecutable
+import com.github.jengelman.gradle.plugins.shadow.snippet.extractCodeSnippets
 import java.nio.file.Path
 import org.junit.jupiter.api.Named.named
 import org.junit.jupiter.api.io.TempDir
@@ -19,11 +19,10 @@ class DocCodeSnippetTest {
     executable.execute(tempDir)
   }
 
-  companion object {
+  private companion object {
     @JvmStatic
     fun snippets(): List<Arguments> {
-      val langExecutables =
-        DslLang.entries.map { executor -> CodeSnippetExtractor.extract(executor) }
+      val langExecutables = DslLang.entries.map { executor -> extractCodeSnippets(executor) }
 
       check(langExecutables.sumOf { it.size } > 0) { "No code snippets found." }
       check(langExecutables.map { it.size }.distinct().size == 1) {

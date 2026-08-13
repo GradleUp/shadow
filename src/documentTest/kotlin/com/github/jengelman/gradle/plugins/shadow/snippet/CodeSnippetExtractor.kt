@@ -9,44 +9,42 @@ import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 
-object CodeSnippetExtractor {
-  private val docRoot = Path(DOCS_DIR)
+private val docRoot = Path(DOCS_DIR)
 
-  private val markdownPaths =
-    docRoot.walk().filter { it.name.endsWith(".md", ignoreCase = true) }.toList()
+private val markdownPaths =
+  docRoot.walk().filter { it.name.endsWith(".md", ignoreCase = true) }.toList()
 
-  fun extract(lang: DslLang): List<SnippetExecutable> {
-    return markdownPaths.flatMap { path -> createExecutables(lang, path) }
+fun extractCodeSnippets(lang: DslLang): List<SnippetExecutable> {
+  return markdownPaths.flatMap { path -> createExecutables(lang, path) }
+}
+
+private fun createExecutables(lang: DslLang, markdownPath: Path): List<SnippetExecutable> {
+  val relativeDocPath = markdownPath.relativeTo(docRoot).toString()
+  return createSnippets(markdownPath.readText(), lang).map { (lineNumber, snippet) ->
+    SnippetExecutable.create(
+      lang = lang,
+      snippet = snippet,
+      testName = "$relativeDocPath:$lineNumber",
+      sourceLocation = "${markdownPath.toUri()}:$lineNumber",
+    )
   }
+}
 
-  private fun createExecutables(lang: DslLang, markdownPath: Path): List<SnippetExecutable> {
-    val relativeDocPath = markdownPath.relativeTo(docRoot).toString()
-    return createSnippets(markdownPath.readText(), lang).map { (lineNumber, snippet) ->
-      SnippetExecutable.create(
-        lang = lang,
-        snippet = snippet,
-        testName = "$relativeDocPath:$lineNumber",
-        sourceLocation = "${markdownPath.toUri()}:$lineNumber",
-      )
-    }
+private fun createSnippets(source: String, lang: DslLang) = buildMap {
+  val pattern = Pattern.compile("(?ims) {4}```${lang}\n(.*?)\n {4}```")
+  val matcher = pattern.matcher(source)
+
+  while (matcher.find()) {
+    val line = source.lineNumberAt(matcher.start())
+    val code = matcher.group(1)
+    put(line, code)
   }
+}
 
-  private fun createSnippets(source: String, lang: DslLang) = buildMap {
-    val pattern = Pattern.compile("(?ims) {4}```${lang}\n(.*?)\n {4}```")
-    val matcher = pattern.matcher(source)
-
-    while (matcher.find()) {
-      val line = source.lineNumberAt(matcher.start())
-      val code = matcher.group(1)
-      put(line, code)
-    }
+private fun String.lineNumberAt(index: Int): Int {
+  var line = 1
+  for (i in 0 until index.coerceAtMost(length)) {
+    if (this[i] == '\n') line++
   }
-
-  private fun String.lineNumberAt(index: Int): Int {
-    var line = 1
-    for (i in 0 until index.coerceAtMost(length)) {
-      if (this[i] == '\n') line++
-    }
-    return line
-  }
+  return line
 }
