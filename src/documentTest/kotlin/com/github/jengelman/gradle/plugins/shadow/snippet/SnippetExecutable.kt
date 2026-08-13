@@ -25,6 +25,8 @@ sealed class SnippetExecutable : Executable {
   abstract val displayName: String
   abstract val exceptionTransformer: (Throwable) -> Throwable
 
+  override fun toString(): String = displayName
+
   lateinit var tempDir: Path
 
   override fun execute() {
