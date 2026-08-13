@@ -71,6 +71,8 @@ class ApacheNoticeResourceTransformer implements Transformer {
     @Input
     String copyright
 
+    private String fallbackCopyright
+
     /**
      * The file encoding of the <code>NOTICE</code> file.
      */
@@ -148,7 +150,7 @@ class ApacheNoticeResourceTransformer implements Transformer {
                 } else {
                     String ent = sb.toString()
                     if (ent.startsWith(projectName) && ent.indexOf("Copyright ") != -1) {
-                        copyright = ent
+                        fallbackCopyright = ent
                     }
                     if (currentOrg == null) {
                         entries.add(ent)
@@ -183,42 +185,40 @@ class ApacheNoticeResourceTransformer implements Transformer {
         zipEntry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, zipEntry.time)
         os.putNextEntry(zipEntry)
 
-        Writer pow
-        if (StringUtils.isNotEmpty(encoding)) {
-            pow = new OutputStreamWriter(os, encoding)
-        } else {
-            pow = new OutputStreamWriter(os)
-        }
-        PrintWriter writer = new PrintWriter(pow)
+        String actualCopyright = copyright ?: fallbackCopyright
 
+        StringBuilder sb = new StringBuilder()
         int count = 0
         for (String line : entries) {
             ++count
-            if (line == copyright && count != 2) {
+            if (line == actualCopyright && count != 2) {
                 continue
             }
 
-            if (count == 2 && copyright != null) {
-                writer.print(copyright)
-                writer.print('\n')
+            if (count == 2 && actualCopyright != null) {
+                sb.append(actualCopyright).append('\n')
             } else {
-                writer.print(line)
-                writer.print('\n')
+                sb.append(line).append('\n')
             }
             if (count == 3) {
                 //do org stuff
                 for (Map.Entry<String, Set<String>> entry : organizationEntries.entrySet()) {
-                    writer.print(entry.getKey())
-                    writer.print('\n')
+                    sb.append(entry.getKey()).append('\n')
                     for (String l : entry.getValue()) {
-                        writer.print(l)
+                        sb.append(l)
                     }
-                    writer.print('\n')
+                    sb.append('\n')
                 }
             }
         }
 
-        writer.flush()
+        byte[] bytes
+        if (StringUtils.isNotEmpty(encoding)) {
+            bytes = sb.toString().trim().getBytes(encoding)
+        } else {
+            bytes = sb.toString().trim().getBytes()
+        }
+        os.write(bytes)
 
         entries.clear()
     }
