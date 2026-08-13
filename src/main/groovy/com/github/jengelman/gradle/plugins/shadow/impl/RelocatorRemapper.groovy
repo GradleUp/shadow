@@ -38,7 +38,7 @@ import java.util.regex.Pattern
 @CompileStatic
 class RelocatorRemapper extends Remapper {
 
-    private final Pattern classPattern = Pattern.compile("(\\[*)?L(.+)")
+    private final Pattern classPattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+)(;?)")
 
     List<Relocator> relocators
     ShadowStats stats
@@ -58,26 +58,28 @@ class RelocatorRemapper extends Remapper {
             String name = (String) object
             String value = name
 
-            String prefix = ""
-            String suffix = ""
-
             Matcher m = classPattern.matcher(name)
-            if (m.matches()) {
-                prefix = m.group(1) + "L"
-                suffix = ""
-                name = m.group(2)
-            }
-
-            for (Relocator r : relocators) {
-                if (r.canRelocateClass(name)) {
-                    RelocateClassContext classContext = RelocateClassContext.builder().className(name).stats(stats).build()
-                    value = prefix + r.relocateClass(classContext) + suffix
-                    break
-                } else if (r.canRelocatePath(name)) {
-                    RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
-                    value = prefix + r.relocatePath(pathContext) + suffix
-                    break
-                }
+            if (m.find()) {
+                StringBuffer sb = new StringBuffer()
+                do {
+                    String prefix = (m.group(1) ?: "") + "L"
+                    String className = m.group(2)
+                    String relocated = className
+                    for (Relocator r : relocators) {
+                        if (r.canRelocateClass(className)) {
+                            RelocateClassContext classContext = RelocateClassContext.builder().className(className).stats(stats).build()
+                            relocated = r.relocateClass(classContext)
+                            break
+                        } else if (r.canRelocatePath(className)) {
+                            RelocatePathContext pathContext = RelocatePathContext.builder().path(className).stats(stats).build()
+                            relocated = r.relocatePath(pathContext)
+                            break
+                        }
+                    }
+                    m.appendReplacement(sb, Matcher.quoteReplacement(prefix + relocated + ";"))
+                } while (m.find())
+                m.appendTail(sb)
+                value = sb.toString()
             }
 
             return value
@@ -90,20 +92,30 @@ class RelocatorRemapper extends Remapper {
     String map(String name) {
         String value = name
 
-        String prefix = ""
-        String suffix = ""
-
         Matcher m = classPattern.matcher(name)
-        if (m.matches()) {
-            prefix = m.group(1) + "L"
-            suffix = ""
-            name = m.group(2)
+        if (m.find()) {
+            StringBuffer sb = new StringBuffer()
+            do {
+                String prefix = (m.group(1) ?: "") + "L"
+                String className = m.group(2)
+                String relocated = className
+                for (Relocator r : relocators) {
+                    if (r.canRelocatePath(className)) {
+                        RelocatePathContext pathContext = RelocatePathContext.builder().path(className).stats(stats).build()
+                        relocated = r.relocatePath(pathContext)
+                        break
+                    }
+                }
+                m.appendReplacement(sb, Matcher.quoteReplacement(prefix + relocated + ";"))
+            } while (m.find())
+            m.appendTail(sb)
+            value = sb.toString()
         }
 
         for (Relocator r : relocators) {
             if (r.canRelocatePath(name)) {
                 RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
-                value = prefix + r.relocatePath(pathContext) + suffix
+                value = r.relocatePath(pathContext)
                 break
             }
         }
