@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.ZipCompressor
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.Transformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
+import com.github.jengelman.gradle.plugins.shadow.internal.ZipUtils
 import groovy.util.logging.Slf4j
 import org.apache.commons.io.FilenameUtils
 import org.apache.commons.io.IOUtils
@@ -227,7 +228,7 @@ class ShadowCopyAction implements CopyAction {
                     if (!remapper.hasRelocators() || !isClass) {
                         if (!isTransformable(fileDetails)) {
                             String mappedPath = remapper.map(fileDetails.relativePath.pathString)
-                            ZipEntry archiveEntry = new ZipEntry(mappedPath)
+                            ZipEntry archiveEntry = ZipUtils.zipEntry(mappedPath)
                             archiveEntry.setTime(getArchiveTimeFor(fileDetails.lastModified))
                             archiveEntry.unixMode = (UnixStat.FILE_FLAG | fileDetails.permissions.toUnixNumeric())
                             zipOutStr.putNextEntry(archiveEntry)
@@ -313,7 +314,7 @@ class ShadowCopyAction implements CopyAction {
 
         private void remapClass(RelativeArchivePath file, ZipFile archive) {
             if (file.classFile) {
-                ZipEntry zipEntry = setArchiveTimes(new ZipEntry(remapper.mapPath(file) + '.class'))
+                ZipEntry zipEntry = setArchiveTimes(ZipUtils.zipEntry(remapper.mapPath(file) + '.class'))
                 addParentDirectories(new RelativeArchivePath(zipEntry))
                 remapClass(archive.getInputStream(file.entry), file.pathString, file.entry.time)
             }
@@ -366,7 +367,7 @@ class ShadowCopyAction implements CopyAction {
             InputStream bis = new ByteArrayInputStream(renamedClass)
             try {
                 // Now we put it back on so the class file is written out with the right extension.
-                ZipEntry archiveEntry = new ZipEntry(mappedName + ".class")
+                ZipEntry archiveEntry = ZipUtils.zipEntry(mappedName + ".class")
                 archiveEntry.setTime(getArchiveTimeFor(lastModified))
                 zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(bis, zipOutStr)
@@ -380,7 +381,7 @@ class ShadowCopyAction implements CopyAction {
 
         private void copyArchiveEntry(RelativeArchivePath archiveFile, ZipFile archive) {
             String mappedPath = remapper.map(archiveFile.entry.name)
-            ZipEntry entry = new ZipEntry(mappedPath)
+            ZipEntry entry = ZipUtils.zipEntry(mappedPath)
             entry.setTime(getArchiveTimeFor(archiveFile.entry.time))
             RelativeArchivePath mappedFile = new RelativeArchivePath(entry)
             addParentDirectories(mappedFile)
@@ -399,7 +400,7 @@ class ShadowCopyAction implements CopyAction {
             try {
                 // Trailing slash in name indicates that entry is a directory
                 String path = dirDetails.relativePath.pathString + '/'
-                ZipEntry archiveEntry = new ZipEntry(path)
+                ZipEntry archiveEntry = ZipUtils.zipEntry(path)
                 archiveEntry.setTime(getArchiveTimeFor(dirDetails.lastModified))
                 archiveEntry.unixMode = (UnixStat.DIR_FLAG | dirDetails.permissions.toUnixNumeric())
                 zipOutStr.putNextEntry(archiveEntry)
@@ -460,7 +461,7 @@ class ShadowCopyAction implements CopyAction {
             } else {
                 //Parent is always a directory so add / to the end of the path
                 String path = segments.take(segments.length - 1).join('/') + '/'
-                return new RelativeArchivePath(setArchiveTimes(new ZipEntry(path)))
+                return new RelativeArchivePath(setArchiveTimes(ZipUtils.zipEntry(path)))
             }
         }
     }

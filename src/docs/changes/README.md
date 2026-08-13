@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Fixed**
+
+- Validate ZIP entry names to prevent Zip Slip path traversal.
+
 
 ## [v8.3.11] (2026-05-28)
 
