@@ -12,19 +12,15 @@ import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 
-sealed class SnippetExecutable {
-  abstract val lang: DslLang
-  abstract val buildScriptName: String
-  abstract val pluginsBlock: String
-  abstract val assembleDependsOn: String
-
-  abstract val snippet: String
-
+sealed interface SnippetExecutable {
+  val lang: DslLang
+  val buildScriptName: String
+  val pluginsBlock: String
+  val assembleDependsOn: String
+  val snippet: String
   /** Unique name for the test, formatted as `publishing/README.md:10`. */
-  abstract val displayName: String
-  abstract val sourceLocation: String
-
-  override fun toString(): String = displayName
+  val displayName: String
+  val sourceLocation: String
 
   fun execute(projectRoot: Path) {
     try {

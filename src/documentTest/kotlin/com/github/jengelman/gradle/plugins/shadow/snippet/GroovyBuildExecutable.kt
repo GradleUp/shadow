@@ -4,7 +4,7 @@ class GroovyBuildExecutable(
   override val snippet: String,
   override val displayName: String,
   override val sourceLocation: String,
-) : SnippetExecutable() {
+) : SnippetExecutable {
 
   override val lang: DslLang = DslLang.Groovy
 
