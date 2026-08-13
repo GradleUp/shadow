@@ -151,9 +151,13 @@ testing.suites {
     targets.configureEach {
       testTask {
         systemProperty("junit.jupiter.execution.parallel.enabled", "true")
+        systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
         systemProperty("junit.jupiter.execution.parallel.config.strategy", "fixed")
+        // Each snippet runs a nested Gradle build. Two-way parallelism performed better than
+        // four-way by avoiding excessive CPU, memory, and disk contention.
         systemProperty("junit.jupiter.execution.parallel.config.fixed.parallelism", "2")
         systemProperty("junit.jupiter.execution.parallel.config.fixed.max-pool-size", "2")
+
         inputs.files(
           fileTree(docsDir) {
             // Changelog file doesn't contain code snippet to run.

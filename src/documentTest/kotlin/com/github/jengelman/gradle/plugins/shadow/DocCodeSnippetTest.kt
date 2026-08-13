@@ -7,13 +7,10 @@ import kotlin.io.path.createDirectory
 import org.junit.jupiter.api.DynamicTest
 import org.junit.jupiter.api.TestFactory
 import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 
 class DocCodeSnippetTest {
 
   @TestFactory
-  @Execution(ExecutionMode.CONCURRENT)
   fun provideDynamicTests(@TempDir root: Path): List<DynamicTest> {
     val langExecutables = DslLang.entries.map { executor -> CodeSnippetExtractor.extract(executor) }
 
