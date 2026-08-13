@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import java.io.InputStream
 
+@Suppress("DEPRECATION")
 public data class TransformerContext
 @JvmOverloads
 constructor(
@@ -10,6 +11,10 @@ constructor(
   val inputStream: InputStream,
   val relocators: Set<Relocator> = emptySet(),
 ) {
+  @Deprecated(
+    message = "Use `TransformerContext` constructor instead. Will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("TransformerContext"),
+  )
   public class Builder {
     private var path = ""
     private var inputStream: InputStream? = null
@@ -34,6 +39,11 @@ constructor(
   }
 
   public companion object {
-    @JvmStatic public fun builder(): Builder = Builder()
+    @Deprecated(
+      message = "Use `TransformerContext` constructor instead. Will be removed in Shadow 10.",
+      replaceWith = ReplaceWith("TransformerContext"),
+    )
+    @JvmStatic
+    public fun builder(): Builder = Builder()
   }
 }
