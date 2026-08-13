@@ -5,9 +5,6 @@ class KotlinBuildExecutable(
   override val displayName: String,
   override val sourceLocation: String,
 ) : SnippetExecutable {
-
-  override val lang: DslLang = DslLang.Kotlin
-
   override val buildScriptName: String = "build.gradle.kts"
 
   override val pluginsBlock: String =

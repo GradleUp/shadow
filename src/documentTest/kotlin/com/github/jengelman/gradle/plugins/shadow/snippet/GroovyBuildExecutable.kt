@@ -5,9 +5,6 @@ class GroovyBuildExecutable(
   override val displayName: String,
   override val sourceLocation: String,
 ) : SnippetExecutable {
-
-  override val lang: DslLang = DslLang.Groovy
-
   override val buildScriptName: String = "build.gradle"
 
   override val pluginsBlock: String =

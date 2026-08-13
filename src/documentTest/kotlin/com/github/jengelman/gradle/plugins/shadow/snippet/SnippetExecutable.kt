@@ -7,13 +7,11 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
-import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.UnexpectedBuildFailure
 
 sealed interface SnippetExecutable {
-  val lang: DslLang
   val buildScriptName: String
   val pluginsBlock: String
   val assembleDependsOn: String
@@ -23,6 +21,8 @@ sealed interface SnippetExecutable {
   val sourceLocation: String
 
   fun execute(projectRoot: Path) {
+    var generatedMainScript: String? = null
+    var gradleBuildOutput: String? = null
     try {
       projectRoot
         .resolve("settings.gradle")
@@ -61,7 +61,7 @@ sealed interface SnippetExecutable {
       }
       projectRoot.addSubProject("api", apiScript)
 
-      val (imports, withoutImports) = importsExtractor(snippet)
+      val (imports, withoutImports) = extractImports()
       val mainScript = buildString {
         appendLine(imports)
         // All buildscript {} blocks must appear before any plugins {} blocks in the script.
@@ -75,14 +75,11 @@ sealed interface SnippetExecutable {
         }
       }
         .trimIndent()
+      generatedMainScript = mainScript
       projectRoot.addSubProject("main", mainScript + assembleDependsOn)
-      projectRoot.resolve("main/foo.jar").createFile().also {
+      listOf("foo.jar", "bar.jar").forEach { name ->
         // Dummy JAR file to ensure the project can be built.
-        JarOutputStream(it.outputStream()).use {}
-      }
-      projectRoot.resolve("main/bar.jar").createFile().also {
-        // Dummy JAR file to ensure the project can be built.
-        JarOutputStream(it.outputStream()).use {}
+        JarOutputStream(projectRoot.resolve("main/$name").outputStream()).use {}
       }
 
       // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
@@ -96,28 +93,34 @@ sealed interface SnippetExecutable {
           commonGradleArgs.toList()
         }
 
-      try {
-        gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
-          .build()
-          .assertNoDeprecationWarnings()
-      } catch (t: Throwable) {
-        val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
-        val message = buildString {
-          appendLine("--- Snippet ---")
-          appendLine()
-          appendLine(mainScript)
+      gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
+        .build()
+        .also { gradleBuildOutput = it.output }
+        .assertNoDeprecationWarnings()
+    } catch (t: Throwable) {
+      val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
+      throw RuntimeException(
+        buildString {
+          append("The error line in the doc is near $sourceLocation")
+          if (generatedMainScript != null) {
+            appendLine()
+            appendLine()
+            appendLine("--- Snippet ---")
+            appendLine()
+            append(generatedMainScript)
+          }
           if (!buildOutput.isNullOrBlank()) {
+            appendLine()
             appendLine()
             appendLine("--- Gradle Build Output ---")
             appendLine()
-            appendLine(buildOutput.trim())
+            append(buildOutput.trim())
+          } else if (!t.message.isNullOrBlank()) {
+            appendLine()
+            appendLine()
+            append(t.message)
           }
-        }
-        throw RuntimeException(message, t)
-      }
-    } catch (t: Throwable) {
-      throw RuntimeException(
-        "The error line in the doc is near $sourceLocation\n\n${t.message}",
+        },
         t,
       )
     }
@@ -127,7 +130,7 @@ sealed interface SnippetExecutable {
     resolve(project).createDirectory().resolve(buildScriptName).writeText(buildScriptText)
   }
 
-  private fun importsExtractor(snippet: String): Pair<String, String> {
+  private fun extractImports(): Pair<String, String> {
     val imports = StringBuilder()
     val withoutImports = StringBuilder()
 
