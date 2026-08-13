@@ -22,6 +22,10 @@
 - Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 
 
+**Deprecated**
+
+- Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+
 ## [v8.3.11] (2026-05-28)
 
 > [!WARNING]
