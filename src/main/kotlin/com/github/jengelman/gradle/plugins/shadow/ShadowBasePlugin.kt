@@ -21,8 +21,7 @@ public abstract class ShadowBasePlugin : Plugin<Project> {
         bundlingAttribute.convention(Bundling.SHADOWED)
         addShadowJarToAssembleLifecycle.convention(true)
       }
-      @Suppress("EagerGradleConfiguration") // this should be created eagerly.
-      configurations.create(CONFIGURATION_NAME) {
+      configurations.register(CONFIGURATION_NAME) {
         it.description = "Specify runtime dependencies that are not merged into the final JAR."
       }
       configurations.register(R8_CONFIGURATION_NAME) {
