@@ -10,8 +10,8 @@
 - Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
 - Do not write modified class files for no-op relocations. ([#1694](https://github.com/GradleUp/shadow/pull/1694))
 - Support relocating list of types in `RelocatorRemapper`. ([#1714](https://github.com/GradleUp/shadow/pull/1714))
-- Reproducible `PropertiesFileTransformer` output. ([#1861](https://github.com/GradleUp/shadow/pull/1861))
-- Merge Groovy Module descriptors into modern `META-INF` path. ([#1706](https://github.com/GradleUp/shadow/pull/1706))
+- Make the output of `PropertiesFileTransformer` reproducible. ([#1861](https://github.com/GradleUp/shadow/pull/1861))
+- Merge Gradle Module descriptors into the modern `META-INF` path. ([#1706](https://github.com/GradleUp/shadow/pull/1706))
 
 **Fixed**
 
