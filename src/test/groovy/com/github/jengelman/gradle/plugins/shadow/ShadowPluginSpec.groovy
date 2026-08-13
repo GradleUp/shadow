@@ -1154,4 +1154,19 @@ class ShadowPluginSpec extends PluginSpecification {
             "META-INF/MANIFEST.MF"
         ])
     }
+
+    def "skip non-existent dependency directory"() {
+        given:
+        buildFile << """
+            dependencies {
+                implementation files('non-existent-dir')
+            }
+        """.stripIndent()
+
+        when:
+        def result = runWithSuccess('shadowJar')
+
+        then:
+        result.task(':shadowJar').outcome == org.gradle.testkit.runner.TaskOutcome.SUCCESS
+    }
 }

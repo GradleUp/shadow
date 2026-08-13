@@ -10,6 +10,7 @@
 **Fixed**
 
 - Validate ZIP entry names to prevent Zip Slip path traversal.
+- Fix failing for non-existent class directories. ([#1976](https://github.com/GradleUp/shadow/pull/1976))
 
 
 ## [v8.3.11] (2026-05-28)

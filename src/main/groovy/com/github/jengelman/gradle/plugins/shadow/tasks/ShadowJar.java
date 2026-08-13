@@ -182,7 +182,13 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
         if (enableRelocation) {
             RelocationUtil.configureRelocation(this, relocationPrefix);
         }
-        from(getIncludedDependencies());
+        for (File file : getIncludedDependencies().getFiles()) {
+            if (!file.exists()) {
+                getLogger().info("Skipping non-existent dependency: {}", file);
+            } else {
+                from(file);
+            }
+        }
         super.copy();
         getLogger().info(shadowStats.toString());
     }
