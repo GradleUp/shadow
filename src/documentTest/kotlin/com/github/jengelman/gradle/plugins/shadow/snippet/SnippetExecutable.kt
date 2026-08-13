@@ -11,9 +11,8 @@ import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.junit.jupiter.api.function.Executable
 
-sealed class SnippetExecutable : Executable {
+sealed class SnippetExecutable {
   abstract val lang: DslLang
   abstract val buildScriptName: String
   abstract val pluginsBlock: String
@@ -27,17 +26,15 @@ sealed class SnippetExecutable : Executable {
 
   override fun toString(): String = displayName
 
-  lateinit var tempDir: Path
-
-  override fun execute() {
+  fun execute(projectRoot: Path) {
     try {
-      execute(tempDir, snippet)
+      executeSnippet(projectRoot, snippet)
     } catch (t: Throwable) {
       throw exceptionTransformer(t)
     }
   }
 
-  private fun execute(projectRoot: Path, snippet: String) {
+  private fun executeSnippet(projectRoot: Path, snippet: String) {
     projectRoot
       .resolve("settings.gradle")
       .writeText(

@@ -13,14 +13,14 @@ class DocCodeSnippetTest {
   @ParameterizedTest(name = "{0}")
   @MethodSource("snippets")
   fun test(executable: SnippetExecutable, @TempDir tempDir: Path) {
-    executable.tempDir = tempDir
-    executable.execute()
+    executable.execute(tempDir)
   }
 
   companion object {
     @JvmStatic
     fun snippets(): List<SnippetExecutable> {
-      val langExecutables = DslLang.entries.map { executor -> CodeSnippetExtractor.extract(executor) }
+      val langExecutables =
+        DslLang.entries.map { executor -> CodeSnippetExtractor.extract(executor) }
 
       check(langExecutables.sumOf { it.size } > 0) { "No code snippets found." }
       check(langExecutables.size == DslLang.entries.size) {
