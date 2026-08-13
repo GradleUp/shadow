@@ -17,6 +17,7 @@
 - Fix failing for non-existent class directories. ([#1976](https://github.com/GradleUp/shadow/pull/1976))
 - Fix skipStringConstants per-relocator behavior in mapName. ([#1968](https://github.com/GradleUp/shadow/pull/1968))
 - Fix excluding dependencies whose versions contain `+`. ([#1597](https://github.com/GradleUp/shadow/pull/1597))
+- Fix relocation exclusion for file patterns like `kotlin/kotlin.kotlin_builtins`. ([#1313](https://github.com/GradleUp/shadow/pull/1313))
 
 
 ## [v8.3.11] (2026-05-28)

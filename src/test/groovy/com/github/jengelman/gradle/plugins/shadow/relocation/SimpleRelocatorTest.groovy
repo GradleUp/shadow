@@ -89,6 +89,14 @@ class SimpleRelocatorTest {
         assertEquals(false, relocator.canRelocatePath("org/foo/recurse/sub/Class"))
         assertEquals(false, relocator.canRelocatePath("org/foo/recurse/sub/Class.class"))
 
+        relocator = new SimpleRelocator("foo.", null, null, null)
+        assertEquals(true, relocator.canRelocatePath("foo/foo.bar"))
+        relocator.exclude("foo/foo.bar")
+        assertEquals(false, relocator.canRelocatePath("foo/foo.bar"))
+        assertEquals(true, relocator.canRelocatePath("foo/foobar"))
+        relocator.exclude("foo/foobar")
+        assertEquals(false, relocator.canRelocatePath("foo/foobar"))
+
         // Verify edge cases
         relocator = new SimpleRelocator("org.f", null, null, null)
         assertEquals(false, relocator.canRelocatePath(""))       // Empty path

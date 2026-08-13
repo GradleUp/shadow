@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
+import org.apache.commons.io.FilenameUtils
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
@@ -112,12 +113,14 @@ class SimpleRelocator implements Relocator {
                     continue
                 }
 
-                String classPattern = pattern.replace('.', '/')
+                String fileName = FilenameUtils.getName(pattern)
+                String fileParent = FilenameUtils.getPathNoEndSeparator(pattern)
+                String filePattern = (fileParent && fileName) ? pattern : pattern.replace('.', '/')
 
-                normalized.add(classPattern)
+                normalized.add(filePattern)
 
-                if (classPattern.endsWith("/*")) {
-                    String packagePattern = classPattern.substring(0, classPattern.lastIndexOf('/'))
+                if (filePattern.endsWith("/*") || filePattern.endsWith("/**")) {
+                    String packagePattern = filePattern.substring(0, filePattern.lastIndexOf('/'))
                     normalized.add(packagePattern)
                 }
             }
