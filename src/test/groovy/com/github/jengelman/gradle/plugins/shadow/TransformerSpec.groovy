@@ -634,7 +634,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         assert output.exists()
 
         and:
-        def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+        def text = getJarFileContents(output, 'META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule')
         def props = new Properties()
         props.load(new StringReader(text))
         assert props.getProperty('moduleName') == 'MergedByShadowJar'
@@ -721,7 +721,7 @@ staticExtensionClasses=com.acme.bar.SomeStaticExtension'''.stripIndent()).write(
         assert output.exists()
 
         and:
-        def text = getJarFileContents(output, 'META-INF/services/org.codehaus.groovy.runtime.ExtensionModule')
+        def text = getJarFileContents(output, 'META-INF/groovy/org.codehaus.groovy.runtime.ExtensionModule')
         def props = new Properties()
         props.load(new StringReader(text))
         assert props.getProperty('moduleName') == 'MergedByShadowJar'

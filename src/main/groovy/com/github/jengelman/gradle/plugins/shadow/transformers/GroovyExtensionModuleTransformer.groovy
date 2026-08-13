@@ -56,16 +56,11 @@ class GroovyExtensionModuleTransformer implements Transformer {
     private static final MERGED_MODULE_VERSION = '1.0.0'
 
     private final Properties module = new Properties()
-    private boolean legacy = true // default to Groovy 2.4 or earlier
 
     @Override
     boolean canTransformResource(FileTreeElement element) {
         def path = element.relativePath.pathString
-        if (path == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH) {
-            legacy = false // Groovy 2.5+
-            return true
-        }
-        return path == GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH
+        return path == GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH || path == GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH
     }
 
     @Override
@@ -110,7 +105,7 @@ class GroovyExtensionModuleTransformer implements Transformer {
 
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
-        ZipEntry entry = new ZipEntry(legacy ? GROOVY_LEGACY_EXTENSION_MODULE_DESCRIPTOR_PATH : GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH)
+        ZipEntry entry = new ZipEntry(GROOVY_EXTENSION_MODULE_DESCRIPTOR_PATH)
         entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
         os.putNextEntry(entry)
         IOUtil.copy(toInputStream(module), os)

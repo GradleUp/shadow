@@ -56,75 +56,51 @@ class RelocatorRemapper extends Remapper {
     @Override
     Object mapValue(Object object) {
         if (object instanceof String) {
-            String name = (String) object
-            String value = name
-
-            Matcher m = classPattern.matcher(name)
-            if (m.find()) {
-                StringBuffer sb = new StringBuffer()
-                do {
-                    String prefix = (m.group(1) ?: "") + "L"
-                    String className = m.group(2)
-                    String relocated = className
-                    for (Relocator r : relocators) {
-                        if (r instanceof SimpleRelocator && ((SimpleRelocator) r).rawString) {
-                            continue
-                        }
-                        if (r.canRelocateClass(className)) {
-                            RelocateClassContext classContext = RelocateClassContext.builder().className(className).stats(stats).build()
-                            relocated = r.relocateClass(classContext)
-                            break
-                        } else if (r.canRelocatePath(className)) {
-                            RelocatePathContext pathContext = RelocatePathContext.builder().path(className).stats(stats).build()
-                            relocated = r.relocatePath(pathContext)
-                            break
-                        }
-                    }
-                    m.appendReplacement(sb, Matcher.quoteReplacement(prefix + relocated + ";"))
-                } while (m.find())
-                m.appendTail(sb)
-                value = sb.toString()
-            }
-
-            return value
+            return mapName((String) object, true)
         }
-
         return super.mapValue(object)
     }
 
     @Override
     String map(String name) {
-        String value = name
+        return mapName(name, false)
+    }
 
-        Matcher m = classPattern.matcher(name)
-        if (m.find()) {
-            StringBuffer sb = new StringBuffer()
-            do {
-                String prefix = (m.group(1) ?: "") + "L"
-                String className = m.group(2)
-                String relocated = className
-                for (Relocator r : relocators) {
-                    if (r.canRelocatePath(className)) {
-                        RelocatePathContext pathContext = RelocatePathContext.builder().path(className).stats(stats).build()
-                        relocated = r.relocatePath(pathContext)
-                        break
-                    }
-                }
-                m.appendReplacement(sb, Matcher.quoteReplacement(prefix + relocated + ";"))
-            } while (m.find())
-            m.appendTail(sb)
-            value = sb.toString()
+    String mapName(String name, boolean mapLiterals) {
+        String[] parts = name.split(";", -1)
+        List<String> mapped = new ArrayList<>(parts.length)
+        for (String part : parts) {
+            mapped.add(realMap(part, mapLiterals))
+        }
+        return mapped.join(";")
+    }
+
+    private String realMap(String name, boolean mapLiterals) {
+        String newName = name
+        String prefix = ""
+        String suffix = ""
+
+        Matcher m = classPattern.matcher(newName)
+        if (m.matches()) {
+            prefix = (m.group(1) ?: "") + "L"
+            suffix = m.group(3) ?: ""
+            newName = m.group(2)
         }
 
         for (Relocator r : relocators) {
-            if (r.canRelocatePath(name)) {
-                RelocatePathContext pathContext = RelocatePathContext.builder().path(name).stats(stats).build()
-                value = r.relocatePath(pathContext)
-                break
+            if (mapLiterals && r instanceof SimpleRelocator && ((SimpleRelocator) r).rawString) {
+                continue
+            }
+            if (r.canRelocateClass(newName)) {
+                RelocateClassContext classContext = RelocateClassContext.builder().className(newName).stats(stats).build()
+                return prefix + r.relocateClass(classContext) + suffix
+            } else if (r.canRelocatePath(newName)) {
+                RelocatePathContext pathContext = RelocatePathContext.builder().path(newName).stats(stats).build()
+                return prefix + r.relocatePath(pathContext) + suffix
             }
         }
 
-        return value
+        return name
     }
 
     String mapPath(String path) {
