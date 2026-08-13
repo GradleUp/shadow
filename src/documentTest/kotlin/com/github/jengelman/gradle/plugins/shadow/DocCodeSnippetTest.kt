@@ -22,7 +22,7 @@ class DocCodeSnippetTest {
   private companion object {
     @JvmStatic
     fun snippets(): List<Arguments> {
-      val langExecutables = DslLang.entries.map { executor -> extractCodeSnippets(executor) }
+      val langExecutables = DslLang.entries.map(DslLang::extractCodeSnippets)
 
       check(langExecutables.sumOf { it.size } > 0) { "No code snippets found." }
       check(langExecutables.map { it.size }.distinct().size == 1) {
