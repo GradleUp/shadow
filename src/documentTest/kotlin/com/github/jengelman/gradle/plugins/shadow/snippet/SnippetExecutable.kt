@@ -24,6 +24,8 @@ sealed class SnippetExecutable {
   abstract val displayName: String
   abstract val exceptionTransformer: (Throwable) -> Throwable
 
+  override fun toString(): String = displayName
+
   fun execute(projectRoot: Path) {
     try {
       executeSnippet(projectRoot, snippet)
