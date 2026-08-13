@@ -161,7 +161,7 @@ class ShadowPropertiesTest {
           )
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
-        assertThat(configurations.get()).containsOnly(runtimeConfiguration)
+        assertThat(configurations.get()).containsOnly(runtimeConfiguration.single())
       }
     }
 
