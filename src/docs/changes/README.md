@@ -3,6 +3,10 @@
 
 ## [Unreleased]
 
+**Changed**
+
+- Stop catching ZipException when writing entries. ([#1970](https://github.com/GradleUp/shadow/pull/1970))
+
 **Fixed**
 
 - Validate ZIP entry names to prevent Zip Slip path traversal.

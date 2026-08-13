@@ -372,8 +372,6 @@ class ShadowCopyAction implements CopyAction {
                 zipOutStr.putNextEntry(archiveEntry)
                 IOUtils.copyLarge(bis, zipOutStr)
                 zipOutStr.closeEntry()
-            } catch (ZipException ignored) {
-                log.warn("We have a duplicate " + mappedName + " in source project")
             } finally {
                 bis.close()
             }
