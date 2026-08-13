@@ -19,6 +19,7 @@
 
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.ZipUtils
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction
 import org.apache.tools.zip.ZipEntry
@@ -92,7 +93,7 @@ class ServiceFileTransformer implements Transformer, PatternFilterable {
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         serviceEntries.each { String path, ServiceStream stream ->
-            ZipEntry entry = new ZipEntry(path)
+            ZipEntry entry = ZipUtils.zipEntry(path)
             entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
             os.putNextEntry(entry)
             IOUtil.copy(stream.toInputStream(), os)

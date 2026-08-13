@@ -20,6 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.ZipUtils
 import java.nio.charset.Charset
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
@@ -244,7 +245,7 @@ class PropertiesFileTransformer implements Transformer {
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
         propertiesEntries.each { String path, CleanProperties props ->
-            ZipEntry entry = new ZipEntry(path)
+            ZipEntry entry = ZipUtils.zipEntry(path)
             entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
             os.putNextEntry(entry)
             props.writeWithoutComments(Charset.forName(getCharset()), os)
