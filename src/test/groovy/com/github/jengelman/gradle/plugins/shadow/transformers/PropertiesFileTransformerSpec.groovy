@@ -161,4 +161,17 @@ class PropertiesFileTransformerSpec extends TransformerSpecSupport {
         path              | charset | input                   || output
         'utf8.properties' | 'utf-8' | ['foo': '传傳磨宿说説'] || ['foo': '传傳磨宿说説']
     }
+
+    void "throws GradleException when keyTransformer is null"() {
+        given:
+        PropertiesFileTransformer transformer = new PropertiesFileTransformer()
+        transformer.keyTransformer = null
+
+        when:
+        transformer.transform(context("test.properties", "foo=bar"))
+
+        then:
+        def e = thrown(org.gradle.api.GradleException)
+        e.message == "keyTransformer must not be null."
+    }
 }

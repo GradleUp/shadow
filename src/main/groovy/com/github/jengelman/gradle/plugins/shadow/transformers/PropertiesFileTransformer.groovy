@@ -23,6 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -196,7 +197,7 @@ class PropertiesFileTransformer implements Transformer {
 
     private Properties transformKeys(Properties properties) {
         if (keyTransformer == null) {
-            throw new IllegalStateException("keyTransformer must not be null.")
+            throw new GradleException("keyTransformer must not be null.")
         }
         if (keyTransformer == IDENTITY) {
             return properties

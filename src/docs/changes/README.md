@@ -6,6 +6,7 @@
 **Changed**
 
 - Stop catching ZipException when writing entries. ([#1970](https://github.com/GradleUp/shadow/pull/1970))
+- Use GradleException for expected build failures. ([#2113](https://github.com/GradleUp/shadow/pull/2113))
 
 **Fixed**
 

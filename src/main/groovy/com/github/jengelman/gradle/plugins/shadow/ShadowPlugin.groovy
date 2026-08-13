@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.plugins.ApplicationPlugin
@@ -18,6 +19,12 @@ class ShadowPlugin implements Plugin<Project> {
             }
             plugins.withType(ApplicationPlugin) {
                 plugins.apply(ShadowApplicationPlugin)
+            }
+            plugins.withId('com.android.base') {
+                throw new GradleException(
+                    "Shadow does not support being used with AGP. You may need the Android Fused Library plugin instead. " +
+                    "See https://developer.android.com/build/publish-library/fused-library"
+                )
             }
             // Apply the legacy plugin last
             //   Because we apply the ShadowJavaPlugin/ShadowApplication plugin in a withType callback for the
