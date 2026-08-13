@@ -337,34 +337,52 @@ class ShadowCopyAction implements CopyAction {
          * See #364 and #408.
          */
         private void remapClass(InputStream classInputStream, String path, long lastModified) {
-            InputStream is = classInputStream
-            ClassReader cr = new ClassReader(is)
+            byte[] bytes
+            try {
+                bytes = IOUtils.toByteArray(classInputStream)
+            } finally {
+                classInputStream.close()
+            }
 
-            // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant pool.
-            // Copying the original constant pool should be avoided because it would keep references
-            // to the original class names. This is not a problem at runtime (because these entries in the
-            // constant pool are never used), but confuses some tools such as Felix' maven-bundle-plugin
-            // that use the constant pool to determine the dependencies of a class.
+            boolean modified = false
+            RelocatorRemapper modifiedRemapper = new RelocatorRemapper(remapper.relocators, remapper.stats) {
+                @Override
+                Object mapValue(Object object) {
+                    Object result = super.mapValue(object)
+                    if (result != object) {
+                        modified = true
+                    }
+                    return result
+                }
+
+                @Override
+                String map(String name) {
+                    String result = super.map(name)
+                    if (result != name) {
+                        modified = true
+                    }
+                    return result
+                }
+            }
+
+            ClassReader cr = new ClassReader(bytes)
             ClassWriter cw = new ClassWriter(0)
-
-            ClassVisitor cv = new ClassRemapper(cw, remapper)
+            ClassVisitor cv = new ClassRemapper(cw, modifiedRemapper)
 
             try {
                 cr.accept(cv, ClassReader.EXPAND_FRAMES)
             } catch (Throwable ise) {
                 throw new GradleException("Error in ASM processing class " + path, ise)
-            } finally {
-                is.close()
             }
 
-            byte[] renamedClass = cw.toByteArray()
+            byte[] finalClass = modified ? cw.toByteArray() : bytes
 
             // Temporarily remove the multi-release prefix.
             String multiReleasePrefix = path.find("^META-INF/versions/\\d+/") ?: ""
             path = path.replace(multiReleasePrefix, "")
-            String mappedName = multiReleasePrefix + remapper.mapPath(path)
+            String mappedName = multiReleasePrefix + modifiedRemapper.mapPath(path)
 
-            InputStream bis = new ByteArrayInputStream(renamedClass)
+            InputStream bis = new ByteArrayInputStream(finalClass)
             try {
                 // Now we put it back on so the class file is written out with the right extension.
                 ZipEntry archiveEntry = ZipUtils.zipEntry(mappedName + ".class")

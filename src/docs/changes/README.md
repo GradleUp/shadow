@@ -8,6 +8,7 @@
 - Stop catching ZipException when writing entries. ([#1970](https://github.com/GradleUp/shadow/pull/1970))
 - Use GradleException for expected build failures. ([#2113](https://github.com/GradleUp/shadow/pull/2113))
 - Update `RelocatorRemapper` class pattern to cover more Java method descriptors. ([#1731](https://github.com/GradleUp/shadow/pull/1731))
+- Do not write modified class files for no-op relocations. ([#1694](https://github.com/GradleUp/shadow/pull/1694))
 
 **Fixed**
 
