@@ -67,12 +67,12 @@ spotless {
   }
 }
 
+@Suppress("UNCHECKED_CAST") // For calling NamedDomainObjectProvider<Configuration>.invoke accessor.
 val testPluginClasspath =
-  configurations.register("testPluginClasspath") {
-    isCanBeResolved = true
+  configurations.resolvable("testPluginClasspath") {
     description = "Plugins used in integration tests could be resolved in classpath."
     extendsFrom(configurations.compileOnly)
-  }
+  } as NamedDomainObjectProvider<Configuration>
 
 val testKit = sourceSets.register("testKit")
 val testKitImplementation = configurations.named("testKitImplementation")
