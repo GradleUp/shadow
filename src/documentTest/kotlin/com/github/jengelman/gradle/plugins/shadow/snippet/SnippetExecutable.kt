@@ -24,20 +24,10 @@ sealed interface SnippetExecutable {
 
   fun execute(projectRoot: Path) {
     try {
-      executeSnippet(projectRoot, snippet)
-    } catch (t: Throwable) {
-      throw RuntimeException(
-        "The error line in the doc is near $sourceLocation\n\n${t.message}",
-        t,
-      )
-    }
-  }
-
-  private fun executeSnippet(projectRoot: Path, snippet: String) {
-    projectRoot
-      .resolve("settings.gradle")
-      .writeText(
-        """
+      projectRoot
+        .resolve("settings.gradle")
+        .writeText(
+          """
         |gradle.beforeProject { p ->
         |  // Snippet version placeholders resolve to '+', so avoid frequent remote version checks.
         |  p.buildscript.configurations.configureEach {
@@ -62,68 +52,74 @@ sealed interface SnippetExecutable {
         |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
         |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
-          .trimMargin()
-      )
+            .trimMargin()
+        )
 
-    val apiScript = buildString {
-      appendLine(pluginsBlock)
-      append(assembleDependsOn)
-    }
-    projectRoot.addSubProject("api", apiScript)
-
-    val (imports, withoutImports) = importsExtractor(snippet)
-    val mainScript = buildString {
-      appendLine(imports)
-      // All buildscript {} blocks must appear before any plugins {} blocks in the script.
-      if (withoutImports.contains("buildscript {")) {
-        appendLine(withoutImports)
-      } else {
-        if (!withoutImports.contains("plugins {")) {
-          appendLine(pluginsBlock)
-        }
-        appendLine(withoutImports)
+      val apiScript = buildString {
+        appendLine(pluginsBlock)
+        append(assembleDependsOn)
       }
-    }
-      .trimIndent()
-    projectRoot.addSubProject("main", mainScript + assembleDependsOn)
-    projectRoot.resolve("main/foo.jar").createFile().also {
-      // Dummy JAR file to ensure the project can be built.
-      JarOutputStream(it.outputStream()).use {}
-    }
-    projectRoot.resolve("main/bar.jar").createFile().also {
-      // Dummy JAR file to ensure the project can be built.
-      JarOutputStream(it.outputStream()).use {}
-    }
+      projectRoot.addSubProject("api", apiScript)
 
-    // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
-    // CC/IP because transient script classloaders cannot be serialized.
-    val runnerArgs =
-      if (withoutImports.contains("class ")) {
-        commonGradleArgs.filterNot {
-          it == "--configuration-cache" || it.contains("isolated-projects")
+      val (imports, withoutImports) = importsExtractor(snippet)
+      val mainScript = buildString {
+        appendLine(imports)
+        // All buildscript {} blocks must appear before any plugins {} blocks in the script.
+        if (withoutImports.contains("buildscript {")) {
+          appendLine(withoutImports)
+        } else {
+          if (!withoutImports.contains("plugins {")) {
+            appendLine(pluginsBlock)
+          }
+          appendLine(withoutImports)
         }
-      } else {
-        commonGradleArgs.toList()
+      }
+        .trimIndent()
+      projectRoot.addSubProject("main", mainScript + assembleDependsOn)
+      projectRoot.resolve("main/foo.jar").createFile().also {
+        // Dummy JAR file to ensure the project can be built.
+        JarOutputStream(it.outputStream()).use {}
+      }
+      projectRoot.resolve("main/bar.jar").createFile().also {
+        // Dummy JAR file to ensure the project can be built.
+        JarOutputStream(it.outputStream()).use {}
       }
 
-    try {
-      gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
-        .build()
-        .assertNoDeprecationWarnings()
+      // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
+      // CC/IP because transient script classloaders cannot be serialized.
+      val runnerArgs =
+        if (withoutImports.contains("class ")) {
+          commonGradleArgs.filterNot {
+            it == "--configuration-cache" || it.contains("isolated-projects")
+          }
+        } else {
+          commonGradleArgs.toList()
+        }
+
+      try {
+        gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
+          .build()
+          .assertNoDeprecationWarnings()
+      } catch (t: Throwable) {
+        val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
+        val message = buildString {
+          appendLine("--- Snippet ---")
+          appendLine()
+          appendLine(mainScript)
+          if (!buildOutput.isNullOrBlank()) {
+            appendLine()
+            appendLine("--- Gradle Build Output ---")
+            appendLine()
+            appendLine(buildOutput.trim())
+          }
+        }
+        throw RuntimeException(message, t)
+      }
     } catch (t: Throwable) {
-      val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
-      val message = buildString {
-        appendLine("--- Snippet ---")
-        appendLine()
-        appendLine(mainScript)
-        if (!buildOutput.isNullOrBlank()) {
-          appendLine()
-          appendLine("--- Gradle Build Output ---")
-          appendLine()
-          appendLine(buildOutput.trim())
-        }
-      }
-      throw RuntimeException(message, t)
+      throw RuntimeException(
+        "The error line in the doc is near $sourceLocation\n\n${t.message}",
+        t,
+      )
     }
   }
 
