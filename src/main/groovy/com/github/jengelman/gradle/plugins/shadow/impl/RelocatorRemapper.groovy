@@ -23,6 +23,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowStats
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.RelativeArchivePath
 import groovy.transform.CompileStatic
 import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
@@ -66,6 +67,9 @@ class RelocatorRemapper extends Remapper {
                     String className = m.group(2)
                     String relocated = className
                     for (Relocator r : relocators) {
+                        if (r instanceof SimpleRelocator && ((SimpleRelocator) r).rawString) {
+                            continue
+                        }
                         if (r.canRelocateClass(className)) {
                             RelocateClassContext classContext = RelocateClassContext.builder().className(className).stats(stats).build()
                             relocated = r.relocateClass(classContext)
