@@ -81,7 +81,6 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
         relocators = new ArrayList<>();
         configurations = new ArrayList<>();
 
-        this.getInputs().property("minimize", (Callable<Boolean>) () -> minimizeJar);
         this.getOutputs().doNotCacheIf("Has one or more transforms or relocators that are not cacheable", task -> {
             for (Transformer transformer : transformers) {
                 if (!isCacheableTransform(transformer.getClass())) {
@@ -475,5 +474,22 @@ public abstract class ShadowJar extends Jar implements ShadowSpec {
 
     public void setRelocationPrefix(String relocationPrefix) {
         this.relocationPrefix = relocationPrefix;
+    }
+
+    /**
+     * @deprecated Use {@link #minimize()} instead.
+     */
+    @Deprecated
+    @Input
+    public boolean getMinimizeJar() {
+        return minimizeJar;
+    }
+
+    /**
+     * @deprecated Use {@link #minimize()} instead.
+     */
+    @Deprecated
+    public void setMinimizeJar(boolean minimizeJar) {
+        this.minimizeJar = minimizeJar;
     }
 }

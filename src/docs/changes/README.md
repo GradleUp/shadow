@@ -25,6 +25,7 @@
 **Deprecated**
 
 - Deprecate `InheritManifest`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
+- Deprecate `minimizeJar` property. ([#2124](https://github.com/GradleUp/shadow/pull/2124))
 
 ## [v8.3.11] (2026-05-28)
 
