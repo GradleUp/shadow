@@ -23,6 +23,7 @@ class RelocatorRemapperSpec extends Specification {
         '(Lorg/package/ClassA;)V'                                || '(Lshadow/org/package/ClassA;)V'
         '(ZLorg/package/ClassA;)V'                               || '(ZLshadow/org/package/ClassA;)V'
         '(ILorg/package/ClassA;Lorg/package/ClassB;)V'           || '(ILshadow/org/package/ClassA;Lshadow/org/package/ClassB;)V'
+        'Lorg/package/ClassA;Lorg/package/ClassB;'               || 'Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;'
         '()Lorg/package/ClassA;'                                 || '()Lshadow/org/package/ClassA;'
     }
 
