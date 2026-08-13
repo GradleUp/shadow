@@ -20,6 +20,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.CleanProperties
+import java.nio.charset.Charset
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.codehaus.plexus.util.IOUtil
@@ -242,23 +243,12 @@ class PropertiesFileTransformer implements Transformer {
 
     @Override
     void modifyOutputStream(ZipOutputStream os, boolean preserveFileTimestamps) {
-        // cannot close the writer as the OutputStream needs to remain open
-        def zipWriter = new OutputStreamWriter(os, charset)
-        propertiesEntries.each { String path, Properties props ->
+        propertiesEntries.each { String path, CleanProperties props ->
             ZipEntry entry = new ZipEntry(path)
             entry.time = TransformerContext.getEntryTimestamp(preserveFileTimestamps, entry.time)
             os.putNextEntry(entry)
-            IOUtil.copy(readerFor(props, charset), zipWriter)
-            zipWriter.flush()
+            props.writeWithoutComments(Charset.forName(getCharset()), os)
             os.closeEntry()
         }
-    }
-
-    private static InputStreamReader readerFor(Properties props, String charset) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream()
-        baos.withWriter(charset) { w ->
-            props.store(w, '')
-        }
-        new InputStreamReader(new ByteArrayInputStream(baos.toByteArray()), charset)
     }
 }
