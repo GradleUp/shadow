@@ -7,9 +7,9 @@ import org.gradle.plugin.compatibility.compatibility
 plugins {
   groovy
   `java-gradle-plugin`
-  id("com.gradle.plugin-publish") version "2.1.0"
-  id("com.vanniktech.maven.publish") version "0.36.0"
-  id("com.diffplug.spotless") version "8.2.1"
+  alias(libs.plugins.pluginPublish)
+  alias(libs.plugins.mavenPublish)
+  alias(libs.plugins.spotless)
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -73,22 +73,22 @@ publishing.publications.withType<MavenPublication>().configureEach {
 }
 
 dependencies {
-  api("org.apache.ant:ant:1.10.15") // Types from Ant are exposed in the public API.
-  implementation("org.jdom:jdom2:2.0.6.1")
-  implementation("commons-io:commons-io:2.19.0")
-  implementation("org.codehaus.plexus:plexus-utils:4.0.2")
-  implementation("org.codehaus.plexus:plexus-xml:4.1.1")
-  implementation("org.apache.logging.log4j:log4j-core:2.25.3")
-  implementation("org.vafer:jdependency:2.16")
+  api(libs.apache.ant) // Types from Ant are exposed in the public API.
+  implementation(libs.commons.io)
+  implementation(libs.jdom2)
+  implementation(libs.plexus.utils)
+  implementation(libs.plexus.xml)
+  implementation(libs.apache.log4j)
+  implementation(libs.jdependency)
 
   testImplementation("org.spockframework:spock-core:2.4-groovy-4.0") {
     exclude(group = "org.codehaus.groovy")
     exclude(group = "org.hamcrest")
   }
-  testImplementation("org.xmlunit:xmlunit-legacy:2.11.0")
+  testImplementation(libs.xmlunit)
   testImplementation("org.apache.commons:commons-lang3:3.17.0")
   testImplementation("com.google.guava:guava:33.3.1-jre")
-  testImplementation(platform("org.junit:junit-bom:5.13.1"))
+  testImplementation(platform(libs.junit.bom))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.junit.platform:junit-platform-suite-engine")
 }

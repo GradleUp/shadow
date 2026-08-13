@@ -1,0 +1,18 @@
+[versions]
+pluginPublish = "2.1.1"
+
+[libraries]
+apache-ant = "org.apache.ant:ant:1.10.17"
+apache-log4j = "org.apache.logging.log4j:log4j-core:2.26.1"
+commons-io = "commons-io:commons-io:2.19.0"
+jdependency = "org.vafer:jdependency:2.16"
+jdom2 = "org.jdom:jdom2:2.0.6.1"
+junit-bom = "org.junit:junit-bom:5.14.0"
+plexus-utils = "org.codehaus.plexus:plexus-utils:4.0.3"
+plexus-xml = "org.codehaus.plexus:plexus-xml:4.1.1"
+xmlunit = "org.xmlunit:xmlunit-legacy:2.13.0"
+
+[plugins]
+mavenPublish = "com.vanniktech.maven.publish:0.37.0"
+pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
+spotless = "com.diffplug.spotless:8.9.0"

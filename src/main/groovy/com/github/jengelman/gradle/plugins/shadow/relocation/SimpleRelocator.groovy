@@ -115,7 +115,9 @@ class SimpleRelocator implements Relocator {
 
                 String fileName = FilenameUtils.getName(pattern)
                 String fileParent = FilenameUtils.getPathNoEndSeparator(pattern)
-                String filePattern = (fileParent && fileName) ? pattern : pattern.replace('.', '/')
+                boolean hasParent = fileParent != null && !fileParent.isEmpty()
+                boolean hasName = fileName != null && !fileName.isEmpty()
+                String filePattern = (hasParent && hasName) ? pattern : pattern.replace('.', '/')
 
                 normalized.add(filePattern)
 

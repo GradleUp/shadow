@@ -6,12 +6,12 @@ pluginManagement {
 }
 
 plugins {
-  id("com.gradle.develocity") version "4.2"
+  id("com.gradle.develocity") version "4.5.0"
 }
 
 develocity {
   buildScan {
-    termsOfUseUrl = "https://gradle.com/terms-of-service"
+    termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
     termsOfUseAgree = "yes"
     // TODO: workaround for https://github.com/gradle/gradle/issues/22879.
     val isCI = providers.environmentVariable("CI").isPresent
