@@ -148,10 +148,7 @@ public abstract class ShadowJar : Jar() {
       if (enabled && tool == MinimizeTool.R8) {
         // Use findByName so custom ShadowJar tasks can be configured even when shadowR8 isn't
         // registered.
-        project.configurations.findByName(R8_CONFIGURATION_NAME)?.apply {
-          // Resolve dependencies only when needed.
-          isCanBeResolved = true
-        } ?: project.files()
+        project.configurations.findByName(R8_CONFIGURATION_NAME) ?: project.files()
       } else {
         emptySet()
       }
