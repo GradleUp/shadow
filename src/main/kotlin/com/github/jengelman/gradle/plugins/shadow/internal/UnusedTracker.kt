@@ -19,9 +19,7 @@ internal fun Project.getApiJars(): Provider<List<File>> {
     if (configurations.names.contains(configName)) {
       configurations.named(configName)
     } else {
-      configurations.register(configName) {
-        it.isCanBeResolved = true
-        it.isCanBeConsumed = false
+      configurations.resolvable(configName) {
         it.attributes { attrs ->
           attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_API))
           attrs.attribute(

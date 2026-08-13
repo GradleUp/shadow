@@ -11,7 +11,6 @@ import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
 import org.gradle.api.attributes.Bundling
@@ -22,7 +21,6 @@ import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIB
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -53,10 +51,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         compileClasspath.extendsFrom(shadowConfig)
       }
     val shadowRuntimeElements =
-      configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { shadowRuntimeElements ->
+      configurations.consumable(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { shadowRuntimeElements
+        ->
         shadowRuntimeElements.extendsFrom(shadowConfig)
-        shadowRuntimeElements.isCanBeConsumed = true
-        shadowRuntimeElements.isCanBeResolved = false
         shadowRuntimeElements.attributes { attrs ->
           attrs.attribute(
             Usage.USAGE_ATTRIBUTE,
@@ -116,17 +113,11 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    @Suppress("UNCHECKED_CAST", "UnstableApiUsage")
-    shadowComponent.addVariantsFromConfiguration(
-      shadowRuntimeElements as Provider<ConsumableConfiguration>
-    ) { variant ->
+    shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
-      @Suppress("UNCHECKED_CAST", "UnstableApiUsage")
-      component.addVariantsFromConfiguration(
-        shadowRuntimeElements as Provider<ConsumableConfiguration>
-      ) { variant ->
+      component.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
         variant.mapToOptional()
         if (shadow.addShadowVariantIntoJavaComponent.get()) {
           logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
@@ -146,7 +137,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadowRuntimeElements:
-      NamedDomainObjectProvider<Configuration>
-      get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+      NamedDomainObjectProvider<ConsumableConfiguration>
+      get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
   }
 }
