@@ -105,7 +105,7 @@ sealed interface SnippetExecutable {
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
       val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
-      throw RuntimeException(
+      throw AssertionError(
         buildString {
           append("The error line in the doc is near $sourceLocation")
           if (generatedMainScript != null) {
