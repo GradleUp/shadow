@@ -7,39 +7,26 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
-import kotlin.io.path.createFile
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import org.gradle.testkit.runner.UnexpectedBuildFailure
-import org.junit.jupiter.api.function.Executable
 
-sealed class SnippetExecutable : Executable {
-  abstract val lang: DslLang
-  abstract val buildScriptName: String
-  abstract val pluginsBlock: String
-  abstract val assembleDependsOn: String
-
-  abstract val snippet: String
-
+sealed interface SnippetExecutable {
+  val buildScriptName: String
+  val assembleDependsOn: String
+  val snippet: String
   /** Unique name for the test, formatted as `publishing/README.md:10`. */
-  abstract val displayName: String
-  abstract val exceptionTransformer: (Throwable) -> Throwable
+  val displayName: String
+  val sourceLocation: String
 
-  lateinit var tempDir: Path
-
-  override fun execute() {
+  fun execute(projectRoot: Path) {
+    var generatedMainScript: String? = null
+    var gradleBuildOutput: String? = null
     try {
-      execute(tempDir, snippet)
-    } catch (t: Throwable) {
-      throw exceptionTransformer(t)
-    }
-  }
-
-  private fun execute(projectRoot: Path, snippet: String) {
-    projectRoot
-      .resolve("settings.gradle")
-      .writeText(
-        """
+      projectRoot
+        .resolve("settings.gradle")
+        .writeText(
+          """
         |gradle.beforeProject { p ->
         |  // Snippet version placeholders resolve to '+', so avoid frequent remote version checks.
         |  p.buildscript.configurations.configureEach {
@@ -64,68 +51,84 @@ sealed class SnippetExecutable : Executable {
         |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
         |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
+            .trimMargin()
+        )
+      val pluginsBlock =
+        """
+        |plugins {
+        |  id("java")
+        |  id("com.gradleup.shadow")
+        |}
+        """
           .trimMargin()
-      )
-
-    val apiScript = buildString {
-      appendLine(pluginsBlock)
-      append(assembleDependsOn)
-    }
-    projectRoot.addSubProject("api", apiScript)
-
-    val (imports, withoutImports) = importsExtractor(snippet)
-    val mainScript = buildString {
-      appendLine(imports)
-      // All buildscript {} blocks must appear before any plugins {} blocks in the script.
-      if (withoutImports.contains("buildscript {")) {
-        appendLine(withoutImports)
-      } else {
-        if (!withoutImports.contains("plugins {")) {
-          appendLine(pluginsBlock)
-        }
-        appendLine(withoutImports)
+      val apiScript = buildString {
+        appendLine(pluginsBlock)
+        append(assembleDependsOn)
       }
-    }
-      .trimIndent()
-    projectRoot.addSubProject("main", mainScript + assembleDependsOn)
-    projectRoot.resolve("main/foo.jar").createFile().also {
-      // Dummy JAR file to ensure the project can be built.
-      JarOutputStream(it.outputStream()).use {}
-    }
-    projectRoot.resolve("main/bar.jar").createFile().also {
-      // Dummy JAR file to ensure the project can be built.
-      JarOutputStream(it.outputStream()).use {}
-    }
+      projectRoot.addSubProject("api", apiScript)
 
-    // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
-    // CC/IP because transient script classloaders cannot be serialized.
-    val runnerArgs =
-      if (withoutImports.contains("class ")) {
-        commonGradleArgs.filterNot {
-          it == "--configuration-cache" || it.contains("isolated-projects")
+      val (imports, withoutImports) = extractImports()
+      val mainScript = buildString {
+        appendLine(imports)
+        // All buildscript {} blocks must appear before any plugins {} blocks in the script.
+        if (withoutImports.contains("buildscript {")) {
+          appendLine(withoutImports)
+        } else {
+          if (!withoutImports.contains("plugins {")) {
+            appendLine(pluginsBlock)
+          }
+          appendLine(withoutImports)
         }
-      } else {
-        commonGradleArgs.toList()
+      }
+        .trimIndent()
+      generatedMainScript = mainScript
+      projectRoot.addSubProject("main", mainScript + assembleDependsOn)
+      listOf("foo.jar", "bar.jar").forEach { name ->
+        // Dummy JAR file to ensure the project can be built.
+        JarOutputStream(projectRoot.resolve("main/$name").outputStream()).use {}
       }
 
-    try {
+      // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
+      // CC/IP because transient script classloaders cannot be serialized.
+      val runnerArgs =
+        if (withoutImports.contains("class ")) {
+          commonGradleArgs.filterNot {
+            it == "--configuration-cache" || it.contains("isolated-projects")
+          }
+        } else {
+          commonGradleArgs.toList()
+        }
+
       gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
         .build()
+        .also { gradleBuildOutput = it.output }
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
-      val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output
-      val message = buildString {
-        appendLine("--- Snippet ---")
-        appendLine()
-        appendLine(mainScript)
-        if (!buildOutput.isNullOrBlank()) {
-          appendLine()
-          appendLine("--- Gradle Build Output ---")
-          appendLine()
-          appendLine(buildOutput.trim())
-        }
-      }
-      throw RuntimeException(message, t)
+      val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
+      throw AssertionError(
+        buildString {
+          append("The error line in the doc is near $sourceLocation")
+          if (generatedMainScript != null) {
+            appendLine()
+            appendLine()
+            appendLine("--- Snippet ---")
+            appendLine()
+            append(generatedMainScript)
+          }
+          if (!buildOutput.isNullOrBlank()) {
+            appendLine()
+            appendLine()
+            appendLine("--- Gradle Build Output ---")
+            appendLine()
+            append(buildOutput.trim())
+          } else if (!t.message.isNullOrBlank()) {
+            appendLine()
+            appendLine()
+            append(t.message)
+          }
+        },
+        t,
+      )
     }
   }
 
@@ -133,7 +136,7 @@ sealed class SnippetExecutable : Executable {
     resolve(project).createDirectory().resolve(buildScriptName).writeText(buildScriptText)
   }
 
-  private fun importsExtractor(snippet: String): Pair<String, String> {
+  private fun extractImports(): Pair<String, String> {
     val imports = StringBuilder()
     val withoutImports = StringBuilder()
 
@@ -153,11 +156,11 @@ sealed class SnippetExecutable : Executable {
       lang: DslLang,
       snippet: String,
       testName: String,
-      exceptionTransformer: (Throwable) -> Throwable,
+      sourceLocation: String,
     ): SnippetExecutable =
       when (lang) {
-        DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, exceptionTransformer)
-        DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, exceptionTransformer)
+        DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, sourceLocation)
+        DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, sourceLocation)
       }
   }
 }
