@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.snippet
+package com.github.jengelman.gradle.plugins.shadow
 
 class GroovyBuildExecutable(
   override val snippet: String,

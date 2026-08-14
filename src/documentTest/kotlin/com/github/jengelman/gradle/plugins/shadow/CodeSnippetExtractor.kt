@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.snippet
+package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.DocumentTestBuildConfig.DOCS_DIR
 import java.util.regex.Pattern

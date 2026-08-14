@@ -1,4 +1,4 @@
-package com.github.jengelman.gradle.plugins.shadow.snippet
+package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs

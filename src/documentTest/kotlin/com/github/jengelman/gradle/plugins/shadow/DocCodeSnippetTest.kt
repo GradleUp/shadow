@@ -1,8 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import com.github.jengelman.gradle.plugins.shadow.snippet.DslLang
-import com.github.jengelman.gradle.plugins.shadow.snippet.SnippetExecutable
-import com.github.jengelman.gradle.plugins.shadow.snippet.extractCodeSnippets
 import java.nio.file.Path
 import org.junit.jupiter.api.Named.named
 import org.junit.jupiter.api.io.TempDir
