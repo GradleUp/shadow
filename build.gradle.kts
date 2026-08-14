@@ -4,6 +4,9 @@ import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.tasks.testing.TestDescriptor
+import org.gradle.api.tasks.testing.TestListener
+import org.gradle.api.tasks.testing.TestResult
 import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -162,6 +165,16 @@ testing.suites {
           fileTree(docsDir) {
             // Changelog file doesn't contain code snippet to run.
             exclude("changes/README.md")
+          }
+        )
+
+        testLogging.showExceptions = false
+        addTestListener(
+          object : TestListener {
+            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+              // Prettify test failure output in console.
+              result.exception?.message?.lineSequence()?.firstOrNull()?.let(logger::error)
+            }
           }
         )
       }
