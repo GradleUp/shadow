@@ -12,7 +12,7 @@
 - Bump min Gradle requirement to 9.4.0. ([#2114](https://github.com/GradleUp/shadow/pull/2114))
 - Remove runtime dependencies on Commons Codec and Commons IO by using JDK APIs. ([#2136](https://github.com/GradleUp/shadow/pull/2136))
 - **POTENTIALLY BREAKING:** Remove `Serializable` from `DependencyFilter`. ([#2144](https://github.com/GradleUp/shadow/pull/2144))
-- Bump default R8 from `9.1.31` to `9.4.14`. ([#2157](https://github.com/GradleUp/shadow/pull/2193))
+- Bump default R8 from `9.1.31` to `9.4.14`. ([#2193](https://github.com/GradleUp/shadow/pull/2193))
 - Allow repackaging Service file classes with R8. ([#2174](https://github.com/GradleUp/shadow/pull/2174))
 
 ### Deprecated
