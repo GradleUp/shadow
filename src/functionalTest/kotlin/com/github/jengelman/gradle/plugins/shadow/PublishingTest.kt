@@ -16,7 +16,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
@@ -48,12 +47,6 @@ import org.gradle.testkit.runner.BuildResult
 
 val PublishingTests by testSuite {
   runTests(::PublishingTest)
-
-  for (addShadowVariant in listOf(false, true)) {
-    runTest("publishShadowVariantJar_addShadowVariant_$addShadowVariant", ::PublishingTest) {
-      publishShadowVariantJar(addShadowVariant)
-    }
-  }
 }
 
 private class PublishingTest : BasePluginTest() {

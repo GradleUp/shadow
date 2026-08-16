@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import de.infix.testBalloon.framework.core.testSuite
@@ -17,27 +16,6 @@ import kotlin.io.path.writeText
 
 val KotlinPluginsTests by testSuite {
   runTests(::KotlinPluginsTest)
-
-  for (excludeStdlib in listOf(false, true)) {
-    runTest("compatKotlinJvmPlugin_excludeStdlib_$excludeStdlib", ::KotlinPluginsTest) {
-      compatKotlinJvmPlugin(excludeStdlib)
-    }
-    runTest("compatKmpJvmTarget_excludeStdlib_$excludeStdlib", ::KotlinPluginsTest) {
-      compatKmpJvmTarget(excludeStdlib)
-    }
-  }
-
-  for (useShadowAttr in listOf(false, true)) {
-    runTest("setMainClassAttributeFromMainRun_useShadowAttr_$useShadowAttr", ::KotlinPluginsTest) {
-      setMainClassAttributeFromMainRun(useShadowAttr)
-    }
-    runTest(
-      "setManifestAttrsFromJvmTargetJar_useShadowAttr_$useShadowAttr",
-      ::KotlinPluginsTest,
-    ) {
-      setManifestAttrsFromJvmTargetJar(useShadowAttr)
-    }
-  }
 }
 
 private class KotlinPluginsTest : BasePluginTest() {

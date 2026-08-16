@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
-import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
@@ -10,15 +9,6 @@ import kotlin.io.path.writeText
 
 val FilteringTests by testSuite {
   runTests(::FilteringTest)
-
-  for (useAccessor in listOf(false, true)) {
-    runTest("excludeDependency_useAccessor_$useAccessor", ::FilteringTest) {
-      excludeDependency(useAccessor)
-    }
-    runTest("filterProjectDependencies_useAccessor_$useAccessor", ::FilteringTest) {
-      filterProjectDependencies(useAccessor)
-    }
-  }
 }
 
 private class FilteringTest : BasePluginTest() {

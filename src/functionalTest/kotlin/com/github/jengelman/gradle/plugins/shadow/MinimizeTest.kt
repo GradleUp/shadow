@@ -11,7 +11,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import de.infix.testBalloon.framework.core.testSuite
 import java.net.URLClassLoader
@@ -23,12 +22,6 @@ import org.gradle.api.JavaVersion
 
 val MinimizeTests by testSuite {
   runTests(::MinimizeTest)
-
-  for (enable in listOf(false, true)) {
-    runTest("enableMinimizationByCliOption_enable_$enable", ::MinimizeTest) {
-      enableMinimizationByCliOption(enable)
-    }
-  }
 }
 
 private class MinimizeTest : BasePluginTest() {

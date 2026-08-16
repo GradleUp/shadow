@@ -51,30 +51,6 @@ val RelocationTests by testSuite {
       preserveLastModifiedCorrectly(preserveFileTimestamps, enableAutoRelocation)
     }
   }
-
-  for (exclude in listOf(false, true)) {
-    runTest("relocateAllPackagesButCertainOne_exclude_$exclude", ::RelocationTest) {
-      relocateAllPackagesButCertainOne(exclude)
-    }
-  }
-
-  for (skipStringConstants in listOf(false, true)) {
-    runTest(
-      "disableStringConstantsRelocation_skipStringConstants_$skipStringConstants",
-      ::RelocationTest,
-    ) {
-      disableStringConstantsRelocation(skipStringConstants)
-    }
-  }
-
-  for (enableKotlinModuleRemapping in listOf(false, true)) {
-    runTest(
-      "relocateKotlinModuleFiles_enableKotlinModuleRemapping_$enableKotlinModuleRemapping",
-      ::RelocationTest,
-    ) {
-      relocateKotlinModuleFiles(enableKotlinModuleRemapping)
-    }
-  }
 }
 
 private class RelocationTest : BasePluginTest() {

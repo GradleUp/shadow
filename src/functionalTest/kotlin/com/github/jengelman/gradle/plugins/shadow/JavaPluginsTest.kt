@@ -46,21 +46,6 @@ import org.gradle.testkit.runner.TaskOutcome.SUCCESS
 val JavaPluginsTests by testSuite {
   runTests(::JavaPluginsTest)
 
-  for (enable in listOf(false, true)) {
-    runTest(
-      "containsMultiReleaseAttrIfAnyDependencyContainsIt_addAttribute_$enable",
-      ::JavaPluginsTest,
-    ) {
-      containsMultiReleaseAttrIfAnyDependencyContainsIt(enable)
-    }
-    runTest("containsMultiReleaseAttrByCliOption_enable_$enable", ::JavaPluginsTest) {
-      containsMultiReleaseAttrByCliOption(enable)
-    }
-    runTest("failBuildIfDuplicateEntries_enable_$enable", ::JavaPluginsTest) {
-      failBuildIfDuplicateEntries(enable)
-    }
-  }
-
   for (configuration in
     listOf(ShadowBasePlugin.CONFIGURATION_NAME, IMPLEMENTATION_CONFIGURATION_NAME)) {
     runTest(

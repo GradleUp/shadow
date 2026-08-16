@@ -26,26 +26,46 @@ inline fun <reified T : Any> TestSuiteScope.runTests(
 ) {
   if (functions.isNotEmpty()) {
     for (function in functions) {
-      runTest(function.name, factory) { function.invoke(this) }
+      runTest(function.name, factory, function)
     }
   } else {
     val discovered =
-      T::class.declaredMemberFunctions.filter {
-        it.visibility != KVisibility.PRIVATE && it.parameters.size == 1
-      }
+      T::class.declaredMemberFunctions.filter { it.visibility != KVisibility.PRIVATE }
     for (function in discovered) {
-      runTest(function.name, factory) {
-        function.isAccessible = true
-        function.call(this)
+      function.isAccessible = true
+      val valueParams = function.parameters.drop(1)
+      when {
+        valueParams.isEmpty() -> {
+          runTest(function.name, factory) {
+            function.call(this)
+          }
+        }
+
+        valueParams.all { it.type.classifier == Boolean::class } -> {
+          val combinations =
+            valueParams.fold(listOf(emptyList<Boolean>())) { acc, _ ->
+              acc.flatMap { list -> listOf(list + false, list + true) }
+            }
+          for (combo in combinations) {
+            val name =
+              "${function.name}_" +
+                valueParams.zip(combo).joinToString("_") { (param, value) ->
+                  "${param.name}_$value"
+                }
+            runTest(name, factory) {
+              function.call(this, *combo.toTypedArray())
+            }
+          }
+        }
       }
     }
   }
 }
 
-inline fun <T : Any> TestSuiteScope.runTest(
+fun <T : Any> TestSuiteScope.runTest(
   name: String,
-  noinline factory: () -> T,
-  crossinline block: T.() -> Unit,
+  factory: () -> T,
+  block: T.() -> Unit,
 ) {
   test(name) {
     val instance = factory()
