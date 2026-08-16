@@ -1,10 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsOnly
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
@@ -13,7 +16,6 @@ import kotlin.io.path.writeText
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
@@ -119,15 +121,13 @@ class DeduplicatingResourceTransformerTest :
       canTransformResource("differing-content", file1)
       canTransformResource("differing-content", file3)
 
-      val failure =
-        assertThrows<GradleException> {
+      assertFailure {
           tempJar.zipOutputStream().use {
             modifyOutputStream(it, false)
           }
         }
-
-      assertThat(failure.message.orEmpty())
-        .isEqualTo(
+        .isInstanceOf<GradleException>()
+        .hasMessage(
           """
           |Found 1 path duplicate(s) with different content in the shadowed JAR:
           |  * differing-content

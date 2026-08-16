@@ -1,14 +1,16 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
+import assertk.assertions.messageContains
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import org.gradle.api.artifacts.ResolvedDependency
 import org.gradle.testfixtures.ProjectBuilder
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -47,10 +49,9 @@ class DefaultDependencyFilterTest {
 
   @Test
   fun rejectsUnsupportedProjectNotation() {
-    val failure = assertThrows<IllegalArgumentException> { filter.project(42) }
-
-    assertThat(failure.message.orEmpty())
-      .contains("Unsupported notation type: class java.lang.Integer")
+    assertFailure { filter.project(42) }
+      .isInstanceOf<IllegalArgumentException>()
+      .messageContains("Unsupported notation type: class java.lang.Integer")
   }
 
   private companion object {

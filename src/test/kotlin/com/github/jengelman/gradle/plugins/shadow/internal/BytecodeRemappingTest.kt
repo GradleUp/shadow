@@ -1,9 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
@@ -15,7 +18,6 @@ import kotlin.reflect.KClass
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -75,9 +77,9 @@ class BytecodeRemappingTest {
         override fun getFile(): File = file
       }
 
-    val failure = assertThrows<GradleException> { details.remapClass(relocators) }
-
-    assertThat(failure.message).isEqualTo("Error in ASM processing class $path")
+    assertFailure { details.remapClass(relocators) }
+      .isInstanceOf<GradleException>()
+      .hasMessage("Error in ASM processing class $path")
   }
 
   @Test

@@ -1,7 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
@@ -13,7 +16,6 @@ import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.io.TempDir
 
 class ZipEntryValidationTest {
@@ -114,12 +116,11 @@ class ZipEntryValidationTest {
       )
 
     for (name in maliciousNames) {
-      val exception =
-        assertThrows<GradleException> {
+      assertFailure {
           ByteArrayOutputStream().zipOutputStream().use { it.writeEntry(name) }
         }
-      assertThat(exception.message)
-        .isEqualTo("Malicious ZIP entry containing path traversal sequence: $name")
+        .isInstanceOf<GradleException>()
+        .hasMessage("Malicious ZIP entry containing path traversal sequence: $name")
     }
   }
 }
