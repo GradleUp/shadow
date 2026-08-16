@@ -4,14 +4,18 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.writeText
-import org.junit.jupiter.api.Test
 
-class PropertiesFileTransformerTest : BaseTransformerTest() {
+val PropertiesFileTransformerTests by testSuite {
+  runTests(::PropertiesFileTransformerTest)
+}
 
-  @Test
+private class PropertiesFileTransformerTest : BaseTransformerTest() {
+
   fun configureComplexTransformerProperties() {
     val propertiesEntry = "META-INF/test.properties"
     val one = buildJarOne {

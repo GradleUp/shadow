@@ -3,22 +3,31 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.MethodSource
 
-class ReproduciblePropertiesTest {
-  @ParameterizedTest
-  @MethodSource("generalCharsetsProvider")
+val ReproduciblePropertiesTests by testSuite {
+  val subject = ReproduciblePropertiesTest()
+
+  for (charset in ReproduciblePropertiesTest.generalCharsetsProvider) {
+    test("emptyProperties_${charset.name()}") { subject.emptyProperties(charset) }
+    test("asciiProps_${charset.name()}") { subject.asciiProps(charset) }
+    test("escapesSpecialCharacters_${charset.name()}") { subject.escapesSpecialCharacters(charset) }
+  }
+
+  for (charset in ReproduciblePropertiesTest.utfCharsetsProvider) {
+    test("utfProps_${charset.name()}") { subject.utfProps(charset) }
+  }
+}
+
+private class ReproduciblePropertiesTest {
   fun emptyProperties(charset: Charset) {
     val output = ReproducibleProperties().writeToString(charset)
 
     assertThat(output).isEqualTo("")
   }
 
-  @ParameterizedTest
-  @MethodSource("generalCharsetsProvider")
   fun asciiProps(charset: Charset) {
     val output =
       ReproducibleProperties()
@@ -50,8 +59,6 @@ class ReproduciblePropertiesTest {
       )
   }
 
-  @ParameterizedTest
-  @MethodSource("utfCharsetsProvider")
   fun utfProps(charset: Charset) {
     val output =
       ReproducibleProperties()
@@ -75,8 +82,6 @@ class ReproduciblePropertiesTest {
       )
   }
 
-  @ParameterizedTest
-  @MethodSource("generalCharsetsProvider")
   fun escapesSpecialCharacters(charset: Charset) {
     val output =
       ReproducibleProperties()
@@ -94,14 +99,13 @@ class ReproduciblePropertiesTest {
       )
   }
 
-  private companion object Companion {
-    @JvmStatic
-    fun generalCharsetsProvider() =
-      listOf(Charsets.ISO_8859_1, Charsets.US_ASCII) + utfCharsetsProvider()
+  companion object Companion {
+    val utfCharsetsProvider = listOf(Charsets.UTF_8, Charsets.UTF_16)
 
-    @JvmStatic fun utfCharsetsProvider() = listOf(Charsets.UTF_8, Charsets.UTF_16)
+    val generalCharsetsProvider =
+      listOf(Charsets.ISO_8859_1, Charsets.US_ASCII) + utfCharsetsProvider
 
-    fun ReproducibleProperties.writeToString(charset: Charset): String {
+    internal fun ReproducibleProperties.writeToString(charset: Charset): String {
       return ByteArrayOutputStream()
         .also { writeWithoutComments(charset, it) }
         .toString(charset.name())

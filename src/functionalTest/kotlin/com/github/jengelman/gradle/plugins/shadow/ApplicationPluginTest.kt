@@ -13,8 +13,10 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
+import de.infix.testBalloon.framework.core.testSuite
 import java.nio.file.Path
 import java.util.zip.ZipFile
 import kotlin.io.path.appendText
@@ -24,12 +26,14 @@ import kotlin.io.path.readText
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
-import org.junit.jupiter.api.Test
 
-class ApplicationPluginTest : BasePluginTest() {
+val ApplicationPluginTests by testSuite {
+  runTests(::ApplicationPluginTest)
+}
+
+private class ApplicationPluginTest : BasePluginTest() {
   private lateinit var mainClass: String
 
-  @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
       mainClassWithImports = true,
@@ -67,7 +71,6 @@ class ApplicationPluginTest : BasePluginTest() {
       )
   }
 
-  @Test
   fun installShadowOutputs() {
     prepare(
       mainClassWithImports = true,
@@ -116,7 +119,6 @@ class ApplicationPluginTest : BasePluginTest() {
       .contains("Hello, World! (bar) from Main", "Refs: junit.framework.Test")
   }
 
-  @Test
   fun installShadowDoesNotExecuteDependentShadowTask() {
     prepare()
 
@@ -125,7 +127,7 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
-  @Test // #613
+  // #613
   fun overrideMainClassAttrInManifestBlock() {
     val main2ClassEntry = writeClass(className = "Main2")
     prepare(
@@ -170,7 +172,6 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(result.output, "bar")
   }
 
-  @Test
   fun overrideMainClassFromApplicationPlugin() {
     prepare()
     projectScript.appendText(
@@ -189,7 +190,6 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun errorWhenMainClassNotSet() {
     prepare(mainClassBlock = "")
 
@@ -198,7 +198,6 @@ class ApplicationPluginTest : BasePluginTest() {
     assertThat(result.output).contains("no main manifest attribute, in")
   }
 
-  @Test
   fun addExtraFilesIntoDistribution() {
     path("extra/echo.sh").writeText("echo 'Hello, World!'")
     path("some/dir/hello.txt").writeText("'Hello, World!'")
@@ -239,7 +238,6 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun includeSrcDistByDefault() {
     path("src/dist/echo.sh").writeText("echo 'Hello, World!'")
     prepare()
@@ -260,7 +258,6 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun honorApplicationExtensionProperties() {
     val applicationNames = "new" to "new"
     val executableDirs = "sbin" to "sbin"
@@ -344,7 +341,7 @@ class ApplicationPluginTest : BasePluginTest() {
     }
   }
 
-  private companion object {
+  companion object {
     fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> =
       walk()
         .filter { includeDirs || it.isRegularFile() }

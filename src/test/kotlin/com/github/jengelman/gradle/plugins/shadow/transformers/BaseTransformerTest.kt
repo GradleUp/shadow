@@ -11,36 +11,29 @@ import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
 import java.util.Locale
 import java.util.jar.JarFile.MANIFEST_NAME
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.io.TempDir
 
-abstract class BaseTransformerTest<T : ResourceTransformer> {
-  lateinit var transformer: T
-    private set
+abstract class BaseTransformerTest<T : ResourceTransformer>(
+  val tempDir: Path = createTempDirectory()
+) {
+  val transformer: T
 
   val manifestTransformerContext: TransformerContext
     get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
 
-  @TempDir
-  lateinit var tempDir: Path
-    private set
+  val tempJar: Path = createTempFile(directory = tempDir, suffix = ".jar")
 
-  lateinit var tempJar: Path
-    private set
-
-  @BeforeEach
-  open fun beforeEach() {
+  init {
     @Suppress("UNCHECKED_CAST")
     val clazz =
       (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.single()
         as Class<T>
     transformer = clazz.create(testObjectFactory)
-    tempJar = createTempFile(directory = tempDir, suffix = ".jar")
   }
 
   companion object {

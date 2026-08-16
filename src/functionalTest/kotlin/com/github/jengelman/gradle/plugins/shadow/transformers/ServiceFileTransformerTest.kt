@@ -6,6 +6,9 @@ import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
@@ -14,35 +17,33 @@ import org.gradle.api.file.DuplicatesStrategy.FAIL
 import org.gradle.api.file.DuplicatesStrategy.INCLUDE
 import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 
-class ServiceFileTransformerTest : BaseTransformerTest() {
-  @Test
-  fun serviceResourceTransformerAlternatePath() {
-    val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
-    val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
-    val config =
-      """
-      |dependencies {
-      |  ${implementationFiles(one, two)}
-      |}
-      |$shadowJarTask {
-      |  mergeServiceFiles("META-INF/foo")
-      |}
-      """
-        .trimMargin()
-    projectScript.appendText(config)
+val ServiceFileTransformerTests by testSuite {
+  runTests(::ServiceFileTransformerTest)
 
-    runWithSuccess(shadowJarPath)
-
-    val content = outputShadowedJar.use { it.getContent(ENTRY_FOO_SHADE) }
-    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
+  for ((strategy, outputRegex) in ServiceFileTransformerTest.withThrowingProvider) {
+    runTest("honorDuplicatesStrategyWithThrowing_$strategy", ::ServiceFileTransformerTest) {
+      honorDuplicatesStrategyWithThrowing(strategy, outputRegex)
+    }
   }
 
-  @Test
+  for ((strategy, firstValue, secondValue) in ServiceFileTransformerTest.withoutThrowingProvider) {
+    runTest("honorDuplicatesStrategyWithoutThrowing_$strategy", ::ServiceFileTransformerTest) {
+      honorDuplicatesStrategyWithoutThrowing(strategy, firstValue, secondValue)
+    }
+  }
+
+  for ((default, override, matchPath) in ServiceFileTransformerTest.eachFileStrategyProvider) {
+    runTest(
+      "strategyCanBeOverriddenByEachFile_${default}_${override}",
+      ::ServiceFileTransformerTest,
+    ) {
+      strategyCanBeOverriddenByEachFile(default, override, matchPath)
+    }
+  }
+}
+
+private class ServiceFileTransformerTest : BaseTransformerTest() {
   fun serviceResourceTransformerWithRelocation() {
     val one = buildJarOne {
       insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
@@ -102,7 +103,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Test
   fun serviceResourceTransformerWithR8Relocation() {
     val one = buildJarOne {
       insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
@@ -167,7 +167,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Test // #70, #71
+  // #70, #71
   fun transformProjectResources() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne { insert(servicesBarEntry, CONTENT_ONE) }
@@ -191,8 +191,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     assertThat(content).isEqualTo("$CONTENT_THREE\n$CONTENT_ONE_TWO")
   }
 
-  @ParameterizedTest
-  @MethodSource("withThrowingProvider")
   fun honorDuplicatesStrategyWithThrowing(strategy: DuplicatesStrategy, outputRegex: String) {
     writeDuplicatesStrategy(strategy)
 
@@ -201,8 +199,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     assertThat(result.output).containsMatch(outputRegex.toRegex())
   }
 
-  @ParameterizedTest
-  @MethodSource("withoutThrowingProvider")
   fun honorDuplicatesStrategyWithoutThrowing(
     strategy: DuplicatesStrategy,
     firstValue: String,
@@ -226,7 +222,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Test
   fun strategyCanBeOverriddenByFilesMatching() {
     writeDuplicatesStrategy(EXCLUDE)
     projectScript.appendText(
@@ -248,7 +243,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @Test
   fun strategyCanBeOverriddenByFilesNotMatching() {
     writeDuplicatesStrategy(INCLUDE)
     projectScript.appendText(
@@ -270,8 +264,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
   }
 
-  @ParameterizedTest
-  @MethodSource("eachFileStrategyProvider")
   fun strategyCanBeOverriddenByEachFile(
     default: DuplicatesStrategy,
     override: DuplicatesStrategy,
@@ -315,33 +307,24 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     )
   }
 
-  private companion object {
-    @JvmStatic
-    fun withThrowingProvider() =
+  companion object {
+    val withThrowingProvider =
       listOf(
-        Arguments.of(
-          FAIL,
-          "Cannot copy zip entry .* to .* because zip entry .* has already been copied there",
-        ),
-        Arguments.of(
-          INHERIT,
-          "Entry .* is a duplicate but no duplicate handling strategy has been set",
-        ),
+        FAIL to "Cannot copy zip entry .* to .* because zip entry .* has already been copied there",
+        INHERIT to "Entry .* is a duplicate but no duplicate handling strategy has been set",
       )
 
-    @JvmStatic
-    fun withoutThrowingProvider() =
+    val withoutThrowingProvider =
       listOf(
-        Arguments.of(EXCLUDE, CONTENT_ONE, "one"),
-        Arguments.of(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
-        Arguments.of(WARN, CONTENT_ONE_TWO, "one\ntwo"),
+        Triple(EXCLUDE, CONTENT_ONE, "one"),
+        Triple(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
+        Triple(WARN, CONTENT_ONE_TWO, "one\ntwo"),
       )
 
-    @JvmStatic
-    fun eachFileStrategyProvider() =
+    val eachFileStrategyProvider =
       listOf(
-        Arguments.of(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
-        Arguments.of(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
+        Triple(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
+        Triple(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
       )
   }
 }

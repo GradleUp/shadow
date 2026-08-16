@@ -8,8 +8,10 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
@@ -18,12 +20,14 @@ import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.Test
 
-class CachingTest : BasePluginTest() {
+val CachingTests by testSuite {
+  runTests(::CachingTest)
+}
+
+private class CachingTest : BasePluginTest() {
   private var taskPath: String = shadowJarPath
 
-  @Test
   fun dependenciesChanged() {
     projectScript.appendText(
       """
@@ -43,7 +47,6 @@ class CachingTest : BasePluginTest() {
     assertCompositeExecutions { containsOnly(*entriesInA, *manifestEntries) }
   }
 
-  @Test
   fun outputFileChanged() {
     projectScript.appendText(
       """
@@ -72,7 +75,6 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun duplicatesStrategyChanged() {
     listOf(DuplicatesStrategy.EXCLUDE, DuplicatesStrategy.INCLUDE, DuplicatesStrategy.WARN)
       .forEach { strategy ->
@@ -90,7 +92,6 @@ class CachingTest : BasePluginTest() {
       }
   }
 
-  @Test
   fun manifestAttrsChanged() {
     projectScript.appendText(
       """
@@ -133,7 +134,6 @@ class CachingTest : BasePluginTest() {
     assertions("Foo3", "Bar3")
   }
 
-  @Test
   fun kotlinMainRunChanged() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
@@ -158,7 +158,6 @@ class CachingTest : BasePluginTest() {
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName) }
   }
 
-  @Test
   fun applicationChanged() {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
@@ -181,7 +180,7 @@ class CachingTest : BasePluginTest() {
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName) }
   }
 
-  @Test // #717
+  // #717
   fun jarIncludesExcludesChanged() {
     val mainClassEntry = writeClass(className = "Main")
     val main2ClassEntry = writeClass(className = "Main2")
@@ -240,7 +239,6 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun dependenciesIncludesExcludesChanged() {
     val mainClassEntry = writeClass(withImports = true)
     projectScript.appendText(
@@ -270,7 +268,6 @@ class CachingTest : BasePluginTest() {
     assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
   }
 
-  @Test
   fun minimizeChanged() {
     taskPath = serverShadowJarPath
 
@@ -312,7 +309,6 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun r8KeepRuleFileChanged() {
     val previousTaskPath = taskPath
     taskPath = serverShadowJarPath
@@ -352,7 +348,6 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun r8ClasspathRuleChanged() {
     val previousTaskPath = taskPath
     taskPath = serverShadowJarPath
@@ -394,7 +389,6 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun relocatorChanged() {
     projectScript.appendText(
       """
@@ -426,7 +420,7 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test // #1932
+  // #1932
   fun relocatorPatternChanged() {
     projectScript.appendText(
       """
@@ -458,7 +452,6 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun serviceFileTransformerPropsChanged() {
     val mainClassEntry = writeClass()
     val assertions = {
@@ -485,7 +478,6 @@ class CachingTest : BasePluginTest() {
     assertions()
   }
 
-  @Test
   fun disableCacheIfAnyTransformerIsNotCacheable() {
     projectScript.appendText(
       """

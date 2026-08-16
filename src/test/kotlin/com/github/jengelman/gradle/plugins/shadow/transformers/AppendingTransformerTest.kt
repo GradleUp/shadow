@@ -7,20 +7,24 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import org.junit.jupiter.api.Test
+import de.infix.testBalloon.framework.core.testSuite
+
+val AppendingTransformerTests by testSuite {
+  runTests(::AppendingTransformerTest)
+}
 
 /**
  * Modified from
  * [org.apache.maven.plugins.shade.resource.AppendingTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/AppendingTransformerTest.java).
  */
-class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
+private class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
 
   init {
     setupTurkishLocale()
   }
 
-  @Test
   fun canTransformResource() =
     with(transformer) {
       resource.set("abcdefghijklmnopqrstuvwxyz")
@@ -30,7 +34,6 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
     }
 
-  @Test
   fun appendResources() =
     with(transformer) {
       resource.set("test.properties")
@@ -44,7 +47,6 @@ class AppendingTransformerTest : BaseTransformerTest<AppendingTransformer>() {
       assertThat(content).isEqualTo("foo=bar\nbaz=qux")
     }
 
-  @Test
   fun appendResourcesWithCustomSeparator() =
     with(transformer) {
       resource.set("application.yml")

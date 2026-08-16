@@ -36,29 +36,66 @@ import kotlin.io.path.writeText
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import org.gradle.testkit.runner.TaskOutcome
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.io.TempDir
 import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-abstract class BasePluginTest {
-  @TempDir
-  lateinit var projectRoot: Path
-    private set
+val sharedLocalRepo: AppendableMavenRepository by lazy {
+  val repoTempDir = createTempDirectory()
+  val repoRoot = repoTempDir.resolve("local-maven-repo").createDirectories()
+  Runtime.getRuntime()
+    .addShutdownHook(
+      Thread {
+        @OptIn(ExperimentalPathApi::class) repoTempDir.deleteRecursively()
+      }
+    )
+  AppendableMavenRepository(root = repoRoot)
+    .apply {
+      jarModule("junit", "junit", "3.8.2") { useJar(BasePluginTest.junitJar) }
+      val a =
+        jarModule("my", "a", "1.0") {
+          buildJar {
+            insert("a.properties", "a")
+            insert("a2.properties", "a2")
+          }
+        }
+      val b = jarModule("my", "b", "1.0") { buildJar { insert("b.properties", "b") } }
+      val c = jarModule("my", "c", "1.0") { buildJar { insert("c.properties", "c") } }
+      val d =
+        jarModule("my", "d", "1.0") {
+          buildJar { insert("d.properties", "d") }
+          // Depends on c but c does not depend on d.
+          addDependency(c)
+        }
+      val e =
+        jarModule("my", "e", "1.0") {
+          buildJar { insert("e.properties", "e") }
+          // Circular dependency with f.
+          addDependency("my:f:1.0")
+        }
+      val f =
+        jarModule("my", "f", "1.0") {
+          buildJar { insert("f.properties", "f") }
+          // Circular dependency with e.
+          addDependency(e)
+        }
+      bomModule("my", "bom", "1.0") {
+        addDependency(a)
+        addDependency(b)
+        addDependency(c)
+        addDependency(d)
+        addDependency(e)
+        addDependency(f)
+      }
+    }
+    .also { it.publish() }
+}
 
-  lateinit var localRepo: AppendableMavenRepository
-    private set
-
-  lateinit var artifactAJar: Path
-    private set
-
-  lateinit var artifactBJar: Path
-    private set
+abstract class BasePluginTest(
+  val projectRoot: Path = createTempDirectory(),
+  val localRepo: AppendableMavenRepository = sharedLocalRepo,
+) {
+  val artifactAJar: Path = localRepo.root.resolve("my/a/1.0/a-1.0.jar")
+  val artifactBJar: Path = localRepo.root.resolve("my/b/1.0/b-1.0.jar")
 
   val projectScript: Path
     get() = path("build.gradle")
@@ -75,70 +112,9 @@ abstract class BasePluginTest {
   val outputServerShadowedJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
 
-  @BeforeAll
-  fun beforeAll() {
-    localRepo =
-      AppendableMavenRepository(
-          root = createTempDirectory().resolve("local-maven-repo").createDirectories()
-        )
-        .apply {
-          jarModule("junit", "junit", "3.8.2") { useJar(junitJar) }
-          val a =
-            jarModule("my", "a", "1.0") {
-              buildJar {
-                insert("a.properties", "a")
-                insert("a2.properties", "a2")
-              }
-            }
-          val b = jarModule("my", "b", "1.0") { buildJar { insert("b.properties", "b") } }
-          val c = jarModule("my", "c", "1.0") { buildJar { insert("c.properties", "c") } }
-          val d =
-            jarModule("my", "d", "1.0") {
-              buildJar { insert("d.properties", "d") }
-              // Depends on c but c does not depend on d.
-              addDependency(c)
-            }
-          val e =
-            jarModule("my", "e", "1.0") {
-              buildJar { insert("e.properties", "e") }
-              // Circular dependency with f.
-              addDependency("my:f:1.0")
-            }
-          val f =
-            jarModule("my", "f", "1.0") {
-              buildJar { insert("f.properties", "f") }
-              // Circular dependency with e.
-              addDependency(e)
-            }
-          bomModule("my", "bom", "1.0") {
-            addDependency(a)
-            addDependency(b)
-            addDependency(c)
-            addDependency(d)
-            addDependency(e)
-            addDependency(f)
-          }
-        }
-    localRepo.publish()
-
-    artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
-    artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
-  }
-
-  @BeforeEach
-  open fun beforeEach() {
+  init {
     projectScript.writeText(getDefaultProjectBuildScript())
     settingsScript.writeText(getDefaultSettingsBuildScript())
-  }
-
-  @AfterEach
-  fun afterEach() {
-    println(projectScript.readText())
-  }
-
-  @AfterAll
-  fun afterAll() {
-    @OptIn(ExperimentalPathApi::class) localRepo.root.deleteRecursively()
   }
 
   fun getDefaultProjectBuildScript(
@@ -164,9 +140,9 @@ abstract class BasePluginTest {
   fun getDefaultSettingsBuildScript(
     startBlock: String = "",
     // Use a test-specific build cache directory. This ensures that we'll only use cached outputs
-    // generated during
-    // this test, and we won't accidentally use cached outputs from a different test or a different
-    // build.
+    // generated during this test, and we won't accidentally use cached outputs from a different
+    // test
+    // or a different build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
     buildCacheBlock: String = "local { directory = file('build-cache') }",
     endBlock: String = "rootProject.name = 'my'",

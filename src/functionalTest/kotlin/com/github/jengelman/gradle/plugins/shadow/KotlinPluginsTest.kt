@@ -8,25 +8,45 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
-class KotlinPluginsTest : BasePluginTest() {
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
+val KotlinPluginsTests by testSuite {
+  runTests(::KotlinPluginsTest)
+
+  for (excludeStdlib in listOf(false, true)) {
+    runTest("compatKotlinJvmPlugin_excludeStdlib_$excludeStdlib", ::KotlinPluginsTest) {
+      compatKotlinJvmPlugin(excludeStdlib)
+    }
+    runTest("compatKmpJvmTarget_excludeStdlib_$excludeStdlib", ::KotlinPluginsTest) {
+      compatKmpJvmTarget(excludeStdlib)
+    }
+  }
+
+  for (useShadowAttr in listOf(false, true)) {
+    runTest("setMainClassAttributeFromMainRun_useShadowAttr_$useShadowAttr", ::KotlinPluginsTest) {
+      setMainClassAttributeFromMainRun(useShadowAttr)
+    }
+    runTest(
+      "setManifestAttrsFromJvmTargetJar_useShadowAttr_$useShadowAttr",
+      ::KotlinPluginsTest,
+    ) {
+      setManifestAttrsFromJvmTargetJar(useShadowAttr)
+    }
+  }
+}
+
+private class KotlinPluginsTest : BasePluginTest() {
+  init {
     projectScript.writeText(
       getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")
     )
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun compatKotlinJvmPlugin(excludeStdlib: Boolean) {
     val stdlib = compileOnlyStdlib(excludeStdlib)
 
@@ -61,8 +81,6 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun compatKmpJvmTarget(excludeStdlib: Boolean) {
     val stdlib = compileOnlyStdlib(excludeStdlib)
 
@@ -108,7 +126,7 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @Test // #1377
+  // #1377
   fun compatKmpForOtherNamedJvmTarget() {
     val jvmTargetName = "newJvm"
     val jvmTargetMain = "${jvmTargetName}Main"
@@ -144,7 +162,7 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @Test // #1377
+  // #1377
   fun doNotCreateJvmTargetEagerly() {
     projectScript.appendText(
       """
@@ -163,8 +181,6 @@ class KotlinPluginsTest : BasePluginTest() {
       )
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun setMainClassAttributeFromMainRun(useShadowAttr: Boolean) {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
@@ -194,8 +210,6 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun setManifestAttrsFromJvmTargetJar(useShadowAttr: Boolean) {
     val mainClassName = "my.Main"
     val main2ClassName = "my.Main2"
@@ -228,7 +242,6 @@ class KotlinPluginsTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun registerShadowJarForFirstJvmTarget() {
     val jvmTargetName = "newJvm"
     projectScript.appendText(

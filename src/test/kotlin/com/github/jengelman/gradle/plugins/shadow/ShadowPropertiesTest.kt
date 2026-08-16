@@ -23,6 +23,8 @@ import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import org.gradle.api.Named
 import org.gradle.api.Project
 import org.gradle.api.Task
@@ -41,22 +43,18 @@ import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
 
-class ShadowPropertiesTest {
-  private lateinit var project: Project
+val ShadowPropertiesTests by testSuite {
+  runTests(::ShadowPropertiesTest)
+}
 
-  @BeforeEach
-  fun beforeEach() {
-    project =
-      ProjectBuilder.builder().withName(PROJECT_NAME).build().also {
-        it.version = VERSION
-        it.plugins.apply(ShadowPlugin::class.java)
-      }
-  }
+private class ShadowPropertiesTest {
+  private val project: Project =
+    ProjectBuilder.builder().withName(PROJECT_NAME).build().also {
+      it.version = VERSION
+      it.plugins.apply(ShadowPlugin::class.java)
+    }
 
-  @Test
   fun misc() =
     with(project) {
       assertThat(plugins.hasPlugin(ShadowPlugin::class.java)).isTrue()
@@ -71,7 +69,6 @@ class ShadowPropertiesTest {
       }
     }
 
-  @Test
   fun inheritManifestAttrsFromJars() =
     with(project) {
       plugins.apply(JavaPlugin::class.java)
@@ -96,7 +93,6 @@ class ShadowPropertiesTest {
         )
     }
 
-  @Test
   fun inheritManifestMainClassFromJar() =
     with(project) {
       plugins.apply(JavaPlugin::class.java)
@@ -108,7 +104,6 @@ class ShadowPropertiesTest {
         .containsOnly("Manifest-Version" to "1.0", mainClassAttributeKey to "Main")
     }
 
-  @Test
   fun applyJavaPlugin() =
     with(project) {
       plugins.apply(JavaPlugin::class.java)
@@ -165,7 +160,6 @@ class ShadowPropertiesTest {
       }
     }
 
-  @Test
   fun applyApplicationPlugin() =
     with(project) {
       plugins.apply(ApplicationPlugin::class.java)
@@ -257,7 +251,6 @@ class ShadowPropertiesTest {
       }
     }
 
-  @Test
   fun applyJavaGradlePlugin() =
     with(project) {
       plugins.apply(JavaGradlePluginPlugin::class.java)
@@ -270,7 +263,7 @@ class ShadowPropertiesTest {
       assertThat(compileOnlyApi.dependencies).containsOnly(gradleApi)
     }
 
-  private companion object {
+  companion object {
     const val PROJECT_NAME = "my-project"
     const val VERSION = "1.0.0"
 

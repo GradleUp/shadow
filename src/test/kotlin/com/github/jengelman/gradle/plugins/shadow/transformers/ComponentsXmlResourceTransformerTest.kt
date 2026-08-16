@@ -3,17 +3,21 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.readText
 import org.custommonkey.xmlunit.XMLUnit
-import org.junit.jupiter.api.Test
+
+val ComponentsXmlResourceTransformerTests by testSuite {
+  runTests(::ComponentsXmlResourceTransformerTest)
+}
 
 /**
  * Modified from
  * [org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ComponentsXmlResourceTransformerTest.java).
  */
-class ComponentsXmlResourceTransformerTest :
+private class ComponentsXmlResourceTransformerTest :
   BaseTransformerTest<ComponentsXmlResourceTransformer>() {
-  @Test
   fun configurationMerging() =
     with(transformer) {
       XMLUnit.setNormalizeWhitespace(true)

@@ -1,18 +1,24 @@
+@file:OptIn(kotlin.io.path.ExperimentalPathApi::class)
+
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import java.nio.file.Path
+import kotlin.io.path.createTempDirectory
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.ZipFile
 import org.gradle.api.tasks.bundling.ZipEntryCompression
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
-class R8MinimizerTest {
-  @Test
-  fun normalizeJarPreservesUnixPermissions(@TempDir tempDir: Path) {
+val R8MinimizerTests by testSuite {
+  runTests(::R8MinimizerTest)
+}
+
+private class R8MinimizerTest(val tempDir: Path = createTempDirectory()) {
+  fun normalizeJarPreservesUnixPermissions() {
     val inputJar = tempDir.resolve("input.jar")
     val outputJar = tempDir.resolve("output.jar")
     val expectedExecutableMode = UnixStat.FILE_FLAG or 493 // 0755 octal

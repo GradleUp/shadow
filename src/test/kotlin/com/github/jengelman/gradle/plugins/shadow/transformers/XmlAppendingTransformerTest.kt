@@ -6,16 +6,20 @@ import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import org.junit.jupiter.api.Test
+import de.infix.testBalloon.framework.core.testSuite
 
-class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>() {
+val XmlAppendingTransformerTests by testSuite {
+  runTests(::XmlAppendingTransformerTest)
+}
+
+private class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>() {
 
   init {
     setupTurkishLocale()
   }
 
-  @Test
   fun canTransformResource() =
     with(transformer) {
       resource.set("abcdefghijklmnopqrstuvwxyz")
@@ -25,7 +29,6 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
     }
 
-  @Test
   fun appendXmlFiles() =
     with(transformer) {
       val xmlEntry = "properties.xml"
@@ -61,7 +64,6 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
         )
     }
 
-  @Test
   fun appendXmlFilesWithUnreachableDtd() =
     with(transformer) {
       val xmlEntry = "properties_invalid_dtd.xml"
@@ -97,7 +99,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
         )
     }
 
-  @Test // #168
+  // #168
   fun mergeNestedLevels() =
     with(transformer) {
       val xmlEntry = "META-INF/nested.xml"
@@ -129,7 +131,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
         )
     }
 
-  private companion object {
+  companion object {
     /**
      * Normalizes line breaks in XML content produced by [XmlAppendingTransformer].
      *

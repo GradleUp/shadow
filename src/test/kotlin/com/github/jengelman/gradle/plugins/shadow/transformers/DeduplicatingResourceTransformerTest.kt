@@ -9,30 +9,29 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer.Companion.sha256Hex
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.File
 import kotlin.io.path.writeText
 import org.gradle.api.GradleException
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
-class DeduplicatingResourceTransformerTest :
+val DeduplicatingResourceTransformerTests by testSuite {
+  runTests(::DeduplicatingResourceTransformerTest)
+}
+
+private class DeduplicatingResourceTransformerTest :
   BaseTransformerTest<DeduplicatingResourceTransformer>() {
 
-  private lateinit var file1: File
-  private lateinit var file2: File
-  private lateinit var file3: File
+  private var file1: File
+  private var file2: File
+  private var file3: File
 
   private var hash1 = ""
   private var hash3 = ""
 
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
-
+  init {
     val content1 = "content1"
     val content2 = "content2"
     file1 = tempDir.resolve("file1").apply { writeText(content1) }.toFile()
@@ -42,7 +41,6 @@ class DeduplicatingResourceTransformerTest :
     hash3 = file3.sha256Hex()
   }
 
-  @Test
   fun sha256Hex() {
     val file = tempDir.resolve("sha256").apply { writeText("content") }
 
@@ -50,8 +48,6 @@ class DeduplicatingResourceTransformerTest :
       .isEqualTo("ed7002b439e9ac845f22357d822bac1444730fbdb6016d3ec9432297b9ec9f73")
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun duplicateContent(exclusionCheck: Boolean) =
     with(transformer) {
       if (!exclusionCheck) {
@@ -115,7 +111,6 @@ class DeduplicatingResourceTransformerTest :
       }
     }
 
-  @Test
   fun modifyOutputStreamReportsDuplicateContent() =
     with(transformer) {
       canTransformResource("differing-content", file1)

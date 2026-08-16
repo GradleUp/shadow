@@ -16,14 +16,18 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import de.infix.testBalloon.framework.core.testSuite
 import java.nio.file.Path
 import kotlin.io.path.appendText
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.exists
 import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
@@ -41,22 +45,24 @@ import org.gradle.api.attributes.java.TargetJvmVersion
 import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
-class PublishingTest : BasePluginTest() {
-  @TempDir lateinit var remoteRepoPath: Path
+val PublishingTests by testSuite {
+  runTests(::PublishingTest)
 
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
+  for (addShadowVariant in listOf(false, true)) {
+    runTest("publishShadowVariantJar_addShadowVariant_$addShadowVariant", ::PublishingTest) {
+      publishShadowVariantJar(addShadowVariant)
+    }
+  }
+}
+
+private class PublishingTest : BasePluginTest() {
+  val remoteRepoPath: Path = createTempDirectory()
+
+  init {
     settingsScript.appendText("rootProject.name = 'maven'\n")
   }
 
-  @Test
   fun publishShadowJarWithCorrectTargetJvm() {
     projectScript.appendText(
       publishConfiguration(
@@ -137,7 +143,7 @@ class PublishingTest : BasePluginTest() {
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
-  @Test // #1665
+  // #1665
   fun dontInjectTargetJvmVersionWhenAutoTargetJvmDisabled() {
     projectScript.appendText(
       publishConfiguration(
@@ -172,7 +178,6 @@ class PublishingTest : BasePluginTest() {
     )
   }
 
-  @Test
   fun dontInjectTargetJvmVersionWhenOptingOut() {
     projectScript.appendText(
       publishConfiguration(
@@ -207,7 +212,6 @@ class PublishingTest : BasePluginTest() {
     )
   }
 
-  @Test
   fun overrideBundlingAttrInGradleMetadata() {
     projectScript.appendText(
       publishConfiguration(
@@ -240,7 +244,6 @@ class PublishingTest : BasePluginTest() {
     )
   }
 
-  @Test
   fun publishShadowJarInsteadOfJar() {
     projectScript.appendText(
       publishConfiguration(
@@ -285,7 +288,6 @@ class PublishingTest : BasePluginTest() {
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module")))
   }
 
-  @Test
   fun publishCustomShadowJar() {
     projectScript.appendText(
       publishConfiguration(
@@ -321,7 +323,6 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun publishShadowedGradlePlugin() {
     writeGradlePluginModule()
     projectScript.appendText(
@@ -365,7 +366,7 @@ class PublishingTest : BasePluginTest() {
     )
   }
 
-  @Test // #614, #860, #945
+  // #614, #860, #945
   fun publishShadowJarWithCustomArtifactName() {
     projectScript.appendText(
       publishConfiguration(
@@ -420,7 +421,6 @@ class PublishingTest : BasePluginTest() {
     assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/my-artifact-2.0.module")))
   }
 
-  @Test
   fun publishJarAndShadowJarWithGradleMetadata() {
     projectScript.appendText(
       publishConfiguration(
@@ -533,8 +533,7 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest // #651
-  @ValueSource(booleans = [false, true])
+  // #651
   fun publishShadowVariantJar(addShadowVariant: Boolean) {
     projectScript.appendText(
       publishingBlock(
@@ -730,7 +729,7 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  private companion object {
+  companion object {
     val gmmAdapter: JsonAdapter<GradleModuleMetadata> =
       Moshi.Builder()
         .add(KotlinJsonAdapterFactory())

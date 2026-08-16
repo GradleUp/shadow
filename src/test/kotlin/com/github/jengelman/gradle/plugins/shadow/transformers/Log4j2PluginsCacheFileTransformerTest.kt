@@ -13,7 +13,10 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.util.Collections
@@ -23,18 +26,27 @@ import kotlin.io.path.writeBytes
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
+
+val Log4j2PluginsCacheFileTransformerTests by testSuite {
+  runTests(::Log4j2PluginsCacheFileTransformerTest)
+
+  for ((pattern, shadedPattern, expected) in
+    Log4j2PluginsCacheFileTransformerTest.relocationProvider) {
+    runTest(
+      "relocations_${pattern}_${shadedPattern}",
+      ::Log4j2PluginsCacheFileTransformerTest,
+    ) {
+      relocations(pattern, shadedPattern, expected)
+    }
+  }
+}
 
 /**
  * Modified from
  * [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformerTest.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/test/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformerTest.java).
  */
-class Log4j2PluginsCacheFileTransformerTest :
+private class Log4j2PluginsCacheFileTransformerTest :
   BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
-  @Test
   fun canTransformResource() =
     with(transformer) {
       assertThat(canTransformResource("")).isFalse()
@@ -45,7 +57,6 @@ class Log4j2PluginsCacheFileTransformerTest :
       assertThat(canTransformResource(PLUGIN_CACHE_FILE)).isTrue()
     }
 
-  @Test
   fun relocateClassesInsideDatFile() =
     with(transformer) {
       val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
@@ -56,8 +67,6 @@ class Log4j2PluginsCacheFileTransformerTest :
         modifyOutputStream(zos, true)
       }
 
-      // Extract the .dat file bytes to a temp file to avoid JarURLConnection locking tempJar on
-      // Windows
       val tempDat = createTempFile(directory = tempDir, suffix = ".dat")
       tempDat.writeBytes(JarPath(tempJar).use { it.getBytes(PLUGIN_CACHE_FILE) })
 
@@ -68,7 +77,7 @@ class Log4j2PluginsCacheFileTransformerTest :
         .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
     }
 
-  @Test // #427
+  // #427
   fun transformAndModifyOutputStream() =
     with(transformer) {
       assertThat(hasTransformedResource()).isFalse()
@@ -87,7 +96,6 @@ class Log4j2PluginsCacheFileTransformerTest :
             fail("No expected resource in the output jar.")
           } else if (jarEntry.name == PLUGIN_CACHE_FILE) {
             assertThat(inputStream.readAllBytes().contentHashCode()).all {
-              // Hash of the original plugin cache file.
               isNotEqualTo(-2114104185)
               isEqualTo(1911442937)
             }
@@ -97,8 +105,6 @@ class Log4j2PluginsCacheFileTransformerTest :
       }
     }
 
-  @ParameterizedTest
-  @MethodSource("relocationProvider")
   fun relocations(pattern: String, shadedPattern: String, expected: String) =
     with(transformer) {
       val aggregator =
@@ -113,24 +119,21 @@ class Log4j2PluginsCacheFileTransformerTest :
       }
     }
 
-  private companion object {
+  companion object {
     val pluginCacheUrl: URL = requireResourceAsPath(PLUGIN_CACHE_FILE).toUri().toURL()
 
     fun context(vararg relocators: Relocator): TransformerContext {
       return resourceContext(PLUGIN_CACHE_FILE, relocators = relocators)
     }
 
-    @JvmStatic
-    fun relocationProvider() =
+    val relocationProvider =
       listOf(
-        // test with matching relocator
-        Arguments.of(
+        Triple(
           "org.apache.logging",
           "new.location.org.apache.logging",
           "new.location.org.apache.logging",
         ),
-        // test without matching relocator
-        Arguments.of("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
+        Triple("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
       )
   }
 }

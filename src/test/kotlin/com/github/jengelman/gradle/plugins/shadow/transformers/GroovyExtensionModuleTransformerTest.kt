@@ -7,6 +7,7 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_EXTENSION_CLASSES
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_VERSION
@@ -16,17 +17,17 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.StringReader
 import java.util.Properties
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 
-class GroovyExtensionModuleTransformerTest :
+val GroovyExtensionModuleTransformerTests by testSuite {
+  runTests(::GroovyExtensionModuleTransformerTest)
+}
+
+private class GroovyExtensionModuleTransformerTest :
   BaseTransformerTest<GroovyExtensionModuleTransformer>() {
 
-  @Test
   fun canTransformResource() =
     with(transformer) {
       assertThat(canTransformResource(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR)).isTrue()
@@ -34,8 +35,6 @@ class GroovyExtensionModuleTransformerTest :
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
     }
 
-  @ParameterizedTest
-  @MethodSource("resourcePathProvider")
   fun mergeDescriptors(fooEntry: String, barEntry: String) =
     with(GroovyExtensionModuleTransformer()) {
       transform(textContext(fooEntry, FOO_DESCRIPTOR))
@@ -56,7 +55,6 @@ class GroovyExtensionModuleTransformerTest :
         .isEqualTo("$STATIC_EXTENSION_CLASSES_FOO,$STATIC_EXTENSION_CLASSES_BAR")
     }
 
-  @Test
   fun groovyExtensionModuleTransformerWithRelocation() =
     with(GroovyExtensionModuleTransformer()) {
       val relocator = SimpleRelocator("com.acme", "com.example.shaded.acme")
@@ -83,7 +81,7 @@ class GroovyExtensionModuleTransformerTest :
         )
     }
 
-  private companion object {
+  companion object {
     const val EXTENSION_CLASSES_FOO = "com.acme.foo.FooExtension,com.acme.foo.BarExtension"
     const val EXTENSION_CLASSES_BAR = "com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension"
     const val STATIC_EXTENSION_CLASSES_FOO = "com.acme.foo.FooStaticExtension"
@@ -109,22 +107,21 @@ class GroovyExtensionModuleTransformerTest :
 
     fun String.toProperties() = Properties().apply { load(StringReader(this@toProperties)) }
 
-    @JvmStatic
-    fun resourcePathProvider() =
+    val resourcePathProvider =
       listOf(
-        Arguments.of(
+        Pair(
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),
-        Arguments.of(
+        Pair(
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),
-        Arguments.of(
+        Pair(
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),
-        Arguments.of(
+        Pair(
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),

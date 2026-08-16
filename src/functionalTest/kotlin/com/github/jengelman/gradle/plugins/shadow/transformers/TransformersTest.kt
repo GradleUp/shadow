@@ -11,16 +11,20 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
-import org.junit.jupiter.api.Test
 
-class TransformersTest : BaseTransformerTest() {
+val TransformersTests by testSuite {
+  runTests(::TransformersTest)
+}
 
-  @Test
+private class TransformersTest : BaseTransformerTest() {
+
   fun manifestRetained() {
     writeClass()
     projectScript.appendText(
@@ -43,7 +47,6 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
-  @Test
   fun manifestTransformed() {
     writeClass()
 
@@ -54,7 +57,7 @@ class TransformersTest : BaseTransformerTest() {
     commonAssertions()
   }
 
-  @Test // #427
+  // #427
   fun mergeLog4j2PluginCacheFiles() {
     val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
     val one = buildJarOne { insert(PLUGIN_CACHE_FILE, content) }
@@ -77,7 +80,6 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
-  @Test
   fun preserveFirstFoundResource() {
     path("src/main/resources/foo/bar").writeText("bar1")
     path("src/main/resources/foo/baz").writeText("baz1")
@@ -105,7 +107,6 @@ class TransformersTest : BaseTransformerTest() {
     }
   }
 
-  @Test
   fun useCustomTransformer() {
     projectScript.appendText(
       """
@@ -138,7 +139,7 @@ class TransformersTest : BaseTransformerTest() {
     mainAttributesBlock(mf.mainAttributes)
   }
 
-  private companion object {
+  companion object {
     const val NEW_ENTRY_ATTR_KEY = "New-Entry"
     const val TEST_ENTRY_ATTR_KEY = "Test-Entry"
 

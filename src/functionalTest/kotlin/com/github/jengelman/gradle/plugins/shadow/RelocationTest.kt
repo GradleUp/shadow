@@ -13,22 +13,71 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONS
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
+import de.infix.testBalloon.framework.core.testSuite
 import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import org.opentest4j.AssertionFailedError
 
-class RelocationTest : BasePluginTest() {
-  @ParameterizedTest
-  @ValueSource(strings = ["foo", "new.pkg", "new/path"])
+val RelocationTests by testSuite {
+  runTests(::RelocationTest)
+
+  for (relocationPrefix in listOf("foo", "new.pkg", "new/path")) {
+    runTest("autoRelocation_$relocationPrefix", ::RelocationTest) {
+      autoRelocation(relocationPrefix)
+    }
+  }
+
+  for ((enable, relocationPrefix) in RelocationTest.relocationCliOptionProvider) {
+    runTest(
+      "enableAutoRelocationByCliOption_${enable}_${relocationPrefix}",
+      ::RelocationTest,
+    ) {
+      enableAutoRelocationByCliOption(enable, relocationPrefix)
+    }
+  }
+
+  for ((preserveFileTimestamps, enableAutoRelocation) in
+    RelocationTest.preserveLastModifiedProvider) {
+    runTest(
+      "preserveLastModifiedCorrectly_${preserveFileTimestamps}_${enableAutoRelocation}",
+      ::RelocationTest,
+    ) {
+      preserveLastModifiedCorrectly(preserveFileTimestamps, enableAutoRelocation)
+    }
+  }
+
+  for (exclude in listOf(false, true)) {
+    runTest("relocateAllPackagesButCertainOne_exclude_$exclude", ::RelocationTest) {
+      relocateAllPackagesButCertainOne(exclude)
+    }
+  }
+
+  for (skipStringConstants in listOf(false, true)) {
+    runTest(
+      "disableStringConstantsRelocation_skipStringConstants_$skipStringConstants",
+      ::RelocationTest,
+    ) {
+      disableStringConstantsRelocation(skipStringConstants)
+    }
+  }
+
+  for (enableKotlinModuleRemapping in listOf(false, true)) {
+    runTest(
+      "relocateKotlinModuleFiles_enableKotlinModuleRemapping_$enableKotlinModuleRemapping",
+      ::RelocationTest,
+    ) {
+      relocateKotlinModuleFiles(enableKotlinModuleRemapping)
+    }
+  }
+}
+
+private class RelocationTest : BasePluginTest() {
   fun autoRelocation(relocationPrefix: String) {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -67,8 +116,6 @@ class RelocationTest : BasePluginTest() {
     assertThat(result.output).contains("Relocator count: 6.")
   }
 
-  @ParameterizedTest
-  @MethodSource("relocationCliOptionProvider")
   fun enableAutoRelocationByCliOption(enable: Boolean, relocationPrefix: String) {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -109,7 +156,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test // #58
+  // #58
   fun relocateDependencyFiles() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -150,7 +197,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun relocateDependencyFilesWithFiltering() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -199,7 +245,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test // #53, #55
+  // #53, #55
   fun remapClassNamesForRelocatedFilesInProjectSource() {
     projectScript.appendText(
       """
@@ -249,7 +295,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test // #93, #114
+  // #93, #114
   fun relocateResourceFiles() {
     val depJar = buildJar("foo.jar") { insert("foo/dep.properties", "c") }
     writeClass(packageName = "foo", className = "Foo")
@@ -280,8 +326,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @MethodSource("preserveLastModifiedProvider")
   fun preserveLastModifiedCorrectly(
     enableAutoRelocation: Boolean,
     preserveFileTimestamps: Boolean,
@@ -372,7 +416,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test // #295, #562, #884
+  // #295, #562, #884
   fun excludeKotlinBuiltinsFromRelocation() {
     val kotlinJar =
       buildJar("kotlin.jar") {
@@ -399,8 +443,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun relocateAllPackagesButCertainOne(exclude: Boolean) {
     val relocateConfig =
       if (exclude) {
@@ -437,7 +479,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun relocateProjectResourcesOnly() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -460,7 +501,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun relocateStringConstantsByDefault() {
     writeClassWithStringRef()
     projectScript.appendText(
@@ -481,8 +521,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
   }
 
-  @ParameterizedTest // #232, #606
-  @ValueSource(booleans = [false, true])
+  // #232, #606
   fun disableStringConstantsRelocation(skipStringConstants: Boolean) {
     writeClassWithStringRef()
     projectScript.appendText(
@@ -509,7 +548,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test // #1403
+  // #1403
   fun relocateMultiClassSignatureStringConstants() {
     writeClass {
       """
@@ -548,7 +587,6 @@ class RelocationTest : BasePluginTest() {
       )
   }
 
-  @Test
   fun classBytesUnchangedIfPossible() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
@@ -570,8 +608,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
-  @ParameterizedTest // #843
-  @ValueSource(booleans = [false, true])
+  // #843
   fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
     val originalModuleFileBytes = requireResourceAsPath(originalModuleFilePath).readBytes()
@@ -627,7 +664,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun relocateWithR8() {
     writeClass(packageName = "my", withImports = false) {
       """
@@ -679,23 +715,21 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  private companion object {
-    @JvmStatic
-    fun preserveLastModifiedProvider() =
+  companion object {
+    val preserveLastModifiedProvider =
       listOf(
-        Arguments.of(false, false),
-        Arguments.of(true, false),
-        Arguments.of(false, true),
-        Arguments.of(true, true),
+        Pair(false, false),
+        Pair(true, false),
+        Pair(false, true),
+        Pair(true, true),
       )
 
-    @JvmStatic
-    fun relocationCliOptionProvider() =
+    val relocationCliOptionProvider =
       listOf(
-        Arguments.of(false, "foo"),
-        Arguments.of(false, "bar"),
-        Arguments.of(true, "foo"),
-        Arguments.of(true, "bar"),
+        Pair(false, "foo"),
+        Pair(false, "bar"),
+        Pair(true, "foo"),
+        Pair(true, "bar"),
       )
   }
 }

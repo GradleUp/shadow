@@ -12,15 +12,20 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.metadata.jvm.KotlinModuleMetadata
 import kotlin.metadata.jvm.UnstableMetadataApi
-import org.junit.jupiter.api.Test
+
+val KotlinModuleMetadataTransformerTests by testSuite {
+  runTests(::KotlinModuleMetadataTransformerTest)
+}
 
 @OptIn(UnstableMetadataApi::class)
-class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMetadataTransformer>() {
+private class KotlinModuleMetadataTransformerTest :
+  BaseTransformerTest<KotlinModuleMetadataTransformer>() {
 
-  @Test
   fun canTransformResource() =
     with(transformer) {
       assertThat(canTransformResource("META-INF/kotlin-stdlib.kotlin_module")).isTrue()
@@ -28,7 +33,6 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
     }
 
-  @Test
   fun transformWithoutRelocator() =
     with(transformer) {
       val modulePath = "META-INF/kotlin-stdlib.kotlin_module"
@@ -42,7 +46,7 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
       assertThat(outputBytes).isEqualTo(originalBytes)
     }
 
-  @Test // #843
+  // #843
   fun transformWithRelocator() =
     with(transformer) {
       val modulePath = "META-INF/kotlin-stdlib.kotlin_module"

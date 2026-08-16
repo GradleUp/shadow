@@ -4,12 +4,9 @@ import com.github.jengelman.gradle.plugins.shadow.BasePluginTest
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import java.nio.file.Path
 import kotlin.io.path.appendText
-import org.junit.jupiter.api.BeforeEach
 
 abstract class BaseTransformerTest : BasePluginTest() {
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
+  init {
     projectScript.appendText(
       """
       |$shadowJarTask {
@@ -49,6 +46,5 @@ abstract class BaseTransformerTest : BasePluginTest() {
     const val ENTRY_TEST_PROPERTIES = "test.properties"
     const val ENTRY_SERVICES_SHADE = "META-INF/services/org.apache.maven.Shade"
     const val ENTRY_SERVICES_FOO = "META-INF/services/com.acme.Foo"
-    const val ENTRY_FOO_SHADE = "META-INF/foo/org.apache.maven.Shade"
   }
 }

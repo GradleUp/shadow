@@ -7,10 +7,15 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import org.junit.jupiter.api.Test
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 
-class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseResourceTransformer>() {
-  @Test
+val MergeLicenseResourceTransformerTests by testSuite {
+  runTests(::MergeLicenseResourceTransformerTest)
+}
+
+private class MergeLicenseResourceTransformerTest :
+  BaseTransformerTest<MergeLicenseResourceTransformer>() {
   fun defaultIncludes() =
     with(transformer) {
       assertThat(canTransformResource("META-INF/LICENSE")).isTrue()
@@ -22,7 +27,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(canTransformResource("something else")).isFalse()
     }
 
-  @Test
   fun customIncludes() =
     with(transformer) {
       include("META-INF/FOO")
@@ -38,7 +42,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(canTransformResource("something else")).isFalse()
     }
 
-  @Test
   fun deduplicateLicenseTexts() =
     with(transformer) {
       transformInternal("license one".toByteArray())
@@ -81,7 +84,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
         )
     }
 
-  @Test
   fun singleAdditionalLicense() =
     with(transformer) {
       transformInternal("license one".toByteArray())
@@ -109,7 +111,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
         )
     }
 
-  @Test
   fun noAdditionalLicenses() =
     with(transformer) {
       val artifactLicenseFile = tempDir.resolve("artifact-license").toFile()
@@ -128,7 +129,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
         )
     }
 
-  @Test
   fun noSpdxId() =
     with(transformer) {
       artifactLicenseSpdxId.unsetConvention()
@@ -142,7 +142,6 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       assertThat(buildLicense()).isEqualTo("artifact license file content")
     }
 
-  @Test
   fun customOutput() =
     with(transformer) {
       outputPath.set("MY_LICENSE")

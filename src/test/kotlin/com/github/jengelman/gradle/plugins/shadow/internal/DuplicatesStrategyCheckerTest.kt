@@ -1,14 +1,19 @@
+@file:OptIn(kotlin.io.path.ExperimentalPathApi::class)
+
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.BaseTransformerTest.Companion.canTransformResource
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.File
 import java.net.JarURLConnection
 import java.nio.file.Path
+import kotlin.io.path.createTempDirectory
 import kotlin.io.path.createTempFile
 import kotlin.io.path.exists
 import kotlin.io.path.extension
@@ -16,13 +21,12 @@ import kotlin.io.path.isRegularFile
 import kotlin.io.path.toPath
 import kotlin.io.path.walk
 import kotlin.reflect.full.isSubclassOf
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
-class DuplicatesStrategyCheckerTest {
-  @TempDir lateinit var tempDir: Path
+val DuplicatesStrategyCheckerTests by testSuite {
+  runTests(::DuplicatesStrategyCheckerTest)
+}
 
-  @Test
+private class DuplicatesStrategyCheckerTest(val tempDir: Path = createTempDirectory()) {
   fun checkDupStrategyInvocationCount() {
     val allResourceTransformers =
       getTransformerClasses().map {

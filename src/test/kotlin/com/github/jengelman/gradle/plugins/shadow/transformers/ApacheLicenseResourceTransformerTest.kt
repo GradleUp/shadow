@@ -3,20 +3,24 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import org.junit.jupiter.api.Test
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
+
+val ApacheLicenseResourceTransformerTests by testSuite {
+  runTests(::ApacheLicenseResourceTransformerTest)
+}
 
 /**
  * Modified from
  * [org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheLicenseResourceTransformerTest.java).
  */
-class ApacheLicenseResourceTransformerTest :
+private class ApacheLicenseResourceTransformerTest :
   BaseTransformerTest<ApacheLicenseResourceTransformer>() {
 
   init {
     setupTurkishLocale()
   }
 
-  @Test
   fun canTransformResource() =
     with(transformer) {
       assertThat(canTransformResource("META-INF/LICENSE")).isTrue()
@@ -27,7 +31,6 @@ class ApacheLicenseResourceTransformerTest :
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
     }
 
-  @Test
   fun canTransformByPattern() =
     with(transformer) {
       exclude("META-INF/LICENSE.txt")

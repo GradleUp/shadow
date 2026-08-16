@@ -11,17 +11,27 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import java.net.URLClassLoader
 import java.util.ServiceLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.JavaVersion
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
-class MinimizeTest : BasePluginTest() {
+val MinimizeTests by testSuite {
+  runTests(::MinimizeTest)
+
+  for (enable in listOf(false, true)) {
+    runTest("enableMinimizationByCliOption_enable_$enable", ::MinimizeTest) {
+      enableMinimizationByCliOption(enable)
+    }
+  }
+}
+
+private class MinimizeTest : BasePluginTest() {
   private val outputImplShadowedJar: JarPath
     get() = jarPath("impl/build/libs/impl-1.0-all.jar")
 
@@ -30,7 +40,6 @@ class MinimizeTest : BasePluginTest() {
    * shall remove 'junit', but not 'api'. Unused classes of 'api' and theirs dependencies also
    * shouldn't be removed.
    */
-  @Test
   fun useMinimizeWithDependenciesWithApiScope() {
     writeApiLibAndImplModules()
 
@@ -54,7 +63,6 @@ class MinimizeTest : BasePluginTest() {
    * 'api' used as api for 'impl', and 'lib' used as api for 'api'. Unused classes of 'api' and
    * 'lib' shouldn't be removed.
    */
-  @Test
   fun useMinimizeWithTransitiveDependenciesWithApiScope() {
     writeApiLibAndImplModules()
     path("api/build.gradle")
@@ -88,7 +96,6 @@ class MinimizeTest : BasePluginTest() {
   }
 
   /** 'Server' depends on 'Client'. 'junit' is independent. The minimize shall remove 'junit'. */
-  @Test
   fun minimizeByKeepingOnlyTransitiveDependencies() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -122,7 +129,6 @@ class MinimizeTest : BasePluginTest() {
    * 'Client', 'Server' and 'junit' are independent. 'junit' is excluded from the minimize step. The
    * minimize step shall remove 'Client' but not 'junit'.
    */
-  @Test
   fun excludeDependencyFromMinimize() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -146,7 +152,7 @@ class MinimizeTest : BasePluginTest() {
    * 'Client', 'Server' and 'junit' are independent. Unused classes of 'client' and theirs
    * dependencies shouldn't be removed.
    */
-  @Test // #744
+  // #744
   fun excludeProjectFromMinimize() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -176,7 +182,6 @@ class MinimizeTest : BasePluginTest() {
    * 'Client', 'Server' and 'junit' are independent. Unused classes of 'client' and theirs
    * dependencies shouldn't be removed.
    */
-  @Test
   fun excludeProjectFromMinimizeShallNotExcludeTransitiveDependenciesThatAreUsedInSubproject() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -220,7 +225,7 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test // #1610
+  // #1610
   fun excludeCircularDependencies() {
     val dependency = "'my:e:1.0'"
     projectScript.appendText(
@@ -244,8 +249,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun enableMinimizationByCliOption(enable: Boolean) {
     writeClientAndServerModules()
 
@@ -272,7 +275,7 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test // #1636
+  // #1636
   fun minimizeBomDependency() {
     writeApiLibAndImplModules()
     path("impl/build.gradle")
@@ -301,7 +304,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun minimizeWithR8ShrinksUnusedDependencyClasses() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -340,7 +342,6 @@ class MinimizeTest : BasePluginTest() {
       )
   }
 
-  @Test
   fun minimizeWithR8KeepsServiceProviders() {
     writeR8Repository()
     writeR8ServiceModules()
@@ -367,7 +368,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun minimizeWithR8HonorsCustomProguardRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -411,7 +411,6 @@ class MinimizeTest : BasePluginTest() {
       )
   }
 
-  @Test
   fun minimizeWithR8GeneratesReportsRelativeToConfigurationFile() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -456,7 +455,6 @@ class MinimizeTest : BasePluginTest() {
       .contains("client.Reflective", "client.Unused")
   }
 
-  @Test
   fun minimizeWithR8UsesClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -505,7 +503,6 @@ class MinimizeTest : BasePluginTest() {
       )
   }
 
-  @Test
   fun minimizeWithR8PreservesRepeatedLinesInClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -547,7 +544,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun minimizeWithR8CanEnableObfuscation() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -575,7 +571,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun minimizeWithR8CanEnableOptimization() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -601,7 +596,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun minimizeWithR8HonorsDependencyExcludes() {
     writeR8Repository()
     writeR8ClientAndServerModules(
@@ -630,7 +624,6 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun minimizeWithR8UsesJavaToolchain() {
     writeR8Repository()
     writeR8ClientAndServerModules(

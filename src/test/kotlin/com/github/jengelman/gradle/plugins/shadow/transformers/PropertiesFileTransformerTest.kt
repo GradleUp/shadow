@@ -13,18 +13,80 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import java.nio.charset.Charset
 import java.util.Properties
 import org.gradle.api.GradleException
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
 
-class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransformer>() {
-  @Test
+val PropertiesFileTransformerTests by testSuite {
+  runTests(::PropertiesFileTransformerTest)
+
+  for ((path, expected) in PropertiesFileTransformerTest.pathProvider) {
+    runTest(
+      "canTransformResourceWithPaths_${path}_$expected",
+      ::PropertiesFileTransformerTest,
+    ) {
+      canTransformResourceWithPaths(path, expected)
+    }
+  }
+
+  for ((path, mergeStrategy, mergeSeparator, input1, input2, expectedOutput, expectedConflicts) in
+    PropertiesFileTransformerTest.transformConfigProvider) {
+    runTest(
+      "exerciseAllTransformConfigurations_${path}_$mergeStrategy",
+      ::PropertiesFileTransformerTest,
+    ) {
+      exerciseAllTransformConfigurations(
+        path,
+        mergeStrategy,
+        mergeSeparator,
+        input1,
+        input2,
+        expectedOutput,
+        expectedConflicts,
+      )
+    }
+  }
+
+  for ((path, paths, input1, input2, expectedOutput) in
+    PropertiesFileTransformerTest.transformConfigWithPathsProvider) {
+    runTest(
+      "exerciseAllTransformConfigurationsWithPaths_${path}",
+      ::PropertiesFileTransformerTest,
+    ) {
+      exerciseAllTransformConfigurationsWithPaths(path, paths, input1, input2, expectedOutput)
+    }
+  }
+
+  for ((path, mappings, input1, input2, expectedOutput) in
+    PropertiesFileTransformerTest.transformConfigWithMappingsProvider) {
+    runTest(
+      "exerciseAllTransformConfigurationsWithMappings_${path}",
+      ::PropertiesFileTransformerTest,
+    ) {
+      exerciseAllTransformConfigurationsWithMappings(path, mappings, input1, input2, expectedOutput)
+    }
+  }
+
+  for ((path, keyTransformer, input1, input2, expectedOutput) in
+    PropertiesFileTransformerTest.keyTransformerProvider) {
+    runTest("appliesKeyTransformer_${path}", ::PropertiesFileTransformerTest) {
+      appliesKeyTransformer(path, keyTransformer, input1, input2, expectedOutput)
+    }
+  }
+
+  for ((path, charset, input1, input2) in PropertiesFileTransformerTest.charsetProvider) {
+    runTest("appliesCharset_${path}", ::PropertiesFileTransformerTest) {
+      appliesCharset(path, charset, input1, input2)
+    }
+  }
+}
+
+private class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransformer>() {
   fun hasTransformedResource() =
     with(transformer) {
       assertThat(hasTransformedResource()).isFalse()
@@ -34,14 +96,10 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(hasTransformedResource()).isTrue()
     }
 
-  @ParameterizedTest
-  @MethodSource("pathProvider")
   fun canTransformResourceWithPaths(path: String, expected: Boolean) {
     assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
   }
 
-  @ParameterizedTest
-  @MethodSource("transformConfigProvider")
   fun exerciseAllTransformConfigurations(
     path: String,
     mergeStrategy: String,
@@ -64,7 +122,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(conflicts).isEqualTo(expectedConflicts)
     }
 
-  @Test
   fun failStrategyReportsConflicts() =
     with(transformer) {
       val path = "f.properties"
@@ -84,8 +141,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         )
     }
 
-  @ParameterizedTest
-  @MethodSource("transformConfigWithPathsProvider")
   fun exerciseAllTransformConfigurationsWithPaths(
     path: String,
     paths: List<String>,
@@ -105,8 +160,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
     }
 
-  @ParameterizedTest
-  @MethodSource("transformConfigWithMappingsProvider")
   fun exerciseAllTransformConfigurationsWithMappings(
     path: String,
     mappings: Map<String, Map<String, String>>,
@@ -126,8 +179,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
     }
 
-  @ParameterizedTest
-  @MethodSource("keyTransformerProvider")
   fun appliesKeyTransformer(
     path: String,
     keyTransformer: (String) -> String,
@@ -147,8 +198,6 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
     }
 
-  @ParameterizedTest
-  @MethodSource("charsetProvider")
   fun appliesCharset(
     path: String,
     charset: String,
@@ -169,7 +218,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       }
     }
 
-  @Test // #856
+  // #856
   fun mergedPropertiesWithoutComments() =
     with(transformer) {
       val path = "META-INF/test.properties"
@@ -189,7 +238,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       assertThat(content).isEqualTo("foo=one,two\n")
     }
 
-  private companion object {
+  companion object {
     fun context(
       path: String,
       input: Map<String, String>,
@@ -199,48 +248,45 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       return TransformerContext(path, properties.inputStream(charset))
     }
 
-    @JvmStatic
-    fun pathProvider() =
+    val pathProvider =
       listOf(
-        Arguments.of("foo.properties", true),
-        Arguments.of("foo/bar.properties", true),
-        Arguments.of("a/b/c/ButtonLabel_en.properties", true),
-        Arguments.of("a/b/c/ButtonLabel_en_US.properties", true),
-        Arguments.of("a/b/c/ButtonLabel_fr_CA_UNIX.properties", true),
-        Arguments.of("foo.props", false),
+        tupleOf("foo.properties", true),
+        tupleOf("foo/bar.properties", true),
+        tupleOf("a/b/c/ButtonLabel_en.properties", true),
+        tupleOf("a/b/c/ButtonLabel_en_US.properties", true),
+        tupleOf("a/b/c/ButtonLabel_fr_CA_UNIX.properties", true),
+        tupleOf("foo.props", false),
       )
 
-    @JvmStatic
-    fun charsetProvider() =
+    val charsetProvider =
       listOf(
-        Arguments.of("utf8.properties", "utf-8", mapOf("foo" to "传傳磨宿说説"), mapOf("foo" to "传傳磨宿说説"))
+        tupleOf("utf8.properties", "utf-8", mapOf("foo" to "传傳磨宿说説"), mapOf("foo" to "传傳磨宿说説"))
       )
 
-    @JvmStatic
-    fun transformConfigWithPathsProvider() =
+    val transformConfigWithPathsProvider =
       listOf(
-        Arguments.of(
+        tupleOf(
           "f.properties",
           listOf("f.properties"),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "foo"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           listOf(".*.properties"),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "foo"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           listOf(".*bar"),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           emptyMap<String, String>(),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           emptyList<String>(),
           mapOf("foo" to "foo"),
@@ -249,45 +295,44 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         ),
       )
 
-    @JvmStatic
-    fun transformConfigWithMappingsProvider() =
+    val transformConfigWithMappingsProvider =
       listOf(
-        Arguments.of(
+        tupleOf(
           "f.properties",
           mapOf("f.properties" to mapOf("mergeStrategy" to "first")),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "foo"),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           mapOf("f.properties" to mapOf("mergeStrategy" to "latest")),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "bar"),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           mapOf("f.properties" to mapOf("mergeStrategy" to "append")),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "foo,bar"),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           mapOf("f.properties" to mapOf("mergeStrategy" to "append", "mergeSeparator" to ";")),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "foo;bar"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           mapOf(".*.properties" to mapOf("mergeStrategy" to "first")),
           mapOf("foo" to "foo"),
           mapOf("foo" to "bar"),
           mapOf("foo" to "foo"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           mapOf(".*bar" to mapOf("mergeStrategy" to "first")),
           mapOf("foo" to "foo"),
@@ -296,10 +341,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         ),
       )
 
-    @JvmStatic
-    fun transformConfigProvider() =
+    val transformConfigProvider =
       listOf(
-        Arguments.of(
+        tupleOf(
           "f.properties",
           "first",
           "",
@@ -308,7 +352,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
           mapOf("foo" to "foo"),
           mapOf<String, Map<String, Int>>(),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           "latest",
           "",
@@ -317,7 +361,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
           mapOf("foo" to "bar"),
           mapOf<String, Map<String, Int>>(),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           "append",
           ",",
@@ -326,7 +370,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
           mapOf("foo" to "foo,bar"),
           mapOf<String, Map<String, Int>>(),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           "append",
           ";",
@@ -335,7 +379,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
           mapOf("foo" to "foo;bar"),
           mapOf<String, Map<String, Int>>(),
         ),
-        Arguments.of(
+        tupleOf(
           "f.properties",
           "fail",
           ";",
@@ -346,31 +390,30 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         ),
       )
 
-    @JvmStatic
-    fun keyTransformerProvider() =
+    val keyTransformerProvider =
       listOf(
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           { key: String -> key },
           mapOf("foo" to "bar"),
           mapOf("FOO" to "baz"),
           mapOf("foo" to "bar", "FOO" to "baz"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           { key: String -> key.uppercase() },
           mapOf("foo" to "bar"),
           mapOf("FOO" to "baz"),
           mapOf("FOO" to "bar,baz"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           { key: String -> "bar.${key.lowercase()}" },
           mapOf("foo" to "bar"),
           mapOf("FOO" to "baz"),
           mapOf("bar.foo" to "bar,baz"),
         ),
-        Arguments.of(
+        tupleOf(
           "foo.properties",
           { key: String -> key.replaceFirst(Regex("^(foo)"), "bar.$1") },
           mapOf("foo" to "bar"),
@@ -380,3 +423,24 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       )
   }
 }
+
+private fun <A, B> tupleOf(a: A, b: B) = Pair(a, b)
+
+private fun <A, B, C, D> tupleOf(a: A, b: B, c: C, d: D) = Tuple4(a, b, c, d)
+
+private fun <A, B, C, D, E> tupleOf(a: A, b: B, c: C, d: D, e: E) = Tuple5(a, b, c, d, e)
+
+private fun <A, B, C, D, E, F, G> tupleOf(a: A, b: B, c: C, d: D, e: E, f: F, g: G) =
+  Tuple7(a, b, c, d, e, f, g)
+
+data class Tuple5<A, B, C, D, E>(val a: A, val b: B, val c: C, val d: D, val e: E)
+
+data class Tuple7<A, B, C, D, E, F, G>(
+  val a: A,
+  val b: B,
+  val c: C,
+  val d: D,
+  val e: E,
+  val f: F,
+  val g: G,
+)

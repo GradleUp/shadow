@@ -8,11 +8,15 @@ import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import java.util.jar.JarFile.MANIFEST_NAME
-import org.junit.jupiter.api.Test
 
-class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
-  @Test
+val ManifestAppenderTransformerTests by testSuite {
+  runTests(::ManifestAppenderTransformerTest)
+}
+
+private class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   fun canTransformResource() =
     with(transformer) {
       append("Name", "org/foo/bar/")
@@ -22,7 +26,6 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       assertThat(canTransformResource(MANIFEST_NAME.lowercase())).isTrue()
     }
 
-  @Test
   fun hasTransformedResource() =
     with(transformer) {
       assertThat(transformer.hasTransformedResource()).isFalse()
@@ -32,7 +35,6 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       assertThat(hasTransformedResource()).isTrue()
     }
 
-  @Test
   fun transformation() =
     with(transformer) {
       append("Name", "org/foo/bar/")
@@ -50,7 +52,6 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
         )
     }
 
-  @Test
   fun noTransformation() =
     with(transformer) {
       val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()

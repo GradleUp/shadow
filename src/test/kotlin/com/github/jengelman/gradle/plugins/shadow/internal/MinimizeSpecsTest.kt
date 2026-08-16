@@ -9,20 +9,23 @@ import assertk.assertions.isNull
 import assertk.assertions.isSameInstanceAs
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.tasks.MinimizeTool
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import org.gradle.testfixtures.ProjectBuilder
-import org.junit.jupiter.api.Test
 
-class MinimizeSpecsTest {
+val MinimizeSpecsTests by testSuite {
+  runTests(::MinimizeSpecsTest)
+}
+
+private class MinimizeSpecsTest {
   private val project = ProjectBuilder.builder().build()
 
-  @Test
   fun defaultMinimizeSpecUsesDependencyAnalyzer() =
     with(project.objects.newInstance(DefaultMinimizeSpec::class.java, project)) {
       assertThat(tool.get()).isEqualTo(MinimizeTool.DEPENDENCY_ANALYZER)
       assertThat(r8SpecForInputs).isNull()
     }
 
-  @Test
   fun r8ConfiguresToolAndExposesSameSpecAsInput() =
     with(project.objects.newInstance(DefaultMinimizeSpec::class.java, project)) {
       lateinit var configured: Any
@@ -33,7 +36,6 @@ class MinimizeSpecsTest {
       assertThat(r8Spec).isSameInstanceAs(configured)
     }
 
-  @Test
   fun defaultR8SpecIsShrinkOnly() =
     with(project.objects.newInstance(DefaultR8Spec::class.java)) {
       assertThat(args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
@@ -47,7 +49,6 @@ class MinimizeSpecsTest {
         )
     }
 
-  @Test
   fun enablingObfuscationRemovesDefaultArgument() =
     with(project.objects.newInstance(DefaultR8Spec::class.java)) {
       enableObfuscation()
@@ -57,7 +58,6 @@ class MinimizeSpecsTest {
       assertThat(optimizationEnabled.get()).isFalse()
     }
 
-  @Test
   fun enablingOptimizationOnlyChangesOptimizationFlag() =
     with(project.objects.newInstance(DefaultR8Spec::class.java)) {
       enableOptimization()
@@ -67,7 +67,6 @@ class MinimizeSpecsTest {
       assertThat(optimizationEnabled.get()).isTrue()
     }
 
-  @Test
   fun explicitArgumentsTakePrecedenceOverChangedDefaults() =
     with(project.objects.newInstance(DefaultR8Spec::class.java)) {
       args.set(listOf("--debug"))

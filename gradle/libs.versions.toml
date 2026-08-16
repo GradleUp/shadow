@@ -3,6 +3,8 @@ minGradle = "9.4.0"
 kotlin = "2.4.10"
 moshi = "1.15.2"
 pluginPublish = "2.1.1"
+testBalloon = "1.1.0-RC"
+
 
 [libraries]
 apache-ant = "org.apache.ant:ant:1.10.17"
@@ -28,8 +30,9 @@ androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0"
 ktfmt = "com.facebook:ktfmt:0.64"
 r8 = "com.android.tools:r8:9.4.14"
 
-junit-bom = "org.junit:junit-bom:6.1.3"
 assertk = "com.willowtreeapps.assertk:assertk:0.28.1"
+testBalloon-framework-core = { module = "de.infix.testBalloon:testBalloon-framework-core", version.ref = "testBalloon" }
+
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
@@ -39,3 +42,4 @@ mavenPublish = "com.vanniktech.maven.publish:0.37.0"
 pluginPublish = { id = "com.gradle.plugin-publish", version.ref = "pluginPublish" }
 spotless = "com.diffplug.spotless:8.9.0"
 buildConfig = "com.github.gmazzo.buildconfig:6.0.10"
+testBalloon = { id = "de.infix.testBalloon", version.ref = "testBalloon" }

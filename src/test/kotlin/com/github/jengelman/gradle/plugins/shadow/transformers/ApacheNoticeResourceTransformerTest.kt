@@ -6,23 +6,28 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import java.util.zip.ZipInputStream
 import org.apache.tools.zip.ZipOutputStream
-import org.junit.jupiter.api.Test
+
+val ApacheNoticeResourceTransformerTests by testSuite {
+  runTests(::ApacheNoticeResourceTransformerTest)
+}
 
 /**
  * Modified from
  * [org.apache.maven.plugins.shade.resource.ApacheNoticeResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheNoticeResourceTransformerTest.java).
  */
-class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeResourceTransformer>() {
+private class ApacheNoticeResourceTransformerTest :
+  BaseTransformerTest<ApacheNoticeResourceTransformer>() {
 
   init {
     setupTurkishLocale()
   }
 
-  @Test
   fun canTransformResource() =
     with(transformer) {
       assertThat(canTransformResource("META-INF/NOTICE")).isTrue()
@@ -33,7 +38,6 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
       assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
     }
 
-  @Test
   fun canTransformByPattern() =
     with(transformer) {
       exclude("META-INF/NOTICE.txt")
@@ -42,7 +46,6 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
       assertThat(canTransformResource("META-INF/NOTICE.log")).isTrue()
     }
 
-  @Test
   fun preamble1ShouldHaveATrailingSpace() =
     with(transformer) {
       val baos = ByteArrayOutputStream()
@@ -60,7 +63,6 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
       assertThat(output).contains("in this case for test-project")
     }
 
-  @Test
   fun overrideOutputPath() =
     with(transformer) {
       val customNoticeEntry = "META-INF/CUSTOM_NOTICE"
@@ -88,7 +90,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
         )
     }
 
-  private companion object {
+  companion object {
     const val NOTICE_RESOURCE = "META-INF/NOTICE"
   }
 }

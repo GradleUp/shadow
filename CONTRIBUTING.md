@@ -29,11 +29,17 @@ Shadow has multiple test suites to ensure code quality:
 
 #### Running Specific Tests
 
-To speed up local development, you can run specific test classes or methods:
+To speed up local development, you can run specific test suites or individual tests:
 
-- Run a specific unit test: `./gradlew test --tests "com.example.YourTestClass"`
-- Run functional tests against a specific Gradle version: `./gradlew functionalTest -PtestGradleVersion=9.1.0` (useful
+- **Run a specific test suite**: `./gradlew test --tests "*ShadowPropertiesTest*"`
+- **Run an individual test within a suite**: TestBalloon uses the `↘` hierarchical separator instead of the standard `Class.method` format:
+  - `./gradlew functionalTest --tests "*CachingTest*↘disableCacheIfAnyTransformerIsNotCacheable"`
+  - `./gradlew documentTest --tests "*DocCodeSnippetTest*↘*groovy*"`
+- **Run functional tests against a specific Gradle version**: `./gradlew functionalTest -PtestGradleVersion=9.1.0` (useful
   to verify compatibility locally with the minimum or a custom Gradle version)
+
+> [!NOTE]
+> When running individual tests via IntelliJ IDEA run configurations, if `--tests` filtering encounters issues, you can set the `TESTBALLOON_INCLUDE_PATTERNS` environment variable instead (e.g. `TESTBALLOON_INCLUDE_PATTERNS="*CachingTest*↘disableCacheIfAnyTransformerIsNotCacheable"`).
 
 Make sure all tests pass before submitting your changes.
 

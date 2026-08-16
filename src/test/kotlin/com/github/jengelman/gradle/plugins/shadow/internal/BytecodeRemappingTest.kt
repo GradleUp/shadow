@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.io.path.ExperimentalPathApi::class)
+
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
@@ -9,18 +11,17 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.File
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.createTempDirectory
 import kotlin.reflect.KClass
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.vafer.jdeb.shaded.objectweb.asm.AnnotationVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
@@ -31,15 +32,17 @@ import org.vafer.jdeb.shaded.objectweb.asm.MethodVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ModuleVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
+val BytecodeRemappingTests by testSuite {
+  runTests(::BytecodeRemappingTest)
+}
+
 /**
  * The cases reflect the cases in
  * [com.github.jengelman.gradle.plugins.shadow.relocation.RelocatorsTest], but operate on the
  * bytecode level to verify that the remapper correctly transforms class names in all relevant
  * bytecode structures.
  */
-class BytecodeRemappingTest {
-  @TempDir lateinit var tempDir: Path
-
+private class BytecodeRemappingTest(val tempDir: Path = createTempDirectory()) {
   // Relocator used across all relocation tests: moves the test package to a distinct target.
   private val relocators =
     setOf(
@@ -55,7 +58,6 @@ class BytecodeRemappingTest {
   private val fixtureSubjectDetails
     get() = FixtureSubject::class.toFileCopyDetails()
 
-  @Test
   fun classNotModified() {
     val details = fixtureSubjectDetails
     // Relocator pattern does not match – original bytes must be returned as-is.
@@ -66,7 +68,6 @@ class BytecodeRemappingTest {
     assertThat(result).isEqualTo(details.file.readBytes())
   }
 
-  @Test
   fun asmFailureIsWrappedWithClassPath() {
     val path = "broken/Example.class"
     val file = tempDir.resolve("broken.class").toFile().apply { writeText("not bytecode") }
@@ -82,7 +83,6 @@ class BytecodeRemappingTest {
       .hasMessage("Error in ASM processing class $path")
   }
 
-  @Test
   fun classNameIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -90,7 +90,6 @@ class BytecodeRemappingTest {
       .isEqualTo($$"com/example/relocated/BytecodeRemappingTest$FixtureSubject")
   }
 
-  @Test
   fun annotationIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -98,7 +97,6 @@ class BytecodeRemappingTest {
       .contains($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;")
   }
 
-  @Test
   fun baseClassNameIsRelocated() {
     // Verify relocation also works on a simple class (FixtureBase has no fields/methods
     // referencing the target package beyond its own class name).
@@ -109,35 +107,30 @@ class BytecodeRemappingTest {
     assertThat(ClassReader(result).className).isEqualTo(relocatedFixtureBase)
   }
 
-  @Test
   fun superclassIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     assertThat(ClassReader(result).superName).isEqualTo(relocatedFixtureBase)
   }
 
-  @Test
   fun fieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     assertThat(result.classInfo().fieldDescriptors).contains("L$relocatedFixtureBase;")
   }
 
-  @Test
   fun arrayFieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     assertThat(result.classInfo().fieldDescriptors).contains("[L$relocatedFixtureBase;")
   }
 
-  @Test
   fun array2dFieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     assertThat(result.classInfo().fieldDescriptors).contains("[[L$relocatedFixtureBase;")
   }
 
-  @Test
   fun methodDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -145,7 +138,6 @@ class BytecodeRemappingTest {
       .contains("(L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
-  @Test
   fun methodMultipleArgsIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -153,8 +145,6 @@ class BytecodeRemappingTest {
       .contains("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
-  @ParameterizedTest
-  @ValueSource(chars = ['B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z'])
   fun primitivePlusClassMethodIsRelocated(primitiveDescriptor: Char) {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -162,7 +152,6 @@ class BytecodeRemappingTest {
       .contains("(${primitiveDescriptor}L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
-  @Test
   fun stringConstantIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -170,7 +159,6 @@ class BytecodeRemappingTest {
       .contains($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
   }
 
-  @Test
   fun stringConstantNotRelocatedWhenSkipEnabled() {
     val skipRelocators =
       setOf(
@@ -186,7 +174,6 @@ class BytecodeRemappingTest {
       .doesNotContain($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
   }
 
-  @Test
   fun multiClassDescriptorStringConstantIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -198,7 +185,6 @@ class BytecodeRemappingTest {
       )
   }
 
-  @Test
   fun interfaceIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -206,7 +192,6 @@ class BytecodeRemappingTest {
       .contains($$"com/example/relocated/BytecodeRemappingTest$FixtureInterface")
   }
 
-  @Test
   fun signatureIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -214,7 +199,6 @@ class BytecodeRemappingTest {
     assertThat(checkNotNull(method.signature)).contains("L$relocatedFixtureBase;")
   }
 
-  @Test
   fun nestedClassSignatureIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -225,7 +209,6 @@ class BytecodeRemappingTest {
       )
   }
 
-  @Test
   fun moduleMainClassIsRelocated() {
     val originalMainClass =
       $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase"
@@ -264,7 +247,6 @@ class BytecodeRemappingTest {
     assertThat(remappedMainClass).isEqualTo(relocatedFixtureBase)
   }
 
-  @Test
   fun localVariableIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -272,7 +254,6 @@ class BytecodeRemappingTest {
     assertThat(method.localVarDescriptors).contains("L$relocatedFixtureBase;")
   }
 
-  @Test
   fun instructionIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 

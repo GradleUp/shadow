@@ -2,17 +2,27 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
-class FilteringTest : BasePluginTest() {
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
+val FilteringTests by testSuite {
+  runTests(::FilteringTest)
+
+  for (useAccessor in listOf(false, true)) {
+    runTest("excludeDependency_useAccessor_$useAccessor", ::FilteringTest) {
+      excludeDependency(useAccessor)
+    }
+    runTest("filterProjectDependencies_useAccessor_$useAccessor", ::FilteringTest) {
+      filterProjectDependencies(useAccessor)
+    }
+  }
+}
+
+private class FilteringTest : BasePluginTest() {
+  init {
     projectScript.appendText(
       """
       |dependencies {
@@ -24,14 +34,12 @@ class FilteringTest : BasePluginTest() {
     )
   }
 
-  @Test
   fun includeAllDependencies() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
-  @Test
   fun excludeFiles() {
     projectScript.appendText(
       """
@@ -49,8 +57,6 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun excludeDependency(useAccessor: Boolean) {
     settingsScript.appendText(
       """
@@ -82,7 +88,6 @@ class FilteringTest : BasePluginTest() {
     commonAssertions()
   }
 
-  @Test
   fun includeDependencyAndExcludeOthers() {
     projectScript.appendText(
       """
@@ -113,8 +118,6 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
   fun filterProjectDependencies(useAccessor: Boolean) {
     val clientProject = if (useAccessor) "project(projects.client)" else "project(':client')"
     writeClientAndServerModules(
@@ -134,7 +137,7 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Test // #671
+  // #671
   fun filterProjectThatVersionContainsPlus() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -154,7 +157,6 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun excludeTransitiveProjectDependency() {
     writeClientAndServerModules(
       serverShadowBlock =
@@ -179,7 +181,6 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun verifyExcludePrecedenceOverInclude() {
     projectScript.appendText(
       """
@@ -199,7 +200,6 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
-  @Test
   fun handleExcludeWithCircularDependency() {
     val dependency = "'my:e:1.0'"
     projectScript.appendText(

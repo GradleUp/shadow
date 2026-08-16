@@ -5,12 +5,16 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.testkit.variantSeparatorsPathString
+import de.infix.testBalloon.framework.core.testSuite
 import kotlin.io.path.appendText
-import org.junit.jupiter.api.Test
 
-class FindResourceInClasspathTest : BasePluginTest() {
-  @Test
+val FindResourceInClasspathTests by testSuite {
+  runTests(::FindResourceInClasspathTest)
+}
+
+private class FindResourceInClasspathTest : BasePluginTest() {
   fun findResourceInClasspath() {
     val taskClassName = FindResourceInClasspath::class.java.name
     projectScript.appendText(

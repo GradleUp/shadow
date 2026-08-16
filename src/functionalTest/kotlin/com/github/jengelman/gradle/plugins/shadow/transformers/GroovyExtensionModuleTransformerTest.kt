@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_EXTENSION_CLASSES
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_VERSION
@@ -11,12 +12,15 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionMo
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_NAME
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.MERGED_MODULE_VERSION
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+import de.infix.testBalloon.framework.core.testSuite
 import java.nio.file.Path
 import kotlin.io.path.appendText
-import org.junit.jupiter.api.Test
 
-class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
-  @Test
+val GroovyExtensionModuleTransformerTests by testSuite {
+  runTests(::GroovyExtensionModuleTransformerTest)
+}
+
+private class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   fun groovyExtensionModuleTransformer() {
     projectScript.appendText(
       """
@@ -70,7 +74,7 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
       )
     }
 
-  private companion object {
+  companion object {
     const val EXTENSION_CLASSES_FOO = "com.acme.foo.FooExtension,com.acme.foo.BarExtension"
     const val EXTENSION_CLASSES_BAR = "com.acme.bar.SomeExtension,com.acme.bar.AnotherExtension"
     const val STATIC_EXTENSION_CLASSES_FOO = "com.acme.foo.FooStaticExtension"

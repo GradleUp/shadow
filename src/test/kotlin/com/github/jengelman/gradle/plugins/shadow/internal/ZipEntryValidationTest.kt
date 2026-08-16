@@ -1,3 +1,5 @@
+@file:OptIn(kotlin.io.path.ExperimentalPathApi::class)
+
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
@@ -6,28 +8,31 @@ import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
+import de.infix.testBalloon.framework.core.testSuite
 import java.io.ByteArrayOutputStream
 import java.nio.file.Path
 import java.util.Properties
 import java.util.zip.ZipInputStream
+import kotlin.io.path.createTempDirectory
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 
-class ZipEntryValidationTest {
+val ZipEntryValidationTests by testSuite {
+  runTests(::ZipEntryValidationTest)
+}
 
-  @Test
+private class ZipEntryValidationTest(val tempDir: Path = createTempDirectory()) {
+
   fun parentDirectoryEntriesAreOrderedFromRootToLeaf() {
     assertThat("foo/bar/baz.txt".parentDirectoryEntries()).isEqualTo(listOf("foo/", "foo/bar/"))
     assertThat("file.txt".parentDirectoryEntries()).isEqualTo(emptyList())
   }
 
-  @Test
-  fun writeEntryUsesRequestedOrReproducibleTimestampAndAppliesUnixMode(@TempDir tempDir: Path) {
+  fun writeEntryUsesRequestedOrReproducibleTimestampAndAppliesUnixMode() {
     val requestedTimestamp = 1_700_000_000_000
     val archive = tempDir.resolve("output.jar").toFile()
     ZipOutputStream(archive).use { output ->
@@ -57,7 +62,6 @@ class ZipEntryValidationTest {
     }
   }
 
-  @Test
   fun propertiesInputStreamUsesRequestedCharsetAndComments() {
     val properties = Properties().apply { setProperty("greeting", "你好") }
 
@@ -70,7 +74,6 @@ class ZipEntryValidationTest {
     assertThat(loaded.getProperty("greeting")).isEqualTo("你好")
   }
 
-  @Test
   fun validZipEntryNamesDoNotThrow() {
     val validNames =
       listOf(
@@ -101,7 +104,6 @@ class ZipEntryValidationTest {
     assertThat(names).isEqualTo(validNames.toSet())
   }
 
-  @Test
   fun maliciousZipEntryNamesWithPathTraversalThrowException() {
     val maliciousNames =
       listOf(

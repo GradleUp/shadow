@@ -3,12 +3,16 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import org.junit.jupiter.api.Test
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import de.infix.testBalloon.framework.core.testSuite
 
-class PreserveFirstFoundResourceTransformerTest :
+val PreserveFirstFoundResourceTransformerTests by testSuite {
+  runTests(::PreserveFirstFoundResourceTransformerTest)
+}
+
+private class PreserveFirstFoundResourceTransformerTest :
   BaseTransformerTest<PreserveFirstFoundResourceTransformer>() {
 
-  @Test
   fun firstOccurrenceIsNotTransformed() =
     with(transformer) {
       include("foo/bar")
@@ -17,7 +21,6 @@ class PreserveFirstFoundResourceTransformerTest :
       assertThat(canTransformResource("foo/bar")).isFalse()
     }
 
-  @Test
   fun subsequentOccurrencesAreTransformed() =
     with(transformer) {
       include("foo/bar")
@@ -28,7 +31,6 @@ class PreserveFirstFoundResourceTransformerTest :
       assertThat(canTransformResource("foo/bar")).isTrue()
     }
 
-  @Test
   fun nonMatchingPathIsNotTransformed() =
     with(transformer) {
       include("foo/bar")
