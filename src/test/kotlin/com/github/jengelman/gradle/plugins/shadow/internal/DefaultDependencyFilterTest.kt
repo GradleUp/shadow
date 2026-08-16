@@ -7,6 +7,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import assertk.assertions.messageContains
+import com.github.jengelman.gradle.plugins.shadow.testkit.Arguments
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
@@ -17,7 +18,7 @@ import org.gradle.testfixtures.ProjectBuilder
 val DefaultDependencyFilterTests by testSuite {
   runTests(::DefaultDependencyFilterTest)
 
-  for ((notation, group, name, version, expected) in
+  for ((notation: Any, group: String, name: String, version: String, expected: Boolean) in
     DefaultDependencyFilterTest.dependencyNotationProvider) {
     runTest(
       "matchesDependencyNotation_${notation}_${group}_${name}_$version",
@@ -75,37 +76,37 @@ private class DefaultDependencyFilterTest {
 
     val stringNotations =
       listOf(
-        Tuple5("foo:bar", "foo", "bar", "1.0", true),
-        Tuple5("f.*:bar", "foo", "bar", "1.0", true),
-        Tuple5("foo:bar:.*", "foo", "bar", "1.0", true),
-        Tuple5("f.*:bar:.*", "foo", "bar", "1.0", true),
-        Tuple5("f.*:bar.*:.*", "foo", "bar", "1.0", true),
-        Tuple5(".*:bar:.*", "foo", "bar", "1.0", true),
-        Tuple5("foo:bar:2.1.0", "foo", "bar", "2.1.0", true),
-        Tuple5("foo:bar:2.1.0", "foo", "baz", "2.1.0", false),
-        Tuple5("foo:bar:2.1.0", "bar", "bar", "2.1.0", false),
-        Tuple5("foo:bar:1.0.0+1", "foo", "bar", "1.0.0+1", true),
-        Tuple5("foo:bar:1.0.0+1", "foo", "bar", "1.0.0+2", false),
-        Tuple5("foo:bar:1\\.0\\..*", "foo", "bar", "1.0.5", true),
-        Tuple5("foo:bar:1\\.0\\..*", "foo", "bar", "2.0.0", false),
-        Tuple5("foo:bar:1.0", "baz", "bar", "1.0", false),
-        Tuple5("foo:bar:1.0", "foo", "bar", "2.0", false),
-        Tuple5("f.*:bar", "zoo", "bar", "1.0", false),
+        Arguments.of("foo:bar", "foo", "bar", "1.0", true),
+        Arguments.of("f.*:bar", "foo", "bar", "1.0", true),
+        Arguments.of("foo:bar:.*", "foo", "bar", "1.0", true),
+        Arguments.of("f.*:bar:.*", "foo", "bar", "1.0", true),
+        Arguments.of("f.*:bar.*:.*", "foo", "bar", "1.0", true),
+        Arguments.of(".*:bar:.*", "foo", "bar", "1.0", true),
+        Arguments.of("foo:bar:2.1.0", "foo", "bar", "2.1.0", true),
+        Arguments.of("foo:bar:2.1.0", "foo", "baz", "2.1.0", false),
+        Arguments.of("foo:bar:2.1.0", "bar", "bar", "2.1.0", false),
+        Arguments.of("foo:bar:1.0.0+1", "foo", "bar", "1.0.0+1", true),
+        Arguments.of("foo:bar:1.0.0+1", "foo", "bar", "1.0.0+2", false),
+        Arguments.of("foo:bar:1\\.0\\..*", "foo", "bar", "1.0.5", true),
+        Arguments.of("foo:bar:1\\.0\\..*", "foo", "bar", "2.0.0", false),
+        Arguments.of("foo:bar:1.0", "baz", "bar", "1.0", false),
+        Arguments.of("foo:bar:1.0", "foo", "bar", "2.0", false),
+        Arguments.of("f.*:bar", "zoo", "bar", "1.0", false),
       )
 
     val providerNotations =
-      listOf(Tuple5(project.provider { "foo:bar:1.0" }, "foo", "bar", "1.0", true))
+      listOf(Arguments.of(project.provider { "foo:bar:1.0" }, "foo", "bar", "1.0", true))
 
     val mapNotations =
       listOf(
-        Tuple5(
+        Arguments.of(
           mapOf("group" to "foo", "name" to "bar", "version" to "1.0"),
           "foo",
           "bar",
           "1.0",
           true,
         ),
-        Tuple5(mapOf("name" to "bar"), "any.group", "bar", "1.0", true),
+        Arguments.of(mapOf("name" to "bar"), "any.group", "bar", "1.0", true),
       )
 
     val dependencyNotationProvider = stringNotations + providerNotations + mapNotations
@@ -119,8 +120,6 @@ private class DefaultDependencyFilterTest {
       )
   }
 }
-
-data class Tuple5<A, B, C, D, E>(val a: A, val b: B, val c: C, val d: D, val e: E)
 
 private class TestResolvedDependency(
   private val group: String,

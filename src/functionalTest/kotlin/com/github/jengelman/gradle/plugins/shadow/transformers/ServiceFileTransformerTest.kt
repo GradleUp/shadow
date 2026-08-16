@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.testkit.Arguments
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
@@ -27,13 +28,15 @@ val ServiceFileTransformerTests by testSuite {
     }
   }
 
-  for ((strategy, firstValue, secondValue) in ServiceFileTransformerTest.withoutThrowingProvider) {
+  for ((strategy: DuplicatesStrategy, firstValue: String, secondValue: String) in
+    ServiceFileTransformerTest.withoutThrowingProvider) {
     runTest("honorDuplicatesStrategyWithoutThrowing_$strategy", ::ServiceFileTransformerTest) {
       honorDuplicatesStrategyWithoutThrowing(strategy, firstValue, secondValue)
     }
   }
 
-  for ((default, override, matchPath) in ServiceFileTransformerTest.eachFileStrategyProvider) {
+  for ((default: DuplicatesStrategy, override: DuplicatesStrategy, matchPath: String) in
+    ServiceFileTransformerTest.eachFileStrategyProvider) {
     runTest(
       "strategyCanBeOverriddenByEachFile_${default}_${override}",
       ::ServiceFileTransformerTest,
@@ -316,15 +319,15 @@ private class ServiceFileTransformerTest : BaseTransformerTest() {
 
     val withoutThrowingProvider =
       listOf(
-        Triple(EXCLUDE, CONTENT_ONE, "one"),
-        Triple(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
-        Triple(WARN, CONTENT_ONE_TWO, "one\ntwo"),
+        Arguments.of(EXCLUDE, CONTENT_ONE, "one"),
+        Arguments.of(INCLUDE, CONTENT_ONE_TWO, "one\ntwo"),
+        Arguments.of(WARN, CONTENT_ONE_TWO, "one\ntwo"),
       )
 
     val eachFileStrategyProvider =
       listOf(
-        Triple(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
-        Triple(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
+        Arguments.of(EXCLUDE, INCLUDE, ENTRY_SERVICES_SHADE),
+        Arguments.of(INCLUDE, EXCLUDE, ENTRY_SERVICES_FOO),
       )
   }
 }

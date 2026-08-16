@@ -5,14 +5,30 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.testkit.Arguments
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import de.infix.testBalloon.framework.core.testSuite
 
 val ServiceFileTransformerTests by testSuite {
   runTests(::ServiceFileTransformerTest)
+
+  for ((path: String, exclude: Boolean, expected: Boolean) in
+    ServiceFileTransformerTest.resourceProvider) {
+    runTest("canTransformResource_${path}", ::ServiceFileTransformerTest) {
+      canTransformResource(path, exclude, expected)
+    }
+  }
+
+  for ((path: String, input1: String, input2: String, output: String) in
+    ServiceFileTransformerTest.serviceFileProvider) {
+    runTest("transformServiceFile_${path}", ::ServiceFileTransformerTest) {
+      transformServiceFile(path, input1, input2, output)
+    }
+  }
 }
 
 /**
@@ -98,21 +114,19 @@ private class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransf
     val resourceProvider =
       listOf(
         // path, exclude, expected
-        Triple("META-INF/services/java.sql.Driver", false, true),
-        Triple("META-INF/services/io.dropwizard.logging.AppenderFactory", false, true),
-        Triple("META-INF/services/org.apache.maven.Shade", true, false),
-        Triple("META-INF/services/foo/bar/moo.goo.Zoo", false, true),
-        Triple("foo/bar.properties", false, false),
-        Triple("foo.props", false, false),
+        Arguments.of("META-INF/services/java.sql.Driver", false, true),
+        Arguments.of("META-INF/services/io.dropwizard.logging.AppenderFactory", false, true),
+        Arguments.of("META-INF/services/org.apache.maven.Shade", true, false),
+        Arguments.of("META-INF/services/foo/bar/moo.goo.Zoo", false, true),
+        Arguments.of("foo/bar.properties", false, false),
+        Arguments.of("foo.props", false, false),
       )
 
     val serviceFileProvider =
       listOf(
         // path, input1, input2, output
-        Tuple4("META-INF/services/com.acme.Foo", "foo", "bar", "foo\nbar"),
-        Tuple4("META-INF/services/com.acme.Bar", "foo\nbar", "zoo", "foo\nbar\nzoo"),
+        Arguments.of("META-INF/services/com.acme.Foo", "foo", "bar", "foo\nbar"),
+        Arguments.of("META-INF/services/com.acme.Bar", "foo\nbar", "zoo", "foo\nbar\nzoo"),
       )
   }
 }
-
-data class Tuple4<A, B, C, D>(val a: A, val b: B, val c: C, val d: D)

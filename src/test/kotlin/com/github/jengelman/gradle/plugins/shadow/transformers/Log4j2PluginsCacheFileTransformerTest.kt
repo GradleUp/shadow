@@ -10,6 +10,7 @@ import assertk.assertions.startsWith
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.testkit.Arguments
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
@@ -30,7 +31,7 @@ import org.apache.tools.zip.ZipOutputStream
 val Log4j2PluginsCacheFileTransformerTests by testSuite {
   runTests(::Log4j2PluginsCacheFileTransformerTest)
 
-  for ((pattern, shadedPattern, expected) in
+  for ((pattern: String, shadedPattern: String, expected: String) in
     Log4j2PluginsCacheFileTransformerTest.relocationProvider) {
     runTest(
       "relocations_${pattern}_${shadedPattern}",
@@ -128,12 +129,12 @@ private class Log4j2PluginsCacheFileTransformerTest :
 
     val relocationProvider =
       listOf(
-        Triple(
+        Arguments.of(
           "org.apache.logging",
           "new.location.org.apache.logging",
           "new.location.org.apache.logging",
         ),
-        Triple("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
+        Arguments.of("com.apache.logging", "new.location.com.apache.logging", "org.apache.logging"),
       )
   }
 }

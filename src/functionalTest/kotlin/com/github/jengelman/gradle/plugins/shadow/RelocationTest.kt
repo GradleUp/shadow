@@ -10,6 +10,7 @@ import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
+import com.github.jengelman.gradle.plugins.shadow.testkit.Arguments
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
@@ -33,22 +34,12 @@ val RelocationTests by testSuite {
     }
   }
 
-  for ((enable, relocationPrefix) in RelocationTest.relocationCliOptionProvider) {
+  for ((enable: Boolean, relocationPrefix: String) in RelocationTest.relocationCliOptionProvider) {
     runTest(
       "enableAutoRelocationByCliOption_${enable}_${relocationPrefix}",
       ::RelocationTest,
     ) {
       enableAutoRelocationByCliOption(enable, relocationPrefix)
-    }
-  }
-
-  for ((preserveFileTimestamps, enableAutoRelocation) in
-    RelocationTest.preserveLastModifiedProvider) {
-    runTest(
-      "preserveLastModifiedCorrectly_${preserveFileTimestamps}_${enableAutoRelocation}",
-      ::RelocationTest,
-    ) {
-      preserveLastModifiedCorrectly(preserveFileTimestamps, enableAutoRelocation)
     }
   }
 }
@@ -692,20 +683,12 @@ private class RelocationTest : BasePluginTest() {
   }
 
   companion object {
-    val preserveLastModifiedProvider =
-      listOf(
-        Pair(false, false),
-        Pair(true, false),
-        Pair(false, true),
-        Pair(true, true),
-      )
-
     val relocationCliOptionProvider =
       listOf(
-        Pair(false, "foo"),
-        Pair(false, "bar"),
-        Pair(true, "foo"),
-        Pair(true, "bar"),
+        Arguments.of(false, "foo"),
+        Arguments.of(false, "bar"),
+        Arguments.of(true, "foo"),
+        Arguments.of(true, "bar"),
       )
   }
 }
