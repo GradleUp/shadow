@@ -57,6 +57,17 @@ inline fun <reified T : Any> TestSuiteScope.runTests(
             }
           }
         }
+
+        else -> {
+          runTest(function.name, factory) {
+            error(
+              "runTests() can only auto-run no-arg tests or tests whose parameters are all Boolean. " +
+                "'${function.name}' has unsupported parameters: " +
+                valueParams.joinToString(", ") { "${it.name}:${it.type}" } +
+                ". Use explicit runTest(...) registrations in the suite."
+            )
+          }
+        }
       }
     }
   }
