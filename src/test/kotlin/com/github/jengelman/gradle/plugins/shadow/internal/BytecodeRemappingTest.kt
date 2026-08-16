@@ -11,6 +11,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import de.infix.testBalloon.framework.core.testSuite
@@ -34,6 +35,12 @@ import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 val BytecodeRemappingTests by testSuite {
   runTests(::BytecodeRemappingTest)
+
+  for (primitiveDescriptor in listOf('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z')) {
+    runTest("primitivePlusClassMethodIsRelocated_$primitiveDescriptor", ::BytecodeRemappingTest) {
+      primitivePlusClassMethodIsRelocated(primitiveDescriptor)
+    }
+  }
 }
 
 /**

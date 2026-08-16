@@ -5,8 +5,10 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.testkit.Arguments
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_EXTENSION_CLASSES
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.KEY_MODULE_NAME
@@ -23,6 +25,13 @@ import java.util.Properties
 
 val GroovyExtensionModuleTransformerTests by testSuite {
   runTests(::GroovyExtensionModuleTransformerTest)
+
+  for ((fooEntry: String, barEntry: String) in
+    GroovyExtensionModuleTransformerTest.resourcePathProvider) {
+    runTest("mergeDescriptors_${fooEntry}_${barEntry}", ::GroovyExtensionModuleTransformerTest) {
+      mergeDescriptors(fooEntry, barEntry)
+    }
+  }
 }
 
 private class GroovyExtensionModuleTransformerTest :
@@ -109,19 +118,19 @@ private class GroovyExtensionModuleTransformerTest :
 
     val resourcePathProvider =
       listOf(
-        Pair(
+        Arguments.of(
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),
-        Pair(
+        Arguments.of(
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),
-        Pair(
+        Arguments.of(
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),
-        Pair(
+        Arguments.of(
           PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
           PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR,
         ),

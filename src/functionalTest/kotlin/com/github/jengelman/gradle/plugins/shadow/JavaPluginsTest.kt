@@ -25,6 +25,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTest
 import com.github.jengelman.gradle.plugins.shadow.testkit.runTests
+import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import de.infix.testBalloon.framework.core.testSuite
@@ -33,6 +34,7 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
+import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
@@ -533,8 +535,8 @@ private class JavaPluginsTest : BasePluginTest() {
   }
 
   fun includeJavaLibraryConfigurationsByDefault() {
-    localRepo
-      .apply {
+    val customRepo =
+      AppendableMavenRepository(root = path("custom-local-maven-repo/")).apply {
         jarModule("my", "api", "1.0") { buildJar { insert("api.properties", "api") } }
         jarModule("my", "implementation", "1.0") {
           buildJar { insert("implementation.properties", "implementation") }
@@ -544,7 +546,16 @@ private class JavaPluginsTest : BasePluginTest() {
           buildJar { insert("runtime-only.properties", "runtime-only") }
         }
       }
-      .publish()
+    customRepo.publish()
+
+    settingsScript.writeText(
+      settingsScript
+        .readText()
+        .replace(
+          "repositories {",
+          "repositories {\n    maven { url = '${customRepo.root.toUri()}' }",
+        )
+    )
 
     projectScript.writeText(
       """

@@ -47,6 +47,27 @@ val ServiceFileTransformerTests by testSuite {
 }
 
 private class ServiceFileTransformerTest : BaseTransformerTest() {
+  fun serviceResourceTransformerAlternatePath() {
+    val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
+    val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
+    val config =
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles("META-INF/foo")
+      |}
+      """
+        .trimMargin()
+    projectScript.appendText(config)
+
+    runWithSuccess(shadowJarPath)
+
+    val content = outputShadowedJar.use { it.getContent(ENTRY_FOO_SHADE) }
+    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
+  }
+
   fun serviceResourceTransformerWithRelocation() {
     val one = buildJarOne {
       insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
