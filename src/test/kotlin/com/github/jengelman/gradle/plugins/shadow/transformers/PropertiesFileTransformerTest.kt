@@ -1,9 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
@@ -16,7 +19,6 @@ import java.nio.charset.Charset
 import java.util.Properties
 import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -70,10 +72,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       transform(context(path, mapOf("foo" to "foo")))
       transform(context(path, mapOf("foo" to "bar")))
 
-      val failure = assertThrows<GradleException> { transformToJar() }
-
-      assertThat(failure.message.orEmpty())
-        .isEqualTo(
+      assertFailure { transformToJar() }
+        .isInstanceOf<GradleException>()
+        .hasMessage(
           """
           |The following properties files have conflicting property values and cannot be merged:
           | * f.properties
