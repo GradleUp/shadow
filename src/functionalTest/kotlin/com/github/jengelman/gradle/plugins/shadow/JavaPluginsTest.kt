@@ -67,6 +67,34 @@ val JavaPluginsTests by testSuite {
       doNotReAddSuppressedGradleApi(configuration)
     }
   }
+
+  val fallbackByPropertyCases =
+    listOf(
+      Triple(
+        "my.Main",
+        "my.Main",
+        "Adding $mainClassAttributeKey attribute to the manifest with value",
+      ),
+      Triple(
+        "",
+        null,
+        "Skipping adding $mainClassAttributeKey attribute to the manifest as it is empty.",
+      ),
+    )
+  for ((index, case) in fallbackByPropertyCases.withIndex()) {
+    val (input, expected, message) = case
+    runTest("fallbackMainClassByProperty_$index", ::JavaPluginsTest) {
+      fallbackMainClassByProperty(input, expected, message)
+    }
+  }
+
+  val fallbackByCliCases = listOf("my.Main" to "my.Main", "" to null)
+  for ((index, case) in fallbackByCliCases.withIndex()) {
+    val (input, expected) = case
+    runTest("fallbackMainClassByCliOption_$index", ::JavaPluginsTest) {
+      fallbackMainClassByCliOption(input, expected)
+    }
+  }
 }
 
 private class JavaPluginsTest : BasePluginTest() {
