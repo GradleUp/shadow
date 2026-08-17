@@ -131,6 +131,23 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service")
     }
 
+  @Test
+  fun serviceFileWithComments() =
+    with(ServiceFileTransformer()) {
+      val relocator = SimpleRelocator("org.foo", "borg.foo")
+      val content = "# Service provider config\norg.foo.Service # default\n"
+      val contentResource = "META-INF/services/org.something.another"
+      transform(textContext(contentResource, content, relocator))
+
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
+
+      val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
+      assertThat(transformedContent)
+        .isEqualTo("# Service provider config\nborg.foo.Service # default")
+    }
+
   private companion object {
     @JvmStatic
     fun resourceProvider() =

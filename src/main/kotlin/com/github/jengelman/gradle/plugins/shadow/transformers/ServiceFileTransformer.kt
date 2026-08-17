@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
+import com.github.jengelman.gradle.plugins.shadow.relocation.applyToSourceContent
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer.Companion.PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR
 import org.apache.tools.zip.ZipOutputStream
@@ -52,7 +53,7 @@ constructor(
     context.inputStream
       .bufferedReader()
       .use { it.readLines() }
-      .forEach { line -> out.add(context.relocators.relocateClass(line)) }
+      .forEach { line -> out.add(context.relocators.applyToSourceContent(line)) }
   }
 
   override fun hasTransformedResource(): Boolean = serviceEntries.isNotEmpty()

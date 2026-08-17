@@ -29,3 +29,13 @@ public fun Iterable<Relocator>.relocatePath(path: String): String {
   }
   return path
 }
+
+public fun Iterable<Relocator>.applyToSourceContent(sourceContent: String): String {
+  var result = sourceContent
+  for (relocator in this) {
+    if (relocator.canRelocateClass(result)) {
+      result = relocator.applyToSourceContent(result)
+    }
+  }
+  return result
+}

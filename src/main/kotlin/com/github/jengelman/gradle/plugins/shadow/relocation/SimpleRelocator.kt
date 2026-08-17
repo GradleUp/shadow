@@ -255,9 +255,7 @@ constructor(
       // Make sure that search pattern starts at word boundary and that we look for literal ".", not
       // regex jokers.
       val snippets =
-        sourceContent
-          .split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-          .filter(CharSequence::isNotEmpty)
+        sourceContent.split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
       snippets.forEachIndexed { i, snippet ->
         val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
