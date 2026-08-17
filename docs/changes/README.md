@@ -7,6 +7,7 @@
 
 - Allow configuring the final R8 configuration file with `R8Spec.configurationFile`. ([#2133](https://github.com/GradleUp/shadow/pull/2133))
 - Add `ProGuardFilesResourceTransformer` to merge R8/ProGuard rule files. ([#2196](https://github.com/GradleUp/shadow/pull/2196))
+- Add `Iterable<Relocator>.applyToSourceContent` extension function. ([#2201](https://github.com/GradleUp/shadow/pull/2201))
 
 ### Changed
 
@@ -25,6 +26,8 @@
 ### Fixed
 
 - Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
+- Fix `ServiceFileTransformer` to properly relocate content with comments or whitespace and append a terminating newline. ([#2201](https://github.com/GradleUp/shadow/pull/2201))
+- Fix `SimpleRelocator.shadeSourceWithExcludes` when the source content starts with the pattern to relocate. ([#2201](https://github.com/GradleUp/shadow/pull/2201))
 
 ### Deprecated
 
