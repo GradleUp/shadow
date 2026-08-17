@@ -70,6 +70,6 @@ constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
      * and inner classes (`com.foo.Bar$Inner`).
      */
     private val CLASS_PATTERN =
-      Regex("""(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z0-9_$*]+)+)""")
+      Regex("""(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z0-9_$*?]+)+)""")
   }
 }
