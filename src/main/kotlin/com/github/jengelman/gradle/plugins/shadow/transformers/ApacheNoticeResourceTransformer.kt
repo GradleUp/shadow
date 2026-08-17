@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.appendLfLine
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
@@ -148,7 +149,7 @@ public open class ApacheNoticeResourceTransformer(
               sb.setLength(0)
             }
           }
-          sb.appendLine(line)
+          sb.appendLfLine(line)
           lineCount++
         } else {
           val entry = sb.toString()
@@ -187,18 +188,18 @@ public open class ApacheNoticeResourceTransformer(
       count++
       if (line == copyright && count != 2) continue
       if (count == 2 && copyright != null) {
-        sb.appendLine(copyright)
+        sb.appendLfLine(copyright)
       } else {
-        sb.appendLine(line)
+        sb.appendLfLine(line)
       }
       if (count == 3) {
         // Do org stuff.
         for ((key, value) in organizationEntries) {
-          sb.appendLine(key)
+          sb.appendLfLine(key)
           for (l in value) {
             sb.append(l)
           }
-          sb.appendLine()
+          sb.appendLfLine()
         }
       }
     }

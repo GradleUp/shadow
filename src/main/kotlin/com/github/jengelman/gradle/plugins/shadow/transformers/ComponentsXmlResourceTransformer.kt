@@ -6,7 +6,9 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.PrintWriter
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter
 import org.codehaus.plexus.util.xml.XmlStreamReader
 import org.codehaus.plexus.util.xml.XmlStreamWriter
 import org.codehaus.plexus.util.xml.Xpp3Dom
@@ -38,7 +40,8 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
         for (component in components.values) {
           componentDom.addChild(component)
         }
-        Xpp3DomWriter.write(writer, dom)
+        val xmlWriter = PrettyPrintXMLWriter(PrintWriter(writer), "  ", "\n", null, null)
+        Xpp3DomWriter.write(xmlWriter, dom)
       }
       return os.toByteArray()
     }

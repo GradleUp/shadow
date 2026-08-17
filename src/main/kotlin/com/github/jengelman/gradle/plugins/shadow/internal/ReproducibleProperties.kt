@@ -27,7 +27,7 @@ internal class ReproducibleProperties : Properties() {
         while (bufferedReader.readLine().also { line = it } != null && line != null) {
           if (!line.startsWith("#")) {
             write(line)
-            newLine()
+            write("\n")
           }
         }
       }

@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
 import org.junit.jupiter.params.ParameterizedTest
@@ -105,7 +104,6 @@ class ReproduciblePropertiesTest {
       return ByteArrayOutputStream()
         .also { writeWithoutComments(charset, it) }
         .toString(charset.name())
-        .invariantEolString
     }
   }
 }

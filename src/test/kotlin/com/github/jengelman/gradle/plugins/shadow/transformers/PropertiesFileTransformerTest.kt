@@ -12,7 +12,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
@@ -185,7 +184,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
-      val content = JarPath(tempJar).use { it.getContent(path) }.invariantEolString
+      val content = JarPath(tempJar).use { it.getContent(path) }
       assertThat(content).isEqualTo("foo=one,two\n")
     }
 

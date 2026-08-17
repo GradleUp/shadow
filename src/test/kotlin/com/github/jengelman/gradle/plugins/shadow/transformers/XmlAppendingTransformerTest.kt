@@ -46,7 +46,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
-      val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
+      val content = JarPath(tempJar).use { it.getContent(xmlEntry) }
       assertThat(content)
         .isEqualTo(
           """
@@ -82,7 +82,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
-      val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
+      val content = JarPath(tempJar).use { it.getContent(xmlEntry) }
       assertThat(content)
         .isEqualTo(
           """
@@ -115,7 +115,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
       tempJar.zipOutputStream().use { zos ->
         modifyOutputStream(zos, false)
       }
-      val content = JarPath(tempJar).use { it.getContent(xmlEntry) }.normalizeXmlEol()
+      val content = JarPath(tempJar).use { it.getContent(xmlEntry) }
       assertThat(content)
         .isEqualTo(
           """
@@ -128,15 +128,4 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
             .trimMargin()
         )
     }
-
-  private companion object {
-    /**
-     * Normalizes line breaks in XML content produced by [XmlAppendingTransformer].
-     *
-     * JDOM2's [org.jdom2.output.Format.getPrettyFormat] defaults its line separator to `\r\n`
-     * (CRLF) across all platforms. Replacing `\r\n` with `\n` aligns the output with Kotlin's raw
-     * string literals (`"""|...""".trimMargin()`) for cross-platform assertions.
-     */
-    fun String.normalizeXmlEol(): String = replace("\r\n", "\n")
-  }
 }
