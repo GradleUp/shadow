@@ -566,6 +566,32 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
     }
     ```
 
+## Merging R8/ProGuard Rule Files
+
+Dependencies may publish ProGuard or R8 rules under `META-INF/proguard`.
+When multiple dependencies have files with the same name under `META-INF/proguard`,
+the [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] merges them into a single file in the
+output JAR, while retaining distinct file names for non-conflicting rules. It also relocates matched class names
+and package patterns within the rules according to configured relocators.
+
+You can add this transformer using [`transform`][ShadowJar.transform]:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ProGuardFilesResourceTransformer>()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ProGuardFilesResourceTransformer)
+    }
+    ```
+
 ## Configuring Resource Transformer Filtering by Pattern
 
 There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provided by Shadow. Some of them extend
@@ -574,6 +600,7 @@ There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provide
 
 - [`ApacheLicenseResourceTransformer`][ApacheLicenseResourceTransformer]
 - [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
+- [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
 - [`ServiceFileTransformer`][ServiceFileTransformer]
 - ...
 
@@ -648,6 +675,7 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [ApacheLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-license-resource-transformer/index.html
 [ApacheNoticeResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-notice-resource-transformer/index.html
+[ProGuardFilesResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pro-guard-files-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
 [PreserveFirstFoundResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-preserve-first-found-resource-transformer/index.html
 [PatternFilterable]: https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.tasks.util/-pattern-filterable/index.html

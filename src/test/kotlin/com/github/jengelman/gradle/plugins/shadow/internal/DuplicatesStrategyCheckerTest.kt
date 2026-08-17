@@ -28,7 +28,7 @@ class DuplicatesStrategyCheckerTest {
       getTransformerClasses().map {
         it.create(testObjectFactory)
       }
-    assertThat(allResourceTransformers.size).isEqualTo(18)
+    assertThat(allResourceTransformers.size).isEqualTo(19)
 
     var invocationCount = 0
     onCheckDupStrategyInvoked = { invocationCount++ }
@@ -37,7 +37,7 @@ class DuplicatesStrategyCheckerTest {
         val file = createTempFile(directory = tempDir).toFile()
         it.canTransformResource(path = file.path, file = file)
       }
-      assertThat(invocationCount).isEqualTo(15)
+      assertThat(invocationCount).isEqualTo(16)
     } finally {
       onCheckDupStrategyInvoked = null
     }
