@@ -54,6 +54,31 @@ class TransformersTest : BaseTransformerTest() {
     commonAssertions()
   }
 
+  @Test
+  fun manifestResourceTransformer() {
+    writeClass()
+    projectScript.appendText(
+      transform<ManifestResourceTransformer>(
+        transformerBlock =
+          """
+          mainClass = 'my.Main'
+          manifestEntries = ['$TEST_ENTRY_ATTR_KEY': 'PASSED', 'Number-Entry': 123]
+          attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
+          """
+            .trimIndent()
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    commonAssertions {
+      assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
+      assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
+      assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
+      assertThat(getValue("Number-Entry")).isEqualTo("123")
+    }
+  }
+
   @Test // #427
   fun mergeLog4j2PluginCacheFiles() {
     val content = requireResourceAsPath(PLUGIN_CACHE_FILE).readText()
