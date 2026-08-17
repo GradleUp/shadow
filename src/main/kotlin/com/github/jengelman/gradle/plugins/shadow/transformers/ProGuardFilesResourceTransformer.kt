@@ -20,7 +20,7 @@ import org.gradle.api.tasks.util.PatternSet
 @CacheableTransformer
 public open class ProGuardFilesResourceTransformer
 @JvmOverloads
-constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
+constructor(patternSet: PatternSet = PatternSet().include("META-INF/proguard/**")) :
   PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal internal val proGuardEntries = mutableMapOf<String, MutableList<String>>()
 
@@ -29,16 +29,14 @@ constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
   }
 
   override fun transform(context: TransformerContext) {
-    val lines =
-      context.inputStream
-        .bufferedReader()
-        .use { it.readLines() }
-        .map { line ->
-          relocateRuleLine(line, context.relocators)
+    with(context) {
+      val lines =
+        inputStream.bufferedReader().readLines().map { line ->
+          relocators.relocateLine(line)
         }
-
-    val targetPath = context.relocators.relocatePath(context.path)
-    proGuardEntries.getOrPut(targetPath) { mutableListOf() }.addAll(lines)
+      val targetPath = relocators.relocatePath(path)
+      proGuardEntries.getOrPut(targetPath) { mutableListOf() }.addAll(lines)
+    }
   }
 
   override fun hasTransformedResource(): Boolean = proGuardEntries.isNotEmpty()
@@ -51,25 +49,22 @@ constructor(patternSet: PatternSet = PatternSet().include(PROGUARD_PATTERN)) :
     }
   }
 
-  private fun relocateRuleLine(line: String, relocators: Collection<Relocator>): String {
-    if (line.isBlank() || line.trimStart().startsWith("#")) {
-      return line
-    }
-    return CLASS_PATTERN.replace(line) { matchResult ->
-      val token = matchResult.value
-      relocators.relocateClass(token)
-    }
-  }
-
   private companion object {
-    private const val PROGUARD_PATH = "META-INF/proguard"
-    private const val PROGUARD_PATTERN = "$PROGUARD_PATH/**"
-
     /**
      * Matches Java class names, fully qualified class names, package wildcards (e.g. `com.foo.**`),
      * and inner classes (`com.foo.Bar$Inner`).
      */
-    private val CLASS_PATTERN =
-      Regex("""(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z0-9_$*?]+)+)""")
+    val CLASS_PATTERN =
+      """(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z0-9_$*?]+)+)""".toRegex()
+
+    fun Iterable<Relocator>.relocateLine(line: String): String {
+      return when {
+        line.isBlank() || line.trimStart().startsWith("#") -> line
+        else ->
+          CLASS_PATTERN.replace(line) { matchResult ->
+            relocateClass(matchResult.value)
+          }
+      }
+    }
   }
 }

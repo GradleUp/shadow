@@ -42,10 +42,8 @@ class ProGuardFilesResourceTransformerTest :
           relocator,
         )
       )
-
       // File 2 from dependency A (different filename)
       transform(textContext("META-INF/proguard/client.pro", "-dontwarn com.foo.**\n", relocator))
-
       // File 1 from dependency B (same filename as File 1)
       transform(textContext("META-INF/proguard/rules.pro", "-keep class com.foo.Baz\n", relocator))
 
@@ -56,9 +54,9 @@ class ProGuardFilesResourceTransformerTest :
       JarPath(tempJar).use { jarPath ->
         assertThat(jarPath.getContent("META-INF/proguard/rules.pro"))
           .isEqualTo(
-            """
+            $$"""
             |-keep class shaded.com.foo.Bar
-            |-keep class shaded.com.foo.Bar${'$'}Inner
+            |-keep class shaded.com.foo.Bar$Inner
             |-keep class shaded.com.foo.Baz
             """
               .trimMargin()

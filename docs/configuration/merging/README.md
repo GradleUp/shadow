@@ -569,9 +569,10 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 ## Merging R8/ProGuard Rule Files
 
 Dependencies may publish ProGuard or R8 rules under `META-INF/proguard`.
-When multiple dependencies have files with the same name under `META-INF/proguard`, the [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
-merges them into a single file in the output JAR, while retaining distinct file names for non-conflicting rules.
-It also relocates matched class names and package patterns within the rules according to configured relocators.
+When multiple dependencies have files with the same name under `META-INF/proguard`,
+the [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] merges them into a single file in the
+output JAR, while retaining distinct file names for non-conflicting rules. It also relocates matched class names
+and package patterns within the rules according to configured relocators.
 
 You can add this transformer using [`transform`][ShadowJar.transform]:
 
