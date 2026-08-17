@@ -12,6 +12,22 @@ public fun Relocator.relocatePath(path: String): String {
   return relocatePath(RelocatePathContext(path))
 }
 
+internal fun Relocator.relocateAllClasses(className: String): String {
+  if (this is SimpleRelocator) {
+    return if (rawString || pattern.isEmpty()) {
+      className
+    } else {
+      className.replace(pattern, shadedPattern)
+    }
+  }
+  var newValue = className
+  do {
+    val value = newValue
+    newValue = relocateClass(value)
+  } while (value != newValue)
+  return newValue
+}
+
 public fun Iterable<Relocator>.relocateClass(className: String): String {
   forEach { relocator ->
     if (relocator.canRelocateClass(className)) {
@@ -28,4 +44,12 @@ public fun Iterable<Relocator>.relocatePath(path: String): String {
     }
   }
   return path
+}
+
+internal fun Iterable<Relocator>.relocateAllClasses(className: String): String {
+  var result = className
+  forEach { relocator ->
+    result = relocator.relocateAllClasses(result)
+  }
+  return result
 }

@@ -2,10 +2,10 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
+import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -76,6 +76,38 @@ class TransformersTest : BaseTransformerTest() {
       assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
       assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
       assertThat(getValue("Number-Entry")).isEqualTo("123")
+    }
+  }
+
+  @Test
+  fun manifestResourceTransformerRemoveAttributes() {
+    writeClass()
+    projectScript.appendText(
+      """
+      |$jarTask {
+      |  manifest {
+      |    attributes 'Header-To-Remove-1': 'Value1', 'Header-To-Remove-2': 'Value2', 'Header-To-Keep': 'Value3'
+      |  }
+      |}
+      |
+      |${transform<ManifestResourceTransformer>(
+        transformerBlock =
+          """
+          |manifestEntries.put('Header-To-Remove-1', ${ManifestResourceTransformer::class.java.name}.NULL)
+          |attributes 'Header-To-Remove-2': null
+          """
+            .trimMargin()
+      )}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    commonAssertions {
+      assertThat(getValue("Header-To-Remove-1")).isNull()
+      assertThat(getValue("Header-To-Remove-2")).isNull()
+      assertThat(getValue("Header-To-Keep")).isEqualTo("Value3")
     }
   }
 
