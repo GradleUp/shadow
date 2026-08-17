@@ -78,7 +78,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     os.writeEntry(resource.get(), preserveFileTimestamps) {
-      XMLOutputter(Format.getPrettyFormat()).output(doc, this)
+      XMLOutputter(Format.getPrettyFormat().setLineSeparator("\n")).output(doc, this)
     }
     doc = null
   }

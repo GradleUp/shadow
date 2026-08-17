@@ -33,3 +33,9 @@ internal fun Properties.inputStream(
   os.writer(charset).use { writer -> store(writer, comments) }
   return os.toByteArray().inputStream()
 }
+
+@Suppress("NOTHING_TO_INLINE") // Syncs with `appendLine`.
+internal inline fun StringBuilder.appendLfLine(value: CharSequence? = null): StringBuilder = apply {
+  if (value != null) append(value)
+  append('\n')
+}

@@ -15,6 +15,12 @@
 - **POTENTIALLY BREAKING:** Remove `Serializable` from `DependencyFilter`. ([#2144](https://github.com/GradleUp/shadow/pull/2144))
 - Bump default R8 from `9.1.31` to `9.4.14`. ([#2193](https://github.com/GradleUp/shadow/pull/2193))
 - Allow repackaging Service file classes with R8. ([#2174](https://github.com/GradleUp/shadow/pull/2174))
+- Normalize line separators to LF (`\n`) in `ResourceTransformer`s for reproducible builds. ([#2197](https://github.com/GradleUp/shadow/pull/2197))
+  - `ApacheNoticeResourceTransformer`
+  - `ComponentsXmlResourceTransformer`
+  - `GroovyExtensionModuleTransformer`
+  - `PropertiesFileTransformer`
+  - `XmlAppendingTransformer`
 
 ### Deprecated
 
