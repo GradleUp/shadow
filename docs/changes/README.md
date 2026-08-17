@@ -21,6 +21,7 @@
   - `GroovyExtensionModuleTransformer`
   - `PropertiesFileTransformer`
   - `XmlAppendingTransformer`
+- Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
 
 ### Fixed
 

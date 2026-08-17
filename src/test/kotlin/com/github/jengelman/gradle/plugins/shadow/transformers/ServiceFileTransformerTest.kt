@@ -71,7 +71,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
 
       val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
-      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
+      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService\n")
     }
 
   @Test
@@ -90,7 +90,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
 
       val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
-      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
+      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService\n")
     }
 
   @Test
@@ -107,7 +107,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
 
       val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
-      assertThat(transformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory")
+      assertThat(transformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory\n")
     }
 
   @Test
@@ -128,7 +128,7 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
       }
 
       val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
-      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service")
+      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service\n")
     }
 
   private companion object {

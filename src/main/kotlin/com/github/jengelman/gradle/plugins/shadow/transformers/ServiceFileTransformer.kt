@@ -60,7 +60,7 @@ constructor(
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     serviceEntries.forEach { (path, data) ->
       os.writeEntry(path, preserveFileTimestamps) {
-        write(data.joinToString("\n").toByteArray())
+        write(data.joinToString(separator = "\n", postfix = "\n").toByteArray())
       }
     }
   }
