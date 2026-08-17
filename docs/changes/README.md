@@ -6,6 +6,7 @@
 ### Added
 
 - Allow configuring the final R8 configuration file with `R8Spec.configurationFile`. ([#2133](https://github.com/GradleUp/shadow/pull/2133))
+- Add `ProGuardFilesResourceTransformer` to merge R8/ProGuard rule files. ([#2196](https://github.com/GradleUp/shadow/pull/2196))
 
 ### Changed
 
