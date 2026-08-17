@@ -39,7 +39,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(ENTRY_FOO_SHADE) }
-    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(content).isEqualTo("$CONTENT_ONE_TWO\n")
   }
 
   @Test
@@ -96,7 +96,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           """
           |relocated.foo.FooDriver
           |relocated.bar.BarDriver
-          """
+          |"""
             .trimMargin()
         )
     }
@@ -188,7 +188,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(servicesBarEntry) }
-    assertThat(content).isEqualTo("$CONTENT_THREE\n$CONTENT_ONE_TWO")
+    assertThat(content).isEqualTo("$CONTENT_THREE\n$CONTENT_ONE_TWO\n")
   }
 
   @ParameterizedTest
@@ -221,8 +221,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     }
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo(secondValue)
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$firstValue\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("$secondValue\n")
     }
   }
 
@@ -243,8 +243,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$CONTENT_ONE_TWO\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\n")
     }
   }
 
@@ -265,8 +265,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$CONTENT_ONE_TWO\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\n")
     }
   }
 
@@ -294,8 +294,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$CONTENT_ONE_TWO\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\n")
     }
   }
 
