@@ -32,7 +32,7 @@ constructor(patternSet: PatternSet = PatternSet().include("META-INF/proguard/**"
     with(context) {
       val lines =
         inputStream.bufferedReader().readLines().map { line ->
-          relocators.relocateLine(line)
+          relocators.relocateRuleLine(line)
         }
       val targetPath = relocators.relocatePath(path)
       proGuardEntries.getOrPut(targetPath) { mutableListOf() }.addAll(lines)
@@ -49,15 +49,15 @@ constructor(patternSet: PatternSet = PatternSet().include("META-INF/proguard/**"
     }
   }
 
-  private companion object {
+  internal companion object {
     /**
      * Matches Java class names, fully qualified class names, package wildcards (e.g. `com.foo.**`),
      * and inner classes (`com.foo.Bar$Inner`).
      */
-    val CLASS_PATTERN =
+    private val CLASS_PATTERN =
       """(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z0-9_$*?]+)+)""".toRegex()
 
-    fun Iterable<Relocator>.relocateLine(line: String): String {
+    fun Iterable<Relocator>.relocateRuleLine(line: String): String {
       return when {
         line.isBlank() || line.trimStart().startsWith("#") -> line
         else ->
