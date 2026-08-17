@@ -89,16 +89,15 @@ public open class MergeLicenseResourceTransformer(
   ) : this(
     objectFactory,
     patternSet =
-      PatternSet().apply {
-        include(
+      PatternSet()
+        .include(
           "META-INF/LICENSE",
           "META-INF/LICENSE.txt",
           "META-INF/LICENSE.md",
           "LICENSE",
           "LICENSE.txt",
           "LICENSE.md",
-        )
-      },
+        ),
   )
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
