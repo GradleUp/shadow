@@ -34,18 +34,43 @@ class ProGuardFilesResourceTransformerTest :
     with(transformer) {
       val relocator = SimpleRelocator("com.foo", "shaded.com.foo")
 
-      // File 1 from dependency A
       transform(
         textContext(
           "META-INF/proguard/rules.pro",
-          "-keep class com.foo.Bar\n-keep class com.foo.Bar\$Inner\n",
+          $$"""
+          |# File 1 from dependency A
+          |-keep class com.foo.Bar
+          |-keep class com.foo.Bar$Inner
+          |-keep class com.foo.?Bar extends com.foo.Base
+          |"""
+            .trimMargin(),
           relocator,
         )
       )
-      // File 2 from dependency A (different filename)
-      transform(textContext("META-INF/proguard/client.pro", "-dontwarn com.foo.**\n", relocator))
-      // File 1 from dependency B (same filename as File 1)
-      transform(textContext("META-INF/proguard/rules.pro", "-keep class com.foo.Baz\n", relocator))
+      transform(
+        textContext(
+          "META-INF/proguard/client.pro",
+          """
+          |# File 2 from dependency A (different filename)
+          |-dontwarn com.foo.**
+          |-keep class com.foo.Test? { @com.foo.MyAnnotation <fields>; }
+          """
+            .trimMargin(),
+          relocator,
+        )
+      )
+      transform(
+        textContext(
+          "META-INF/proguard/rules.pro",
+          """
+          |# File 1 from dependency B (same filename as File 1)
+          |-keep class com.foo.Baz
+          |-dontwarn com.foo.internal.*
+          """
+            .trimMargin(),
+          relocator,
+        )
+      )
 
       assertThat(hasTransformedResource()).isTrue()
 
@@ -55,14 +80,25 @@ class ProGuardFilesResourceTransformerTest :
         assertThat(jarPath.getContent("META-INF/proguard/rules.pro"))
           .isEqualTo(
             $$"""
+            |# File 1 from dependency A
             |-keep class shaded.com.foo.Bar
             |-keep class shaded.com.foo.Bar$Inner
+            |-keep class shaded.com.foo.?Bar extends shaded.com.foo.Base
+            |# File 1 from dependency B (same filename as File 1)
             |-keep class shaded.com.foo.Baz
+            |-dontwarn shaded.com.foo.internal.*
             """
               .trimMargin()
           )
         assertThat(jarPath.getContent("META-INF/proguard/client.pro"))
-          .isEqualTo("-dontwarn shaded.com.foo.**")
+          .isEqualTo(
+            """
+            |# File 2 from dependency A (different filename)
+            |-dontwarn shaded.com.foo.**
+            |-keep class shaded.com.foo.Test? { @shaded.com.foo.MyAnnotation <fields>; }
+            """
+              .trimMargin()
+          )
       }
     }
 }

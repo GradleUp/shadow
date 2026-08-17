@@ -62,8 +62,10 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
       insert(
         "META-INF/proguard/rules.pro",
         """
+        |# Core rules
         |-keep class com.example.Driver { *; }
         |-dontwarn foo.**
+        |-keep class foo.?Driver
         """
           .trimMargin(),
       )
@@ -73,6 +75,7 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
       insert(
         "META-INF/proguard/rules.pro",
         """
+        |# Extension rules
         |-keep class bar.BarDriver
         """
           .trimMargin(),
@@ -113,8 +116,11 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
       getContent("META-INF/proguard/rules.pro")
         .isEqualTo(
           """
+          |# Core rules
           |-keep class relocated.com.example.Driver { *; }
           |-dontwarn relocated.foo.**
+          |-keep class relocated.foo.?Driver
+          |# Extension rules
           |-keep class relocated.bar.BarDriver
           """
             .trimMargin()
