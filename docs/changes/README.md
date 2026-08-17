@@ -22,6 +22,10 @@
   - `PropertiesFileTransformer`
   - `XmlAppendingTransformer`
 
+### Fixed
+
+- Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
+
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  

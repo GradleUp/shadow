@@ -1,12 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
-import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.IOException
-import java.util.jar.Attributes as JarAttribute
+import java.util.jar.Attributes.Name as JarAttributeName
 import java.util.jar.JarFile.MANIFEST_NAME
 import java.util.jar.Manifest
 import javax.inject.Inject
@@ -38,8 +37,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
   @get:Input public open val mainClass: Property<String> = objectFactory.property("")
 
-  @get:Input
-  public open val manifestEntries: MapProperty<String, JarAttribute> = objectFactory.mapProperty()
+  @get:Input public open val manifestEntries: MapProperty<String, Any> = objectFactory.mapProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.path, ignoreCase = true).also { flag ->
@@ -72,16 +70,22 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     }
 
     val attributes = manifest!!.mainAttributes
-    mainClass.get().takeIf(CharSequence::isNotEmpty)?.let { attributes[mainClassAttributeKey] = it }
-    manifestEntries.get().forEach { (key, value) -> attributes[JarAttribute.Name(key)] = value }
+    mainClass.get().takeIf(CharSequence::isNotEmpty)?.let {
+      attributes[JarAttributeName.MAIN_CLASS] = it
+    }
+    manifestEntries.get().forEach { (key, value) -> attributes.putValue(key, value.toString()) }
 
     os.writeEntry(MANIFEST_NAME, preserveFileTimestamps) {
       manifest!!.write(this)
     }
   }
 
-  public open fun attributes(attributes: Map<String, JarAttribute>) {
-    manifestEntries.putAll(attributes)
+  public open fun attributes(attributes: Map<String, *>) {
+    attributes.forEach { (key, value) ->
+      if (value != null) {
+        manifestEntries.put(key, value)
+      }
+    }
   }
 
   private companion object {
