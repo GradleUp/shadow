@@ -238,10 +238,10 @@ class RelocationTest : BasePluginTest() {
     val url = outputShadowedJar.use { it.toUri().toURL() }
     URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
       assertFailure {
-          // check that the class can be loaded. If the file was not relocated properly, we should
-          // get a NoDefClassFound
+          // Check that the class can be loaded. If the file was not relocated properly, we should
+          // get a NoDefClassFound.
           // Isolated class loader with only the JVM system jars and the output jar from the test
-          // project
+          // project.
           classLoader.loadClass("my.MyTest")
           fail("Should not reach here.")
         }

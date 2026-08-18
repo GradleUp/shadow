@@ -123,8 +123,7 @@ public interface DependencyFilter {
         val versionMatch =
           version?.let {
             // Version like `1.0.0+1` can't be converted to regex directly because `+` is a special
-            // character in regex.
-            // So we check for exact match first, then fallback to regex match.
+            // character in regex. So we check for exact match first, then fallback to regex match.
             it == resolvedDependency.moduleVersion ||
               resolvedDependency.moduleVersion.matches(it.toRegex())
           } ?: true

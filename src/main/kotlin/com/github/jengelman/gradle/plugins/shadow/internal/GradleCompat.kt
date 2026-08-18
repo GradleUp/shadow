@@ -40,9 +40,8 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
 
-// ExtraPropertiesExtension is IP safe and contains properties from both the root
-// `gradle.properties` and the
-// subproject's `gradle.properties`. See
+// ExtraPropertiesExtension is IP safe and contains properties from both the
+// root `gradle.properties` and the subproject's `gradle.properties`. See
 // https://github.com/gradle/gradle/issues/29600#issuecomment-3580868326.
 internal fun Project.findOptionalProperty(propertyName: String): String? {
   val extras = checkNotNull(extensions.findByType(ExtraPropertiesExtension::class.java))

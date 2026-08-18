@@ -46,11 +46,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   }
 
   override fun transform(context: TransformerContext) {
-    // We just want to take the first manifest we come across as that's our project's manifest. This
-    // is the behavior
-    // now which is situational at best. Right now there is no context passed in with the processing
-    // so we cannot
-    // tell what artifact is being processed.
+    // We just want to take the first manifest we come across as that's our project's manifest.
+    // This is the behavior now which is situational at best. Right now there is no context
+    // passed in with the processing so we cannot tell what artifact is being processed.
     if (!manifestDiscovered) {
       try {
         manifest = Manifest(context.inputStream)

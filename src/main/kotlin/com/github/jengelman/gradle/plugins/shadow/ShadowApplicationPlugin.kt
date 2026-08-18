@@ -110,9 +110,8 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       dist.distributionBaseName.convention(
         provider {
           // distributionBaseName defaults to `$project.name-$distribution.name`, applicationName
-          // defaults to project.name
-          // so we append the suffix to match the default distributionBaseName. Modified from
-          // `ApplicationPlugin.configureDistribution()`.
+          // defaults to project.name so we append the suffix to match the default
+          // distributionBaseName. Modified from `ApplicationPlugin.configureDistribution()`.
           "${applicationExtension.applicationName}-$DISTRIBUTION_NAME"
         }
       )

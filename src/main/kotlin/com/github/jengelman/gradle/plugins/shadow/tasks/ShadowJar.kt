@@ -773,9 +773,8 @@ public abstract class ShadowJar : Jar() {
           action.execute(task)
         }
         .also { task ->
-          // Can't use `named` directly as the task is optional or may not exist when the plugin is
-          // applied.
-          // Using Spec<String> applies the action to the task if it is added later.
+          // Can't use `named` directly as the task is optional or may not exist when the plugin
+          // is applied. Using Spec<String> applies the action to the task if it is added later.
           tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach {
             if (shadow.addShadowJarToAssembleLifecycle.get()) {
               it.dependsOn(task)

@@ -233,9 +233,9 @@ constructor(
             pattern.replace('.', '/')
           }
         add(filePattern)
-        // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk, but
-        // some users
-        // mistake them for path patterns like 'my/path/**', so let us be a bit more lenient here.
+        // Actually, class patterns should just use 'foo.bar.*' ending with a single asterisk,
+        // but some users mistake them for path patterns like 'my/path/**', so let us be a bit more
+        // lenient here.
         if (filePattern.endsWith("/*") || filePattern.endsWith("/**")) {
           val packagePattern = filePattern.take(filePattern.lastIndexOf('/'))
           add(packagePattern)

@@ -80,7 +80,7 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
 
       val key = "$role:$roleHint"
       // TODO: use the tools in Plexus to merge these properly. For now, I just need an
-      //  all-or-nothing. Configuration carry over.
+      //  all-or-nothing configuration carry over.
       components[key]?.getChild("configuration")?.let { component.addChild(it) }
 
       val requirements = component.getChild("requirements")

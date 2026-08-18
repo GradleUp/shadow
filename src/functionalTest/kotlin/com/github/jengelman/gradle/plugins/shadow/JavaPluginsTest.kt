@@ -1019,8 +1019,8 @@ class JavaPluginsTest : BasePluginTest() {
         serverShadowJarPath,
         infoArgument,
         "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
-        "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a
-        // file instead.
+        // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
+        "-Dscan.dump",
       )
 
     assertThat(result.output).all {
