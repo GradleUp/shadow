@@ -61,11 +61,11 @@ class TransformersTest : BaseTransformerTest() {
       transform<ManifestResourceTransformer>(
         transformerBlock =
           """
-          mainClass = 'my.Main'
-          manifestEntries = ['$TEST_ENTRY_ATTR_KEY': 'PASSED', 'Number-Entry': 123]
-          attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
+          |mainClass = 'my.Main'
+          |manifestEntries = ['$TEST_ENTRY_ATTR_KEY': 'PASSED', 'Number-Entry': 123]
+          |attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
           """
-            .trimIndent()
+            .trimMargin()
       )
     )
 

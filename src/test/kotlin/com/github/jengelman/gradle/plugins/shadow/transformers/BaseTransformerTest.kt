@@ -10,7 +10,6 @@ import java.io.File
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
 import java.util.Locale
-import java.util.jar.JarFile.MANIFEST_NAME
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
@@ -22,9 +21,6 @@ import org.junit.jupiter.api.io.TempDir
 abstract class BaseTransformerTest<T : ResourceTransformer> {
   lateinit var transformer: T
     private set
-
-  val manifestTransformerContext: TransformerContext
-    get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
 
   @TempDir
   lateinit var tempDir: Path

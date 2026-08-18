@@ -85,6 +85,12 @@ When adding new features or public APIs:
 4. Add appropriate tests for the new functionality
 5. Update the documentation in the `./docs` directory if applicable
 
+### Writing Tests
+
+- Prefer exact and complete matching using `isEqualTo` for string assertions whenever possible instead of partial
+  matching (e.g., `contains`).
+- Raw multiline strings in tests should be constructed using `.trimMargin()`.
+
 ### Before Submitting a Pull Request
 
 1. Run `./gradlew spotlessApply` to format your code
