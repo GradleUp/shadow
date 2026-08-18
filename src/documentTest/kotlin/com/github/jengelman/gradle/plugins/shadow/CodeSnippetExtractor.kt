@@ -23,7 +23,7 @@ fun DslLang.extractCodeSnippets(): List<SnippetExecutable> {
         while (matcher.find()) {
           val lineNumber = source.lineNumberAt(matcher.start())
           add(
-            SnippetExecutable.create(
+            SnippetExecutable(
               lang = lang,
               snippet = matcher.group(1),
               testName = "${path.relativeTo(docRoot)}:$lineNumber",

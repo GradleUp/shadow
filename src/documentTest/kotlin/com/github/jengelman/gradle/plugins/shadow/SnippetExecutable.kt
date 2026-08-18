@@ -149,18 +149,15 @@ sealed interface SnippetExecutable {
       // Replace the version placeholders.
       withoutImports.toString().replace("<version>", "+")
   }
-
-  companion object {
-
-    fun create(
-      lang: DslLang,
-      snippet: String,
-      testName: String,
-      sourceLocation: String,
-    ): SnippetExecutable =
-      when (lang) {
-        DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, sourceLocation)
-        DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, sourceLocation)
-      }
-  }
 }
+
+fun SnippetExecutable(
+  lang: DslLang,
+  snippet: String,
+  testName: String,
+  sourceLocation: String,
+): SnippetExecutable =
+  when (lang) {
+    DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, sourceLocation)
+    DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, sourceLocation)
+  }
