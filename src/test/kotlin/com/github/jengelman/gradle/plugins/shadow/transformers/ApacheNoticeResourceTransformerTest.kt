@@ -1,15 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import java.io.ByteArrayOutputStream
-import java.nio.charset.Charset
-import java.util.zip.ZipInputStream
-import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 
 /**
@@ -45,19 +40,28 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   @Test
   fun preamble1ShouldHaveATrailingSpace() =
     with(transformer) {
-      val baos = ByteArrayOutputStream()
-      val zos = ZipOutputStream(baos)
-
       projectName.set("test-project")
+      copyright.set("test-project\nCopyright 2006 The Apache Software Foundation\n")
       transform(textContext(NOTICE_RESOURCE))
-      modifyOutputStream(zos, false)
-      zos.close()
 
-      val zis = ZipInputStream(baos.toByteArray().inputStream())
-      zis.nextEntry
-      val output = zis.readAllBytes().toString(Charset.forName(charsetName.get()))
+      val content = transformToJar().use { it.getContent(NOTICE_RESOURCE) }
 
-      assertThat(output).contains("in this case for test-project")
+      assertThat(content)
+        .isEqualTo(
+          """
+          |// ------------------------------------------------------------------
+          |// NOTICE file corresponding to the section 4d of The Apache License,
+          |// Version 2.0, in this case for test-project
+          |// ------------------------------------------------------------------
+          |
+          |test-project
+          |Copyright 2006 The Apache Software Foundation
+          |
+          |This product includes software developed at
+          |The Apache Software Foundation (https://www.apache.org/).
+          """
+            .trimMargin()
+        )
     }
 
   @Test
