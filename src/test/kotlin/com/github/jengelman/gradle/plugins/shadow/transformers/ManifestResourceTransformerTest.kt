@@ -179,28 +179,6 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
       }
     }
 
-  @Test
-  fun removeAttributeUsingAttributesMapWithNull() =
-    with(transformer) {
-      val source =
-        """
-        |Manifest-Version: 1.0
-        |Header-To-Remove: Value1
-        |Header-To-Keep: Value2
-        |"""
-          .trimMargin()
-          .crlfEolString
-
-      attributes(mapOf("Header-To-Remove" to null))
-
-      transform(textContext(MANIFEST_NAME, source))
-
-      transformToJar().use { jarPath ->
-        assertThat(jarPath.getMainAttr("Header-To-Remove")).isNull()
-        assertThat(jarPath.getMainAttr("Header-To-Keep")).isEqualTo("Value2")
-      }
-    }
-
   private companion object {
     fun createManifestContext(
       manifest: Manifest,

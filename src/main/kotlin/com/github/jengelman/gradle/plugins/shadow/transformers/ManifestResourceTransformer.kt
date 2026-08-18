@@ -113,6 +113,10 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
    *
    * If a value is `null`, it will be mapped to [NULL] to remove the attribute from the manifest.
    */
+  @Deprecated(
+    "Use manifestEntries instead. This method will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("manifestEntries.putAll(attributes)"),
+  )
   public open fun attributes(attributes: Map<String, *>) {
     attributes.forEach { (key, value) ->
       manifestEntries.put(key, value ?: NULL)
