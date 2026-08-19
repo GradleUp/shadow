@@ -12,7 +12,7 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 
-internal open class DefaultMinimizeSpec
+internal abstract class DefaultMinimizeSpec
 @Inject
 constructor(
   project: Project,
