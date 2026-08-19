@@ -10,7 +10,7 @@ import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 
-internal open class DefaultR8Spec
+internal abstract class DefaultR8Spec
 @Inject
 constructor(
   layout: ProjectLayout,
