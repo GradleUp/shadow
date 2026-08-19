@@ -220,12 +220,10 @@ class SimpleRelocatorTest {
   }
 
   @Test
-  fun relocateAllClasses() {
+  fun relocateText() {
     var relocator = SimpleRelocator("org.foo")
     assertThat(
-        relocator.relocateAllClasses(
-          "org.foo.bar.Class, hidden.org.foo.bar.Class and org.foo.bar.Class"
-        )
+        relocator.relocateText("org.foo.bar.Class, hidden.org.foo.bar.Class and org.foo.bar.Class")
       )
       .isEqualTo(
         "hidden.org.foo.bar.Class, hidden.hidden.org.foo.bar.Class and hidden.org.foo.bar.Class"
@@ -233,9 +231,7 @@ class SimpleRelocatorTest {
 
     relocator = SimpleRelocator("org.foo", "private.stuff")
     assertThat(
-        relocator.relocateAllClasses(
-          "org.foo.bar.Class, private.stuff.bar.Class and org.foo.bar.Class"
-        )
+        relocator.relocateText("org.foo.bar.Class, private.stuff.bar.Class and org.foo.bar.Class")
       )
       .isEqualTo("private.stuff.bar.Class, private.stuff.bar.Class and private.stuff.bar.Class")
   }

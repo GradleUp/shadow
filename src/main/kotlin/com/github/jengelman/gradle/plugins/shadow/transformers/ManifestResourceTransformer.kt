@@ -5,7 +5,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateAllClasses
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateText
 import java.io.IOException
 import java.io.Serializable
 import java.util.jar.Attributes.Name as JarAttributeName
@@ -70,7 +70,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
           for (attribute in relocateAttributes.get()) {
             val attributeValue = attributes.getValue(attribute)
             if (attributeValue != null) {
-              val newValue = context.relocators.relocateAllClasses(attributeValue)
+              val newValue = context.relocators.relocateText(attributeValue)
               attributes.putValue(attribute, newValue)
             }
           }

@@ -12,15 +12,26 @@ public fun Relocator.relocatePath(path: String): String {
   return relocatePath(RelocatePathContext(path))
 }
 
-internal fun Relocator.relocateAllClasses(className: String): String {
+/**
+ * Relocates all matching class and package names in the given [text].
+ *
+ * Unlike [relocateClass], which operates on a single class name (subject to prefix/format checks in
+ * [Relocator.canRelocateClass] and single-occurrence replacement), this function performs global
+ * replacement across arbitrary text content (e.g. `MANIFEST.MF` attributes or ProGuard/R8 rules).
+ *
+ * For [SimpleRelocator], it directly replaces all occurrences of [SimpleRelocator.pattern] with
+ * [SimpleRelocator.shadedPattern]. For generic [Relocator]s, it iteratively calls [relocateClass]
+ * until the value converges.
+ */
+internal fun Relocator.relocateText(text: String): String {
   if (this is SimpleRelocator) {
     return if (rawString || pattern.isEmpty()) {
-      className
+      text
     } else {
-      className.replace(pattern, shadedPattern)
+      text.replace(pattern, shadedPattern)
     }
   }
-  var newValue = className
+  var newValue = text
   do {
     val value = newValue
     newValue = relocateClass(value)
@@ -46,10 +57,18 @@ public fun Iterable<Relocator>.relocatePath(path: String): String {
   return path
 }
 
-internal fun Iterable<Relocator>.relocateAllClasses(className: String): String {
-  var result = className
+/**
+ * Sequentially relocates all matching class and package names in the given [text] across all
+ * relocators in this collection.
+ *
+ * Unlike [Iterable.relocateClass] which stops at the first matching relocator, this function passes
+ * the text through every relocator in a chain-of-responsibility pipeline so that all patterns
+ * present in the text are relocated.
+ */
+internal fun Iterable<Relocator>.relocateText(text: String): String {
+  var result = text
   forEach { relocator ->
-    result = relocator.relocateAllClasses(result)
+    result = relocator.relocateText(result)
   }
   return result
 }
