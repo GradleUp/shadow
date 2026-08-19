@@ -1,7 +1,7 @@
 # Shadow
 
 A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications
-with R8/ProGuard. The Gradle counterpart to Maven's Shade plugin.
+with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.gradleup.shadow/shadow-gradle-plugin)](https://central.sonatype.com/artifact/com.gradleup.shadow/shadow-gradle-plugin)
 [![Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.gradleup.shadow)](https://plugins.gradle.org/plugin/com.gradleup.shadow)

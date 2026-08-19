@@ -4,7 +4,7 @@ I (John Engelman) started this project in December 2012. We were working on conv
 into the new hot jazz of "microservices" using Dropwizard.
 I had also just started learning about Gradle and I knew that the incremental build system it provided would benefit
 our development team greatly.
-Unfortunately, the closest thing that Gradle had to Maven's Shade plugin was its ability to create application TARs and
+Unfortunately, the closest thing that Gradle had to Maven Shade Plugin was its ability to create application TARs and
 ZIPs.
 
 So, Charlie Knudsen and I set out to port the existing Shade code into a Gradle plugin.
