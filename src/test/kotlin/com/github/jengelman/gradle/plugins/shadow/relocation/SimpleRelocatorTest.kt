@@ -220,6 +220,29 @@ class SimpleRelocatorTest {
   }
 
   @Test
+  fun relocateText() {
+    var relocator = SimpleRelocator("org.foo")
+    assertThat(
+        relocator.relocateText("org.foo.bar.Class, hidden.org.foo.bar.Class and org.foo.bar.Class")
+      )
+      .isEqualTo(
+        "hidden.org.foo.bar.Class, hidden.hidden.org.foo.bar.Class and hidden.org.foo.bar.Class"
+      )
+
+    relocator = SimpleRelocator("org.foo", "private.stuff")
+    assertThat(
+        relocator.relocateText("org.foo.bar.Class, private.stuff.bar.Class and org.foo.bar.Class")
+      )
+      .isEqualTo("private.stuff.bar.Class, private.stuff.bar.Class and private.stuff.bar.Class")
+
+    relocator = SimpleRelocator()
+    assertThat(relocator.relocateText("org.foo.bar.Class")).isEqualTo("org.foo.bar.Class")
+
+    relocator = SimpleRelocator("org.foo", "shaded.foo", rawString = true)
+    assertThat(relocator.relocateText("org.foo.bar.Class")).isEqualTo("org.foo.bar.Class")
+  }
+
+  @Test
   fun relocateRawString() {
     var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", rawString = true)
     assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class;"))
