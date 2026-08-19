@@ -83,26 +83,29 @@ class TransformersTest : BaseTransformerTest() {
   fun manifestResourceTransformerRemoveAttributes() {
     writeClass()
     projectScript.appendText(
-      transform<ManifestResourceTransformer>(
+      """
+      |$jarTask {
+      |  manifest {
+      |    attributes 'Header-To-Remove-1': 'Value1', 'Header-To-Keep': 'Value2'
+      |  }
+      |}
+      |${transform<ManifestResourceTransformer>(
         transformerBlock =
           """
-          |mainClass = 'my.Main'
-          |manifestEntries = ['Header-To-Keep': 'Value3', 'Header-To-Remove-1': 'Value1']
           |manifestEntries.put('Header-To-Remove-1', ${ManifestResourceTransformer::class.java.name}.NULL)
-          |manifestEntries.put('Header-To-Remove-2', ${ManifestResourceTransformer::class.java.name}.NULL)
           """
             .trimMargin()
-      )
+      )}
+      """
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
-    val mf = outputShadowedJar.use { it.manifest }
-    assertThat(mf).isNotNull()
-    val attributes = mf.mainAttributes
-    assertThat(attributes.getValue("Header-To-Keep")).isEqualTo("Value3")
-    assertThat(attributes.getValue("Header-To-Remove-1")).isNull()
-    assertThat(attributes.getValue("Header-To-Remove-2")).isNull()
+    commonAssertions {
+      assertThat(getValue("Header-To-Remove-1")).isNull()
+      assertThat(getValue("Header-To-Keep")).isEqualTo("Value2")
+    }
   }
 
   @Test // #427
