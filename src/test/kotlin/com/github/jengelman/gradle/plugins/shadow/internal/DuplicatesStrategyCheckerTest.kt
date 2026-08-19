@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.transformers.BaseTransformerTest.Companion.canTransformResource
+import com.github.jengelman.gradle.plugins.shadow.transformers.PatternFilterableResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
@@ -56,7 +57,11 @@ private fun getTransformerClasses(): List<Class<out ResourceTransformer>> {
     runCatching {
       val clazz = Class.forName(className)
       with(clazz.kotlin) {
-        if (isSubclassOf(parentClass) && !isAbstract) {
+        if (
+          !java.isInterface &&
+            isSubclassOf(parentClass) &&
+            clazz != PatternFilterableResourceTransformer::class.java
+        ) {
           @Suppress("UNCHECKED_CAST") classes.add(clazz as Class<out ResourceTransformer>)
         }
       }

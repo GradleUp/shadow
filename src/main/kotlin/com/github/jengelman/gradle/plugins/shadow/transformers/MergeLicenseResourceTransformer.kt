@@ -39,7 +39,7 @@ import org.gradle.api.tasks.util.PatternSet
  * files to include, the paths mentioned above are then not considered unless explicitly included.
  */
 @CacheableTransformer
-public open class MergeLicenseResourceTransformer(
+public abstract class MergeLicenseResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {

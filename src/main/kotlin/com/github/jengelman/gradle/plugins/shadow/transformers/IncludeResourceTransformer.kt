@@ -28,7 +28,7 @@ import org.gradle.api.tasks.PathSensitivity
   replaceWith = ReplaceWith("from"),
 )
 @CacheableTransformer
-public open class IncludeResourceTransformer
+public abstract class IncludeResourceTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) :
   ResourceTransformer by ResourceTransformer.Companion {

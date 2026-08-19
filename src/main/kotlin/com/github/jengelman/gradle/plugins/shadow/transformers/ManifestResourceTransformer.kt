@@ -29,7 +29,7 @@ import org.gradle.api.tasks.Input
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ManifestResourceTransformer
+public abstract class ManifestResourceTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var manifestDiscovered = false

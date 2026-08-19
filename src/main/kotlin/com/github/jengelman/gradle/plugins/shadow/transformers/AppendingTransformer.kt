@@ -20,7 +20,7 @@ import org.gradle.api.tasks.Input
  * @author John Engelman
  */
 @CacheableTransformer
-public open class AppendingTransformer
+public abstract class AppendingTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var _data: ByteArrayOutputStream? =

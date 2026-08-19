@@ -26,7 +26,7 @@ import org.gradle.api.tasks.util.PatternSet
  * @author John Engelman
  */
 @CacheableTransformer
-public open class ApacheNoticeResourceTransformer(
+public abstract class ApacheNoticeResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {

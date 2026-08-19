@@ -56,7 +56,7 @@ import org.gradle.api.tasks.util.PatternSet
  * behavior.
  */
 @CacheableTransformer
-public open class DeduplicatingResourceTransformer(
+public abstract class DeduplicatingResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {

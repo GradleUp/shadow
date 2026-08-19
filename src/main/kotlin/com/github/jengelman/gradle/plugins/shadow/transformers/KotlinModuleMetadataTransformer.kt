@@ -19,7 +19,7 @@ import org.gradle.api.tasks.util.PatternSet
  * (`.kotlin_module`).
  */
 @CacheableTransformer
-public open class KotlinModuleMetadataTransformer(
+public abstract class KotlinModuleMetadataTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {

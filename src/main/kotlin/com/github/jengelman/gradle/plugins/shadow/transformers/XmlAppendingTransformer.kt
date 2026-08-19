@@ -29,7 +29,7 @@ import org.xml.sax.InputSource
  * @author John Engelman
  */
 @CacheableTransformer
-public open class XmlAppendingTransformer
+public abstract class XmlAppendingTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private var doc: Document? = null

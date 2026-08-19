@@ -99,7 +99,7 @@ import org.gradle.api.tasks.Internal
  * @author Marc Philipp
  */
 @CacheableTransformer
-public open class PropertiesFileTransformer
+public abstract class PropertiesFileTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
   private inline val charset

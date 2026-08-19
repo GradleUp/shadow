@@ -23,7 +23,7 @@ import org.gradle.api.tasks.Input
   replaceWith = ReplaceWith("exclude"),
 )
 @CacheableTransformer
-public open class DontIncludeResourceTransformer
+public abstract class DontIncludeResourceTransformer
 @Inject
 constructor(final override val objectFactory: ObjectFactory) :
   ResourceTransformer by ResourceTransformer.Companion {

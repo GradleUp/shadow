@@ -32,7 +32,7 @@ import org.gradle.api.tasks.util.PatternSet
  * @see [ShadowJar.getDuplicatesStrategy]
  */
 @CacheableTransformer
-public open class PreserveFirstFoundResourceTransformer(
+public abstract class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
