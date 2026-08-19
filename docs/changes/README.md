@@ -22,7 +22,7 @@
   - `PropertiesFileTransformer`
   - `XmlAppendingTransformer`
 - Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
-- **POTENTIALLY BREAKING:** Mark `abstract` for `ObjectFactory`-injected `ResourceTransformer`s. ([#2205](https://github.com/GradleUp/shadow/pull/2205))
+- **POTENTIALLY BREAKING:** Mark `ObjectFactory`-injected `ResourceTransformer`s as `abstract`. ([#2205](https://github.com/GradleUp/shadow/pull/2205))
   - `ApacheNoticeResourceTransformer`
   - `AppendingTransformer`
   - `DeduplicatingResourceTransformer`
