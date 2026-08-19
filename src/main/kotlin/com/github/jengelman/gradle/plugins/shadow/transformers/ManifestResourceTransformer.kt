@@ -1,11 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.classNamePattern
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateText
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.IOException
 import java.io.Serializable
 import java.util.jar.Attributes.Name as JarAttributeName
@@ -70,7 +71,10 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
           for (attribute in relocateAttributes.get()) {
             val attributeValue = attributes.getValue(attribute)
             if (attributeValue != null) {
-              val newValue = context.relocators.relocateText(attributeValue)
+              val newValue =
+                classNamePattern.replace(attributeValue) { matchResult ->
+                  context.relocators.relocateClass(matchResult.value)
+                }
               attributes.putValue(attribute, newValue)
             }
           }

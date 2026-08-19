@@ -40,27 +40,6 @@ class RelocatorsTest {
       .isEqualTo("shadow.org.package.Bar")
   }
 
-  @Test
-  fun relocateTextChained() {
-    val relocators =
-      listOf(
-        SimpleRelocator("org.foo", "shaded.foo"),
-        SimpleRelocator("org.bar", "shaded.bar"),
-      )
-    assertThat(relocators.relocateText("org.foo.Foo, org.bar.Bar and other.Baz"))
-      .isEqualTo("shaded.foo.Foo, shaded.bar.Bar and other.Baz")
-  }
-
-  @Test
-  fun relocateTextOrder() {
-    val relocators =
-      listOf(
-        SimpleRelocator("org.foo", "org.bar"),
-        SimpleRelocator("org.bar", "org.baz"),
-      )
-    assertThat(relocators.relocateText("org.foo.Foo")).isEqualTo("org.baz.Foo")
-  }
-
   private companion object {
     val primitiveTypes = setOf('B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z')
 

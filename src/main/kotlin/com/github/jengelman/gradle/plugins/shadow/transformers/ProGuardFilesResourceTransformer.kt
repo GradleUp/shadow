@@ -1,10 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.classNamePattern
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateText
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.tasks.Internal
@@ -53,7 +54,10 @@ constructor(patternSet: PatternSet = PatternSet().include("META-INF/proguard/**"
     fun Iterable<Relocator>.relocateRuleLine(line: String): String {
       return when {
         line.isBlank() || line.trimStart().startsWith("#") -> line
-        else -> relocateText(line)
+        else ->
+          classNamePattern.replace(line) { matchResult ->
+            relocateClass(matchResult.value)
+          }
       }
     }
   }
