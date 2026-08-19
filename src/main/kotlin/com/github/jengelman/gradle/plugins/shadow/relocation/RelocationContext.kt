@@ -65,10 +65,5 @@ public fun Iterable<Relocator>.relocatePath(path: String): String {
  * the text through every relocator in a chain-of-responsibility pipeline so that all patterns
  * present in the text are relocated.
  */
-internal fun Iterable<Relocator>.relocateText(text: String): String {
-  var result = text
-  forEach { relocator ->
-    result = relocator.relocateText(result)
-  }
-  return result
-}
+internal fun Iterable<Relocator>.relocateText(text: String): String =
+  fold(text) { acc, relocator -> relocator.relocateText(acc) }

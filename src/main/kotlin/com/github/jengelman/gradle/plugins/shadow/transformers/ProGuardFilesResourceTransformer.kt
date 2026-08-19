@@ -51,10 +51,9 @@ constructor(patternSet: PatternSet = PatternSet().include("META-INF/proguard/**"
 
   internal companion object {
     fun Iterable<Relocator>.relocateRuleLine(line: String): String {
-      return if (line.isBlank() || line.trimStart().startsWith("#")) {
-        line
-      } else {
-        relocateText(line)
+      return when {
+        line.isBlank() || line.trimStart().startsWith("#") -> line
+        else -> relocateText(line)
       }
     }
   }
