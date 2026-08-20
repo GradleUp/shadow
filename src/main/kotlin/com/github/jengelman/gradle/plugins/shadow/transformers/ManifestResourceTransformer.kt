@@ -1,10 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.classNamePattern
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
+import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.IOException
+import java.io.Serializable
 import java.util.jar.Attributes.Name as JarAttributeName
 import java.util.jar.JarFile.MANIFEST_NAME
 import java.util.jar.Manifest
@@ -15,6 +19,7 @@ import org.gradle.api.logging.Logging
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 
 /**
@@ -37,7 +42,16 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
   @get:Input public open val mainClass: Property<String> = objectFactory.property("")
 
+  /**
+   * Additional manifest entries to add to or remove from `MANIFEST.MF`.
+   *
+   * Setting an entry's value to [NULL] removes the corresponding attribute from the manifest.
+   */
   @get:Input public open val manifestEntries: MapProperty<String, Any> = objectFactory.mapProperty()
+
+  @get:Input
+  public open val relocateAttributes: SetProperty<String> =
+    objectFactory.setProperty(DEFAULT_RELOCATE_ATTRIBUTES)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.path, ignoreCase = true).also { flag ->
@@ -51,7 +65,21 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     // passed in with the processing so we cannot tell what artifact is being processed.
     if (!manifestDiscovered) {
       try {
-        manifest = Manifest(context.inputStream)
+        val loadedManifest = Manifest(context.inputStream)
+        if (context.relocators.isNotEmpty()) {
+          val attributes = loadedManifest.mainAttributes
+          for (attribute in relocateAttributes.get()) {
+            val attributeValue = attributes.getValue(attribute)
+            if (attributeValue != null) {
+              val newValue =
+                classNamePattern.replace(attributeValue) { matchResult ->
+                  context.relocators.relocateClass(matchResult.value)
+                }
+              attributes.putValue(attribute, newValue)
+            }
+          }
+        }
+        manifest = loadedManifest
         manifestDiscovered = true
       } catch (e: IOException) {
         logger.warn("Failed to read MANIFEST.MF", e)
@@ -71,22 +99,49 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     mainClass.get().takeIf(CharSequence::isNotEmpty)?.let {
       attributes[JarAttributeName.MAIN_CLASS] = it
     }
-    manifestEntries.get().forEach { (key, value) -> attributes.putValue(key, value.toString()) }
+    manifestEntries.get().forEach { (key, value) ->
+      if (value == NULL) {
+        attributes.remove(JarAttributeName(key))
+      } else {
+        attributes.putValue(key, value.toString())
+      }
+    }
 
     os.writeEntry(MANIFEST_NAME, preserveFileTimestamps) {
       manifest!!.write(this)
     }
   }
 
+  /**
+   * Adds the given attributes to [manifestEntries].
+   *
+   * If a value is `null`, it will be mapped to [NULL] to remove the attribute from the manifest.
+   */
+  @Deprecated(
+    "Use manifestEntries instead. This method will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("manifestEntries.putAll(attributes)"),
+  )
   public open fun attributes(attributes: Map<String, *>) {
     attributes.forEach { (key, value) ->
-      if (value != null) {
-        manifestEntries.put(key, value)
-      }
+      manifestEntries.put(key, value ?: NULL)
     }
   }
 
-  private companion object {
+  public companion object {
+    private val DEFAULT_RELOCATE_ATTRIBUTES =
+      setOf("Export-Package", "Import-Package", "Provide-Capability", "Require-Capability")
+
     private val logger = Logging.getLogger(ManifestResourceTransformer::class.java)
+
+    /**
+     * A sentinel object used in [manifestEntries] or [attributes] to indicate that the specified
+     * manifest attribute should be removed from the merged `MANIFEST.MF`.
+     */
+    @JvmField
+    public val NULL: Any =
+      object : Serializable {
+        @Suppress("unused") // For JavaIoSerializableObjectMustHaveReadResolve.
+        private fun readResolve(): Any = NULL
+      }
   }
 }
