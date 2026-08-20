@@ -147,7 +147,7 @@ dependencies {
 val docsDir = file("docs")
 
 testing.suites {
-  getByName<JvmTestSuite>("test") {
+  named<JvmTestSuite>("test") {
     dependencies { implementation(libs.xmlunit) }
   }
   register<JvmTestSuite>("documentTest") {
@@ -238,10 +238,10 @@ gradlePlugin {
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
-  val main = getByName("main")
-  getByName("functionalTest") {
+  val main = named("main")
+  named("functionalTest") {
     // Import main and its classpath as dependencies and establish internal visibility.
-    associateWith(main)
+    associateWith(main.get())
   }
 }
 
