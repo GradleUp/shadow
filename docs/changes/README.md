@@ -23,10 +23,6 @@
   - `XmlAppendingTransformer`
 - Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
 
-### Fixed
-
-- Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
-
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  
@@ -37,6 +33,10 @@
   Use `ShadowJar.exclude` or `ShadowJar.from` instead. The classes will be removed in Shadow 10.
 - Deprecate `TransformerContext.Builder`. ([#2184](https://github.com/GradleUp/shadow/pull/2184))  
   Use `TransformerContext` constructor instead. The Builder API will be removed in Shadow 10.
+
+### Fixed
+
+- Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 
