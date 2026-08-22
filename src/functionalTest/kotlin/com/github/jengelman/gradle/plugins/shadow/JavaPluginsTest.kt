@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
-import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -1307,17 +1306,10 @@ class JavaPluginsTest : BasePluginTest() {
         "Bar.class",
         *manifestEntries,
       )
+      getBytes("Bar.class").isEqualTo(createEmptyClassBytes("Bar"))
+      getBytes("bar.class").isEqualTo(createEmptyClassBytes("bar"))
       getContent("foo.txt").isEqualTo("lower")
       getContent("Foo.txt").isEqualTo("upper")
-      val upperBytes = getBytes("Bar.class")
-      val lowerBytes = getBytes("bar.class")
-      assertThat(upperBytes).isNotEqualTo(lowerBytes)
-      classLoader { classLoader ->
-        val upper = classLoader.loadClass("Bar")
-        val lower = classLoader.loadClass("bar")
-        assertThat(upper.name).isEqualTo("Bar")
-        assertThat(lower.name).isEqualTo("bar")
-      }
     }
   }
 
