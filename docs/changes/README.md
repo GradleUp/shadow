@@ -37,6 +37,7 @@
 ### Fixed
 
 - Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
+- Avoid overwriting entries that differ only by case on case-insensitive OS. ([#2213](https://github.com/GradleUp/shadow/pull/2213))
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 
