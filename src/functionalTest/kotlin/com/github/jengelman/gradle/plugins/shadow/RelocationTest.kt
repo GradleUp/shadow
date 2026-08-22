@@ -658,6 +658,13 @@ class RelocationTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    val url = outputShadowedJar.use { it.toUri().toURL() }
+    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+      val main = classLoader.loadClass("my.Main")
+      val foo = classLoader.loadClass("relocated.foo.Foo")
+      assertThat(main.name).isEqualTo("my.Main")
+      assertThat(foo.name).isEqualTo("relocated.foo.Foo")
+    }
   }
 
   private fun writeClassWithStringRef() {
