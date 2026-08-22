@@ -13,8 +13,15 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
  * Applies remapping to the given class file using the provided relocators and returns the
  * (possibly) remapped class bytes. If no remapping is required, the original bytes are returned.
  */
-internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
-  file.readBytes().let { bytes ->
+internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray {
+  val bytes =
+    try {
+      // Open is more performant than getFile, it doesn't extract the zip files.
+      open().use { it.readBytes() }
+    } catch (_: UnsupportedOperationException) {
+      file.readBytes()
+    }
+  return bytes.let {
     var modified = false
     val remapper = RelocatorRemapper(relocators) { modified = true }
 
@@ -34,6 +41,7 @@ internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
       throw GradleException("Error in ASM processing class $path", t)
     }
   }
+}
 
 private class RelocatorRemapper(
   private val relocators: Set<Relocator>,

@@ -660,6 +660,48 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun relocateCaseSensitiveAndInsensitiveClassesInJar() {
+    val fooJar =
+      buildJar("foo.jar") {
+        insert("foo/Bar.class", createEmptyClassBytes("foo/Bar"))
+        insert("foo/bar.class", createEmptyClassBytes("foo/bar"))
+      }
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(fooJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate 'foo', 'shadow.foo'
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "shadow/",
+        "shadow/foo/",
+        "shadow/foo/Bar.class",
+        "shadow/foo/bar.class",
+        *manifestEntries,
+      )
+      val upperBytes = getBytes("shadow/foo/Bar.class")
+      val lowerBytes = getBytes("shadow/foo/bar.class")
+      assertThat(upperBytes).isNotEqualTo(lowerBytes)
+    }
+    val url = outputShadowedJar.use { it.toUri().toURL() }
+    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+      val upper = classLoader.loadClass("shadow.foo.Bar")
+      val lower = classLoader.loadClass("shadow.foo.bar")
+      assertThat(upper.name).isEqualTo("shadow.foo.Bar")
+      assertThat(lower.name).isEqualTo("shadow.foo.bar")
+    }
+  }
+
   private fun writeClassWithStringRef() {
     writeClass {
       """

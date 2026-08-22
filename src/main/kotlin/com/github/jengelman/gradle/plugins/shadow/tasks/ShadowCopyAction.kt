@@ -204,9 +204,16 @@ internal constructor(
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.file.inputStream().use { inputStream ->
+      val inputStream =
+        try {
+          // Open is more performant than getFile, it doesn't extract the zip files.
+          fileDetails.open()
+        } catch (_: UnsupportedOperationException) {
+          fileDetails.file.inputStream()
+        }
+      inputStream.use {
         transformer.transform(
-          TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
+          TransformerContext(path = path, inputStream = it, relocators = relocators)
         )
       }
       return true

@@ -20,6 +20,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
@@ -1305,6 +1306,8 @@ class JavaPluginsTest : BasePluginTest() {
         "Bar.class",
         *manifestEntries,
       )
+      getBytes("Bar.class").isEqualTo(createEmptyClassBytes("Bar"))
+      getBytes("bar.class").isEqualTo(createEmptyClassBytes("bar"))
       getContent("foo.txt").isEqualTo("lower")
       getContent("Foo.txt").isEqualTo("upper")
     }
