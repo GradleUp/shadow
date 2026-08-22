@@ -112,6 +112,13 @@ class RelocationTest : BasePluginTest() {
         containsOnly(*junitEntries, *commonEntries)
       }
     }
+    val url = outputShadowedJar.use { it.toUri().toURL() }
+    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+      val testClassName =
+        if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
+      val test = classLoader.loadClass(testClassName)
+      assertThat(test.name).isEqualTo(testClassName)
+    }
   }
 
   @Test // #58
