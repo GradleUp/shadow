@@ -24,9 +24,9 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.invariantSeparatorsPathString
@@ -1313,8 +1313,7 @@ class JavaPluginsTest : BasePluginTest() {
       val lowerBytes = getBytes("bar.class")
       assertThat(upperBytes).isNotEqualTo(lowerBytes)
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val upper = classLoader.loadClass("Bar")
       val lower = classLoader.loadClass("bar")
       assertThat(upper.name).isEqualTo("Bar")

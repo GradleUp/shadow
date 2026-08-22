@@ -11,8 +11,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONS
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -62,8 +62,7 @@ class RelocationTest : BasePluginTest() {
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
     assertThat(result.output).contains("Relocator count: 6.")
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val pkg = relocationPrefix.replace('/', '.')
       val main = classLoader.loadClass("my.Main")
       val test = classLoader.loadClass("$pkg.junit.framework.Test")
@@ -112,8 +111,7 @@ class RelocationTest : BasePluginTest() {
         containsOnly(*junitEntries, *commonEntries)
       }
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val testClassName =
         if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
       val test = classLoader.loadClass(testClassName)
@@ -160,8 +158,7 @@ class RelocationTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val runner = classLoader.loadClass("a.BaseTestRunner")
       val test = classLoader.loadClass("b.Test")
       assertThat(runner.name).isEqualTo("a.BaseTestRunner")
@@ -216,8 +213,7 @@ class RelocationTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val nonRelocatedRunner = classLoader.loadClass("junit.runner.BaseTestRunner")
       val relocatedOtherRunner = classLoader.loadClass("a.StandardTestSuiteLoader")
       val relocatedTest = classLoader.loadClass("b.Test")
@@ -265,8 +261,7 @@ class RelocationTest : BasePluginTest() {
       containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
     }
 
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val myTest = classLoader.loadClass("my.MyTest")
       val test = classLoader.loadClass("shadow.junit.Test")
       assertThat(myTest.name).isEqualTo("my.MyTest")
@@ -684,8 +679,7 @@ class RelocationTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val main = classLoader.loadClass("my.Main")
       val foo = classLoader.loadClass("relocated.foo.Foo")
       assertThat(main.name).isEqualTo("my.Main")
