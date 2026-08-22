@@ -1,10 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
@@ -13,8 +11,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONS
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -24,7 +22,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
   @ParameterizedTest
@@ -65,6 +62,13 @@ class RelocationTest : BasePluginTest() {
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
     assertThat(result.output).contains("Relocator count: 6.")
+    outputShadowedJar.classLoader().use { classLoader ->
+      val pkg = relocationPrefix.replace('/', '.')
+      val main = classLoader.loadClass("my.Main")
+      val test = classLoader.loadClass("$pkg.junit.framework.Test")
+      assertThat(main.name).isEqualTo("my.Main")
+      assertThat(test.name).isEqualTo("$pkg.junit.framework.Test")
+    }
   }
 
   @ParameterizedTest
@@ -107,6 +111,12 @@ class RelocationTest : BasePluginTest() {
         containsOnly(*junitEntries, *commonEntries)
       }
     }
+    outputShadowedJar.classLoader().use { classLoader ->
+      val testClassName =
+        if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
+      val test = classLoader.loadClass(testClassName)
+      assertThat(test.name).isEqualTo(testClassName)
+    }
   }
 
   @Test // #58
@@ -147,6 +157,12 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
+    }
+    outputShadowedJar.classLoader().use { classLoader ->
+      val runner = classLoader.loadClass("a.BaseTestRunner")
+      val test = classLoader.loadClass("b.Test")
+      assertThat(runner.name).isEqualTo("a.BaseTestRunner")
+      assertThat(test.name).isEqualTo("b.Test")
     }
   }
 
@@ -197,6 +213,16 @@ class RelocationTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    outputShadowedJar.classLoader().use { classLoader ->
+      val nonRelocatedRunner = classLoader.loadClass("junit.runner.BaseTestRunner")
+      val relocatedOtherRunner = classLoader.loadClass("a.StandardTestSuiteLoader")
+      val relocatedTest = classLoader.loadClass("b.Test")
+      val nonRelocatedFramework = classLoader.loadClass("junit.framework.Assert")
+      assertThat(nonRelocatedRunner.name).isEqualTo("junit.runner.BaseTestRunner")
+      assertThat(relocatedOtherRunner.name).isEqualTo("a.StandardTestSuiteLoader")
+      assertThat(relocatedTest.name).isEqualTo("b.Test")
+      assertThat(nonRelocatedFramework.name).isEqualTo("junit.framework.Assert")
+    }
   }
 
   @Test // #53, #55
@@ -235,17 +261,12 @@ class RelocationTest : BasePluginTest() {
       containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
     }
 
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
-      assertFailure {
-          // Check that the class can be loaded. If the file was not relocated properly, we should
-          // get a NoDefClassFound.
-          // Isolated class loader with only the JVM system jars and the output jar from the test
-          // project.
-          classLoader.loadClass("my.MyTest")
-          fail("Should not reach here.")
-        }
-        .isInstanceOf(AssertionFailedError::class)
+    outputShadowedJar.classLoader().use { classLoader ->
+      val myTest = classLoader.loadClass("my.MyTest")
+      val test = classLoader.loadClass("shadow.junit.Test")
+      assertThat(myTest.name).isEqualTo("my.MyTest")
+      assertThat(test.name).isEqualTo("shadow.junit.Test")
+      assertThat(test.isAssignableFrom(myTest)).isEqualTo(true)
     }
   }
 
@@ -657,6 +678,12 @@ class RelocationTest : BasePluginTest() {
         "relocated/foo/Foo.class",
         *manifestEntries,
       )
+    }
+    outputShadowedJar.classLoader().use { classLoader ->
+      val main = classLoader.loadClass("my.Main")
+      val foo = classLoader.loadClass("relocated.foo.Foo")
+      assertThat(main.name).isEqualTo("my.Main")
+      assertThat(foo.name).isEqualTo("relocated.foo.Foo")
     }
   }
 
