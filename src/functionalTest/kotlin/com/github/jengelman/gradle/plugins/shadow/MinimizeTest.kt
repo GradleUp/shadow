@@ -11,7 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import java.net.URLClassLoader
+import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import java.util.ServiceLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -338,8 +338,7 @@ class MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), ClassLoader.getSystemClassLoader().parent).use { loader ->
+    outputServerShadowedJar.classLoader().use { loader ->
       val server = loader.loadClass("server.Server")
       val used = loader.loadClass("client.Used")
       assertThat(server.name).isEqualTo("server.Server")
@@ -367,8 +366,7 @@ class MinimizeTest : BasePluginTest() {
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
     }
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), null).use { loader ->
+    outputServerShadowedJar.classLoader(null).use { loader ->
       val serviceClass = loader.loadClass("service.Greeter")
       assertThat(ServiceLoader.load(serviceClass, loader).toList()).hasSize(1)
     }
@@ -416,8 +414,7 @@ class MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), ClassLoader.getSystemClassLoader().parent).use { loader ->
+    outputServerShadowedJar.classLoader().use { loader ->
       val server = loader.loadClass("server.Server")
       val used = loader.loadClass("client.Used")
       val reflective = loader.loadClass("client.Reflective")
@@ -519,8 +516,7 @@ class MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), ClassLoader.getSystemClassLoader().parent).use { loader ->
+    outputServerShadowedJar.classLoader().use { loader ->
       val server = loader.loadClass("server.Server")
       val used = loader.loadClass("client.Used")
       val reflective = loader.loadClass("client.Reflective")
@@ -570,8 +566,7 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), ClassLoader.getSystemClassLoader().parent).use { loader ->
+    outputServerShadowedJar.classLoader().use { loader ->
       val server = loader.loadClass("server.Server")
       val used = loader.loadClass("client.Used")
       val reflective = loader.loadClass("client.Reflective")
@@ -609,8 +604,7 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), ClassLoader.getSystemClassLoader().parent).use { loader ->
+    outputServerShadowedJar.classLoader().use { loader ->
       val server = loader.loadClass("server.Server")
       val obfuscated = loader.loadClass("a.a")
       assertThat(server.name).isEqualTo("server.Server")
@@ -671,8 +665,7 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
     }
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), ClassLoader.getSystemClassLoader().parent).use { loader ->
+    outputServerShadowedJar.classLoader().use { loader ->
       val server = loader.loadClass("server.Server")
       val used = loader.loadClass("client.Used")
       val unused = loader.loadClass("client.Unused")

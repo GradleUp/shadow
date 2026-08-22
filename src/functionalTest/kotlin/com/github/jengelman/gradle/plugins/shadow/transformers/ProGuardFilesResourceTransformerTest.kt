@@ -4,7 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import java.net.URLClassLoader
+import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import kotlin.io.path.appendText
 import org.junit.jupiter.api.Test
 
@@ -127,8 +127,7 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
             .trimMargin()
         )
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val driver = classLoader.loadClass("relocated.com.example.Driver")
       val fooDriver = classLoader.loadClass("relocated.foo.FooDriver")
       val barDriver = classLoader.loadClass("relocated.bar.BarDriver")

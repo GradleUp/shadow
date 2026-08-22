@@ -6,7 +6,7 @@ import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import java.net.URLClassLoader
+import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
@@ -101,8 +101,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             .trimMargin()
         )
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val driver = classLoader.loadClass("relocated.com.example.Driver")
       val fooDriver = classLoader.loadClass("relocated.foo.FooDriver")
       val barDriver = classLoader.loadClass("relocated.bar.BarDriver")
@@ -175,8 +174,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
             .trimMargin()
         )
     }
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
+    outputShadowedJar.classLoader().use { classLoader ->
       val driver = classLoader.loadClass("relocated.com.example.Driver")
       val fooDriver = classLoader.loadClass("relocated.foo.FooDriver")
       val barDriver = classLoader.loadClass("relocated.bar.BarDriver")
