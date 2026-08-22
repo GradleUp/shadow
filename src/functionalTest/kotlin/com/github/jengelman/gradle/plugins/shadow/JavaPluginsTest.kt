@@ -1273,6 +1273,43 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun handleCaseSensitiveEntriesAcrossMultipleJars() {
+    val one =
+      buildJar("one.jar") {
+        insert("foo.txt", "lower")
+        insert("Bar.class", createEmptyClassBytes("Bar"))
+      }
+    val two =
+      buildJar("two.jar") {
+        insert("Foo.txt", "upper")
+        insert("bar.class", createEmptyClassBytes("bar"))
+      }
+
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "foo.txt",
+        "Foo.txt",
+        "bar.class",
+        "Bar.class",
+        *manifestEntries,
+      )
+      getContent("foo.txt").isEqualTo("lower")
+      getContent("Foo.txt").isEqualTo("upper")
+    }
+  }
+
   private fun dependencies(configuration: String, vararg flags: String): String {
     return runWithSuccess("dependencies", "--configuration", configuration, *flags).output
   }
