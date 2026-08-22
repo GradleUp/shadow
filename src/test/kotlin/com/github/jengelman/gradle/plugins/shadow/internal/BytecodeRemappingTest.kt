@@ -11,9 +11,11 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import java.io.File
+import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeBytes
@@ -277,6 +279,8 @@ class BytecodeRemappingTest {
       override fun getPath(): String = relativeTo(tempDir).invariantSeparatorsPathString
 
       override fun getFile(): File = toFile()
+
+      override fun open(): InputStream = inputStream()
     }
 
   private fun KClass<*>.toFileCopyDetails(): FileCopyDetails {
