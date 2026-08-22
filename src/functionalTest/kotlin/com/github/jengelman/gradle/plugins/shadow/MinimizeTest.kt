@@ -6,12 +6,12 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import java.util.ServiceLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -324,6 +324,12 @@ class MinimizeTest : BasePluginTest() {
         "client/Used.class",
         *manifestEntries,
       )
+      classLoader { loader ->
+        val server = loader.loadClass("server.Server")
+        val used = loader.loadClass("client.Used")
+        assertThat(server.name).isEqualTo("server.Server")
+        assertThat(used.name).isEqualTo("client.Used")
+      }
     }
     val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
     val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
@@ -338,12 +344,6 @@ class MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    outputServerShadowedJar.classLoader().use { loader ->
-      val server = loader.loadClass("server.Server")
-      val used = loader.loadClass("client.Used")
-      assertThat(server.name).isEqualTo("server.Server")
-      assertThat(used.name).isEqualTo("client.Used")
-    }
   }
 
   @Test
@@ -365,10 +365,10 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
-    }
-    outputServerShadowedJar.classLoader(null).use { loader ->
-      val serviceClass = loader.loadClass("service.Greeter")
-      assertThat(ServiceLoader.load(serviceClass, loader).toList()).hasSize(1)
+      classLoader(null) { loader ->
+        val serviceClass = loader.loadClass("service.Greeter")
+        assertThat(ServiceLoader.load(serviceClass, loader).toList()).hasSize(1)
+      }
     }
   }
 
@@ -399,6 +399,14 @@ class MinimizeTest : BasePluginTest() {
         "client/Reflective.class",
         *manifestEntries,
       )
+      classLoader { loader ->
+        val server = loader.loadClass("server.Server")
+        val used = loader.loadClass("client.Used")
+        val reflective = loader.loadClass("client.Reflective")
+        assertThat(server.name).isEqualTo("server.Server")
+        assertThat(used.name).isEqualTo("client.Used")
+        assertThat(reflective.name).isEqualTo("client.Reflective")
+      }
     }
     val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
     val outputConfigDir = path("server/build/r8/config").toRealPath()
@@ -414,14 +422,6 @@ class MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    outputServerShadowedJar.classLoader().use { loader ->
-      val server = loader.loadClass("server.Server")
-      val used = loader.loadClass("client.Used")
-      val reflective = loader.loadClass("client.Reflective")
-      assertThat(server.name).isEqualTo("server.Server")
-      assertThat(used.name).isEqualTo("client.Used")
-      assertThat(reflective.name).isEqualTo("client.Reflective")
-    }
   }
 
   @Test
@@ -497,6 +497,14 @@ class MinimizeTest : BasePluginTest() {
         "META-INF/proguard/client.pro",
         *manifestEntries,
       )
+      classLoader { loader ->
+        val server = loader.loadClass("server.Server")
+        val used = loader.loadClass("client.Used")
+        val reflective = loader.loadClass("client.Reflective")
+        assertThat(server.name).isEqualTo("server.Server")
+        assertThat(used.name).isEqualTo("client.Used")
+        assertThat(reflective.name).isEqualTo("client.Reflective")
+      }
     }
     val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
     val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
@@ -516,14 +524,6 @@ class MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    outputServerShadowedJar.classLoader().use { loader ->
-      val server = loader.loadClass("server.Server")
-      val used = loader.loadClass("client.Used")
-      val reflective = loader.loadClass("client.Reflective")
-      assertThat(server.name).isEqualTo("server.Server")
-      assertThat(used.name).isEqualTo("client.Used")
-      assertThat(reflective.name).isEqualTo("client.Reflective")
-    }
   }
 
   @Test
@@ -565,16 +565,16 @@ class MinimizeTest : BasePluginTest() {
         "META-INF/proguard/client.pro",
         *manifestEntries,
       )
-    }
-    outputServerShadowedJar.classLoader().use { loader ->
-      val server = loader.loadClass("server.Server")
-      val used = loader.loadClass("client.Used")
-      val reflective = loader.loadClass("client.Reflective")
-      val unused = loader.loadClass("client.Unused")
-      assertThat(server.name).isEqualTo("server.Server")
-      assertThat(used.name).isEqualTo("client.Used")
-      assertThat(reflective.name).isEqualTo("client.Reflective")
-      assertThat(unused.name).isEqualTo("client.Unused")
+      classLoader { loader ->
+        val server = loader.loadClass("server.Server")
+        val used = loader.loadClass("client.Used")
+        val reflective = loader.loadClass("client.Reflective")
+        val unused = loader.loadClass("client.Unused")
+        assertThat(server.name).isEqualTo("server.Server")
+        assertThat(used.name).isEqualTo("client.Used")
+        assertThat(reflective.name).isEqualTo("client.Reflective")
+        assertThat(unused.name).isEqualTo("client.Unused")
+      }
     }
   }
 
@@ -603,12 +603,12 @@ class MinimizeTest : BasePluginTest() {
         "a/a.class",
         *manifestEntries,
       )
-    }
-    outputServerShadowedJar.classLoader().use { loader ->
-      val server = loader.loadClass("server.Server")
-      val obfuscated = loader.loadClass("a.a")
-      assertThat(server.name).isEqualTo("server.Server")
-      assertThat(obfuscated.name).isEqualTo("a.a")
+      classLoader { loader ->
+        val server = loader.loadClass("server.Server")
+        val obfuscated = loader.loadClass("a.a")
+        assertThat(server.name).isEqualTo("server.Server")
+        assertThat(obfuscated.name).isEqualTo("a.a")
+      }
     }
   }
 
@@ -664,16 +664,16 @@ class MinimizeTest : BasePluginTest() {
         "client/Reflective.class",
         *manifestEntries,
       )
-    }
-    outputServerShadowedJar.classLoader().use { loader ->
-      val server = loader.loadClass("server.Server")
-      val used = loader.loadClass("client.Used")
-      val unused = loader.loadClass("client.Unused")
-      val reflective = loader.loadClass("client.Reflective")
-      assertThat(server.name).isEqualTo("server.Server")
-      assertThat(used.name).isEqualTo("client.Used")
-      assertThat(unused.name).isEqualTo("client.Unused")
-      assertThat(reflective.name).isEqualTo("client.Reflective")
+      classLoader { loader ->
+        val server = loader.loadClass("server.Server")
+        val used = loader.loadClass("client.Used")
+        val unused = loader.loadClass("client.Unused")
+        val reflective = loader.loadClass("client.Reflective")
+        assertThat(server.name).isEqualTo("server.Server")
+        assertThat(used.name).isEqualTo("client.Used")
+        assertThat(unused.name).isEqualTo("client.Unused")
+        assertThat(reflective.name).isEqualTo("client.Reflective")
+      }
     }
   }
 

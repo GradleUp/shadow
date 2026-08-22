@@ -5,6 +5,7 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import java.io.InputStream
+import java.net.URLClassLoader
 import java.nio.file.Path
 import java.util.jar.JarFile
 import java.util.zip.ZipFile
@@ -44,6 +45,12 @@ fun ZipFile.getStream(entryName: String): InputStream {
   return getInputStream(entry)
 }
 
+fun JarPath.classLoader(
+  parent: ClassLoader? = ClassLoader.getSystemClassLoader().parent
+): URLClassLoader {
+  return URLClassLoader(arrayOf(toUri().toURL()), parent)
+}
+
 fun Assert<JarPath>.getBytes(entryName: String) = transform { it.getBytes(entryName) }
 
 fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
@@ -70,4 +77,11 @@ fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsO
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }
+}
+
+fun Assert<JarPath>.classLoader(
+  parent: ClassLoader? = ClassLoader.getSystemClassLoader().parent,
+  block: (URLClassLoader) -> Unit,
+) = given { actual ->
+  actual.classLoader(parent).use(block)
 }

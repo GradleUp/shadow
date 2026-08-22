@@ -17,6 +17,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -24,7 +25,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
-import com.github.jengelman.gradle.plugins.shadow.util.classLoader
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
@@ -1312,12 +1312,12 @@ class JavaPluginsTest : BasePluginTest() {
       val upperBytes = getBytes("Bar.class")
       val lowerBytes = getBytes("bar.class")
       assertThat(upperBytes).isNotEqualTo(lowerBytes)
-    }
-    outputShadowedJar.classLoader().use { classLoader ->
-      val upper = classLoader.loadClass("Bar")
-      val lower = classLoader.loadClass("bar")
-      assertThat(upper.name).isEqualTo("Bar")
-      assertThat(lower.name).isEqualTo("bar")
+      classLoader { classLoader ->
+        val upper = classLoader.loadClass("Bar")
+        val lower = classLoader.loadClass("bar")
+        assertThat(upper.name).isEqualTo("Bar")
+        assertThat(lower.name).isEqualTo("bar")
+      }
     }
   }
 
