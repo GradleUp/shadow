@@ -608,25 +608,6 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  private fun writeClassWithStringRef() {
-    writeClass {
-      """
-      |package my;
-      |public class Main {
-      |  public static void main(String[] args) {
-      |    switch (1) {
-      |      default:
-      |        System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
-      |        break;
-      |    }
-      |    System.out.println("foo.Bar");
-      |  }
-      |}
-      """
-        .trimMargin()
-    }
-  }
-
   @Test
   fun relocateWithR8() {
     writeClass(packageName = "my", withImports = false) {
@@ -676,6 +657,25 @@ class RelocationTest : BasePluginTest() {
         "relocated/foo/Foo.class",
         *manifestEntries,
       )
+    }
+  }
+
+  private fun writeClassWithStringRef() {
+    writeClass {
+      """
+      |package my;
+      |public class Main {
+      |  public static void main(String[] args) {
+      |    switch (1) {
+      |      default:
+      |        System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
+      |        break;
+      |    }
+      |    System.out.println("foo.Bar");
+      |  }
+      |}
+      """
+        .trimMargin()
     }
   }
 
