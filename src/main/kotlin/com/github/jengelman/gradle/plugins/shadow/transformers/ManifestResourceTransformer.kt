@@ -62,24 +62,22 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     // We just want to take the first manifest we come across as that's our project's manifest.
     // This is the behavior now which is situational at best. Right now there is no context
     // passed in with the processing so we cannot tell what artifact is being processed.
-    if (!manifestDiscovered) {
-      try {
-        val loadedManifest = Manifest(context.inputStream)
-        if (context.relocators.isNotEmpty()) {
-          val attributes = loadedManifest.mainAttributes
+    if (manifestDiscovered) return
+
+    try {
+      manifest =
+        Manifest(context.inputStream).apply {
           for (attribute in relocateAttributes.get()) {
-            val attributeValue = attributes.getValue(attribute)
+            val attributeValue = mainAttributes.getValue(attribute)
             if (attributeValue != null) {
               val newValue = context.relocators.relocateText(attributeValue)
-              attributes.putValue(attribute, newValue)
+              mainAttributes.putValue(attribute, newValue)
             }
           }
         }
-        manifest = loadedManifest
-        manifestDiscovered = true
-      } catch (e: IOException) {
-        logger.warn("Failed to read MANIFEST.MF", e)
-      }
+      manifestDiscovered = true
+    } catch (e: IOException) {
+      logger.warn("Failed to read MANIFEST.MF", e)
     }
   }
 
@@ -87,11 +85,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
     // If we didn't find a manifest, then let's create one.
-    if (manifest == null) {
-      manifest = Manifest()
-    }
+    val manifest = manifest ?: Manifest()
 
-    val attributes = manifest!!.mainAttributes
+    val attributes = manifest.mainAttributes
     mainClass.get().takeIf(CharSequence::isNotEmpty)?.let {
       attributes[JarAttributeName.MAIN_CLASS] = it
     }
@@ -104,15 +100,10 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     }
 
     os.writeEntry(MANIFEST_NAME, preserveFileTimestamps) {
-      manifest!!.write(this)
+      manifest.write(this)
     }
   }
 
-  /**
-   * Adds the given attributes to [manifestEntries].
-   *
-   * If a value is `null`, it will be mapped to [NULL] to remove the attribute from the manifest.
-   */
   @Deprecated(
     "Use manifestEntries instead. This method will be removed in Shadow 10.",
     replaceWith = ReplaceWith("manifestEntries.putAll(attributes)"),
