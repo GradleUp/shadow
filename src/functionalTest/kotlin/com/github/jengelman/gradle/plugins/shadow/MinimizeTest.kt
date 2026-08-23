@@ -364,7 +364,7 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
-      classLoader(null) {
+      classLoader {
         val serviceClass = loadClass("service.Greeter")
         loadService(serviceClass).hasSize(1)
       }

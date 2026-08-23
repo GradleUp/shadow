@@ -47,9 +47,7 @@ fun ZipFile.getStream(entryName: String): InputStream {
   return getInputStream(entry)
 }
 
-fun JarPath.classLoader(
-  parent: ClassLoader? = ClassLoader.getSystemClassLoader().parent
-): URLClassLoader {
+fun JarPath.classLoader(parent: ClassLoader? = null): URLClassLoader {
   return URLClassLoader(arrayOf(toUri().toURL()), parent)
 }
 
@@ -78,7 +76,7 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
 
 fun Assert<JarPath>.classLoader(
-  parent: ClassLoader? = ClassLoader.getSystemClassLoader().parent,
+  parent: ClassLoader? = null,
   block: Assert<URLClassLoader>.() -> Unit,
 ) = given { actual ->
   actual.classLoader(parent).use {
