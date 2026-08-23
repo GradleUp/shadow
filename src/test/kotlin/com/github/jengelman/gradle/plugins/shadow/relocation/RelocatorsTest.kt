@@ -55,10 +55,30 @@ class RelocatorsTest {
   fun relocateTextOrder() {
     val relocators =
       listOf(
-        SimpleRelocator("org.foo", "org.bar"),
-        SimpleRelocator("org.bar", "org.baz"),
+        SimpleRelocator("org.foo.bar", "shaded.one"),
+        SimpleRelocator("org.foo", "shaded.two"),
       )
-    assertThat(relocators.relocateText("org.foo.Foo")).isEqualTo("org.baz.Foo")
+    assertThat(relocators.relocateText("org.foo.bar.Baz")).isEqualTo("shaded.one.Baz")
+  }
+
+  @Test
+  fun customRelocatorRelocateText() {
+    val customRelocator =
+      object : Relocator {
+        override fun canRelocatePath(path: String): Boolean = false
+
+        override fun relocatePath(context: RelocatePathContext): String = context.path
+
+        override fun canRelocateClass(className: String): Boolean =
+          className.startsWith("custom.pkg")
+
+        override fun relocateClass(context: RelocateClassContext): String =
+          "relocated." + context.className
+
+        override fun applyToSourceContent(sourceContent: String): String = sourceContent
+      }
+    assertThat(customRelocator.relocateText("Header: custom.pkg.Foo, other.Bar"))
+      .isEqualTo("Header: relocated.custom.pkg.Foo, other.Bar")
   }
 
   private companion object {

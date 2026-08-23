@@ -12,31 +12,25 @@ public fun Relocator.relocatePath(path: String): String {
   return relocatePath(RelocatePathContext(path))
 }
 
+private val IDENTIFIER_PATTERN =
+  """(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z_$][a-zA-Z0-9_$]*)*)""".toRegex()
+
 /**
  * Relocates all matching class and package names in the given [text].
  *
- * Unlike [relocateClass], which operates on a single class name (subject to prefix/format checks in
- * [Relocator.canRelocateClass] and single-occurrence replacement), this function performs global
- * replacement across arbitrary text content (e.g. `MANIFEST.MF` attributes or ProGuard/R8 rules).
- *
- * For [SimpleRelocator], it directly replaces all occurrences of [SimpleRelocator.pattern] with
- * [SimpleRelocator.shadedPattern]. For generic [Relocator]s, it iteratively calls [relocateClass]
- * until the value converges.
+ * Scans [text] for candidate class or package names, checks [Relocator.canRelocateClass] for each
+ * candidate to respect includes, excludes, and pattern boundaries, and replaces matching candidates
+ * with [Relocator.relocateClass].
  */
 internal fun Relocator.relocateText(text: String): String {
-  if (this is SimpleRelocator) {
-    return if (rawString || pattern.isEmpty()) {
-      text
+  return IDENTIFIER_PATTERN.replace(text) { matchResult ->
+    val candidate = matchResult.value
+    if (canRelocateClass(candidate)) {
+      relocateClass(candidate)
     } else {
-      text.replace(pattern, shadedPattern)
+      candidate
     }
   }
-  var newValue = text
-  do {
-    val value = newValue
-    newValue = relocateClass(value)
-  } while (value != newValue)
-  return newValue
 }
 
 public fun Iterable<Relocator>.relocateClass(className: String): String {
@@ -61,9 +55,10 @@ public fun Iterable<Relocator>.relocatePath(path: String): String {
  * Sequentially relocates all matching class and package names in the given [text] across all
  * relocators in this collection.
  *
- * Unlike [Iterable.relocateClass] which stops at the first matching relocator, this function passes
- * the text through every relocator in a chain-of-responsibility pipeline so that all patterns
- * present in the text are relocated.
+ * For each candidate class or package name found in [text], delegates to [Iterable.relocateClass]
+ * to find the first matching relocator.
  */
 internal fun Iterable<Relocator>.relocateText(text: String): String =
-  fold(text) { acc, relocator -> relocator.relocateText(acc) }
+  IDENTIFIER_PATTERN.replace(text) { matchResult ->
+    relocateClass(matchResult.value)
+  }

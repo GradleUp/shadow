@@ -156,6 +156,34 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
     }
 
   @Test
+  fun rewriteAttributesRespectingExcludes() =
+    with(transformer) {
+      val source =
+        """
+        |Manifest-Version: 1.0
+        |Export-Package: org.foo.public.api;version="1.0",org.foo.internal.impl;version="1.0"
+        |"""
+          .trimMargin()
+          .crlfEolString
+
+      val relocator =
+        SimpleRelocator(
+          "org.foo",
+          "shaded.org.foo",
+          excludes = listOf("org.foo.internal.*"),
+        )
+
+      transform(textContext(MANIFEST_NAME, source, relocator))
+
+      transformToJar().use { jarPath ->
+        assertThat(jarPath.getMainAttr("Export-Package"))
+          .isEqualTo(
+            """shaded.org.foo.public.api;version="1.0",org.foo.internal.impl;version="1.0""""
+          )
+      }
+    }
+
+  @Test
   fun removeAttributeUsingNullConstant() =
     with(transformer) {
       val source =
