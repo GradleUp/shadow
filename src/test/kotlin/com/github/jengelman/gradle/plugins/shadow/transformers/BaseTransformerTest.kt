@@ -53,6 +53,9 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
           override fun getFile(): File = requireNotNull(file) { "File must be provided." }
 
           override fun open(): InputStream = getFile().inputStream()
+
+          // Mock Gradle's AbstractFileTreeElement.toString, which returns getDisplayName().
+          override fun toString(): String = file?.path ?: path
         }
       return canTransformResource(element)
     }

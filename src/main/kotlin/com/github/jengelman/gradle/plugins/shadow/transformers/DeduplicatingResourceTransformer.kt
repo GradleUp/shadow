@@ -92,7 +92,8 @@ public open class DeduplicatingResourceTransformer(
           append("  * $path\n")
           infos.elementsPerHash.forEach { (hash, elements) ->
             elements.forEach { element ->
-              val filePath = runCatching { element.file.path }.getOrElse { element.path }
+              // Formats as `file '<path>'` for local files or `zip entry '<jar>!<entry>'`.
+              val filePath = element.toString()
               append("    * $filePath (SHA256: $hash)\n")
             }
           }
