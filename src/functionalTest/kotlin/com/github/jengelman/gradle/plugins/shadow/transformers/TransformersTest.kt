@@ -2,15 +2,18 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.all
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import java.util.jar.Attributes as JarAttribute
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
@@ -196,6 +199,214 @@ class TransformersTest : BaseTransformerTest() {
       containsOnly("foo/", "foo/Bar.txt", "foo/bar.txt", *manifestEntries)
       getContent("foo/Bar.txt").isEqualTo("Bar")
       getContent("foo/bar.txt").isEqualTo("bar")
+    }
+  }
+
+  @Test
+  fun apacheLicenseResourceTransformer() {
+    val one = buildJarOne {
+      insert("META-INF/LICENSE", "License 1")
+      insert("foo/bar.txt", "bar")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/LICENSE.txt", "License 2")
+      insert("foo/baz.txt", "baz")
+    }
+    projectScript.appendText(
+      transform<ApacheLicenseResourceTransformer>(dependenciesBlock = implementationFiles(one, two))
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("foo/", "foo/bar.txt", "foo/baz.txt", *manifestEntries)
+    }
+  }
+
+  @Test
+  fun apacheNoticeResourceTransformer() {
+    val one = buildJarOne {
+      insert("META-INF/NOTICE", "Notice from A")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/NOTICE.txt", "Notice from B")
+    }
+    projectScript.appendText(
+      transform<ApacheNoticeResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock =
+          """
+          |projectName = 'my-project'
+          |copyright = 'Copyright 2026 Foo'
+          """
+            .trimMargin(),
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent("META-INF/NOTICE").contains("Notice from A")
+      getContent("META-INF/NOTICE").contains("Notice from B")
+      getContent("META-INF/NOTICE").contains("Copyright 2026 Foo")
+      getContent("META-INF/NOTICE").contains("my-project")
+    }
+  }
+
+  @Test
+  fun componentsXmlResourceTransformer() {
+    val xml1 =
+      """
+      |<component-set>
+      |  <components>
+      |    <component>
+      |      <role>org.example.Driver</role>
+      |      <role-hint>default</role-hint>
+      |      <implementation>org.example.DriverImpl</implementation>
+      |    </component>
+      |  </components>
+      |</component-set>
+      """
+        .trimMargin()
+    val xml2 =
+      """
+      |<component-set>
+      |  <components>
+      |    <component>
+      |      <role>org.example.Server</role>
+      |      <role-hint>default</role-hint>
+      |      <implementation>org.example.ServerImpl</implementation>
+      |    </component>
+      |  </components>
+      |</component-set>
+      """
+        .trimMargin()
+    val one = buildJarOne {
+      insert(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH, xml1)
+    }
+    val two = buildJarTwo {
+      insert(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH, xml2)
+    }
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  transform(${ComponentsXmlResourceTransformer::class.java.name})
+      |  relocate('org.example', 'relocated.org.example')
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
+        .contains("<role>relocated.org.example.Driver</role>")
+      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
+        .contains("<implementation>relocated.org.example.DriverImpl</implementation>")
+      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
+        .contains("<role>relocated.org.example.Server</role>")
+      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
+        .contains("<implementation>relocated.org.example.ServerImpl</implementation>")
+    }
+  }
+
+  @Test
+  fun kotlinModuleMetadataTransformer() {
+    val moduleBytes = requireResourceAsStream("META-INF/kotlin-stdlib.kotlin_module").readBytes()
+    val one = buildJarOne {
+      insert("META-INF/kotlin-stdlib.kotlin_module", moduleBytes)
+    }
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one)}
+      |}
+      |$shadowJarTask {
+      |  transform(${KotlinModuleMetadataTransformer::class.java.name})
+      |  relocate('kotlin', 'my.kotlin')
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("META-INF/", "META-INF/kotlin-stdlib.shadow.kotlin_module", *manifestEntries)
+      getBytes("META-INF/kotlin-stdlib.shadow.kotlin_module").isNotNull()
+    }
+  }
+
+  @Test
+  fun manifestAppenderTransformer() {
+    val one = buildJarOne {
+      insert("foo/bar.txt", "bar")
+    }
+    projectScript.appendText(
+      transform<ManifestAppenderTransformer>(
+        dependenciesBlock = implementationFiles(one),
+        transformerBlock =
+          """
+          |it.append('Name', 'org/foo/bar/')
+          |it.append('Sealed', 'true')
+          """
+            .trimMargin(),
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent("META-INF/MANIFEST.MF").contains("Name: org/foo/bar/\r\nSealed: true")
+    }
+  }
+
+  @Test
+  fun xmlAppendingTransformer() {
+    val xmlEntry = "META-INF/custom.xml"
+    val xml1 =
+      """
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<root>
+      |  <child id="1"/>
+      |</root>
+      """
+        .trimMargin()
+    val xml2 =
+      """
+      |<?xml version="1.0" encoding="UTF-8"?>
+      |<root>
+      |  <child id="2"/>
+      |</root>
+      """
+        .trimMargin()
+    val one = buildJarOne { insert(xmlEntry, xml1) }
+    val two = buildJarTwo { insert(xmlEntry, xml2) }
+    projectScript.appendText(
+      transform<XmlAppendingTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = "resource = '$xmlEntry'",
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent(xmlEntry)
+        .isEqualTo(
+          """
+          |<?xml version="1.0" encoding="UTF-8"?>
+          |<root>
+          |  <child id="1" />
+          |  <child id="2" />
+          |</root>
+          |"""
+            .trimMargin()
+        )
     }
   }
 
