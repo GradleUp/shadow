@@ -134,13 +134,7 @@ class FilteringTest : BasePluginTest() {
 
     runWithSuccess(serverShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
-      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
-      classLoader {
-        loadClass("server.Server")
-        loadClass("junit.framework.Test")
-      }
-    }
+    commonServerAssertions()
   }
 
   @Test // #671
@@ -158,13 +152,7 @@ class FilteringTest : BasePluginTest() {
 
     runWithSuccess(serverShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
-      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
-      classLoader {
-        loadClass("server.Server")
-        loadClass("junit.framework.Test")
-      }
-    }
+    commonServerAssertions()
   }
 
   @Test
@@ -243,6 +231,16 @@ class FilteringTest : BasePluginTest() {
   private fun commonAssertions() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("c.properties", *entriesInAB, *manifestEntries)
+    }
+  }
+
+  private fun commonServerAssertions() {
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
+      classLoader {
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 }

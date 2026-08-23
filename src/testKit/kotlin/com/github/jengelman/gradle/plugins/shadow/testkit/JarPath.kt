@@ -96,12 +96,12 @@ fun Assert<Class<*>>.isAssignableFrom(other: Assert<Class<*>>) = given { actual 
 
 fun Assert<URLClassLoader>.loadService(service: Assert<Class<*>>): Assert<List<Any>> =
   transform { loader ->
-    var result: List<Any>? = null
+    lateinit var result: List<Any>
     service.given { serviceClass ->
       @Suppress("UNCHECKED_CAST")
       result = ServiceLoader.load(serviceClass as Class<Any>, loader).toList()
     }
-    checkNotNull(result)
+    result
   }
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->

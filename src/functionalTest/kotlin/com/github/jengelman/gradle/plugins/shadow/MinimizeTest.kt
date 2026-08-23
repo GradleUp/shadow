@@ -50,7 +50,6 @@ class MinimizeTest : BasePluginTest() {
       )
       classLoader {
         loadClass("impl.SimpleEntity")
-        loadClass("api.Entity")
         loadClass("api.UnusedEntity")
         loadClass("lib.LibEntity")
       }
@@ -93,9 +92,7 @@ class MinimizeTest : BasePluginTest() {
       )
       classLoader {
         loadClass("impl.SimpleEntity")
-        loadClass("api.Entity")
         loadClass("api.UnusedEntity")
-        loadClass("lib.LibEntity")
         loadClass("lib.UnusedLibEntity")
       }
     }
