@@ -205,9 +205,9 @@ internal constructor(
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.inputStream.use {
+      fileDetails.inputStream().use { inputStream ->
         transformer.transform(
-          TransformerContext(path = path, inputStream = it, relocators = relocators)
+          TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
         )
       }
       return true

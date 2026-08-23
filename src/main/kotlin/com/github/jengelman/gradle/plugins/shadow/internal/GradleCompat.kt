@@ -21,15 +21,6 @@ import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
 
-internal inline val FileTreeElement.inputStream: InputStream
-  get() =
-    try {
-      // Open is more performant than getFile, it doesn't extract the zip files.
-      open()
-    } catch (_: UnsupportedOperationException) {
-      file.inputStream()
-    }
-
 /** Return `runtimeClasspath` or `runtime` configuration. */
 internal inline val Project.runtimeConfiguration: Configuration
   get() =
@@ -69,6 +60,14 @@ internal fun Project.addBuildScanCustomValues() {
     }
   }
 }
+
+internal fun FileTreeElement.inputStream(): InputStream =
+  try {
+    // Open is more performant than getFile, it doesn't extract the zip files.
+    open()
+  } catch (_: UnsupportedOperationException) {
+    file.inputStream()
+  }
 
 internal inline fun <reified V : Any> ObjectFactory.property(
   defaultValue: Any? = null

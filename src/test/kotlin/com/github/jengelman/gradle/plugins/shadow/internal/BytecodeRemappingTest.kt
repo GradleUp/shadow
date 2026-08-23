@@ -280,7 +280,7 @@ class BytecodeRemappingTest {
 
       override fun getFile(): File = toFile()
 
-      override fun open(): InputStream = inputStream()
+      override fun open(): InputStream = this@toFileCopyDetails.inputStream()
     }
 
   private fun KClass<*>.toFileCopyDetails(): FileCopyDetails {

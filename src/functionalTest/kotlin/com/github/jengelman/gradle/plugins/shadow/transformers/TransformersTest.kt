@@ -153,11 +153,10 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun deduplicatingResourceTransformerWithCaseSensitiveEntries() {
-    val one =
-      buildJar("one.jar") {
-        insert("foo/Bar.txt", "Bar")
-        insert("foo/bar.txt", "bar")
-      }
+    val one = buildJarOne {
+      insert("foo/Bar.txt", "Bar")
+      insert("foo/bar.txt", "bar")
+    }
     projectScript.appendText(
       transform<DeduplicatingResourceTransformer>(dependenciesBlock = implementationFiles(one))
     )

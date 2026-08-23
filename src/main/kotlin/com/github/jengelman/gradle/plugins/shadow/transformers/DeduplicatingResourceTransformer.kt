@@ -67,7 +67,7 @@ public open class DeduplicatingResourceTransformer(
   @Inject public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val hash = element.inputStream.use { it.sha256Hex() }
+    val hash = element.inputStream().use { it.sha256Hex() }
 
     val flag = patternSpec.isSatisfiedBy(element)
     checkDupStrategy(flag, element)
@@ -92,12 +92,7 @@ public open class DeduplicatingResourceTransformer(
           append("  * $path\n")
           infos.elementsPerHash.forEach { (hash, elements) ->
             elements.forEach { element ->
-              val filePath =
-                try {
-                  element.file.path
-                } catch (_: Exception) {
-                  element.path
-                }
+              val filePath = runCatching { element.file.path }.getOrElse { element.path }
               append("    * $filePath (SHA256: $hash)\n")
             }
           }
@@ -113,7 +108,7 @@ public open class DeduplicatingResourceTransformer(
     }
 
   internal data class PathInfos(val failOnDuplicateContent: Boolean) {
-    val elementsPerHash: MutableMap<String, MutableList<FileTreeElement>> = mutableMapOf()
+    val elementsPerHash = mutableMapOf<String, MutableList<FileTreeElement>>()
 
     fun uniqueContentCount() = elementsPerHash.size
 
@@ -125,6 +120,8 @@ public open class DeduplicatingResourceTransformer(
   }
 
   internal companion object {
+    fun File.sha256Hex(): String = inputStream().use { it.sha256Hex() }
+
     private fun InputStream.sha256Hex(): String {
       try {
         val digest = MessageDigest.getInstance("SHA-256")
@@ -139,7 +136,5 @@ public open class DeduplicatingResourceTransformer(
         throw RuntimeException("Failed to read data or calculate hash", e)
       }
     }
-
-    fun File.sha256Hex(): String = inputStream().use { it.sha256Hex() }
   }
 }

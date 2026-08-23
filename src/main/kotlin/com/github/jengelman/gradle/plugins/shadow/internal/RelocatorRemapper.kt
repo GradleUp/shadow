@@ -14,7 +14,7 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
  * (possibly) remapped class bytes. If no remapping is required, the original bytes are returned.
  */
 internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
-  inputStream
+  inputStream()
     .use { it.readBytes() }
     .let { bytes ->
       var modified = false
