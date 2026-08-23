@@ -220,39 +220,6 @@ class SimpleRelocatorTest {
   }
 
   @Test
-  fun relocateText() {
-    var relocator = SimpleRelocator("org.foo")
-    assertThat(
-        relocator.relocateText("org.foo.bar.Class, hidden.org.foo.bar.Class and org.foo.bar.Class")
-      )
-      .isEqualTo("hidden.org.foo.bar.Class, hidden.org.foo.bar.Class and hidden.org.foo.bar.Class")
-
-    relocator = SimpleRelocator("org.foo", "private.stuff")
-    assertThat(
-        relocator.relocateText("org.foo.bar.Class, private.stuff.bar.Class and org.foo.bar.Class")
-      )
-      .isEqualTo("private.stuff.bar.Class, private.stuff.bar.Class and private.stuff.bar.Class")
-
-    relocator =
-      SimpleRelocator(
-        "org.foo",
-        "shaded.org.foo",
-        excludes = listOf("org.foo.internal.*"),
-      )
-    assertThat(relocator.relocateText("org.foo.Bar, org.foo.internal.Baz, org.foo.internal"))
-      .isEqualTo("shaded.org.foo.Bar, org.foo.internal.Baz, org.foo.internal")
-
-    relocator =
-      SimpleRelocator(
-        "org.foo",
-        "shaded.org.foo",
-        includes = listOf("org.foo.public.*"),
-      )
-    assertThat(relocator.relocateText("org.foo.public.Bar, org.foo.other.Baz"))
-      .isEqualTo("shaded.org.foo.public.Bar, org.foo.other.Baz")
-  }
-
-  @Test
   fun relocateRawString() {
     var relocator = SimpleRelocator("Lorg/foo", "Lhidden/org/foo", rawString = true)
     assertThat(relocator.relocatePath("(I)Lorg/foo/bar/Class;"))

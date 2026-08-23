@@ -5,7 +5,8 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateText
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.IOException
 import java.io.Serializable
 import java.util.jar.Attributes.Name as JarAttributeName
@@ -123,7 +124,15 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     private val DEFAULT_ATTRIBUTES_TO_RELOCATE =
       setOf("Export-Package", "Import-Package", "Provide-Capability", "Require-Capability")
 
+    private val IDENTIFIER_PATTERN =
+      """(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z_$][a-zA-Z0-9_$]*)*)""".toRegex()
+
     private val logger = Logging.getLogger(ManifestResourceTransformer::class.java)
+
+    private fun Iterable<Relocator>.relocateText(text: String): String =
+      IDENTIFIER_PATTERN.replace(text) { matchResult ->
+        relocateClass(matchResult.value)
+      }
 
     /**
      * A sentinel object used in [manifestEntries] or [attributes] to indicate that the specified
