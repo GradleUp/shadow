@@ -265,37 +265,39 @@ class TransformersTest : BaseTransformerTest() {
 
   @Test
   fun componentsXmlResourceTransformer() {
-    val xml1 =
-      """
-      |<component-set>
-      |  <components>
-      |    <component>
-      |      <role>org.example.Driver</role>
-      |      <role-hint>default</role-hint>
-      |      <implementation>org.example.DriverImpl</implementation>
-      |    </component>
-      |  </components>
-      |</component-set>
-      """
-        .trimMargin()
-    val xml2 =
-      """
-      |<component-set>
-      |  <components>
-      |    <component>
-      |      <role>org.example.Server</role>
-      |      <role-hint>default</role-hint>
-      |      <implementation>org.example.ServerImpl</implementation>
-      |    </component>
-      |  </components>
-      |</component-set>
-      """
-        .trimMargin()
     val one = buildJarOne {
-      insert(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH, xml1)
+      insert(
+        ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH,
+        """
+        |<component-set>
+        |  <components>
+        |    <component>
+        |      <role>org.example.Driver</role>
+        |      <role-hint>default</role-hint>
+        |      <implementation>org.example.DriverImpl</implementation>
+        |    </component>
+        |  </components>
+        |</component-set>
+        """
+          .trimMargin(),
+      )
     }
     val two = buildJarTwo {
-      insert(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH, xml2)
+      insert(
+        ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH,
+        """
+        |<component-set>
+        |  <components>
+        |    <component>
+        |      <role>org.example.Server</role>
+        |      <role-hint>default</role-hint>
+        |      <implementation>org.example.ServerImpl</implementation>
+        |    </component>
+        |  </components>
+        |</component-set>
+        """
+          .trimMargin(),
+      )
     }
     projectScript.appendText(
       """
@@ -401,24 +403,30 @@ class TransformersTest : BaseTransformerTest() {
   @Test
   fun xmlAppendingTransformer() {
     val xmlEntry = "META-INF/custom.xml"
-    val xml1 =
-      """
-      |<?xml version="1.0" encoding="UTF-8"?>
-      |<root>
-      |  <child id="1"/>
-      |</root>
-      """
-        .trimMargin()
-    val xml2 =
-      """
-      |<?xml version="1.0" encoding="UTF-8"?>
-      |<root>
-      |  <child id="2"/>
-      |</root>
-      """
-        .trimMargin()
-    val one = buildJarOne { insert(xmlEntry, xml1) }
-    val two = buildJarTwo { insert(xmlEntry, xml2) }
+    val one = buildJarOne {
+      insert(
+        xmlEntry,
+        """
+        |<?xml version="1.0" encoding="UTF-8"?>
+        |<root>
+        |  <child id="1"/>
+        |</root>
+        """
+          .trimMargin(),
+      )
+    }
+    val two = buildJarTwo {
+      insert(
+        xmlEntry,
+        """
+        |<?xml version="1.0" encoding="UTF-8"?>
+        |<root>
+        |  <child id="2"/>
+        |</root>
+        """
+          .trimMargin(),
+      )
+    }
     projectScript.appendText(
       transform<XmlAppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
