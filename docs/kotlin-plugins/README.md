@@ -153,14 +153,14 @@ To explicitly apply this remapping (recommended for future compatibility), add
 
     ```kotlin
     tasks.shadowJar {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer::class.java)
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer>()
     }
     ```
 
 === "Groovy"
 
     ```groovy
-    tasks.shadowJar {
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer)
     }
     ```

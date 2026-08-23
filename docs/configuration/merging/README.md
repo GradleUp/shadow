@@ -829,29 +829,6 @@ To remove a specific attribute from the manifest, map its name to [`ManifestReso
     }
     ```
 
-## Merging Kotlin Module Metadata Files
-
-Kotlin libraries contain `.kotlin_module` files in `META-INF/` that describe package parts and multi-file facades.
-When relocating Kotlin classes, the [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer] rewrites
-metadata within these files to match relocated class and package names.
-
-See [Kotlin Module Metadata Remapping](../../kotlin-plugins/README.md#kotlin-module-metadata-remapping) for more details.
-
-=== "Kotlin"
-
-    ```kotlin
-    tasks.shadowJar {
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer>()
-    }
-    ```
-
-=== "Groovy"
-
-    ```groovy
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer)
-    }
-    ```
 
 ## Preserving First-Found Resources
 
