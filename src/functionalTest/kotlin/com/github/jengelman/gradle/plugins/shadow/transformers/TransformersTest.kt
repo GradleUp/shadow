@@ -219,7 +219,8 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("foo/", "foo/bar.txt", "foo/baz.txt", *manifestEntries)
+      containsOnly("META-INF/LICENSE", "foo/", "foo/bar.txt", "foo/baz.txt", *manifestEntries)
+      getContent("META-INF/LICENSE").isEqualTo("License 1")
     }
   }
 
@@ -361,7 +362,7 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("META-INF/", "META-INF/kotlin-stdlib.shadow.kotlin_module", *manifestEntries)
-      getBytes("META-INF/kotlin-stdlib.shadow.kotlin_module").isNotNull()
+      getBytes("META-INF/kotlin-stdlib.shadow.kotlin_module").isNotEqualTo(moduleBytes)
     }
   }
 
