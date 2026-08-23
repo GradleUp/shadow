@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import kotlin.io.path.appendText
@@ -51,7 +50,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(propertiesEntry).contains("FOO=第一;第二")
+      getContent(propertiesEntry).isEqualTo("FOO=第一;第二\n")
       getContent("MY_LICENSE")
         .isEqualTo(
           """
