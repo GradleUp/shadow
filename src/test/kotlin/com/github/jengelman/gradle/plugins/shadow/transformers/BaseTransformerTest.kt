@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
+import java.io.InputStream
 import java.lang.reflect.ParameterizedType
 import java.nio.file.Path
 import java.util.Locale
@@ -50,6 +51,8 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
           override fun getRelativePath(): RelativePath = _relativePath
 
           override fun getFile(): File = requireNotNull(file) { "File must be provided." }
+
+          override fun open(): InputStream = getFile().inputStream()
         }
       return canTransformResource(element)
     }

@@ -139,3 +139,6 @@ class DeduplicatingResourceTransformerTest :
         )
     }
 }
+
+private val DeduplicatingResourceTransformer.PathInfos.filesPerHash: Map<String, List<File>>
+  get() = elementsPerHash.mapValues { (_, elements) -> elements.map { it.file } }

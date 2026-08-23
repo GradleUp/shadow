@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import java.io.File
+import java.io.InputStream
 import java.security.MessageDigest
 import java.util.HexFormat
 import javax.inject.Inject
@@ -65,14 +66,13 @@ public open class DeduplicatingResourceTransformer(
   @Inject public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val file = element.file
-    val hash = file.sha256Hex()
+    val hash = element.sha256Hex()
 
     val flag = patternSpec.isSatisfiedBy(element)
     checkDupStrategy(flag, element)
 
     val pathInfos = sources.computeIfAbsent(element.path) { PathInfos(flag) }
-    val retainInOutput = pathInfos.addFile(hash, file)
+    val retainInOutput = pathInfos.addElement(hash, element)
 
     return !retainInOutput
   }
@@ -89,8 +89,16 @@ public open class DeduplicatingResourceTransformer(
         )
         duplicatePaths.forEach { (path, infos) ->
           append("  * $path\n")
-          infos.filesPerHash.forEach { (hash, files) ->
-            files.forEach { file -> append("    * ${file.path} (SHA256: $hash)\n") }
+          infos.elementsPerHash.forEach { (hash, elements) ->
+            elements.forEach { element ->
+              val filePath =
+                try {
+                  element.file.path
+                } catch (_: Exception) {
+                  element.path
+                }
+              append("    * $filePath (SHA256: $hash)\n")
+            }
           }
         }
       }
@@ -104,33 +112,44 @@ public open class DeduplicatingResourceTransformer(
     }
 
   internal data class PathInfos(val failOnDuplicateContent: Boolean) {
-    val filesPerHash: MutableMap<String, MutableList<File>> = mutableMapOf()
+    val elementsPerHash: MutableMap<String, MutableList<FileTreeElement>> = mutableMapOf()
 
-    fun uniqueContentCount() = filesPerHash.size
+    fun uniqueContentCount() = elementsPerHash.size
 
-    fun addFile(hash: String, file: File): Boolean {
-      val new = hash !in filesPerHash
-      filesPerHash.getOrPut(hash) { mutableListOf() }.add(file)
+    fun addElement(hash: String, element: FileTreeElement): Boolean {
+      val new = hash !in elementsPerHash
+      elementsPerHash.getOrPut(hash) { mutableListOf() }.add(element)
       return new
     }
   }
 
   internal companion object {
-    fun File.sha256Hex(): String {
+    private fun FileTreeElement.sha256Hex(): String {
+      val stream =
+        try {
+          // Open is more performant than getFile, it doesn't extract the zip files.
+          open()
+        } catch (_: UnsupportedOperationException) {
+          file.inputStream()
+        }
+      return stream.use { it.sha256Hex() }
+    }
+
+    private fun InputStream.sha256Hex(): String {
       try {
         val digest = MessageDigest.getInstance("SHA-256")
-        inputStream().use { input ->
-          val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
-          while (true) {
-            val count = input.read(buffer)
-            if (count < 0) break
-            digest.update(buffer, 0, count)
-          }
+        val buffer = ByteArray(DEFAULT_BUFFER_SIZE)
+        while (true) {
+          val count = read(buffer)
+          if (count < 0) break
+          digest.update(buffer, 0, count)
         }
         return HexFormat.of().formatHex(digest.digest())
       } catch (e: Exception) {
-        throw RuntimeException("Failed to read data or calculate hash for $this", e)
+        throw RuntimeException("Failed to read data or calculate hash", e)
       }
     }
+
+    fun File.sha256Hex(): String = inputStream().use { it.sha256Hex() }
   }
 }
