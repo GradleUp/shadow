@@ -632,7 +632,8 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
 When multiple dependencies contain license files (such as `META-INF/LICENSE`), you can merge them into a single
 license file in the output JAR using the [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer].
-You must specify your project's license file using `artifactLicense`: 
+You must specify your project's license file using `artifactLicense`:
+
 === "Kotlin"
 
     ```kotlin
