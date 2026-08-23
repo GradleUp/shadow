@@ -43,6 +43,7 @@
 
 - Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
 - Avoid overwriting entries that differ only by case on case-insensitive filesystems. ([#2213](https://github.com/GradleUp/shadow/pull/2213))
+- Fix `ManifestAppenderTransformer` clearing attributes on transform. ([#2220](https://github.com/GradleUp/shadow/pull/2220))
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 
