@@ -79,6 +79,23 @@
 
 ## [9.5.0](https://github.com/GradleUp/shadow/releases/tag/9.5.0) - 2026-07-06
 
+!!! note
+
+    With the introduction of `DuplicatesStrategy` checking for transformers, you may see warnings like:
+
+    ```
+'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+    ```
+
+    If you do not need Kotlin module metadata remapping, you can disable it:
+
+    ```kt
+    tasks.shadowJar {
+      @Suppress("DEPRECATION") // This flag will be disabled and removed in the next major version of Shadow.
+      enableKotlinModuleRemapping = false
+    }
+    ```
+
 ### Added
 
 - Check `DuplicatesStrategy` for merging transformers. ([#2026](https://github.com/GradleUp/shadow/pull/2026))  
