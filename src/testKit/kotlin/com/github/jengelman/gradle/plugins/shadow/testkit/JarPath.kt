@@ -47,10 +47,6 @@ fun ZipFile.getStream(entryName: String): InputStream {
   return getInputStream(entry)
 }
 
-fun JarPath.classLoader(parent: ClassLoader? = null): URLClassLoader {
-  return URLClassLoader(arrayOf(toUri().toURL()), parent)
-}
-
 fun Assert<JarPath>.getBytes(entryName: String) = transform { it.getBytes(entryName) }
 
 fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
@@ -79,7 +75,7 @@ fun Assert<JarPath>.classLoader(
   parent: ClassLoader? = null,
   block: Assert<URLClassLoader>.() -> Unit,
 ) = given { actual ->
-  actual.classLoader(parent).use {
+  URLClassLoader(arrayOf(actual.toUri().toURL()), parent).use {
     assertThat(it).block()
   }
 }
