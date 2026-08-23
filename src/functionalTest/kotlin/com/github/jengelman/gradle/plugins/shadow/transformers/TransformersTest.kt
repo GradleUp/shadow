@@ -151,6 +151,25 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
   }
 
+  @Test
+  fun deduplicatingResourceTransformerWithCaseSensitiveEntries() {
+    val one = buildJarOne {
+      insert("foo/Bar.txt", "Bar")
+      insert("foo/bar.txt", "bar")
+    }
+    projectScript.appendText(
+      transform<DeduplicatingResourceTransformer>(dependenciesBlock = implementationFiles(one))
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("foo/", "foo/Bar.txt", "foo/bar.txt", *manifestEntries)
+      getContent("foo/Bar.txt").isEqualTo("Bar")
+      getContent("foo/bar.txt").isEqualTo("bar")
+    }
+  }
+
   private fun commonAssertions(
     mainAttributesBlock: JarAttribute.() -> Unit = {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
