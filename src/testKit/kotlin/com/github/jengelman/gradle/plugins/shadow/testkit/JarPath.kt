@@ -4,7 +4,7 @@ import assertk.Assert
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
-import assertk.assertions.isEqualTo
+import assertk.assertions.isTrue
 import java.io.InputStream
 import java.net.URLClassLoader
 import java.nio.file.Path
@@ -90,7 +90,7 @@ fun Assert<URLClassLoader>.loadClass(name: String): Assert<Class<*>> = transform
 
 fun Assert<Class<*>>.isAssignableFrom(other: Assert<Class<*>>) = given { actual ->
   other.given { otherActual ->
-    assertThat(actual.isAssignableFrom(otherActual)).isEqualTo(true)
+    assertThat(actual.isAssignableFrom(otherActual)).isTrue()
   }
 }
 
