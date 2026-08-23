@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import java.io.File
 import java.io.InputStream
@@ -66,7 +67,7 @@ public open class DeduplicatingResourceTransformer(
   @Inject public constructor(objectFactory: ObjectFactory) : this(objectFactory, PatternSet())
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val hash = element.sha256Hex()
+    val hash = element.inputStream.use { it.sha256Hex() }
 
     val flag = patternSpec.isSatisfiedBy(element)
     checkDupStrategy(flag, element)
@@ -124,17 +125,6 @@ public open class DeduplicatingResourceTransformer(
   }
 
   internal companion object {
-    private fun FileTreeElement.sha256Hex(): String {
-      val stream =
-        try {
-          // Open is more performant than getFile, it doesn't extract the zip files.
-          open()
-        } catch (_: UnsupportedOperationException) {
-          file.inputStream()
-        }
-      return stream.use { it.sha256Hex() }
-    }
-
     private fun InputStream.sha256Hex(): String {
       try {
         val digest = MessageDigest.getInstance("SHA-256")

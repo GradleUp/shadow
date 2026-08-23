@@ -6,6 +6,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
@@ -204,14 +205,7 @@ internal constructor(
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      val inputStream =
-        try {
-          // Open is more performant than getFile, it doesn't extract the zip files.
-          fileDetails.open()
-        } catch (_: UnsupportedOperationException) {
-          fileDetails.file.inputStream()
-        }
-      inputStream.use {
+      fileDetails.inputStream.use {
         transformer.transform(
           TransformerContext(path = path, inputStream = it, relocators = relocators)
         )

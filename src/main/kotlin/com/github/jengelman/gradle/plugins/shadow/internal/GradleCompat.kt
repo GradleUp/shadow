@@ -2,10 +2,12 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
+import java.io.InputStream
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaApplication
@@ -18,6 +20,15 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
+
+internal inline val FileTreeElement.inputStream: InputStream
+  get() =
+    try {
+      // Open is more performant than getFile, it doesn't extract the zip files.
+      open()
+    } catch (_: UnsupportedOperationException) {
+      file.inputStream()
+    }
 
 /** Return `runtimeClasspath` or `runtime` configuration. */
 internal inline val Project.runtimeConfiguration: Configuration
