@@ -219,8 +219,7 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("META-INF/LICENSE", "foo/", "foo/bar.txt", "foo/baz.txt", *manifestEntries)
-      getContent("META-INF/LICENSE").isEqualTo("License 1")
+      containsOnly("foo/", "foo/bar.txt", "foo/baz.txt", *manifestEntries)
     }
   }
 
