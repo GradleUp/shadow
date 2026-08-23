@@ -546,12 +546,18 @@ reads each XML document and merges each root element into a single document.
 There is no short syntax method for the [`XmlAppendingTransformer`][XmlAppendingTransformer].
 It must be added using the [`transform`][ShadowJar.transform] methods.
 
+You can configure:
+
+- `resource`: The XML resource path to merge (required).
+- `ignoreDtd`: Whether to disable external DTD validation and entity resolution when parsing XML (defaults to `true`).
+
 === "Kotlin"
 
     ```kotlin
     tasks.shadowJar {
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer> {
         resource = "properties.xml"
+        ignoreDtd = true
       }
     }
     ```
@@ -562,6 +568,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer) {
         resource = 'properties.xml'
+        ignoreDtd = true
       }
     }
     ```
@@ -635,6 +642,45 @@ strategies using `mappings`, rewrite property keys using `keyTransformer`, or ch
         paths.add('META-INF/test.properties')
         mergeStrategy = MergeStrategy.Append
         mergeSeparator = ';'
+      }
+    }
+    ```
+
+### Advanced Properties Configuration
+
+To configure different merge strategies per file path or rewrite property keys during the merge process, use
+`mappings` and `keyTransformer`:
+
+=== "Kotlin"
+
+    ```kotlin
+    import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+
+    tasks.shadowJar {
+      transform<PropertiesFileTransformer> {
+        // Configure per-path merge strategy and separator
+        mappings.put(
+          "META-INF/app.properties",
+          mapOf("mergeStrategy" to "Append", "mergeSeparator" to ";"),
+        )
+        mappings.put(
+          "META-INF/settings.properties",
+          mapOf("mergeStrategy" to "Latest"),
+        )
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(PropertiesFileTransformer) {
+        // Configure per-path merge strategy and separator
+        mappings.put('META-INF/app.properties', [mergeStrategy: 'Append', mergeSeparator: ';'])
+        mappings.put('META-INF/settings.properties', [mergeStrategy: 'Latest'])
       }
     }
     ```
