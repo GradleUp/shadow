@@ -7,6 +7,7 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
@@ -100,13 +101,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           |"""
             .trimMargin()
         )
-      classLoader { loader ->
-        val driver = loader.loadClass("relocated.com.example.Driver")
-        val fooDriver = loader.loadClass("relocated.foo.FooDriver")
-        val barDriver = loader.loadClass("relocated.bar.BarDriver")
-        assertThat(driver.name).isEqualTo("relocated.com.example.Driver")
-        assertThat(fooDriver.name).isEqualTo("relocated.foo.FooDriver")
-        assertThat(barDriver.name).isEqualTo("relocated.bar.BarDriver")
+      classLoader {
+        loadClass("relocated.com.example.Driver")
+        loadClass("relocated.foo.FooDriver")
+        loadClass("relocated.bar.BarDriver")
       }
     }
   }
@@ -173,13 +171,10 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           |"""
             .trimMargin()
         )
-      classLoader { loader ->
-        val driver = loader.loadClass("relocated.com.example.Driver")
-        val fooDriver = loader.loadClass("relocated.foo.FooDriver")
-        val barDriver = loader.loadClass("relocated.bar.BarDriver")
-        assertThat(driver.name).isEqualTo("relocated.com.example.Driver")
-        assertThat(fooDriver.name).isEqualTo("relocated.foo.FooDriver")
-        assertThat(barDriver.name).isEqualTo("relocated.bar.BarDriver")
+      classLoader {
+        loadClass("relocated.com.example.Driver")
+        loadClass("relocated.foo.FooDriver")
+        loadClass("relocated.bar.BarDriver")
       }
     }
   }

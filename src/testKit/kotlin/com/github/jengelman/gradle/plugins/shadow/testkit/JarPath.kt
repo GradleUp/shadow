@@ -4,9 +4,11 @@ import assertk.Assert
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
+import assertk.assertions.isEqualTo
 import java.io.InputStream
 import java.net.URLClassLoader
 import java.nio.file.Path
+import java.util.ServiceLoader
 import java.util.jar.JarFile
 import java.util.zip.ZipFile
 
@@ -75,13 +77,35 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
  */
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
 
-private fun Assert<JarPath>.toEntries() = transform { actual ->
-  actual.entries().toList().map { it.name }
-}
-
 fun Assert<JarPath>.classLoader(
   parent: ClassLoader? = ClassLoader.getSystemClassLoader().parent,
-  block: (URLClassLoader) -> Unit,
+  block: Assert<URLClassLoader>.() -> Unit,
 ) = given { actual ->
-  actual.classLoader(parent).use(block)
+  actual.classLoader(parent).use {
+    assertThat(it).block()
+  }
+}
+
+fun Assert<URLClassLoader>.loadClass(name: String): Assert<Class<*>> = transform {
+  it.loadClass(name)
+}
+
+fun Assert<Class<*>>.isAssignableFrom(other: Assert<Class<*>>) = given { actual ->
+  other.given { otherActual ->
+    assertThat(actual.isAssignableFrom(otherActual)).isEqualTo(true)
+  }
+}
+
+fun Assert<URLClassLoader>.loadService(service: Assert<Class<*>>): Assert<List<Any>> =
+  transform { loader ->
+    var result: List<Any>? = null
+    service.given { serviceClass ->
+      @Suppress("UNCHECKED_CAST")
+      result = ServiceLoader.load(serviceClass as Class<Any>, loader).toList()
+    }
+    checkNotNull(result)
+  }
+
+private fun Assert<JarPath>.toEntries() = transform { actual ->
+  actual.entries().toList().map { it.name }
 }

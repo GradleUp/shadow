@@ -11,6 +11,8 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONS
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
@@ -59,12 +61,10 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("my/", mainClassEntry, *relocatedEntries, *manifestEntries)
-      classLoader { loader ->
+      classLoader {
         val pkg = relocationPrefix.replace('/', '.')
-        val main = loader.loadClass("my.Main")
-        val test = loader.loadClass("$pkg.junit.framework.Test")
-        assertThat(main.name).isEqualTo("my.Main")
-        assertThat(test.name).isEqualTo("$pkg.junit.framework.Test")
+        loadClass("my.Main")
+        loadClass("$pkg.junit.framework.Test")
       }
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
@@ -110,11 +110,10 @@ class RelocationTest : BasePluginTest() {
       } else {
         containsOnly(*junitEntries, *commonEntries)
       }
-      classLoader { loader ->
+      classLoader {
         val testClassName =
           if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
-        val test = loader.loadClass(testClassName)
-        assertThat(test.name).isEqualTo(testClassName)
+        loadClass(testClassName)
       }
     }
   }
@@ -157,11 +156,9 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
-      classLoader { loader ->
-        val runner = loader.loadClass("a.BaseTestRunner")
-        val test = loader.loadClass("b.Test")
-        assertThat(runner.name).isEqualTo("a.BaseTestRunner")
-        assertThat(test.name).isEqualTo("b.Test")
+      classLoader {
+        loadClass("a.BaseTestRunner")
+        loadClass("b.Test")
       }
     }
   }
@@ -212,15 +209,11 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
-      classLoader { loader ->
-        val nonRelocatedRunner = loader.loadClass("junit.runner.BaseTestRunner")
-        val relocatedOtherRunner = loader.loadClass("a.StandardTestSuiteLoader")
-        val relocatedTest = loader.loadClass("b.Test")
-        val nonRelocatedFramework = loader.loadClass("junit.framework.Assert")
-        assertThat(nonRelocatedRunner.name).isEqualTo("junit.runner.BaseTestRunner")
-        assertThat(relocatedOtherRunner.name).isEqualTo("a.StandardTestSuiteLoader")
-        assertThat(relocatedTest.name).isEqualTo("b.Test")
-        assertThat(nonRelocatedFramework.name).isEqualTo("junit.framework.Assert")
+      classLoader {
+        loadClass("junit.runner.BaseTestRunner")
+        loadClass("a.StandardTestSuiteLoader")
+        loadClass("b.Test")
+        loadClass("junit.framework.Assert")
       }
     }
   }
@@ -259,12 +252,10 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
-      classLoader { loader ->
-        val myTest = loader.loadClass("my.MyTest")
-        val test = loader.loadClass("shadow.junit.Test")
-        assertThat(myTest.name).isEqualTo("my.MyTest")
-        assertThat(test.name).isEqualTo("shadow.junit.Test")
-        assertThat(test.isAssignableFrom(myTest)).isEqualTo(true)
+      classLoader {
+        val myTest = loadClass("my.MyTest")
+        val test = loadClass("shadow.junit.Test")
+        test.isAssignableFrom(myTest)
       }
     }
   }
@@ -677,11 +668,9 @@ class RelocationTest : BasePluginTest() {
         "relocated/foo/Foo.class",
         *manifestEntries,
       )
-      classLoader { loader ->
-        val main = loader.loadClass("my.Main")
-        val foo = loader.loadClass("relocated.foo.Foo")
-        assertThat(main.name).isEqualTo("my.Main")
-        assertThat(foo.name).isEqualTo("relocated.foo.Foo")
+      classLoader {
+        loadClass("my.Main")
+        loadClass("relocated.foo.Foo")
       }
     }
   }
