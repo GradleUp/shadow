@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.crlfEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import java.util.jar.JarFile.MANIFEST_NAME
 import org.junit.jupiter.api.Test
@@ -53,7 +54,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
           |
           |"""
             .trimMargin()
-            .replace("\n", "\r\n")
+            .crlfEolString
         )
     }
 

@@ -7,6 +7,9 @@
 
 - Allow configuring the final R8 configuration file with `R8Spec.configurationFile`. ([#2133](https://github.com/GradleUp/shadow/pull/2133))
 - Add `ProGuardFilesResourceTransformer` to merge R8/ProGuard rule files. ([#2196](https://github.com/GradleUp/shadow/pull/2196))
+- Improvements for `ManifestResourceTransformer`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))
+  - Support removing manifest attributes using `NULL`.
+  - Support manifest header relocation via configurable `attributesToRelocate` property.
 
 ### Changed
 
@@ -33,6 +36,8 @@
   Use `ShadowJar.exclude` or `ShadowJar.from` instead. The classes will be removed in Shadow 10.
 - Deprecate `TransformerContext.Builder`. ([#2184](https://github.com/GradleUp/shadow/pull/2184))  
   Use `TransformerContext` constructor instead. The Builder API will be removed in Shadow 10.
+- Deprecate `ManifestResourceTransformer.attributes(Map)`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))  
+  Use `manifestEntries` instead. The method will be removed in Shadow 10.
 
 ### Fixed
 
