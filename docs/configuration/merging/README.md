@@ -592,6 +592,45 @@ You can add this transformer using [`transform`][ShadowJar.transform]:
     }
     ```
 
+## Configuring Resource Transformer Filtering by Pattern
+
+There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provided by Shadow. Some of them extend
+[`PatternFilterableResourceTransformer`][PatternFilterableResourceTransformer], which extends
+[`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. For example:
+
+- [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
+- [`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer]
+- [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer]
+- [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer]
+- [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer]
+- [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
+- [`ServiceFileTransformer`][ServiceFileTransformer]
+
+You can use `include`/`exclude` and more methods to configure the patterns for those
+[`ResourceTransformer`][ResourceTransformer]s that support it. For example:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
+        include("META-INF/services/com.example.*")
+        exclude("META-INF/services/com.example.Internal")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
+        include 'META-INF/services/com.example.*'
+        exclude 'META-INF/services/com.example.Internal'
+      }
+    }
+    ```
+
 ## Merging Properties Files
 
 Properties files can be merged across dependencies and project resources using
@@ -883,45 +922,6 @@ If certain duplicate resources at the same path legitimately have different cont
       duplicatesStrategy = DuplicatesStrategy.INCLUDE
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer) {
         exclude 'META-INF/maven/**/pom.*'
-      }
-    }
-    ```
-
-## Configuring Resource Transformer Filtering by Pattern
-
-There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provided by Shadow. Some of them extend
-[`PatternFilterableResourceTransformer`][PatternFilterableResourceTransformer], which extends
-[`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. For example:
-
-- [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
-- [`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer]
-- [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer]
-- [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer]
-- [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer]
-- [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
-- [`ServiceFileTransformer`][ServiceFileTransformer]
-
-You can use `include`/`exclude` and more methods to configure the patterns for those
-[`ResourceTransformer`][ResourceTransformer]s that support it. For example:
-
-=== "Kotlin"
-
-    ```kotlin
-    tasks.shadowJar {
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
-        include("META-INF/services/com.example.*")
-        exclude("META-INF/services/com.example.Internal")
-      }
-    }
-    ```
-
-=== "Groovy"
-
-    ```groovy
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
-        include 'META-INF/services/com.example.*'
-        exclude 'META-INF/services/com.example.Internal'
       }
     }
     ```
