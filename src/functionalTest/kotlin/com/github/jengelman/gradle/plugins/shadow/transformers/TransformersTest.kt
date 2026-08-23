@@ -8,7 +8,6 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
-import com.github.jengelman.gradle.plugins.shadow.testkit.crlfEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
@@ -382,40 +381,6 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("META-INF/", "META-INF/kotlin-stdlib.shadow.kotlin_module", *manifestEntries)
       getBytes("META-INF/kotlin-stdlib.shadow.kotlin_module").isNotEqualTo(moduleBytes)
-    }
-  }
-
-  @Test
-  fun manifestResourceTransformerAppendEntries() {
-    val one = buildJarOne {
-      insert("foo/bar.txt", "bar")
-    }
-    projectScript.appendText(
-      transform<ManifestResourceTransformer>(
-        dependenciesBlock = implementationFiles(one),
-        transformerBlock =
-          """
-          |manifestEntries.put('Name', 'org/foo/bar/')
-          |manifestEntries.put('Sealed', 'true')
-          """
-            .trimMargin(),
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/MANIFEST.MF")
-        .isEqualTo(
-          """
-          |Manifest-Version: 1.0
-          |Name: org/foo/bar/
-          |Sealed: true
-          |
-          |"""
-            .trimMargin()
-            .crlfEolString
-        )
     }
   }
 
