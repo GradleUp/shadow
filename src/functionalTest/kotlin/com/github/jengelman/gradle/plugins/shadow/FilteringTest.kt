@@ -1,7 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -110,6 +112,9 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("d.properties", "my/", "my/Passed.class", *manifestEntries)
+      classLoader {
+        loadClass("my.Passed")
+      }
     }
   }
 
@@ -129,9 +134,7 @@ class FilteringTest : BasePluginTest() {
 
     runWithSuccess(serverShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
-      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
-    }
+    commonServerAssertions()
   }
 
   @Test // #671
@@ -149,9 +152,7 @@ class FilteringTest : BasePluginTest() {
 
     runWithSuccess(serverShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
-      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
-    }
+    commonServerAssertions()
   }
 
   @Test
@@ -176,6 +177,10 @@ class FilteringTest : BasePluginTest() {
         "server/Server.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+      }
     }
   }
 
@@ -226,6 +231,16 @@ class FilteringTest : BasePluginTest() {
   private fun commonAssertions() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("c.properties", *entriesInAB, *manifestEntries)
+    }
+  }
+
+  private fun commonServerAssertions() {
+    assertThat(outputServerShadowedJar).useAll {
+      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
+      classLoader {
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 }

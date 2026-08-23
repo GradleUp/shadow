@@ -6,13 +6,14 @@ import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
-import java.net.URLClassLoader
-import java.util.ServiceLoader
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadService
 import kotlin.io.path.appendText
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
@@ -47,6 +48,11 @@ class MinimizeTest : BasePluginTest() {
         "lib/LibEntity.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("impl.SimpleEntity")
+        loadClass("api.UnusedEntity")
+        loadClass("lib.LibEntity")
+      }
     }
   }
 
@@ -84,6 +90,11 @@ class MinimizeTest : BasePluginTest() {
         "lib/UnusedLibEntity.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("impl.SimpleEntity")
+        loadClass("api.UnusedEntity")
+        loadClass("lib.UnusedLibEntity")
+      }
     }
   }
 
@@ -115,6 +126,10 @@ class MinimizeTest : BasePluginTest() {
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("client/Client.class", "server/Server.class")
       containsNone("junit/framework/Test.class")
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+      }
     }
   }
 
@@ -139,6 +154,10 @@ class MinimizeTest : BasePluginTest() {
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("server/Server.class", *junitEntries)
       containsNone("client/Client.class")
+      classLoader {
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -169,6 +188,11 @@ class MinimizeTest : BasePluginTest() {
         *junitEntries,
         *manifestEntries,
       )
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -203,6 +227,11 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+        loadClass("junit.framework.TestCase")
+      }
     }
 
     path("client/src/main/java/client/Client.java")
@@ -217,6 +246,11 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -268,6 +302,12 @@ class MinimizeTest : BasePluginTest() {
           *junitEntries,
           *manifestEntries,
         )
+      }
+      classLoader {
+        loadClass("server.Server")
+        if (!enable) {
+          loadClass("client.Client")
+        }
       }
     }
   }
@@ -324,6 +364,10 @@ class MinimizeTest : BasePluginTest() {
         "client/Used.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("client.Used")
+      }
     }
     val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
     val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
@@ -359,11 +403,10 @@ class MinimizeTest : BasePluginTest() {
         *manifestEntries,
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
-    }
-    val shadowJarUrl = outputServerShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(shadowJarUrl), null).use { loader ->
-      val serviceClass = loader.loadClass("service.Greeter")
-      assertThat(ServiceLoader.load(serviceClass, loader).toList()).hasSize(1)
+      classLoader {
+        val serviceClass = loadClass("service.Greeter")
+        loadService(serviceClass).hasSize(1)
+      }
     }
   }
 
@@ -394,6 +437,11 @@ class MinimizeTest : BasePluginTest() {
         "client/Reflective.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("client.Used")
+        loadClass("client.Reflective")
+      }
     }
     val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
     val outputConfigDir = path("server/build/r8/config").toRealPath()
@@ -484,6 +532,11 @@ class MinimizeTest : BasePluginTest() {
         "META-INF/proguard/client.pro",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("client.Used")
+        loadClass("client.Reflective")
+      }
     }
     val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
     val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
@@ -544,6 +597,12 @@ class MinimizeTest : BasePluginTest() {
         "META-INF/proguard/client.pro",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("client.Used")
+        loadClass("client.Reflective")
+        loadClass("client.Unused")
+      }
     }
   }
 
@@ -572,6 +631,10 @@ class MinimizeTest : BasePluginTest() {
         "a/a.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("a.a")
+      }
     }
   }
 
@@ -627,6 +690,12 @@ class MinimizeTest : BasePluginTest() {
         "client/Reflective.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("client.Used")
+        loadClass("client.Unused")
+        loadClass("client.Reflective")
+      }
     }
   }
 

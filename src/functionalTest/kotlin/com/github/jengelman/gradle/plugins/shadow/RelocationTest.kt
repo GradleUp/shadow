@@ -1,20 +1,20 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -24,7 +24,6 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
   @ParameterizedTest
@@ -62,6 +61,11 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("my/", mainClassEntry, *relocatedEntries, *manifestEntries)
+      classLoader {
+        val pkg = relocationPrefix.replace('/', '.')
+        loadClass("my.Main")
+        loadClass("$pkg.junit.framework.Test")
+      }
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
     assertThat(result.output).contains("Relocator count: 6.")
@@ -106,6 +110,11 @@ class RelocationTest : BasePluginTest() {
       } else {
         containsOnly(*junitEntries, *commonEntries)
       }
+      classLoader {
+        val testClassName =
+          if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
+        loadClass(testClassName)
+      }
     }
   }
 
@@ -147,6 +156,10 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
+      classLoader {
+        loadClass("a.BaseTestRunner")
+        loadClass("b.Test")
+      }
     }
   }
 
@@ -196,6 +209,12 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
+      classLoader {
+        loadClass("junit.runner.BaseTestRunner")
+        loadClass("a.StandardTestSuiteLoader")
+        loadClass("b.Test")
+        loadClass("junit.framework.Assert")
+      }
     }
   }
 
@@ -233,19 +252,11 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
-    }
-
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
-      assertFailure {
-          // Check that the class can be loaded. If the file was not relocated properly, we should
-          // get a NoDefClassFound.
-          // Isolated class loader with only the JVM system jars and the output jar from the test
-          // project.
-          classLoader.loadClass("my.MyTest")
-          fail("Should not reach here.")
-        }
-        .isInstanceOf(AssertionFailedError::class)
+      classLoader {
+        val myTest = loadClass("my.MyTest")
+        val test = loadClass("shadow.junit.Test")
+        test.isAssignableFrom(myTest)
+      }
     }
   }
 
@@ -277,6 +288,9 @@ class RelocationTest : BasePluginTest() {
         "bar/dep.properties",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("bar.Foo")
+      }
     }
   }
 
@@ -657,6 +671,10 @@ class RelocationTest : BasePluginTest() {
         "relocated/foo/Foo.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("my.Main")
+        loadClass("relocated.foo.Foo")
+      }
     }
   }
 
