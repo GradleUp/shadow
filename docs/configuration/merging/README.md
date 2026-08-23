@@ -923,7 +923,6 @@ There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provide
 [`PatternFilterableResourceTransformer`][PatternFilterableResourceTransformer], which extends
 [`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. e.g.
 
-- [`ApacheLicenseResourceTransformer`][ApacheLicenseResourceTransformer]
 - [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
 - [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
 - [`ServiceFileTransformer`][ServiceFileTransformer]
@@ -936,9 +935,9 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
     ```kotlin
     tasks.shadowJar {
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer>() {
-        include("META-INF/LICENSE.*")
-        exclude("META-INF/LICENSE.log")
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
+        include("META-INF/services/com.example.*")
+        exclude("META-INF/services/com.example.Internal")
       }
     }
     ```
@@ -947,9 +946,82 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer) {
-        include 'META-INF/LICENSE.*'
-        exclude 'META-INF/LICENSE.log'
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
+        include 'META-INF/services/com.example.*'
+        exclude 'META-INF/services/com.example.Internal'
+      }
+    }
+    ```
+
+## Merging License Files
+
+When multiple dependencies contain license files (such as `META-INF/LICENSE`), you can merge them into a single
+license file in the output JAR using the [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer].
+You must specify your project's license file using `artifactLicense`:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.MergeLicenseResourceTransformer>() {
+        artifactLicense = file("LICENSE")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.MergeLicenseResourceTransformer) {
+        artifactLicense = file('LICENSE')
+      }
+    }
+    ```
+
+If you instead want to discard all license files from the output JAR, you can simply use [`ShadowJar.exclude`][ShadowJar.exclude]:
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      exclude("META-INF/LICENSE*")
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      exclude 'META-INF/LICENSE*'
+    }
+    ```
+
+## Transforming and Relocating Manifest Attributes
+
+While standard manifest attributes can be configured using Gradle's native `manifest { ... }` block, the
+[`ManifestResourceTransformer`][ManifestResourceTransformer] allows modifying manifest entries while automatically
+relocating class and package names within configured manifest attributes (such as `Export-Package`, `Import-Package`,
+`Provide-Capability`, `Require-Capability`):
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer>() {
+        mainClass = "my.Main"
+        manifestEntries.put("Custom-Attribute", "Custom-Value")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer) {
+        mainClass = 'my.Main'
+        manifestEntries.put('Custom-Attribute', 'Custom-Value')
       }
     }
     ```
@@ -1008,7 +1080,6 @@ You can then run the task to scan each entry on the classpath and print any matc
 [PropertiesFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-properties-file-transformer/index.html
 [PropertiesFileTransformer.MergeStrategy.First]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-properties-file-transformer/-merge-strategy/-first/index.html
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
-[ApacheLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-license-resource-transformer/index.html
 [ApacheNoticeResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-notice-resource-transformer/index.html
 [ProGuardFilesResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pro-guard-files-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
@@ -1023,3 +1094,6 @@ You can then run the task to scan each entry on the classpath and print any matc
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
 [CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
+[MergeLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-merge-license-resource-transformer/index.html
+[ManifestResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-manifest-resource-transformer/index.html
+[ShadowJar.exclude]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html#org.gradle.api.tasks.AbstractCopyTask:exclude(java.lang.Iterable)

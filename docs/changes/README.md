@@ -38,11 +38,16 @@
   Use `TransformerContext` constructor instead. The Builder API will be removed in Shadow 10.
 - Deprecate `ManifestResourceTransformer.attributes(Map)`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))  
   Use `manifestEntries` instead. The method will be removed in Shadow 10.
+- Deprecate `ApacheLicenseResourceTransformer`. ([#2221](https://github.com/GradleUp/shadow/pull/2221))  
+  Use `ShadowJar.exclude` or `MergeLicenseResourceTransformer` instead. The class will be removed in Shadow 10.
+- Deprecate `ManifestAppenderTransformer`. ([#2221](https://github.com/GradleUp/shadow/pull/2221))  
+  Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead. The class will be removed in Shadow 10.
 
 ### Fixed
 
 - Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
 - Avoid overwriting entries that differ only by case on case-insensitive filesystems. ([#2213](https://github.com/GradleUp/shadow/pull/2213))
+- Fix `ManifestAppenderTransformer` clearing attributes on transform. ([#2220](https://github.com/GradleUp/shadow/pull/2220))
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 
