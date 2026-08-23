@@ -84,7 +84,7 @@
     With the introduction of `DuplicatesStrategy` checking for transformers, you may see warnings like:
 
     ```
-    'META-INF/...kotlin_module' is matched by KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
     ```
 
     If you do not need Kotlin module metadata remapping, you can disable it:
