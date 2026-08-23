@@ -37,7 +37,7 @@
 - Deprecate `TransformerContext.Builder`. ([#2184](https://github.com/GradleUp/shadow/pull/2184))  
   Use `TransformerContext` constructor instead. The Builder API will be removed in Shadow 10.
 - Deprecate `ManifestResourceTransformer.attributes(Map)`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))  
-  Calling `manifestEntries` instead. The method will be removed in Shadow 10.
+  Use `manifestEntries` instead. The method will be removed in Shadow 10.
 
 ### Fixed
 
