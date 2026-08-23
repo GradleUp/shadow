@@ -5,15 +5,8 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.util.regex.Pattern
 
-/**
- * Matches Java class names, package wildcards (e.g. `com.foo.**`), single-segment packages, and
- * inner classes (`com.foo.Bar$Inner`).
- */
-internal val classNamePattern: Regex =
-  """(?<![a-zA-Z0-9_$.])([a-zA-Z_$][a-zA-Z0-9_$]*(?:\.[a-zA-Z0-9_$*?]+)*)""".toRegex()
-
 /** https://docs.oracle.com/javase/specs/jvms/se8/html/jvms-4.html */
-private val typeDescriptorPattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+);?")
+private val classPattern: Pattern = Pattern.compile("([\\[()BCDFIJSZ]*)?L([^;]+);?")
 
 internal fun Set<Relocator>.mapName(
   name: String,
@@ -37,7 +30,7 @@ private fun Set<Relocator>.realMap(name: String, mapLiterals: Boolean): String {
   var prefix = ""
   var suffix = ""
 
-  val matcher = typeDescriptorPattern.matcher(newName)
+  val matcher = classPattern.matcher(newName)
   if (matcher.matches()) {
     prefix = matcher.group(1) + "L"
     suffix = ""
