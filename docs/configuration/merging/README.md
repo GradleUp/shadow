@@ -598,7 +598,6 @@ There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provide
 [`PatternFilterableResourceTransformer`][PatternFilterableResourceTransformer], which extends
 [`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. e.g.
 
-- [`ApacheLicenseResourceTransformer`][ApacheLicenseResourceTransformer]
 - [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
 - [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
 - [`ServiceFileTransformer`][ServiceFileTransformer]
@@ -611,9 +610,9 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
     ```kotlin
     tasks.shadowJar {
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer>() {
-        include("META-INF/LICENSE.*")
-        exclude("META-INF/LICENSE.log")
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
+        include("META-INF/services/com.example.*")
+        exclude("META-INF/services/com.example.Internal")
       }
     }
     ```
@@ -622,12 +621,21 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer) {
-        include 'META-INF/LICENSE.*'
-        exclude 'META-INF/LICENSE.log'
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
+        include 'META-INF/services/com.example.*'
+        exclude 'META-INF/services/com.example.Internal'
       }
     }
     ```
+
+## Deprecated Resource Transformers
+
+Some earlier [`ResourceTransformer`][ResourceTransformer]s are deprecated in favor of Gradle's native copy features or more modern transformers:
+
+- [`ApacheLicenseResourceTransformer`][ApacheLicenseResourceTransformer]: Deprecated. Use [`ShadowJar.exclude`][ShadowJar.exclude] (e.g. `exclude("META-INF/LICENSE*")`) to exclude license files, or [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer] to merge license files into the output JAR.
+- [`ManifestAppenderTransformer`][ManifestAppenderTransformer]: Deprecated. Use [`ManifestResourceTransformer`][ManifestResourceTransformer] (which supports class relocation within manifest attributes) or Gradle's native `manifest { attributes(...) }` instead.
+- `DontIncludeResourceTransformer`: Deprecated. Use [`ShadowJar.exclude`][ShadowJar.exclude] instead.
+- `IncludeResourceTransformer`: Deprecated. Use [`ShadowJar.from`][ShadowJar.from] instead.
 
 ## Finding Resources in the Classpath
 
@@ -689,3 +697,7 @@ You can then run the task to scan each entry on the classpath and print any matc
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
 [CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
+[MergeLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-merge-license-resource-transformer/index.html
+[ManifestAppenderTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-manifest-appender-transformer/index.html
+[ManifestResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-manifest-resource-transformer/index.html
+[ShadowJar.exclude]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html#org.gradle.api.tasks.AbstractCopyTask:exclude(java.lang.Iterable)

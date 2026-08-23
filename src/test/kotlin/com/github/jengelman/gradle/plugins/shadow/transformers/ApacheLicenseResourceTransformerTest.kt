@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
  * Modified from
  * [org.apache.maven.plugins.shade.resource.ApacheLicenseResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ApacheLicenseResourceTransformerTest.java).
  */
+@Suppress("DEPRECATION")
 class ApacheLicenseResourceTransformerTest :
   BaseTransformerTest<ApacheLicenseResourceTransformer>() {
 

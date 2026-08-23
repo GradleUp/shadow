@@ -23,6 +23,11 @@ import org.gradle.api.tasks.Input
  *
  * @author Chris Rankin
  */
+@Deprecated(
+  message =
+    "Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead. This will be removed in Shadow 10.",
+  replaceWith = ReplaceWith("transform(ManifestResourceTransformer::class.java)"),
+)
 @CacheableTransformer
 public open class ManifestAppenderTransformer
 @Inject
@@ -72,6 +77,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     attributes.add(name to value)
   }
 
+  @Suppress("DEPRECATION")
   private companion object {
     private val logger = Logging.getLogger(ManifestAppenderTransformer::class.java)
     private val EOL = "\r\n".toByteArray()
