@@ -48,6 +48,12 @@ class MinimizeTest : BasePluginTest() {
         "lib/LibEntity.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("impl.SimpleEntity")
+        loadClass("api.Entity")
+        loadClass("api.UnusedEntity")
+        loadClass("lib.LibEntity")
+      }
     }
   }
 
@@ -85,6 +91,13 @@ class MinimizeTest : BasePluginTest() {
         "lib/UnusedLibEntity.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("impl.SimpleEntity")
+        loadClass("api.Entity")
+        loadClass("api.UnusedEntity")
+        loadClass("lib.LibEntity")
+        loadClass("lib.UnusedLibEntity")
+      }
     }
   }
 
@@ -116,6 +129,10 @@ class MinimizeTest : BasePluginTest() {
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("client/Client.class", "server/Server.class")
       containsNone("junit/framework/Test.class")
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+      }
     }
   }
 
@@ -140,6 +157,10 @@ class MinimizeTest : BasePluginTest() {
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("server/Server.class", *junitEntries)
       containsNone("client/Client.class")
+      classLoader {
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -170,6 +191,11 @@ class MinimizeTest : BasePluginTest() {
         *junitEntries,
         *manifestEntries,
       )
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -204,6 +230,11 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+        loadClass("junit.framework.TestCase")
+      }
     }
 
     path("client/src/main/java/client/Client.java")
@@ -218,6 +249,11 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -269,6 +305,12 @@ class MinimizeTest : BasePluginTest() {
           *junitEntries,
           *manifestEntries,
         )
+      }
+      classLoader {
+        loadClass("server.Server")
+        if (!enable) {
+          loadClass("client.Client")
+        }
       }
     }
   }

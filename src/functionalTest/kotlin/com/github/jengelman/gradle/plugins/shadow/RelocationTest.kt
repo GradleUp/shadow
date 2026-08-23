@@ -288,6 +288,9 @@ class RelocationTest : BasePluginTest() {
         "bar/dep.properties",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("bar.Foo")
+      }
     }
   }
 

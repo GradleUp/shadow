@@ -1,7 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
@@ -110,6 +112,9 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("d.properties", "my/", "my/Passed.class", *manifestEntries)
+      classLoader {
+        loadClass("my.Passed")
+      }
     }
   }
 
@@ -131,6 +136,10 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
+      classLoader {
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -151,6 +160,10 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
+      classLoader {
+        loadClass("server.Server")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -176,6 +189,10 @@ class FilteringTest : BasePluginTest() {
         "server/Server.class",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("client.Client")
+        loadClass("server.Server")
+      }
     }
   }
 
