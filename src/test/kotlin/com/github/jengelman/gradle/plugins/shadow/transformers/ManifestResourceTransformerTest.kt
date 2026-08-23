@@ -134,7 +134,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
     }
 
   @Test
-  fun rewriteRelocateAttributes() =
+  fun rewriteAttributesToRelocate() =
     with(transformer) {
       val source =
         """
@@ -145,7 +145,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
           .crlfEolString
 
       val relocator = SimpleRelocator("javax", "jakarta")
-      relocateAttributes.addAll("description-custom", "attribute-unknown")
+      attributesToRelocate.addAll("description-custom", "attribute-unknown")
 
       transform(textContext(MANIFEST_NAME, source, relocator))
 

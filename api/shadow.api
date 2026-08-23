@@ -455,10 +455,10 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun attributes (Ljava/util/Map;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun getAttributesToRelocate ()Lorg/gradle/api/provider/SetProperty;
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
-	public fun getRelocateAttributes ()Lorg/gradle/api/provider/SetProperty;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V

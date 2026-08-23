@@ -48,9 +48,14 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
    */
   @get:Input public open val manifestEntries: MapProperty<String, Any> = objectFactory.mapProperty()
 
+  /**
+   * The manifest attributes whose values should be relocated using the configured relocators.
+   *
+   * Defaults to [DEFAULT_ATTRIBUTES_TO_RELOCATE].
+   */
   @get:Input
-  public open val relocateAttributes: SetProperty<String> =
-    objectFactory.setProperty(DEFAULT_RELOCATE_ATTRIBUTES)
+  public open val attributesToRelocate: SetProperty<String> =
+    objectFactory.setProperty(DEFAULT_ATTRIBUTES_TO_RELOCATE)
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return MANIFEST_NAME.equals(element.path, ignoreCase = true).also { flag ->
@@ -67,7 +72,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
     try {
       manifest =
         Manifest(context.inputStream).apply {
-          for (attribute in relocateAttributes.get()) {
+          for (attribute in attributesToRelocate.get()) {
             val attributeValue = mainAttributes.getValue(attribute)
             if (attributeValue != null) {
               val newValue = context.relocators.relocateText(attributeValue)
@@ -115,7 +120,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   }
 
   public companion object {
-    private val DEFAULT_RELOCATE_ATTRIBUTES =
+    private val DEFAULT_ATTRIBUTES_TO_RELOCATE =
       setOf("Export-Package", "Import-Package", "Provide-Capability", "Require-Capability")
 
     private val logger = Logging.getLogger(ManifestResourceTransformer::class.java)

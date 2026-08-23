@@ -9,7 +9,7 @@
 - Add `ProGuardFilesResourceTransformer` to merge R8/ProGuard rule files. ([#2196](https://github.com/GradleUp/shadow/pull/2196))
 - Improvements for `ManifestResourceTransformer`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))
   - Support removing manifest attributes using `NULL`.
-  - Support manifest header relocation via configurable `relocateAttributes` property.
+  - Support manifest header relocation via configurable `attributesToRelocate` property.
 
 ### Changed
 
