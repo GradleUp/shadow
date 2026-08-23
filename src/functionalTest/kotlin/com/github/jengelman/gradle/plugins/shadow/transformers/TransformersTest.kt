@@ -2,13 +2,13 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.crlfEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
@@ -236,8 +236,8 @@ class TransformersTest : BaseTransformerTest() {
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock =
           """
-          |projectName = 'my-project'
-          |copyright = 'Copyright 2026 Foo'
+          |addHeader = false
+          |copyright = 'Copyright 2026 Foo\n'
           """
             .trimMargin(),
       )
@@ -246,10 +246,20 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/NOTICE").contains("Notice from A")
-      getContent("META-INF/NOTICE").contains("Notice from B")
-      getContent("META-INF/NOTICE").contains("Copyright 2026 Foo")
-      getContent("META-INF/NOTICE").contains("my-project")
+      getContent("META-INF/NOTICE")
+        .isEqualTo(
+          """
+          |Copyright 2026 Foo
+          |
+          |This product includes software developed at
+          |The Apache Software Foundation (https://www.apache.org/).
+          |
+          |Notice from A
+          |
+          |Notice from B
+          """
+            .trimMargin()
+        )
     }
   }
 
@@ -304,13 +314,25 @@ class TransformersTest : BaseTransformerTest() {
 
     assertThat(outputShadowedJar).useAll {
       getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
-        .contains("<role>relocated.org.example.Driver</role>")
-      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
-        .contains("<implementation>relocated.org.example.DriverImpl</implementation>")
-      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
-        .contains("<role>relocated.org.example.Server</role>")
-      getContent(ComponentsXmlResourceTransformer.COMPONENTS_XML_PATH)
-        .contains("<implementation>relocated.org.example.ServerImpl</implementation>")
+        .isEqualTo(
+          """
+          |<component-set>
+          |  <components>
+          |    <component>
+          |      <role>relocated.org.example.Driver</role>
+          |      <role-hint>default</role-hint>
+          |      <implementation>relocated.org.example.DriverImpl</implementation>
+          |    </component>
+          |    <component>
+          |      <role>relocated.org.example.Server</role>
+          |      <role-hint>default</role-hint>
+          |      <implementation>relocated.org.example.ServerImpl</implementation>
+          |    </component>
+          |  </components>
+          |</component-set>
+          """
+            .trimMargin()
+        )
     }
   }
 
@@ -361,7 +383,18 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/MANIFEST.MF").contains("Name: org/foo/bar/\r\nSealed: true")
+      getContent("META-INF/MANIFEST.MF")
+        .isEqualTo(
+          """
+          |Manifest-Version: 1.0
+          |
+          |Name: org/foo/bar/
+          |Sealed: true
+          |
+          |"""
+            .trimMargin()
+            .crlfEolString
+        )
     }
   }
 
