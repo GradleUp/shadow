@@ -140,7 +140,7 @@ Here are some examples:
       }
       // Step 3. Using `PreserveFirstFoundResourceTransformer`:
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer>() {
-        resources.add("META-INF/foo/**") // Or something else where the first occurrence should be preserved.
+        include("META-INF/foo/**") // Or something else where the first occurrence should be preserved.
       }
     }
 
@@ -181,7 +181,7 @@ Here are some examples:
       }
       // Step 3. Using `PreserveFirstFoundResourceTransformer`:
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer) {
-        resources.add('META-INF/foo/**') // Or something else where the first occurrence should be preserved.
+        include 'META-INF/foo/**' // Or something else where the first occurrence should be preserved.
       }
     }
 
@@ -592,6 +592,331 @@ You can add this transformer using [`transform`][ShadowJar.transform]:
     }
     ```
 
+## Merging Properties Files
+
+Properties files can be merged across dependencies and project resources using
+[`PropertiesFileTransformer`][PropertiesFileTransformer].
+
+By default, the transformer merges all `.properties` files using `MergeStrategy.First`, which keeps the first value
+found for duplicate property keys. You can customize the merge behavior with several strategies:
+
+- `MergeStrategy.First`: Keeps the first occurrence of a property key (default).
+- `MergeStrategy.Latest`: Overwrites previous property values with the latest occurrence.
+- `MergeStrategy.Append`: Combines duplicate property values using `mergeSeparator` (default `,`).
+- `MergeStrategy.Fail`: Fails the build if duplicate keys have conflicting values.
+
+You can also specify specific file paths or regular expressions to match using `paths`, configure per-path merge
+strategies using `mappings`, rewrite property keys using `keyTransformer`, or change file encoding using
+`charsetName` (defaults to `ISO-8859-1`).
+
+=== "Kotlin"
+
+    ```kotlin
+    import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+    import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+
+    tasks.shadowJar {
+      transform<PropertiesFileTransformer> {
+        paths.add("META-INF/test.properties")
+        mergeStrategy = MergeStrategy.Append
+        mergeSeparator = ";"
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
+    import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(PropertiesFileTransformer) {
+        paths.add('META-INF/test.properties')
+        mergeStrategy = MergeStrategy.Append
+        mergeSeparator = ';'
+      }
+    }
+    ```
+
+## Preventing Duplicate License Files
+
+When bundling dependencies, multiple copies of license files (`META-INF/LICENSE`, `META-INF/LICENSE.txt`,
+`META-INF/LICENSE.md`) may be included. The [`ApacheLicenseResourceTransformer`][ApacheLicenseResourceTransformer]
+ensures that only a single license file is retained in the output JAR.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer>()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheLicenseResourceTransformer)
+    }
+    ```
+
+## Merging License Files
+
+[`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer] aggregates the project's license text and
+license files from included dependencies (`META-INF/LICENSE*`, `LICENSE*`) into a single output license file.
+
+You can configure:
+
+- `artifactLicense`: Path to the project's license file (required).
+- `artifactLicenseSpdxId`: An SPDX identifier placed as a header (`SPDX-License-Identifier: <id>`) to avoid
+  ambiguous license detection by scanning tools (defaults to `Apache-2.0`).
+- `outputPath`: The destination path in the final JAR (defaults to `META-INF/LICENSE`).
+- `firstSeparator`: Separator between the project's license and dependency licenses.
+- `separator`: Separator between individual dependency licenses.
+
+=== "Kotlin"
+
+    ```kotlin
+    file("LICENSE").createNewFile()
+
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.MergeLicenseResourceTransformer> {
+        artifactLicense = layout.projectDirectory.file("LICENSE")
+        artifactLicenseSpdxId = "Apache-2.0"
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    file('LICENSE').createNewFile()
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.MergeLicenseResourceTransformer) {
+        artifactLicense = layout.projectDirectory.file('LICENSE')
+        artifactLicenseSpdxId = 'Apache-2.0'
+      }
+    }
+    ```
+
+## Merging Apache NOTICE Files
+
+The [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer] aggregates `META-INF/NOTICE*` files
+(`META-INF/NOTICE`, `META-INF/NOTICE.txt`, `META-INF/NOTICE.md`) into a single `NOTICE` file following Apache NOTICE
+formatting requirements.
+
+You can configure properties such as `projectName`, `copyright`, `organizationName`, `organizationURL`,
+`inceptionYear`, `outputPath` (defaults to `META-INF/NOTICE`), `addHeader`, and `charsetName` (defaults to `UTF-8`).
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer> {
+        projectName = "My Project"
+        organizationName = "My Organization"
+        organizationURL = "https://example.com"
+        inceptionYear = "2024"
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ApacheNoticeResourceTransformer) {
+        projectName = 'My Project'
+        organizationName = 'My Organization'
+        organizationURL = 'https://example.com'
+        inceptionYear = '2024'
+      }
+    }
+    ```
+
+## Merging Plexus Components XML Files
+
+Maven plugins and components using the Plexus IoC container provide component definitions in
+`META-INF/plexus/components.xml`. The [`ComponentsXmlResourceTransformer`][ComponentsXmlResourceTransformer]
+aggregates these component definitions into a single file and relocates the `role` and `implementation` class names
+matching the configured relocators.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer>()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ComponentsXmlResourceTransformer)
+    }
+    ```
+
+## Modifying and Appending Manifest Files
+
+Shadow provides two transformers to customize `META-INF/MANIFEST.MF` entries during the shadowing process:
+
+### Modifying Manifest with `ManifestResourceTransformer`
+
+[`ManifestResourceTransformer`][ManifestResourceTransformer] transforms the first discovered `MANIFEST.MF` (or creates
+a new one). It allows setting `mainClass`, manipulating `manifestEntries`, and automatically relocating class names in
+bundle headers (`Export-Package`, `Import-Package`, `Provide-Capability`, `Require-Capability` by default, configurable
+via `attributesToRelocate`).
+
+To remove a specific attribute from the manifest, map its name to [`ManifestResourceTransformer.NULL`][ManifestResourceTransformer.NULL].
+
+=== "Kotlin"
+
+    ```kotlin
+    import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
+
+    tasks.shadowJar {
+      transform<ManifestResourceTransformer> {
+        mainClass = "com.example.Main"
+        manifestEntries.put("Built-By", "Shadow")
+        manifestEntries.put("Header-To-Remove", ManifestResourceTransformer.NULL)
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(ManifestResourceTransformer) {
+        mainClass = 'com.example.Main'
+        manifestEntries.put('Built-By', 'Shadow')
+        manifestEntries.put('Header-To-Remove', ManifestResourceTransformer.NULL)
+      }
+    }
+    ```
+
+### Appending Manifest Attributes with `ManifestAppenderTransformer`
+
+[`ManifestAppenderTransformer`][ManifestAppenderTransformer] appends arbitrary attributes to the first
+`MANIFEST.MF` in the order they are specified. Duplicate attribute names are preserved, which is useful for
+per-package sealing and other multi-entry manifest attributes.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer> {
+        append("Name", "com/example/")
+        append("Sealed", true)
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ManifestAppenderTransformer) {
+        append('Name', 'com/example/')
+        append('Sealed', true)
+      }
+    }
+    ```
+
+## Merging Kotlin Module Metadata Files
+
+Kotlin libraries contain `.kotlin_module` files in `META-INF/` that describe package parts and multi-file facades.
+When relocating Kotlin classes, the [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer] rewrites
+metadata within these files to match relocated class and package names.
+
+See [Kotlin Module Metadata Remapping](../../kotlin-plugins/README.md#kotlin-module-metadata-remapping) for more details.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer>()
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer)
+    }
+    ```
+
+## Preserving First-Found Resources
+
+[`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] preserves the first resource
+matching the specified patterns and discards any subsequent duplicates found with the same path.
+
+This transformer is useful when `duplicatesStrategy` is set to `INCLUDE` or `WARN`, ensuring that project resources
+take precedence and duplicate dependency resources at the same path are omitted.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer> {
+        include("config.json", "META-INF/foo/**")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer) {
+        include 'config.json', 'META-INF/foo/**'
+      }
+    }
+    ```
+
+## Deduplicating Resources by Content
+
+[`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer] checks all entries in the resulting JAR and
+ensures that files with identical SHA-256 content are included only once.
+
+If multiple files share the same path but have **different** content, the transformer will fail the build with a
+detailed report of the conflicting paths and file hashes.
+
+If certain duplicate resources legitimately have different content (such as Maven `pom.properties` or `pom.xml` files
+from different dependency versions), you can exclude those paths from being checked using `exclude(...)`:
+
+!!! warning "Do Not Combine with PreserveFirstFoundResourceTransformer"
+
+    Do not combine [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] with
+    [`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer], as they handle duplicates differently and
+    combining them leads to redundant or unexpected behavior.
+
+=== "Kotlin"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer> {
+        exclude("META-INF/maven/**/pom.*")
+      }
+    }
+    ```
+
+=== "Groovy"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer) {
+        exclude 'META-INF/maven/**/pom.*'
+      }
+    }
+    ```
+
 ## Configuring Resource Transformer Filtering by Pattern
 
 There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provided by Shadow. Some of them extend
@@ -667,17 +992,26 @@ You can then run the task to scan each entry on the classpath and print any matc
 [Jar.filesMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesMatching(java.lang.Iterable,%20org.gradle.api.Action)
 [Jar.filesNotMatching]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:filesNotMatching(java.lang.Iterable,%20org.gradle.api.Action)
 [AppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-appending-transformer/index.html
+[ComponentsXmlResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-components-xml-resource-transformer/index.html
+[DeduplicatingResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-deduplicating-resource-transformer/index.html
 [DuplicatesStrategy]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/DuplicatesStrategy.html
 [FindResourceInClasspath]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-find-resource-in-classpath/index.html
 [GroovyExtensionModuleTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-groovy-extension-module-transformer/index.html
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
+[KotlinModuleMetadataTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-kotlin-module-metadata-transformer/index.html
 [Log4j2PluginsCacheFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-log4j2-plugins-cache-file-transformer/index.html
+[ManifestAppenderTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-manifest-appender-transformer/index.html
+[ManifestResourceTransformer.NULL]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-manifest-resource-transformer/-companion/-n-u-l-l.html
+[ManifestResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-manifest-resource-transformer/index.html
+[MergeLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-merge-license-resource-transformer/index.html
+[PreserveFirstFoundResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-preserve-first-found-resource-transformer/index.html
+[PropertiesFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-properties-file-transformer/index.html
+[PropertiesFileTransformer.MergeStrategy.First]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-properties-file-transformer/-merge-strategy/-first/index.html
 [ResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [ApacheLicenseResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-license-resource-transformer/index.html
 [ApacheNoticeResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-apache-notice-resource-transformer/index.html
 [ProGuardFilesResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pro-guard-files-resource-transformer/index.html
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
-[PreserveFirstFoundResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-preserve-first-found-resource-transformer/index.html
 [PatternFilterable]: https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.tasks.util/-pattern-filterable/index.html
 [PatternFilterableResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pattern-filterable-resource-transformer/index.html
 [ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html

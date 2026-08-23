@@ -64,7 +64,6 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
           write(EOL)
         }
         write(EOL)
-        attributes.empty()
       }
     }
   }
