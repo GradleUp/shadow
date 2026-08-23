@@ -201,6 +201,48 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
+  fun mergeLicenseResourceTransformer() {
+    path("LICENSE").writeText("Sample Project License")
+    val one = buildJarOne {
+      insert("META-INF/LICENSE", "License from One")
+    }
+    val two = buildJarTwo {
+      insert("META-INF/LICENSE.txt", "License from Two")
+    }
+    projectScript.appendText(
+      transform<MergeLicenseResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = "artifactLicense = file('LICENSE')",
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("META-INF/", "META-INF/LICENSE", *manifestEntries)
+      getContent("META-INF/LICENSE")
+        .isEqualTo(
+          """
+          |SPDX-License-Identifier: Apache-2.0
+          |Sample Project License
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |This artifact includes dependencies with the following licenses:
+          |----------------------------------------------------------------
+          |
+          |License from One
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |License from Two
+          """
+            .trimMargin()
+        )
+    }
+  }
+
+  @Test
   fun apacheNoticeResourceTransformer() {
     val one = buildJarOne {
       insert("META-INF/NOTICE", "Notice from A")
