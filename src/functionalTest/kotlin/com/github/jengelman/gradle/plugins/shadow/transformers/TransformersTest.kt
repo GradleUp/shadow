@@ -65,8 +65,7 @@ class TransformersTest : BaseTransformerTest() {
         transformerBlock =
           """
           |mainClass = 'my.Main'
-          |manifestEntries = ['$TEST_ENTRY_ATTR_KEY': 'PASSED', 'Number-Entry': 123]
-          |attributes '$NEW_ENTRY_ATTR_KEY': 'NEW'
+          |manifestEntries = ['$TEST_ENTRY_ATTR_KEY': 'PASSED', 'Number-Entry': 123, '$NEW_ENTRY_ATTR_KEY': 'NEW']
           """
             .trimMargin()
       )
@@ -149,7 +148,7 @@ class TransformersTest : BaseTransformerTest() {
     projectScript.appendText(
       transform<PreserveFirstFoundResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
-        transformerBlock = "resources = ['foo/bar']",
+        transformerBlock = "include('foo/bar')",
       )
     )
 
