@@ -681,7 +681,7 @@ If you instead want to discard all license files from the output JAR, you can si
 
     ```kotlin
     tasks.shadowJar {
-      exclude("META-INF/LICENSE*")
+      exclude("META-INF/LICENSE*", "LICENSE*")
     }
     ```
 
@@ -689,7 +689,7 @@ If you instead want to discard all license files from the output JAR, you can si
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      exclude 'META-INF/LICENSE*'
+      exclude 'META-INF/LICENSE*', 'LICENSE*'
     }
     ```
 
@@ -844,14 +844,20 @@ take precedence and duplicate dependency resources at the same path are omitted.
 
 ## Deduplicating Resources by Content
 
-[`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer] checks all entries in the resulting JAR and
-ensures that files with identical SHA-256 content are included only once.
+[`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer] checks entries at the same path across all input
+JARs and ensures that duplicate files with identical SHA-256 content are included only once in the output JAR.
 
-If multiple files share the same path but have **different** content, the transformer will fail the build with a
+If multiple files share the **same path** but have **different** content, the transformer will fail the build with a
 detailed report of the conflicting paths and file hashes.
 
-If certain duplicate resources legitimately have different content (such as Maven `pom.properties` or `pom.xml` files
-from different dependency versions), you can exclude those paths from being checked using `exclude(...)`:
+If certain duplicate resources at the same path legitimately have different content (such as Maven `pom.properties` or
+`pom.xml` files from different dependency versions), you can exclude those paths from being checked using `exclude(...)`:
+
+!!! note "Requires DuplicatesStrategy.INCLUDE or WARN"
+
+    Because Gradle's `duplicatesStrategy` defaults to `EXCLUDE` (which drops duplicate entries before they reach
+    Shadow's transformers), you should set `duplicatesStrategy = DuplicatesStrategy.INCLUDE` (or `WARN`) so that
+    all duplicates reach the transformer to be verified and deduplicated.
 
 !!! warning "Do Not Combine with PreserveFirstFoundResourceTransformer"
 
@@ -863,6 +869,7 @@ from different dependency versions), you can exclude those paths from being chec
 
     ```kotlin
     tasks.shadowJar {
+      duplicatesStrategy = DuplicatesStrategy.INCLUDE
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer> {
         exclude("META-INF/maven/**/pom.*")
       }
@@ -873,6 +880,7 @@ from different dependency versions), you can exclude those paths from being chec
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      duplicatesStrategy = DuplicatesStrategy.INCLUDE
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer) {
         exclude 'META-INF/maven/**/pom.*'
       }
@@ -883,12 +891,15 @@ from different dependency versions), you can exclude those paths from being chec
 
 There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provided by Shadow. Some of them extend
 [`PatternFilterableResourceTransformer`][PatternFilterableResourceTransformer], which extends
-[`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. e.g.
+[`PatternFilterable`][PatternFilterable] to provide `include`/`exclude` pattern filtering capabilities. For example:
 
 - [`ApacheNoticeResourceTransformer`][ApacheNoticeResourceTransformer]
+- [`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer]
+- [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer]
+- [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer]
+- [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer]
 - [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
 - [`ServiceFileTransformer`][ServiceFileTransformer]
-- ...
 
 You can use `include`/`exclude` and more methods to configure the patterns for those
 [`ResourceTransformer`][ResourceTransformer]s that support it. For example:
