@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import java.util.jar.JarFile.MANIFEST_NAME
 import org.junit.jupiter.api.Test
 
+@Suppress("DEPRECATION")
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @Test
   fun canTransformResource() =

@@ -12,6 +12,11 @@ import org.gradle.api.tasks.util.PatternSet
  *
  * @author John Engelman
  */
+@Deprecated(
+  message =
+    "Use `ShadowJar.exclude` or `MergeLicenseResourceTransformer` instead. This will be removed in Shadow 10.",
+  replaceWith = ReplaceWith("exclude"),
+)
 @CacheableTransformer
 public open class ApacheLicenseResourceTransformer
 @JvmOverloads

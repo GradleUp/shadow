@@ -87,6 +87,7 @@ sealed interface SnippetExecutable {
         // Dummy JAR file to ensure the project can be built.
         JarOutputStream(projectRoot.resolve("main/$name").outputStream()).use {}
       }
+      projectRoot.resolve("main/LICENSE").writeText("Sample License")
 
       // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
       // CC/IP because transient script classloaders cannot be serialized.

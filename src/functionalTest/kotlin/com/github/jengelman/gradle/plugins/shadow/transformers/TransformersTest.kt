@@ -8,7 +8,6 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
-import com.github.jengelman.gradle.plugins.shadow.testkit.crlfEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
@@ -202,23 +201,44 @@ class TransformersTest : BaseTransformerTest() {
   }
 
   @Test
-  fun apacheLicenseResourceTransformer() {
+  fun mergeLicenseResourceTransformer() {
+    path("LICENSE").writeText("Sample Project License")
     val one = buildJarOne {
-      insert("META-INF/LICENSE", "License 1")
-      insert("foo/bar.txt", "bar")
+      insert("META-INF/LICENSE", "License from One")
     }
     val two = buildJarTwo {
-      insert("META-INF/LICENSE.txt", "License 2")
-      insert("foo/baz.txt", "baz")
+      insert("META-INF/LICENSE.txt", "License from Two")
     }
     projectScript.appendText(
-      transform<ApacheLicenseResourceTransformer>(dependenciesBlock = implementationFiles(one, two))
+      transform<MergeLicenseResourceTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = "artifactLicense = file('LICENSE')",
+      )
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("foo/", "foo/bar.txt", "foo/baz.txt", *manifestEntries)
+      containsOnly("META-INF/", "META-INF/LICENSE", *manifestEntries)
+      getContent("META-INF/LICENSE")
+        .isEqualTo(
+          """
+          |SPDX-License-Identifier: Apache-2.0
+          |Sample Project License
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |This artifact includes dependencies with the following licenses:
+          |----------------------------------------------------------------
+          |
+          |License from One
+          |
+          |------------------------------------------------------------------------------------------------------------------------
+          |
+          |License from Two
+          """
+            .trimMargin()
+        )
     }
   }
 
@@ -361,41 +381,6 @@ class TransformersTest : BaseTransformerTest() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("META-INF/", "META-INF/kotlin-stdlib.shadow.kotlin_module", *manifestEntries)
       getBytes("META-INF/kotlin-stdlib.shadow.kotlin_module").isNotEqualTo(moduleBytes)
-    }
-  }
-
-  @Test
-  fun manifestAppenderTransformer() {
-    val one = buildJarOne {
-      insert("foo/bar.txt", "bar")
-    }
-    projectScript.appendText(
-      transform<ManifestAppenderTransformer>(
-        dependenciesBlock = implementationFiles(one),
-        transformerBlock =
-          """
-          |it.append('Name', 'org/foo/bar/')
-          |it.append('Sealed', 'true')
-          """
-            .trimMargin(),
-      )
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/MANIFEST.MF")
-        .isEqualTo(
-          """
-          |Manifest-Version: 1.0
-          |
-          |Name: org/foo/bar/
-          |Sealed: true
-          |
-          |"""
-            .trimMargin()
-            .crlfEolString
-        )
     }
   }
 
