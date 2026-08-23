@@ -869,12 +869,6 @@ detailed report of the conflicting paths and file hashes.
 If certain duplicate resources at the same path legitimately have different content (such as Maven `pom.properties` or
 `pom.xml` files from different dependency versions), you can exclude those paths from being checked using `exclude(...)`:
 
-!!! note "Requires DuplicatesStrategy.INCLUDE or WARN"
-
-    Because Gradle's `duplicatesStrategy` defaults to `EXCLUDE` (which drops duplicate entries before they reach
-    Shadow's transformers), you should set `duplicatesStrategy = DuplicatesStrategy.INCLUDE` (or `WARN`) so that
-    all duplicates reach the transformer to be verified and deduplicated.
-
 !!! warning "Do Not Combine with PreserveFirstFoundResourceTransformer"
 
     Do not combine [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] with
@@ -885,7 +879,6 @@ If certain duplicate resources at the same path legitimately have different cont
 
     ```kotlin
     tasks.shadowJar {
-      duplicatesStrategy = DuplicatesStrategy.INCLUDE
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer> {
         exclude("META-INF/maven/**/pom.*")
       }
@@ -896,7 +889,6 @@ If certain duplicate resources at the same path legitimately have different cont
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      duplicatesStrategy = DuplicatesStrategy.INCLUDE
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.DeduplicatingResourceTransformer) {
         exclude 'META-INF/maven/**/pom.*'
       }
