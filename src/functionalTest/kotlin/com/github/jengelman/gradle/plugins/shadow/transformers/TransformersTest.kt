@@ -8,6 +8,7 @@ import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.crlfEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
@@ -196,6 +197,41 @@ class TransformersTest : BaseTransformerTest() {
       containsOnly("foo/", "foo/Bar.txt", "foo/bar.txt", *manifestEntries)
       getContent("foo/Bar.txt").isEqualTo("Bar")
       getContent("foo/bar.txt").isEqualTo("bar")
+    }
+  }
+
+  @Test
+  fun manifestAppenderTransformer() {
+    val one = buildJarOne {
+      insert("foo/bar.txt", "bar")
+    }
+    projectScript.appendText(
+      transform<ManifestAppenderTransformer>(
+        dependenciesBlock = implementationFiles(one),
+        transformerBlock =
+          """
+          |it.append('Name', 'org/foo/bar/')
+          |it.append('Sealed', 'true')
+          """
+            .trimMargin(),
+      )
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      getContent("META-INF/MANIFEST.MF")
+        .isEqualTo(
+          """
+          |Manifest-Version: 1.0
+          |
+          |Name: org/foo/bar/
+          |Sealed: true
+          |
+          |"""
+            .trimMargin()
+            .crlfEolString
+        )
     }
   }
 
