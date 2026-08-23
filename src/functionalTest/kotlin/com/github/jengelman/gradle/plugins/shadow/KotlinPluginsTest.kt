@@ -5,9 +5,11 @@ import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -58,6 +60,10 @@ class KotlinPluginsTest : BasePluginTest() {
       } else {
         containsAtLeast(*entries)
       }
+      classLoader {
+        loadClass("my.Main")
+        loadClass("junit.framework.Test")
+      }
     }
   }
 
@@ -105,6 +111,9 @@ class KotlinPluginsTest : BasePluginTest() {
       } else {
         containsAtLeast(*entries)
       }
+      classLoader {
+        loadClass("my.Main")
+      }
     }
   }
 
@@ -141,6 +150,9 @@ class KotlinPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll {
       val entries = arrayOf("my/", mainClassEntry, *entriesInAB, *manifestEntries)
       containsAtLeast(*entries)
+      classLoader {
+        loadClass("my.Main")
+      }
     }
   }
 

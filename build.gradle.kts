@@ -147,20 +147,12 @@ dependencies {
 val docsDir = file("docs")
 
 testing.suites {
-  getByName<JvmTestSuite>("test") {
+  named<JvmTestSuite>("test") {
     dependencies { implementation(libs.xmlunit) }
   }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
-        systemProperty("junit.jupiter.execution.parallel.enabled", "true")
-        systemProperty("junit.jupiter.execution.parallel.mode.default", "concurrent")
-        systemProperty("junit.jupiter.execution.parallel.config.strategy", "fixed")
-        // Each snippet runs a nested Gradle build. Two-way parallelism performed better than
-        // four-way by avoiding excessive CPU, memory, and disk contention.
-        systemProperty("junit.jupiter.execution.parallel.config.fixed.parallelism", "2")
-        systemProperty("junit.jupiter.execution.parallel.config.fixed.max-pool-size", "2")
-
         inputs.files(
           fileTree(docsDir) {
             // Changelog file doesn't contain code snippet to run.
@@ -238,10 +230,10 @@ gradlePlugin {
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
-  val main = getByName("main")
-  getByName("functionalTest") {
+  val main = named("main")
+  named("functionalTest") {
     // Import main and its classpath as dependencies and establish internal visibility.
-    associateWith(main)
+    associateWith(main.get())
   }
 }
 

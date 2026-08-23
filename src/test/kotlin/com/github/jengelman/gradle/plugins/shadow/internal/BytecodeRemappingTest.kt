@@ -11,9 +11,15 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import java.io.File
+import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.relativeTo
+import kotlin.io.path.writeBytes
+import kotlin.io.path.writeText
 import kotlin.reflect.KClass
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
@@ -69,15 +75,9 @@ class BytecodeRemappingTest {
   @Test
   fun asmFailureIsWrappedWithClassPath() {
     val path = "broken/Example.class"
-    val file = tempDir.resolve("broken.class").toFile().apply { writeText("not bytecode") }
-    val details =
-      object : FileCopyDetails by noOpDelegate() {
-        override fun getPath(): String = path
+    val file = tempDir.resolve(path).createParentDirectories().apply { writeText("not bytecode") }
 
-        override fun getFile(): File = file
-      }
-
-    assertFailure { details.remapClass(relocators) }
+    assertFailure { file.toFileCopyDetails().remapClass(relocators) }
       .isInstanceOf<GradleException>()
       .hasMessage("Error in ASM processing class $path")
   }
@@ -233,16 +233,8 @@ class BytecodeRemappingTest {
     writer.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null)
     writer.visitModule("example.module", 0, null).apply { visitMainClass(originalMainClass) }
     writer.visitEnd()
-    val file =
-      tempDir.resolve("module-info.class").toFile().apply { writeBytes(writer.toByteArray()) }
-    val details =
-      object : FileCopyDetails by noOpDelegate() {
-        override fun getPath(): String = file.name
-
-        override fun getFile(): File = file
-      }
-
-    val result = details.remapClass(relocators)
+    val file = tempDir.resolve("module-info.class").apply { writeBytes(writer.toByteArray()) }
+    val result = file.toFileCopyDetails().remapClass(relocators)
     var remappedMainClass: String? = null
     ClassReader(result)
       .accept(
@@ -281,20 +273,24 @@ class BytecodeRemappingTest {
     assertThat(method.invokeOwners).contains(relocatedFixtureBase)
   }
 
-  private fun KClass<*>.toFileCopyDetails() =
+  private fun Path.toFileCopyDetails() =
     object : FileCopyDetails by noOpDelegate() {
-      private val _path = "${java.name.replace('.', '/')}.class"
-      private val _file =
-        tempDir
-          .resolve(_path)
-          .createParentDirectories()
-          .also { requireResourceAsPath(_path).copyTo(it) }
-          .toFile()
 
-      override fun getPath(): String = _path
+      override fun getPath(): String = relativeTo(tempDir).invariantSeparatorsPathString
 
-      override fun getFile(): File = _file
+      override fun getFile(): File = toFile()
+
+      override fun open(): InputStream = this@toFileCopyDetails.inputStream()
     }
+
+  private fun KClass<*>.toFileCopyDetails(): FileCopyDetails {
+    val path = "${java.name.replace('.', '/')}.class"
+    val file =
+      tempDir.resolve(path).createParentDirectories().also {
+        requireResourceAsPath(path).copyTo(it)
+      }
+    return file.toFileCopyDetails()
+  }
 
   // ---------------------------------------------------------------------------
   // Fixture classes – declared as nested classes so their bytecode is compiled

@@ -6,6 +6,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.cast
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
@@ -204,7 +205,7 @@ internal constructor(
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.file.inputStream().use { inputStream ->
+      fileDetails.inputStream().use { inputStream ->
         transformer.transform(
           TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
         )

@@ -26,10 +26,6 @@
   - `XmlAppendingTransformer`
 - Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
 
-### Fixed
-
-- Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
-
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  
@@ -42,6 +38,11 @@
   Use `TransformerContext` constructor instead. The Builder API will be removed in Shadow 10.
 - Deprecate `ManifestResourceTransformer.attributes(Map)`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))  
   Calling `manifestEntries` instead. The method will be removed in Shadow 10.
+
+### Fixed
+
+- Fix `ManifestResourceTransformer.manifestEntries` value type to `Any` and support CC. ([#2198](https://github.com/GradleUp/shadow/pull/2198))
+- Avoid overwriting entries that differ only by case on case-insensitive filesystems. ([#2213](https://github.com/GradleUp/shadow/pull/2213))
 
 ## [9.6.1](https://github.com/GradleUp/shadow/releases/tag/9.6.1) - 2026-07-22
 

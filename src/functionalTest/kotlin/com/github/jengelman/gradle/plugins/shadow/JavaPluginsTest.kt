@@ -20,6 +20,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
@@ -1270,6 +1271,45 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(path("gradle.lockfile").toFile().readText()).all {
       contains("junit:junit:3.8.2")
       doesNotContain("com.android.tools:r8")
+    }
+  }
+
+  @Test
+  fun handleCaseSensitiveEntriesAcrossMultipleJars() {
+    val one =
+      buildJar("one.jar") {
+        insert("foo.txt", "lower")
+        insert("Bar.class", createEmptyClassBytes("Bar"))
+      }
+    val two =
+      buildJar("two.jar") {
+        insert("Foo.txt", "upper")
+        insert("bar.class", createEmptyClassBytes("bar"))
+      }
+
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "foo.txt",
+        "Foo.txt",
+        "bar.class",
+        "Bar.class",
+        *manifestEntries,
+      )
+      getBytes("Bar.class").isEqualTo(createEmptyClassBytes("Bar"))
+      getBytes("bar.class").isEqualTo(createEmptyClassBytes("bar"))
+      getContent("foo.txt").isEqualTo("lower")
+      getContent("Foo.txt").isEqualTo("upper")
     }
   }
 
