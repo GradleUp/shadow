@@ -139,7 +139,7 @@ Here are some examples:
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       }
       // Step 3. Using `PreserveFirstFoundResourceTransformer`:
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer>() {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.PreserveFirstFoundResourceTransformer> {
         include("META-INF/foo/**") // Or something else where the first occurrence should be preserved.
       }
     }
@@ -273,7 +273,7 @@ can also be provided.
 
     tasks.shadowJar {
       // Initialize with default constructor and configure with closure.
-      transform<MyTransformer>() {
+      transform<MyTransformer> {
         enabled = true
       }
 
@@ -374,7 +374,7 @@ This directory can be overridden to merge descriptor files in a different locati
       }
 
       // Full syntax.
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
         path = "META-INF/custom"
       }
     }
@@ -411,7 +411,7 @@ from merging.
       }
 
       // Full syntax.
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
         exclude("META-INF/services/com.acme.*")
       }
     }
@@ -518,7 +518,7 @@ this transformer.
       // short syntax
       append("resources/application.yml", "\n---\n")
       // full syntax
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer>() {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer> {
         resource = "resources/custom-config/application.yml"
         separator = "\n---\n"
       }
@@ -550,7 +550,7 @@ It must be added using the [`transform`][ShadowJar.transform] methods.
 
     ```kotlin
     tasks.shadowJar {
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer>() {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.XmlAppendingTransformer> {
         resource = "properties.xml"
       }
     }
@@ -770,6 +770,7 @@ To remove a specific attribute from the manifest, map its name to [`ManifestReso
         mainClass = "com.example.Main"
         manifestEntries.put("Built-By", "Shadow")
         manifestEntries.put("Header-To-Remove", ManifestResourceTransformer.NULL)
+        attributesToRelocate.add("Custom-Package-Header")
       }
     }
     ```
@@ -784,6 +785,7 @@ To remove a specific attribute from the manifest, map its name to [`ManifestReso
         mainClass = 'com.example.Main'
         manifestEntries.put('Built-By', 'Shadow')
         manifestEntries.put('Header-To-Remove', ManifestResourceTransformer.NULL)
+        attributesToRelocate.add('Custom-Package-Header')
       }
     }
     ```
@@ -895,7 +897,7 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
 
     ```kotlin
     tasks.shadowJar {
-      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>() {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
         include("META-INF/services/com.example.*")
         exclude("META-INF/services/com.example.Internal")
       }
