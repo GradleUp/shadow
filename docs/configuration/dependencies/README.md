@@ -22,17 +22,18 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
     ```
 
 The above code sample would configure the [`ShadowJar`][ShadowJar] task to merge dependencies from only the
-`compileClasspath` configuration.
-This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
+`compileClasspath` configuration. This means any dependency declared in the `runtimeOnly` configuration would be **not**
+be included in the final JAR.
 
 !!! warning "Required Configuration"
 
     Note the literal use of [`project.configurations`][Project.configurations] when setting the
     [`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
 
-    This is **required**. It may be tempting to specify `configurations = [configurations.compileClasspath]` but this will
-    not have the intended effect, as `configurations.compile` will try to delegate to the
-    [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`.
+    This is **required**. It may be tempting to specify `configurations = [configurations.compileClasspath]` but
+    this will not have the intended effect, as `configurations.compile` will try to delegate to the
+    [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the
+    `project`.
 
 ## Embedding Local Jar Files into Your Shadowed JAR
 
@@ -169,8 +170,8 @@ configuration.
 
 ### Excluding Non-JAR Transitive Dependencies
 
-If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need
-in your shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
+If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need in your
+shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
 
 === "Kotlin"
 
@@ -201,8 +202,8 @@ in your shadowed JAR, you can exclude it using the `dependencies` block instead 
 ## Filtering Dependencies
 
 Individual dependencies can be filtered from the final JAR by using the `dependencies` block of a
-[`ShadowJar`][ShadowJar] task. Dependency filtering does **not** apply to transitive dependencies.
-That is, excluding a dependency does not exclude any of its dependencies from the final JAR.
+[`ShadowJar`][ShadowJar] task. Dependency filtering does **not** apply to transitive dependencies. That is, excluding a
+dependency does not exclude any of its dependencies from the final JAR.
 
 The `dependency` blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle's [`project.configurations`][Project.configurations] block.
@@ -271,9 +272,8 @@ Gradle's [`project.configurations`][Project.configurations] block.
 
 ### Using Regex Patterns to Filter Dependencies
 
-Dependencies can be filtered using regex patterns.
-Coupled with the `<group>:<artifact>:<version>` notation for dependencies, this allows for excluding/including
-using any of these individual fields.
+Dependencies can be filtered using regex patterns. Coupled with the `<group>:<artifact>:<version>` notation for
+dependencies, this allows for excluding/including using any of these individual fields.
 
 === "Kotlin"
 
@@ -477,7 +477,6 @@ block provides a method that accepts a `Closure` for selecting dependencies.
       }
     }
     ```
-
 
 
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)

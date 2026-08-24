@@ -111,11 +111,9 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin
     documentation [here][gradle-plugin-portal].
 
-Shadow is a reactive plugin.
-This means that applying Shadow by itself will perform no configuration on your project.
+Shadow is a reactive plugin. This means that applying Shadow by itself will perform no configuration on your project.
 Instead, Shadow _reacts_
-This means, that for most users, the `java` or `groovy` plugins must be _explicitly_ applied
-to have the desired effect.
+This means, that for most users, the `java` or `groovy` plugins must be _explicitly_ applied to have the desired effect.
 
 ## Default Java/Kotlin/Groovy Tasks
 
@@ -145,8 +143,8 @@ in their build logic), Shadow will automatically configure the following behavio
 
 ## ShadowJar Command Line options
 
-Sometimes, a user wants to declare the value of an exposed task property on the command line instead of the
-build script. Passing property values on the command line is particularly helpful if they change more frequently.  
+Sometimes, a user wants to declare the value of an exposed task property on the command line instead of the build
+script. Passing property values on the command line is particularly helpful if they change more frequently.  
 Here are the options that can be passed to the `shadowJar`:
 
 ```
@@ -172,7 +170,6 @@ Also, you can view more information about the [`ShadowJar`][ShadowJar] task by r
 ```
 
 Refer to [listing command line options][listing-command-line-options].
-
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
