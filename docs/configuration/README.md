@@ -35,7 +35,7 @@ flowchart TD
     end
 
     subgraph CopySpecProcessing["3. Gradle Copy Engine & Duplicate Handling"]
-        PreStream["createCopyAction()<br/>• findUnusedClasses()<br/>• createZipOutputStream()"]
+        PreStream["createCopyAction()<br/>• findUnusedClasses() if DEPENDENCY_ANALYZER enabled<br/>• createZipOutputStream()"]
         B6 --> PreStream
         ExecuteStream["ShadowCopyAction.execute()<br/>• zipOutStream.use { ... }<br/>• stream.process entries"]
         PreStream --> ExecuteStream
@@ -46,8 +46,10 @@ flowchart TD
         EntryLoop -->|"Yes"| C1{"Included by Patterns?<br/>(include / exclude)"}
         EntryLoop -->|"No"| F1
         C1 -->|"No"| EntryLoop
-        C1 -->|"Yes"| C2{"Path Already Seen?"}
-        C2 -->|"No"| D1{"Entry Type?"}
+        C1 -->|"Yes"| CDir{"Directory?"}
+        CDir -->|"Yes"| D8
+        CDir -->|"No"| C2{"Path Already Seen?"}
+        C2 -->|"No"| D1{"File Type?"}
         C2 -->|"Yes"| CStrategy{"Effective<br/>duplicatesStrategy?"}
         CStrategy -->|"EXCLUDE (default)"| EntryLoop
         CStrategy -->|"INCLUDE"| D1
@@ -75,7 +77,7 @@ flowchart TD
 
         D1 -->|"*.class"| D2
         D1 -->|"Resource"| E1
-        D1 -->|"Directory"| D8["Record in visitedDirs<br/>(timestamp & permissions)"]
+        D8["Record in visitedDirs<br/>(timestamp & permissions)"]
 
         D3 & D5 & D7 & E3 & E4 & D8 --> EntryLoop
     end
