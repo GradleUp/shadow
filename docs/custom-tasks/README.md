@@ -85,6 +85,7 @@ The above configuration will create a shadow JAR file that contains only the cla
 configuration. The standard `jar` task will still produce a JAR with only the project's sources.
 
 
+
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar.configurations]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

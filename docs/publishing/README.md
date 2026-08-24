@@ -344,9 +344,8 @@ Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
 The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
 Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
 automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the
-plugin. See the
-[Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
-for details. The only thing you need to do from the Shadow side is to empty the `archiveClassifier` like:
+plugin. See the [Gradle Plugin Publish docs][gradle-plugin-publish-docs] for details.
+The only thing you need to do from the Shadow side is to empty the `archiveClassifier` like:
 
 === "Kotlin"
 
@@ -454,7 +453,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
 ## Publishing the Shadowed JAR with Custom Artifact Name
 
 It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
-customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
+customizable properties listed in [Configuring Output Name][configuring-output-name]. e.g.
 
 === "Kotlin"
 
@@ -529,3 +528,5 @@ be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
+[gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
+[configuring-output-name]: ../configuration/README.md#configuring-output-name

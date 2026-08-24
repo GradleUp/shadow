@@ -13,16 +13,22 @@ It functioned, but it wasn't idiomatic Gradle by any means.
 
 Starting with 0.9, Shadow was rewritten from the ground up as standard Gradle plugin and leveraged as much of Gradle's
 classes and concepts as possible.
-At the same time as the 0.9 release, Gradle was announcing the [Gradle Plugin Portal](https://plugins.gradle.org) and
+At the same time as the 0.9 release, Gradle was announcing the [Gradle Plugin Portal][gradle-plugin-portal] and
 so Shadow was published there.
 
 ## Maintainers
 
-* [John Engelman](https://github.com/johnrengelman)
-* [Zongle Wang](https://github.com/Goooler)
+* [John Engelman][john-engelman]
+* [Zongle Wang][zongle-wang]
 
 ## Contributors
 
 <a href="https://github.com/GradleUp/shadow/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=GradleUp/shadow"  alt="Contributors"/>
 </a>
+
+
+
+[gradle-plugin-portal]: https://plugins.gradle.org
+[john-engelman]: https://github.com/johnrengelman
+[zongle-wang]: https://github.com/Goooler

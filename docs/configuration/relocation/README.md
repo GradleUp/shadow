@@ -45,8 +45,7 @@ In the resulting JAR, the class file is relocated from `junit/framework/TestCase
 ## Filtering Relocation
 
 Specific classes or files can be `included`/`excluded` from the relocation operation if necessary. Use
-[Ant Path Matcher](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html)
-syntax to specify matching path for your files and directories.
+[Ant Path Matcher][ant-path-matcher] syntax to specify matching path for your files and directories.
 
 === "Kotlin"
 
@@ -74,7 +73,7 @@ syntax to specify matching path for your files and directories.
     }
     ```
 
-For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the
+For a more advanced path matching you might want to use [Regular Expressions][regular-expressions] instead. Wrap the
 expression in `%regex[]` before passing it to `include`/`exclude`.
 
 === "Kotlin"
@@ -249,8 +248,8 @@ relocating), you can try out the trick like:
     }
     ```
 
-This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See
-[Configuring Shadowed Dependencies](../dependencies/README.md) for more information about `configurations`.
+This is useful in some cases like [#759] mentioned. See
+[Configuring Shadowed Dependencies][configuring-shadowed-dependencies] for more information about `configurations`.
 
 ## Relocating with R8
 
@@ -326,6 +325,7 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 
 
 [#1622]: https://github.com/GradleUp/shadow/issues/1622
+[#759]: https://github.com/GradleUp/shadow/issues/759
 [kotlin-metadata]: https://kotlinlang.org/docs/metadata-jvm.html
 [kotlin-reflection]: https://kotlinlang.org/docs/reflection.html
 [r8-minimizing]: ../minimizing/README.md#minimizing-with-r8
@@ -333,3 +333,6 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 [repackageclasses]: https://www.guardsquare.com/manual/configuration/usage#repackageclasses
 [allowaccessmodification]: https://www.guardsquare.com/manual/configuration/usage#allowaccessmodification
 [keeppackagenames]: https://www.guardsquare.com/manual/configuration/usage#keeppackagenames
+[ant-path-matcher]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html
+[regular-expressions]: https://regexr.com/
+[configuring-shadowed-dependencies]: ../dependencies/README.md

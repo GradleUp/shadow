@@ -27,8 +27,7 @@ to make sure compilations success and avoid shadowing as follows:
     }
     ```
 
-See more information about
-[Dependency on the standard library](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library).
+See more information about [Dependency on the standard library][dependency-on-the-standard-library].
 
 ## For Kotlin JVM Plugin
 
@@ -61,8 +60,8 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     ```
 
 You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins,
-easily organize your build logic for [Publishing Libraries](../publishing/README.md),
-[Running Applications](../application-plugin/README.md), and so on.
+easily organize your build logic for [Publishing Libraries][publishing-libraries],
+[Running Applications][running-applications], and so on.
 
 ## For Kotlin Multiplatform Plugin
 
@@ -165,5 +164,10 @@ To explicitly apply this remapping (recommended for future compatibility), add
     }
     ```
 
+
+
 [org.jetbrains.kotlin.multiplatform]: https://kotlinlang.org/docs/multiplatform-intro.html
 [KotlinModuleMetadataTransformer]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-kotlin-module-metadata-transformer/index.html
+[dependency-on-the-standard-library]: https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library
+[publishing-libraries]: ../publishing/README.md
+[running-applications]: ../application-plugin/README.md
