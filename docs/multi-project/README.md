@@ -1,15 +1,13 @@
 # Using Shadow in Multi-Project Builds
 
-When using Shadow in a multi-project build, project dependencies will be treated the same as
-external dependencies.
-That is a project dependency will be merged into the [`ShadowJar`][ShadowJar] output of the project that
-is applying the Shadow plugin.
+When using Shadow in a multi-project build, project dependencies will be treated the same as external dependencies. That
+is a project dependency will be merged into the [`ShadowJar`][ShadowJar] output of the project that is applying the
+Shadow plugin.
 
 ## Depending on the Shadow Jar from Another Project
 
-In a multi-project build there may be one project that applies Shadow and another that
-requires the shadowed JAR as a dependency.
-In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
+In a multi-project build there may be one project that applies Shadow and another that requires the shadowed JAR as a
+dependency. In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
 configuration of the shadowed project.
 
 === "Kotlin"
@@ -88,7 +86,8 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
 
 !!! important
 
-    Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during compilation.
+    Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during
+    compilation.
 
 **Consuming projects can then depend on `:api` without specifying the `shadow` configuration:**
 
@@ -150,7 +149,6 @@ configurations as well:
       }
     }
     ```
-
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html

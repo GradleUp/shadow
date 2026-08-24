@@ -1,4 +1,4 @@
-# pip install mkdocs mkdocs-material
+# pip install mkdocs-material mdx_truly_sane_lists
 # mkdocs serve
 # mkdocs gh-deploy
 
@@ -63,6 +63,9 @@ markdown_extensions:
   - admonition
   - attr_list
   - md_in_html
+  - mdx_truly_sane_lists:
+      nested_indent: 2
+      truly_sane: true
 
 nav:
   - 'Introduction': README.md

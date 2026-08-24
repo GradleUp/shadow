@@ -60,7 +60,7 @@ Shadow uses [Android Lint](https://developer.android.com/studio/write/lint) to c
 Shadow's user guide is built using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/). You can build and
 preview the documentation website locally:
 
-- **Install MkDocs dependencies**: `pip install mkdocs mkdocs-material`
+- **Install MkDocs dependencies**: `pip install mkdocs-material mdx_truly_sane_lists`
 - **Preview documentation locally**: `mkdocs serve` (then navigate to `http://127.0.0.1:8000/`)
 - **Build the static site**: `mkdocs build`
 

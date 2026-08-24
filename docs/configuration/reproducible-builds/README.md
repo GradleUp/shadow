@@ -59,6 +59,5 @@ within the JAR, then this may not be the correct choice for you.
 See the [Reproducible archives section in Gradle's documentation][reproducible-archives-section] for more information.
 
 
-
 [reproducible-builds.org]: https://reproducible-builds.org/
 [reproducible-archives-section]: https://docs.gradle.org/4.9/userguide/working_with_files.html#sec:reproducible_archives

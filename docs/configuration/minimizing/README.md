@@ -19,10 +19,10 @@ minimizing the resulting shadowed JAR.
     }
     ```
 
-A dependency can be excluded from the minimization process, thereby forcing its inclusion the shadow JAR.
-This is useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class
-is loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of
-a `dependency` is interpreted as a regular expression.
+A dependency can be excluded from the minimization process, thereby forcing its inclusion the shadow JAR. This is useful
+when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is loaded
+dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
+`dependency` is interpreted as a regular expression.
 
 === "Kotlin"
 
@@ -78,12 +78,12 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 
 ## Minimizing with R8
 
-Shadow can also run [R8][R8] over the final shadowed JAR. This is useful when you want
-whole-program shrinking instead of the default dependency analyzer. R8 runs after Shadow has merged, transformed, and
-relocated the JAR, so service descriptors in `META-INF/services` are used to keep service providers.
+Shadow can also run [R8][R8] over the final shadowed JAR. This is useful when you want whole-program shrinking instead
+of the default dependency analyzer. R8 runs after Shadow has merged, transformed, and relocated the JAR, so service
+descriptors in `META-INF/services` are used to keep service providers.
 
-The default R8 configuration only shrinks unused code. It disables name minification and optimization.
-R8 also applies rules published in dependency JARs, for example under `META-INF/proguard`.
+The default R8 configuration only shrinks unused code. It disables name minification and optimization. R8 also applies
+rules published in dependency JARs, for example under `META-INF/proguard`.
 
 === "Kotlin"
 
@@ -180,14 +180,12 @@ Add them as `proguardRules` when you want to retain name mappings, matched keep 
 
 Relative report paths are resolved from the directory containing `configurationFile`. The example above writes the
 reports under `build/r8/reports`. Use absolute paths if the reports must be written independently of the configuration
-file location. This behavior follows
-[R8's configuration parser][ProguardConfigurationParser].
-`-printmapping` only contains renamed items, so call `enableObfuscation()` when you need a useful mapping.
+file location. This behavior follows [R8's configuration parser][ProguardConfigurationParser]. `-printmapping` only
+contains renamed items, so call `enableObfuscation()` when you need a useful mapping.
 
 These reporting options belong in the build's R8 configuration, not in rules published inside a dependency JAR.
-Android's
-[library optimization guidance][library-optimization-guidance]
-lists them among the global options that library authors should not publish as consumer keep rules.
+Android's [library optimization guidance][library-optimization-guidance] lists them among the global options that
+library authors should not publish as consumer keep rules.
 
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
 published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:
@@ -208,9 +206,9 @@ published by Google Maven rather than Maven Central. Add `google()` to your repo
     }
     ```
 
-Advanced R8 command line arguments can be added with `args`. Replacing the default `args` value removes Shadow's
-default command line arguments, so prefer the helper functions for common obfuscation and optimization toggles. These
-helpers are independent and can be used together.
+Advanced R8 command line arguments can be added with `args`. Replacing the default `args` value removes Shadow's default
+command line arguments, so prefer the helper functions for common obfuscation and optimization toggles. These helpers
+are independent and can be used together.
 
 For example, to downgrade R8 warnings to info:
 
@@ -349,7 +347,6 @@ To enable both:
       }
     }
     ```
-
 
 
 [-printmapping]: https://www.guardsquare.com/manual/configuration/usage#printmapping

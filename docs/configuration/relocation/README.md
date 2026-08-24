@@ -1,15 +1,14 @@
 # Relocating Packages
 
-Shadow is capable of scanning a project's classes and relocating specific dependencies to a new location.
-This is often required when one of the dependencies is susceptible to breaking changes in versions or
-to classpath pollution in a downstream project.
+Shadow is capable of scanning a project's classes and relocating specific dependencies to a new location. This is often
+required when one of the dependencies is susceptible to breaking changes in versions or to classpath pollution in a
+downstream project.
 
 !!! tip
 
     Google's Guava and the ASM library are typical cases where package relocation can come in handy.
 
-Shadow uses the ASM library to modify class byte code to replace the package name and any import
-statements for a class.
+Shadow uses the ASM library to modify class byte code to replace the package name and any import statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
 
 === "Kotlin"
@@ -28,10 +27,9 @@ Any non-class files that are stored within a package structure are also relocate
     }
     ```
 
-The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`.
-For example, the class `junit.framework.TestCase` becomes `shadow.junit.TestCase`.
-In the resulting JAR, the class file is relocated from `junit/framework/TestCase.class` to
-`shadow/junit/TestCase.class`.
+The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`. For example, the
+class `junit.framework.TestCase` becomes `shadow.junit.TestCase`. In the resulting JAR, the class file is relocated from
+`junit/framework/TestCase.class` to `shadow/junit/TestCase.class`.
 
 !!! warning "Scope of Relocation"
 
@@ -210,12 +208,12 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
 
 !!! warning "Performance & Transitive Dependencies"
 
-    Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
-    in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
+    Configuring package auto relocation can add significant time to the shadow process as it will process all
+    dependencies in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath`
+    configurations.
 
-    Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these
-    dependencies if you do not intend to shadow them into your library.
-
+    Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove
+    these dependencies if you do not intend to shadow them into your library.
 
 ## Relocating Kotlin Standard Library
 
@@ -253,11 +251,11 @@ This is useful in some cases, as mentioned in [#759]. See
 
 ## Relocating with R8
 
-As an alternative to Shadow's built-in `relocate` configuration (which uses ASM to rename package prefixes during
-JAR merging), you can use [R8][r8-minimizing] to handle package relocation (also referred to as *repackaging*).
+As an alternative to Shadow's built-in `relocate` configuration (which uses ASM to rename package prefixes during JAR
+merging), you can use [R8][r8-minimizing] to handle package relocation (also referred to as *repackaging*).
 
-R8 performs whole-program analysis during its minimization pass to safely relocate classes while respecting Java
-access visibility constraints (such as package-private and `protected` members). For more details on R8 rules, see
+R8 performs whole-program analysis during its minimization pass to safely relocate classes while respecting Java access
+visibility constraints (such as package-private and `protected` members). For more details on R8 rules, see
 the [Global options for additional optimization][android-r8-global-options] and ProGuard manual for
 [-repackageclasses][repackageclasses], [-allowaccessmodification][allowaccessmodification]
 and [-keeppackagenames][keeppackagenames].
@@ -321,7 +319,6 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 | **Relocation Scope**        | Explicit per-prefix or per-class pattern matching | Whole-program automatic relocation                  |
 | **Visibility Handling**     | Direct string/type renaming (no visibility check) | Analyzes package-private & protected constraints    |
 | **Shrinking / Obfuscation** | Relocation only                                   | Combined with shrinking (optional name obfuscation) |
-
 
 
 [#1622]: https://github.com/GradleUp/shadow/issues/1622

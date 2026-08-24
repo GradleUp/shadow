@@ -89,12 +89,12 @@
     With the introduction of `DuplicatesStrategy` checking for transformers, you may see warnings like:
 
     ```
-'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+    'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
     ```
 
     If you do not need Kotlin module metadata remapping, you can disable it:
 
-    ```kt
+    ```
     tasks.shadowJar {
       @Suppress("DEPRECATION") // This flag will be disabled and removed in the next major version of Shadow.
       enableKotlinModuleRemapping = false
@@ -354,10 +354,10 @@
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
 - Default `duplicatesStrategy` back to `EXCLUDE`. ([#1617](https://github.com/GradleUp/shadow/pull/1617))
-    - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
-    - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
-    - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
-    - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+  - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
+  - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
+  - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
+  - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ### Fixed
 
@@ -419,9 +419,9 @@
 - Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
   This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
-    - It only checks the entries in the shadowed jar, not the input files.
-    - It works with setting `duplicatesStrategy` to any value.
-    - It provides a stricter fallback check before the JAR is created.
+  - It only checks the entries in the shadowed jar, not the input files.
+  - It works with setting `duplicatesStrategy` to any value.
+  - It provides a stricter fallback check before the JAR is created.
 
 ### Changed
 
@@ -438,30 +438,30 @@
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
-    - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
-    - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
-    - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate resources to be merged.
-    - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
-    - Use `filesMatching` to override the default strategy for specific files.
-    - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
-    - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
-    - **Note:** The default `duplicatesStrategy` is changed back to `EXCLUDE` in 9.0.1 release.
+  - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
+  - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
+  - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate resources to be merged.
+  - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
+  - Use `filesMatching` to override the default strategy for specific files.
+  - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
+  - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+  - **Note:** The default `duplicatesStrategy` is changed back to `EXCLUDE` in 9.0.1 release.
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
   issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
   the files, only copy the files as-is. If you still want to shadow the unzipped files, try out something like:
   ```kotlin
-    tasks.shadowJar {
-      // Unzip the files before pass them to `from` by using `zipTree`.
-      from(zipTree(files('path/to/your/file.zip')))
-    }
+  tasks.shadowJar {
+    // Unzip the files before pass them to `from` by using `zipTree`.
+    from(zipTree(files("path/to/your/file.zip")))
+  }
   ```
   or
-  ```kotlin
-    dependencies {
-      // Add the files to `implementation` configuration, Shadow will unzip them automatically.
-      implementation(files('path/to/your/file.zip'))
-    }
+  ```groovy
+  dependencies {
+    // Add the files to `implementation` configuration, Shadow will unzip them automatically.
+    implementation(files('path/to/your/file.zip'))
+  }
   ```
 - **BREAKING CHANGE:** Rename `Transformer` to `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
   Aims to better align with the name `org.apache.maven.plugins.shade.resource.ResourceTransformer.java`
@@ -706,29 +706,19 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ### What's Changed
 
-* Replace deprecated ConfigureUtil by [@Goooler](https://github.com/Goooler)
-  in [#826](https://github.com/GradleUp/shadow/pull/826)
-* Polish outdated configs by [@Goooler](https://github.com/Goooler)
-  in [#831](https://github.com/GradleUp/shadow/pull/831)
-* Update plugin com.gradle.enterprise to v3.12.5 by [@renovate](https://github.com/renovate-bot)
-  in [#838](https://github.com/GradleUp/shadow/pull/838)
-* Update dependency gradle to v8.0.2 by [@renovate](https://github.com/renovate-bot)
-  in [#844](https://github.com/GradleUp/shadow/pull/844)
-* fix(deps): update dependency org.codehaus.plexus:plexus-utils to v3.5.1
-  by [@renovate](https://github.com/renovate-bot) in [#837](https://github.com/GradleUp/shadow/pull/837)
-* chore(deps): update dependency prismjs to v1.27.0 [security] by [@renovate](https://github.com/renovate-bot)
-  in [#828](https://github.com/GradleUp/shadow/pull/828)
-* Encode transformed properties files with specified Charset by [@scottsteen](https://github.com/scottsteen)
-  in [#819](https://github.com/GradleUp/shadow/pull/819)
-* chore(deps): update dependency vuepress to v1.9.9 by [@renovate](https://github.com/renovate-bot)
-  in [#842](https://github.com/GradleUp/shadow/pull/842)
+- Replace deprecated ConfigureUtil by [@Goooler](https://github.com/Goooler) in [#826](https://github.com/GradleUp/shadow/pull/826)
+- Polish outdated configs by [@Goooler](https://github.com/Goooler) in [#831](https://github.com/GradleUp/shadow/pull/831)
+- Update plugin com.gradle.enterprise to v3.12.5 by [@renovate](https://github.com/renovate-bot) in [#838](https://github.com/GradleUp/shadow/pull/838)
+- Update dependency gradle to v8.0.2 by [@renovate](https://github.com/renovate-bot) in [#844](https://github.com/GradleUp/shadow/pull/844)
+- fix(deps): update dependency org.codehaus.plexus:plexus-utils to v3.5.1 by [@renovate](https://github.com/renovate-bot) in [#837](https://github.com/GradleUp/shadow/pull/837)
+- chore(deps): update dependency prismjs to v1.27.0 [security] by [@renovate](https://github.com/renovate-bot) in [#828](https://github.com/GradleUp/shadow/pull/828)
+- Encode transformed properties files with specified Charset by [@scottsteen](https://github.com/scottsteen) in [#819](https://github.com/GradleUp/shadow/pull/819)
+- chore(deps): update dependency vuepress to v1.9.9 by [@renovate](https://github.com/renovate-bot) in [#842](https://github.com/GradleUp/shadow/pull/842)
 
 ### New Contributors
 
-* [@renovate](https://github.com/renovate-bot) made their first contribution
-  in [#838](https://github.com/GradleUp/shadow/pull/838)
-* [@scottsteen](https://github.com/scottsteen) made their first contribution
-  in [#819](https://github.com/GradleUp/shadow/pull/819)
+- [@renovate](https://github.com/renovate-bot) made their first contribution in [#838](https://github.com/GradleUp/shadow/pull/838)
+- [@scottsteen](https://github.com/scottsteen) made their first contribution in [#819](https://github.com/GradleUp/shadow/pull/819)
 
 **Full Changelog**: [`8.1.0...8.1.1`](https://github.com/GradleUp/shadow/compare/8.1.0...8.1.1)
 
@@ -747,15 +737,13 @@ type.
 
 ### What's Changed
 
-* Minor cleanups by [@Goooler](https://github.com/Goooler) in [#823](https://github.com/GradleUp/shadow/pull/823)
-* Support config cache by [@Goooler](https://github.com/Goooler) in [#824](https://github.com/GradleUp/shadow/pull/824)
-* Fix RelocatorRemapper: do not map inner class name if not changed by [@Him188](https://github.com/Him188)
-  in [#793](https://github.com/GradleUp/shadow/pull/793)
+- Minor cleanups by [@Goooler](https://github.com/Goooler) in [#823](https://github.com/GradleUp/shadow/pull/823)
+- Support config cache by [@Goooler](https://github.com/Goooler) in [#824](https://github.com/GradleUp/shadow/pull/824)
+- Fix RelocatorRemapper: do not map inner class name if not changed by [@Him188](https://github.com/Him188) in [#793](https://github.com/GradleUp/shadow/pull/793)
 
 ### New Contributors
 
-* [@Him188](https://github.com/Him188) made their first contribution
-  in [#793](https://github.com/GradleUp/shadow/pull/793)
+- [@Him188](https://github.com/Him188) made their first contribution in [#793](https://github.com/GradleUp/shadow/pull/793)
 
 **Full Changelog**: [`8.0.0...8.1.0`](https://github.com/GradleUp/shadow/compare/8.0.0...8.1.0)
 
@@ -763,62 +751,36 @@ type.
 
 ### What's Changed
 
-* Fix the plugin dependency identifier in the docs by [@lnhrdt](https://github.com/lnhrdt)
-  in [#754](https://github.com/GradleUp/shadow/pull/754)
-* mergeGroovyExtensionModules() not working with Groovy 2.5+ by [@paulk-asert](https://github.com/paulk-asert)
-  in [#779](https://github.com/GradleUp/shadow/pull/779)
-* Upgrade to ASM 9.3 to support JDK 19. by [@vyazelenko](https://github.com/vyazelenko)
-  in [#770](https://github.com/GradleUp/shadow/pull/770)
-* Do not add a dependencies block if it's already there by [@desiderantes](https://github.com/desiderantes)
-  in [#769](https://github.com/GradleUp/shadow/pull/769)
-* Update README with new badge and links by [@ThexXTURBOXx](https://github.com/ThexXTURBOXx)
-  in [#743](https://github.com/GradleUp/shadow/pull/743)
-* Fix value not set when rawString is true. by [@qian0817](https://github.com/qian0817)
-  in [#765](https://github.com/GradleUp/shadow/pull/765)
-* Mark the Log4j2PluginsCacheFileTransformer as cacheable. by [@staktrace](https://github.com/staktrace)
-  in [#724](https://github.com/GradleUp/shadow/pull/724)
-* Fix retrieval of dependencies node when publishing by [@netomi](https://github.com/netomi)
-  in [#798](https://github.com/GradleUp/shadow/pull/798)
-* Upgrade dependency ASM from `9.3` to `9.4` by [@codecholeric](https://github.com/codecholeric)
-  in [#817](https://github.com/GradleUp/shadow/pull/817)
-* Fix a typo of code comment in the minimizing page by [@jebnix](https://github.com/jebnix)
-  in [#800](https://github.com/GradleUp/shadow/pull/800)
-* Prefer using plugin extensions over deprecated conventions by [@eskatos](https://github.com/eskatos)
-  in [#821](https://github.com/GradleUp/shadow/pull/821)
-* Introduce CleanProperties by [@simPod](https://github.com/simPod)
-  in [#622](https://github.com/GradleUp/shadow/pull/622)
-* Support Gradle 8.0 by [@Goooler](https://github.com/Goooler) in [#822](https://github.com/GradleUp/shadow/pull/822)
-* Updated dependencies, Gradle versions and Fix Test by [@ElisaMin](https://github.com/ElisaMin)
-  in [#791](https://github.com/GradleUp/shadow/pull/791)
+- Fix the plugin dependency identifier in the docs by [@lnhrdt](https://github.com/lnhrdt) in [#754](https://github.com/GradleUp/shadow/pull/754)
+- mergeGroovyExtensionModules() not working with Groovy 2.5+ by [@paulk-asert](https://github.com/paulk-asert) in [#779](https://github.com/GradleUp/shadow/pull/779)
+- Upgrade to ASM 9.3 to support JDK 19. by [@vyazelenko](https://github.com/vyazelenko) in [#770](https://github.com/GradleUp/shadow/pull/770)
+- Do not add a dependencies block if it's already there by [@desiderantes](https://github.com/desiderantes) in [#769](https://github.com/GradleUp/shadow/pull/769)
+- Update README with new badge and links by [@ThexXTURBOXx](https://github.com/ThexXTURBOXx) in [#743](https://github.com/GradleUp/shadow/pull/743)
+- Fix value not set when rawString is true. by [@qian0817](https://github.com/qian0817) in [#765](https://github.com/GradleUp/shadow/pull/765)
+- Mark the Log4j2PluginsCacheFileTransformer as cacheable. by [@staktrace](https://github.com/staktrace) in [#724](https://github.com/GradleUp/shadow/pull/724)
+- Fix retrieval of dependencies node when publishing by [@netomi](https://github.com/netomi) in [#798](https://github.com/GradleUp/shadow/pull/798)
+- Upgrade dependency ASM from `9.3` to `9.4` by [@codecholeric](https://github.com/codecholeric) in [#817](https://github.com/GradleUp/shadow/pull/817)
+- Fix a typo of code comment in the minimizing page by [@jebnix](https://github.com/jebnix) in [#800](https://github.com/GradleUp/shadow/pull/800)
+- Prefer using plugin extensions over deprecated conventions by [@eskatos](https://github.com/eskatos) in [#821](https://github.com/GradleUp/shadow/pull/821)
+- Introduce CleanProperties by [@simPod](https://github.com/simPod) in [#622](https://github.com/GradleUp/shadow/pull/622)
+- Support Gradle 8.0 by [@Goooler](https://github.com/Goooler) in [#822](https://github.com/GradleUp/shadow/pull/822)
+- Updated dependencies, Gradle versions and Fix Test by [@ElisaMin](https://github.com/ElisaMin) in [#791](https://github.com/GradleUp/shadow/pull/791)
 
 ### New Contributors
 
-* [@lnhrdt](https://github.com/lnhrdt) made their first contribution
-  in [#754](https://github.com/GradleUp/shadow/pull/754)
-* [@paulk-asert](https://github.com/paulk-asert) made their first contribution
-  in [#779](https://github.com/GradleUp/shadow/pull/779)
-* [@desiderantes](https://github.com/desiderantes) made their first contribution
-  in [#769](https://github.com/GradleUp/shadow/pull/769)
-* [@ThexXTURBOXx](https://github.com/ThexXTURBOXx) made their first contribution
-  in [#743](https://github.com/GradleUp/shadow/pull/743)
-* [@qian0817](https://github.com/qian0817) made their first contribution
-  in [#765](https://github.com/GradleUp/shadow/pull/765)
-* [@staktrace](https://github.com/staktrace) made their first contribution
-  in [#724](https://github.com/GradleUp/shadow/pull/724)
-* [@netomi](https://github.com/netomi) made their first contribution
-  in [#798](https://github.com/GradleUp/shadow/pull/798)
-* [@codecholeric](https://github.com/codecholeric) made their first contribution
-  in [#817](https://github.com/GradleUp/shadow/pull/817)
-* [@jebnix](https://github.com/jebnix) made their first contribution
-  in [#800](https://github.com/GradleUp/shadow/pull/800)
-* [@eskatos](https://github.com/eskatos) made their first contribution
-  in [#821](https://github.com/GradleUp/shadow/pull/821)
-* [@simPod](https://github.com/simPod) made their first contribution
-  in [#622](https://github.com/GradleUp/shadow/pull/622)
-* [@Goooler](https://github.com/Goooler) made their first contribution
-  in [#822](https://github.com/GradleUp/shadow/pull/822)
-* [@ElisaMin](https://github.com/ElisaMin) made their first contribution
-  in [#791](https://github.com/GradleUp/shadow/pull/791)
+- [@lnhrdt](https://github.com/lnhrdt) made their first contribution in [#754](https://github.com/GradleUp/shadow/pull/754)
+- [@paulk-asert](https://github.com/paulk-asert) made their first contribution in [#779](https://github.com/GradleUp/shadow/pull/779)
+- [@desiderantes](https://github.com/desiderantes) made their first contribution in [#769](https://github.com/GradleUp/shadow/pull/769)
+- [@ThexXTURBOXx](https://github.com/ThexXTURBOXx) made their first contribution in [#743](https://github.com/GradleUp/shadow/pull/743)
+- [@qian0817](https://github.com/qian0817) made their first contribution in [#765](https://github.com/GradleUp/shadow/pull/765)
+- [@staktrace](https://github.com/staktrace) made their first contribution in [#724](https://github.com/GradleUp/shadow/pull/724)
+- [@netomi](https://github.com/netomi) made their first contribution in [#798](https://github.com/GradleUp/shadow/pull/798)
+- [@codecholeric](https://github.com/codecholeric) made their first contribution in [#817](https://github.com/GradleUp/shadow/pull/817)
+- [@jebnix](https://github.com/jebnix) made their first contribution in [#800](https://github.com/GradleUp/shadow/pull/800)
+- [@eskatos](https://github.com/eskatos) made their first contribution in [#821](https://github.com/GradleUp/shadow/pull/821)
+- [@simPod](https://github.com/simPod) made their first contribution in [#622](https://github.com/GradleUp/shadow/pull/622)
+- [@Goooler](https://github.com/Goooler) made their first contribution in [#822](https://github.com/GradleUp/shadow/pull/822)
+- [@ElisaMin](https://github.com/ElisaMin) made their first contribution in [#791](https://github.com/GradleUp/shadow/pull/791)
 
 **Full Changelog**: [`7.1.2...8.0.0`](https://github.com/GradleUp/shadow/compare/7.1.2...8.0.0)
 
@@ -1153,7 +1115,7 @@ type.
 
 - Make service files root path configurable for
   `ServiceFileTransformer`, [#72](https://github.com/GradleUp/shadow/issues/72)
-- [Andres Almiray](https://github.com/aalmiray - Added
+- [Andres Almiray](https://github.com/aalmiray) - Added
   PropertiesFileTransformer, [#73](https://github.com/GradleUp/shadow/issues/73)
 - [Brandon Kearby](https://github.com/brandonkearby) - Fixed StackOverflow when a cycle occurs in the resolved
   dependency grap, [#69](https://github.com/GradleUp/shadow/pull/69)
