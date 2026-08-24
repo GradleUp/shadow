@@ -9,9 +9,9 @@ R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 
 !!! warning "Plugin ID Change"
 
-    Previously this plugin was developed by [@johnrengelman][johnrengelman] and published under the ID
+    Previously this plugin was developed by @johnrengelman and published under the ID
     [`com.github.johnrengelman.shadow`][johnrengelman's] before maintenance was transferred to the
-    [GradleUp organization][GradleUp] to ensure future development, see [#908].
+    [GradleUp organization][GradleUp] to ensure future development, see #908.
 
     If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID
     [`com.gradleup.shadow`][gradleup's] and update to the latest version to receive all the latest bug fixes and
@@ -62,6 +62,4 @@ library's dependencies will not conflict with the same dependency being declared
 
 [johnrengelman's]: https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 [gradleup's]: https://plugins.gradle.org/plugin/com.gradleup.shadow
-[johnrengelman]: https://github.com/johnrengelman
 [GradleUp]: https://github.com/GradleUp
-[#908]: https://github.com/GradleUp/shadow/issues/908

@@ -101,7 +101,11 @@ markdown_extensions:
   - pymdownx.keys
   - pymdownx.tasklist:
       custom_checkbox: true
-  - pymdownx.magiclink
+  - pymdownx.magiclink:
+      normalize_issue_symbols: true
+      repo_url_shorthand: true
+      user: GradleUp
+      repo: shadow
   - pymdownx.smartsymbols
   - pymdownx.emoji:
       emoji_index: !!python/name:material.extensions.emoji.twemoji

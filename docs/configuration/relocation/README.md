@@ -219,7 +219,7 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
 
 It is not recommended to relocate Kotlin Standard Library if you are using [Kotlin Metadata][kotlin-metadata] or
 [Kotlin Reflection][kotlin-reflection] in the project, because they are tightly coupled with Kotlin compiler and
-runtime. See more details and discussion in [#1622][#1622].
+runtime. See more details and discussion in #1622.
 
 ## Relocating Project Resources Only
 
@@ -246,7 +246,7 @@ relocating), you can try out the trick like:
     }
     ```
 
-This is useful in some cases, as mentioned in [#759]. See
+This is useful in some cases, as mentioned in #759. See
 [Configuring Shadowed Dependencies][configuring-shadowed-dependencies] for more information about `configurations`.
 
 ## Relocating with R8
@@ -321,8 +321,6 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 | **Shrinking / Obfuscation** | Relocation only                                   | Combined with shrinking (optional name obfuscation) |
 
 
-[#1622]: https://github.com/GradleUp/shadow/issues/1622
-[#759]: https://github.com/GradleUp/shadow/issues/759
 [kotlin-metadata]: https://kotlinlang.org/docs/metadata-jvm.html
 [kotlin-reflection]: https://kotlinlang.org/docs/reflection.html
 [r8-minimizing]: ../minimizing/README.md#minimizing-with-r8
