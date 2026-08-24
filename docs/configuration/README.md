@@ -5,7 +5,7 @@ This means that all attributes and methods available on [`Jar`][Jar] are also av
 
 ## ShadowJar Execution Flow
 
-The following diagram and breakdown illustrate how the `shadowJar` task processes inputs from dependency configurations
+The following diagram illustrates how the `shadowJar` task processes inputs from dependency configurations
 and source files to the final shadowed output JAR:
 
 ```mermaid
@@ -104,79 +104,8 @@ flowchart TD
     click F7 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-r8-spec/index.html" "R8Spec"
 ```
 
-### Execution Lifecycle Breakdown
-
-1. **Input Resolution & Filtering**:
-    - **Configurations**: Shadow resolves dependencies from configured configurations (such as `runtimeClasspath`).
-    - **Dependency Filtering**: The [`dependencies`][DependencyFilter] block (`include`/`exclude`) filters artifacts
-      before merging, producing `includedDependencies`.
-    - **Unmerged Dependencies**: Dependencies added to `configurations.shadow` are not bundled into the JAR; instead,
-      their file names are added to the `Class-Path` manifest attribute.
-    - **Extra Inputs**: Additional files or directories can be included via standard [`from(...)`][Jar.from] calls.
-
-2. **Task Preparation (`ShadowJar.copy()`)**:
-    - **`addIncludedDependencies()`**: Analyzes each dependency file:
-        - Regular JAR/ZIP files are unpacked and added as copy specs via `archiveOperations.zipTree(jar)`.
-        - Directories are added via `from(dir)`.
-        - AAR files immediately fail the build with an error suggesting the Android Fused Library plugin.
-    - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path`
-      (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release`
-      attribute if enabled. Note that the manifest itself inherits from the standard `jar` task, but the `jar` task's
-      archive contents are not input to `shadowJar`.
-    - **`super.copy()`**: Enters Gradle's copy engine execution pipeline.
-
-3. **Gradle Copy Engine & Duplicate Handling**:
-    - **`createCopyAction()`**: Before file iteration begins, if minimization with
-      `MinimizeTool.DEPENDENCY_ANALYZER` is enabled, Shadow runs `findUnusedClasses()` once upfront to pre-calculate
-      the set of unused classes, then instantiates `ShadowCopyAction`.
-    - **`ShadowCopyAction.execute()`**: Opens the output `ZipOutputStream` and starts stream processing.
-    - **`CopySpec` Filtering & Duplicate Handling**: For each entry encountered during the copy stream:
-        - File-level `include` and `exclude` pattern filters are evaluated.
-        - Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach Shadow's transformers
-          or relocators:
-            - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped
-              by Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
-            - `INCLUDE` / `WARN`: Allows duplicate files to pass through to `ShadowCopyAction.visitFile` so
-              [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
-            - See [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining
-              `duplicatesStrategy` and transformers.
-
-4. **Stream Processing (`ShadowCopyAction.visitFile`)**:
-    - **Class Files (`*.class`)**:
-        - *Unused Class Filter*: Checks if the class name is present in the pre-computed `unusedClasses` set, dropping
-          it if found.
-        - *Direct Write if No Relocators*: If no relocators are configured, the class file is written directly to the
-          ZIP stream with its original bytecode and path.
-        - *Relocation & Remapping*: When relocators are configured, ASM remappers rewrite bytecode references, relocate
-          the class path (including handling Multi-Release version prefixes under `META-INF/versions/`), and write the
-          remapped bytes to the ZIP stream.
-    - **Resource & Other Files**:
-        - *Path Relocation Computation*: Computes the relocated path upfront via `relocators.relocatePath(path)`.
-        - *Resource Transformers Matching*: Evaluates registered [`ResourceTransformer`][ResourceTransformer]s against
-          the resource via `canTransformResource(fileDetails)` using the original `FileCopyDetails`.
-        - *Transformation*: If matched, the file stream and pre-computed relocated path are passed to
-          `transform(TransformerContext(path = relocated, ...))`, allowing the transformer to buffer and merge entries.
-        - *Direct Write*: If unmatched, the resource is written directly to the ZIP output stream using the
-          pre-computed relocated path.
-    - **Directories**: Recorded in `visitedDirs` with their timestamp and permission metadata.
-
-5. **Output Finalization**:
-    - **`processTransformers()`**: Calls `modifyOutputStream` on all active
-      [`ResourceTransformer`][ResourceTransformer]s, writing merged contents (e.g. `META-INF/services/`, merged
-      properties, appended files, XML) into the ZIP stream.
-    - **`addDirs()`**: Derives required parent directory paths from all written archive entries, querying
-      `visitedDirs` to preserve timestamp and permission metadata.
-    - **`checkDuplicateEntries()`**: Always scans all entries in the final output ZIP for duplicate paths. If duplicates
-      are found and [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled (`true`), an exception is
-      thrown; the stream is closed, the incomplete intermediate ZIP is deleted, and the build fails. When disabled
-      (`false`), a warning message is logged by default.
-    - The intermediate ZIP output stream is closed.
-
-6. **Post-Processing Optimization (R8 Minimization)**:
-    - If minimization is configured with `MinimizeTool.R8`, Shadow invokes R8 on the intermediate JAR.
-    - By default, R8 performs shrinking (dead code removal) based on keep rules. Optimization and obfuscation only
-      occur if explicitly enabled in `r8 { ... }`. Shadow then outputs the final shadowed fat JAR.
-
+See also [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining
+`duplicatesStrategy` and resource transformers.
 
 ## Configuring Output Name
 
@@ -391,10 +320,6 @@ See also [Embedding Local Jar Files Into Your Shadowed Jar][embedding-local-jar-
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
-[ShadowJar.failOnDuplicateEntries]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
-[DependencyFilter]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
-[Relocator]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.relocation/-relocator/index.html
-[ResourceTransformer]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [application]: https://docs.gradle.org/current/userguide/application_plugin.html
 [archiveAppendix]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveAppendix
 [archiveBaseName]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveBaseName
