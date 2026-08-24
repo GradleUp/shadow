@@ -10,111 +10,45 @@ and source files to the final shadowed output JAR:
 
 ```mermaid
 flowchart TD
-    subgraph Inputs["1. Inputs & Configuration"]
+    subgraph Inputs["1. Inputs"]
         A1["Project Outputs & Extra Files<br/>(sourceSets.main.output / from(...))"]
         A2["Dependency Configurations<br/>(runtimeClasspath, etc.)"]
         A3["shadow Configuration<br/>(Unmerged runtime deps)"]
-        A4["dependencies { include(...) / exclude(...) }"]
-        A2 --> A4
-        A4 -->|"includedDependencies"| A5["Dependency Artifacts"]
+        A2 --> A4["Dependency Filter<br/>(include / exclude)"]
+        A4 --> A5["Included Dependency Artifacts"]
     end
 
-    subgraph Preparation["2. Task Preparation (ShadowJar.copy)"]
-        B1{"More Dependencies?<br/>(addIncludedDependencies)"}
+    subgraph Assembly["2. Prepare & Select Entries"]
+        B1["ShadowJar.copy()<br/>• Add dependency inputs (directories / JARs)<br/>• Reject AARs<br/>• Inject manifest attributes"]
         A5 --> B1
-        B1 -->|"Yes"| B2{"Dependency File Type?"}
-        B2 -->|"Missing"| B3["Log & Skip"]
-        B2 -->|"Directory"| B4["from(dir)"]
-        B2 -->|"AAR"| BFail["Fail Build<br/>(AAR not supported; use Fused Library)"]
-        B2 -->|"Other File"| BArchive["from(zipTree(file))"]
-        B3 & B4 & BArchive --> B1
-        B5["injectManifestAttributes()<br/>• Main-Class<br/>• Class-Path (from shadow)<br/>• Multi-Release flag"]
-        B1 -->|"No / Empty"| B5
-        A3 -.-> B5
-        B5 --> B6["super.copy()"]
+        A3 -.->|"Manifest Class-Path"| B1
+        B1 --> B2["Gradle CopySpec<br/>• include / exclude patterns<br/>• duplicatesStrategy<br/>(applied before Shadow processing)"]
+        A1 --> B2
     end
 
-    subgraph CopySpecProcessing["3. Gradle Copy Engine & Duplicate Handling"]
-        PreStream["createCopyAction()<br/>• findUnusedClasses() if DEPENDENCY_ANALYZER enabled<br/>• createZipOutputStream()"]
-        B6 --> PreStream
-        ExecuteStream["ShadowCopyAction.execute()<br/>• zipOutStream.use { ... }<br/>• stream.process entries"]
-        PreStream --> ExecuteStream
-        A1 -.->|"Configured Specs"| ExecuteStream
-
-        EntryLoop{"More Entries?"}
-        ExecuteStream --> EntryLoop
-        EntryLoop -->|"Yes"| C1{"Included by Patterns?<br/>(include / exclude)"}
-        EntryLoop -->|"No"| F1
-        C1 -->|"No"| EntryLoop
-        C1 -->|"Yes"| CDir{"Directory?"}
-        CDir -->|"Yes"| D8
-        CDir -->|"No"| C2{"Path Already Seen?"}
-        C2 -->|"No"| D1{"File Type?"}
-        C2 -->|"Yes"| CStrategy{"Effective<br/>duplicatesStrategy?"}
-        CStrategy -->|"EXCLUDE (default)"| EntryLoop
-        CStrategy -->|"INCLUDE"| D1
-        CStrategy -->|"WARN"| CWarn["Log Warning"]
-        CWarn --> D1
-        CStrategy -->|"FAIL / unresolved INHERIT"| F4Close
+    subgraph Processing["3. Process Accepted Entries (ShadowCopyAction)"]
+        B2 --> C1["Classes<br/>• Drop unused classes when analyzer is enabled<br/>• Relocate / remap when configured<br/>• Write to ZIP"]
+        B2 --> C2["Resources<br/>• Relocate paths<br/>• Transform matching resources<br/>• Write unmatched resources"]
+        B2 --> C3["Directories<br/>Retain timestamp & permission metadata"]
     end
 
-    subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
-        subgraph ClassBranch["Class Files (*.class)"]
-            D2{"In pre-computed<br/>unusedClasses?"}
-            D2 -->|"Yes"| D3["Drop Unused Class"]
-            D2 -->|"No"| D4{"Relocators configured?"}
-            D4 -->|"No"| D5["Write Original Bytes to ZIP"]
-            D4 -->|"Yes"| D6["ASM Bytecode Remap<br/>& Relocate Class Path<br/>(handle META-INF/versions/)"]
-            D6 --> D7["Write Relocated Entry to ZIP"]
-        end
-
-        subgraph ResourceBranch["Resource Files & Others"]
-            E1["Compute Relocated Path<br/>(relocators.relocatePath)"]
-            E1 --> E2{"Matched by<br/>ResourceTransformer?<br/>(canTransformResource using fileDetails)"}
-            E2 -->|"Yes"| E3["Accumulate in Transformer<br/>(receives pre-computed relocated path)"]
-            E2 -->|"No"| E4["Write Entry to ZIP<br/>(using pre-computed relocated path)"]
-        end
-
-        D1 -->|"*.class"| D2
-        D1 -->|"Resource"| E1
-        D8["Record in visitedDirs<br/>(timestamp & permissions)"]
-
-        D3 & D5 & D7 & E3 & E4 & D8 --> EntryLoop
-    end
-
-    subgraph Finalization["5. Output Finalization & Post-Processing"]
-        F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
-        F2["addDirs()<br/>Generate parent directory entries"]
-        F1 --> F2
-        D8 -.->|"Directory Metadata"| F2
-        F3{"Duplicates found in ZIP?<br/>(checkDuplicateEntries)"}
-        F2 --> F3
-        F3 -->|"Duplicates found & failOnDuplicateEntries = true"| F4Close["Close ZIP Stream"]
-        F4Close --> F4Delete["Delete Intermediate ZIP"] --> F4Fail["Fail Build"]
-        F3 -->|"Duplicates found & failOnDuplicateEntries = false (default)"| F4Warn["Log Warning"]
-        F3 -->|"No duplicates"| F5["Close Intermediate ZIP"]
-        F4Warn --> F5
-
-        F6{"Minimize Tool == R8?"}
-        F5 --> F6
-        F6 -->|"Yes"| F7["runR8Minimization()<br/>R8 shrinking (and optional optimization/obfuscation)"]
-        F7 --> F8["Final Shadowed JAR"]
-        F6 -->|"No"| F8
+    subgraph Finalization["4. Finalize Output"]
+        C1 & C2 & C3 --> D1["Finalize ZIP<br/>• Flush transformers & generate directories<br/>• Check duplicates (warn or fail)<br/>• Close ZIP"]
+        D1 -->|"Success"| D4{"R8 Minimization Enabled?"}
+        D4 -->|"Yes"| D5["Run R8<br/>(shrinking; optional optimization / obfuscation)"]
+        D5 --> D6["Final Shadowed JAR"]
+        D4 -->|"No"| D6
     end
 
     click A2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html" "ShadowJar.configurations"
     click A3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow/-shadow-base-plugin/-companion/-c-o-n-f-i-g-u-r-a-t-i-o-n_-n-a-m-e.html" "ShadowBasePlugin.CONFIGURATION_NAME"
-    click A4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html" "ShadowJar.dependencies"
     click A5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-dependencies.html" "ShadowJar.includedDependencies"
-    click B5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/add-multi-release-attribute.html" "ShadowJar.addMultiReleaseAttribute"
-    click CStrategy href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
-    click D2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/minimize.html" "ShadowJar.minimize"
-    click D6 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
-    click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
-    click E2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
-    click F1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
-    click F3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html" "ShadowJar.failOnDuplicateEntries"
-    click F7 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-r8-spec/index.html" "R8Spec"
+    click A4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html" "ShadowJar.dependencies"
+    click B2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
+    click C1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/minimize.html" "ShadowJar.minimize"
+    click C2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
+    click D1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html" "ShadowJar.failOnDuplicateEntries"
+    click D5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-r8-spec/index.html" "R8Spec"
 ```
 
 See also [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining
