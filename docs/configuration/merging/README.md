@@ -53,8 +53,9 @@ Different strategies will lead to different results for `foo/bar` files in the J
 - `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
 - `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
 - `INCLUDE`: **Duplicate** `foo/bar` entries will be included in the final JAR.
-- `INHERIT`: **Inherit** the strategy from the parent copy specification. If explicitly set to `INHERIT` on the root task (where no parent specification exists to inherit from), encountering duplicates will fail the build with an exception like
-  `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `INHERIT`: **Inherit** the strategy from the parent copy specification. If explicitly set to `INHERIT` on the root
+  task (where no parent specification exists to inherit from), encountering duplicates will fail the build with an
+  exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
 - `WARN`: **Warn** about duplicates in the build log; this behaves exactly as `INCLUDE` otherwise.
 
 !!! note "Precedence of DuplicatesStrategy"

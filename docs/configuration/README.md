@@ -5,7 +5,8 @@ This means that all attributes and methods available on [`Jar`][Jar] are also av
 
 ## ShadowJar Execution Flow
 
-The following diagram and breakdown illustrate how the `shadowJar` task processes inputs from dependency configurations and source files to the final shadowed output JAR:
+The following diagram and breakdown illustrate how the `shadowJar` task processes inputs from dependency configurations
+and source files to the final shadowed output JAR:
 
 ```mermaid
 flowchart TD
@@ -98,8 +99,10 @@ flowchart TD
 
 1. **Input Resolution & Filtering**:
     - **Configurations**: Shadow resolves dependencies from configured configurations (such as `runtimeClasspath`).
-    - **Dependency Filtering**: The [`dependencies`][DependencyFilter] block (`include`/`exclude`) filters artifacts before merging, producing `includedDependencies`.
-    - **Unmerged Dependencies**: Dependencies added to `configurations.shadow` are not bundled into the JAR; instead, their file names are added to the `Class-Path` manifest attribute.
+    - **Dependency Filtering**: The [`dependencies`][DependencyFilter] block (`include`/`exclude`) filters artifacts
+      before merging, producing `includedDependencies`.
+    - **Unmerged Dependencies**: Dependencies added to `configurations.shadow` are not bundled into the JAR; instead,
+      their file names are added to the `Class-Path` manifest attribute.
     - **Extra Inputs**: Additional files or directories can be included via standard [`from(...)`][Jar.from] calls.
 
 2. **Task Preparation (`ShadowJar.copy()`)**:
@@ -107,35 +110,52 @@ flowchart TD
         - Regular JAR/ZIP files are unpacked and added as copy specs via `archiveOperations.zipTree(jar)`.
         - Directories are added via `from(dir)`.
         - AAR files are rejected with a helpful error suggesting the Android Fused Library plugin.
-    - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path` (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release` attribute if enabled. Note that the manifest itself inherits from the standard `jar` task, but the `jar` task's archive contents are not input to `shadowJar`.
+    - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path`
+      (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release`
+      attribute if enabled. Note that the manifest itself inherits from the standard `jar` task, but the `jar` task's
+      archive contents are not input to `shadowJar`.
 
 3. **Gradle `CopySpec` & `duplicatesStrategy` Intervention**:
     - File-level `include` and `exclude` pattern filters are evaluated.
-    - **Duplicate Handling**: Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach Shadow's transformers or relocators:
-        - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped by Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
-        - `INCLUDE` / `WARN`: Allows duplicate files to pass through to the `CopyAction` so [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
-        - See [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining `duplicatesStrategy` and transformers.
+    - **Duplicate Handling**: Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach
+      Shadow's transformers or relocators:
+        - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped by
+          Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
+        - `INCLUDE` / `WARN`: Allows duplicate files to pass through to the `CopyAction` so
+          [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
+        - See [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining
+          `duplicatesStrategy` and transformers.
 
 4. **Stream Processing (`ShadowCopyAction`)**:
     - **Class Files (`*.class`)**:
-        - *Dependency Analyzer Minimization*: If minimization with `MinimizeTool.DEPENDENCY_ANALYZER` is enabled, unused classes are identified and dropped.
-        - *Relocation & Remapping*: ASM remappers rewrite bytecode references according to configured [`relocators`][Relocator] and auto-relocation rules.
-        - *Path Relocation*: The class path is relocated (including handling Multi-Release version prefixes under `META-INF/versions/`) and written to the ZIP stream.
+        - *Dependency Analyzer Minimization*: If minimization with `MinimizeTool.DEPENDENCY_ANALYZER` is enabled,
+          unused classes are identified and dropped.
+        - *Relocation & Remapping*: ASM remappers rewrite bytecode references according to configured
+          [`relocators`][Relocator] and auto-relocation rules.
+        - *Path Relocation*: The class path is relocated (including handling Multi-Release version prefixes under
+          `META-INF/versions/`) and written to the ZIP stream.
     - **Resource & Other Files**:
         - *Path Relocation*: Relocates resource paths matching configured relocators.
-        - *Resource Transformers*: Checks if a registered [`ResourceTransformer`][ResourceTransformer] matches the file (`canTransformResource`). If matched, the file stream is passed to the transformer (`transform`) to buffer and merge in memory.
+        - *Resource Transformers*: Checks if a registered [`ResourceTransformer`][ResourceTransformer] matches the file
+          (`canTransformResource`). If matched, the file stream is passed to the transformer (`transform`) to buffer
+          and merge in memory.
         - *Unmatched Resources*: Written directly to the ZIP output stream.
     - **Directories**: Tracked in memory to generate required parent directory entries.
 
 5. **Output Finalization**:
-    - **`processTransformers()`**: Calls `modifyOutputStream` on all active [`ResourceTransformer`][ResourceTransformer]s, writing merged contents (e.g. `META-INF/services/`, merged properties, appended files, XML) into the ZIP stream.
+    - **`processTransformers()`**: Calls `modifyOutputStream` on all active
+      [`ResourceTransformer`][ResourceTransformer]s, writing merged contents (e.g. `META-INF/services/`, merged
+      properties, appended files, XML) into the ZIP stream.
     - **`addDirs()`**: Creates synthetic directory entries in the ZIP for proper archive structure.
-    - **`checkDuplicateEntries()`**: Always scans all entries in the final output ZIP for duplicate paths. If duplicates are found, it fails the build when [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled (`true`), or logs a warning message by default when disabled (`false`).
+    - **`checkDuplicateEntries()`**: Always scans all entries in the final output ZIP for duplicate paths. If duplicates
+      are found, it fails the build when [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled
+      (`true`), or logs a warning message by default when disabled (`false`).
     - The intermediate ZIP output stream is closed.
 
 6. **Post-Processing Optimization (R8 Minimization)**:
     - If minimization is configured with `MinimizeTool.R8`, Shadow invokes R8 on the intermediate JAR.
-    - By default, R8 performs shrinking (dead code removal) based on keep rules. Optimization and obfuscation only occur if explicitly enabled in `r8 { ... }`. Shadow then outputs the final shadowed fat JAR.
+    - By default, R8 performs shrinking (dead code removal) based on keep rules. Optimization and obfuscation only
+      occur if explicitly enabled in `r8 { ... }`. Shadow then outputs the final shadowed fat JAR.
 
 
 ## Configuring Output Name
@@ -223,7 +243,8 @@ Class-Path: junit-3.8.2.jar
 
 !!! important
 
-    When deploying a shadowed JAR as an execution JAR, any non-bundled runtime dependencies **must** be deployed in the location specified in the `Class-Path` entry in the manifest.
+    When deploying a shadowed JAR as an execution JAR, any non-bundled runtime dependencies **must** be deployed in the
+    location specified in the `Class-Path` entry in the manifest.
 
 ## Configuring the JAR Manifest
 
@@ -344,7 +365,7 @@ method can be used to add extra files.
     }
     ```
 
-See also [Embedding Local Jar Files Into Your Shadowed Jar](dependencies/README.md#embedding-local-jar-files-into-your-shadowed-jar).
+See also [Embedding Local Jar Files Into Your Shadowed Jar][embedding-local-jar-files-into-your-shadowed-jar].
 
 
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
@@ -363,4 +384,6 @@ See also [Embedding Local Jar Files Into Your Shadowed Jar](dependencies/README.
 [archiveFile]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveFile
 [archiveVersion]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveVersion
 [destinationDirectory]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:destinationDirectory
+[embedding-local-jar-files-into-your-shadowed-jar]: dependencies/README.md#embedding-local-jar-files-into-your-shadowed-jar
+[handling-duplicates-strategy]: merging/README.md#handling-duplicates-strategy
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
