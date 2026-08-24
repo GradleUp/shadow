@@ -94,7 +94,7 @@
 
     If you do not need Kotlin module metadata remapping, you can disable it:
 
-    ```kotlin
+    ```
     tasks.shadowJar {
       @Suppress("DEPRECATION") // This flag will be disabled and removed in the next major version of Shadow.
       enableKotlinModuleRemapping = false
@@ -863,7 +863,7 @@ type.
   `gradle.plugin.com.github.jengelman.gradle.plugins`. Users explicitly declaring the buildscript classpath will need to
   update their configuration.
 
-  ```groovy
+  ```
   buildscript {
     repositories {
       gradlePluginPortal()
