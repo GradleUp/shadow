@@ -153,12 +153,7 @@ testing.suites {
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
       testTask {
-        inputs.files(
-          fileTree(docsDir) {
-            // Changelog file doesn't contain code snippet to run.
-            exclude("changes/README.md")
-          }
-        )
+        inputs.dir(docsDir)
 
         testLogging.showExceptions = false
         addTestListener(

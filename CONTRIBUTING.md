@@ -100,4 +100,4 @@ When adding new features or public APIs:
 5. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the
    project
 6. Ensure your commit messages are clear and descriptive
-7. Update the `Unreleased` section in [CHANGELOG](docs/changes/README.md) if applicable
+7. Update the `Unreleased` section in [CHANGELOG](CHANGELOG.md) if applicable

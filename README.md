@@ -21,7 +21,7 @@ with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 ## Documentation
 
 - [User Guide](https://gradleup.com/shadow/)
-- [Change Log](docs/changes/README.md)
+- [Change Log](CHANGELOG.md)
 
 ## Compatibility Matrix
 

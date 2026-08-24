@@ -6,12 +6,14 @@ on:
       - main
     paths:
       - docs/**
+      - CHANGELOG.md
       - README.md
       - RELEASING.md
       - .github/workflows/links.yml
   pull_request:
     paths:
       - docs/**
+      - CHANGELOG.md
       - README.md
       - RELEASING.md
       - .github/workflows/links.yml
