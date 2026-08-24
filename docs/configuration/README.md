@@ -29,7 +29,7 @@ flowchart TD
     subgraph Processing["3. Process Accepted Entries (ShadowCopyAction)"]
         B2 --> C1["Classes<br/>• Drop unused classes when analyzer is enabled<br/>• Relocate / remap when configured<br/>• Write to ZIP"]
         B2 --> C2["Resources<br/>• Relocate paths<br/>• Transform matching resources<br/>• Write unmatched resources"]
-        B2 --> C3["Directories<br/>Retain timestamp & permission metadata"]
+        C3["Directories<br/>Add parent entries; preserve source metadata where available/configured"]
     end
 
     subgraph Finalization["4. Finalize Output"]
