@@ -53,9 +53,10 @@ Different strategies will lead to different results for `foo/bar` files in the J
 - `EXCLUDE`: The **first** `foo/bar` file will be included in the final JAR.
 - `FAIL`: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate `foo/bar` files.
 - `INCLUDE`: **Duplicate** `foo/bar` entries will be included in the final JAR.
-- `INHERIT`: **Fail** the build with an exception like
-  `Entry .* is a duplicate but no duplicate handling strategy has been set`.
-- `WARN`: **Warn** about duplicates in the build log, this behaves exactly as `INHERIT` otherwise.
+- `INHERIT`: **Inherit** the strategy from the parent copy specification. If explicitly set to `INHERIT` on the root
+  task (where no parent specification exists to inherit from), encountering duplicates will fail the build with an
+  exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+- `WARN`: **Warn** about duplicates in the build log; this behaves exactly as `INCLUDE` otherwise.
 
 !!! note "Precedence of DuplicatesStrategy"
 
@@ -63,6 +64,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
     Because `ShadowJar` is a subclass of Gradle's `AbstractCopyTask`, duplicate filtering configured via
     `duplicatesStrategy` is performed at Gradle's `CopySpec` processing layer **before** entries are passed to Shadow's
     internal [`ResourceTransformer`][ResourceTransformer] engine.
+    See the [ShadowJar Execution Flow][shadowjar-execution-flow] for the complete lifecycle diagram.
 
 If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
 [`ResourceTransformer`][ResourceTransformer] like below:
@@ -963,3 +965,4 @@ You can then run the task to scan each entry on the classpath and print any matc
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
 [CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
+[shadowjar-execution-flow]: ../README.md#shadowjar-execution-flow
