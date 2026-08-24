@@ -41,6 +41,7 @@ val commonGradleArgs =
     "--build-cache",
     "--stacktrace",
     "--warning-mode=fail",
+    "-Dorg.gradle.kotlin.dsl.allWarningsAsErrors=true",
     // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
     "-Dorg.gradle.configuration-cache.parallel=true",
     // https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
