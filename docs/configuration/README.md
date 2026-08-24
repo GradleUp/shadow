@@ -3,6 +3,125 @@
 The [`ShadowJar`][ShadowJar] task type extends from Gradle's [`Jar`][Jar] type.
 This means that all attributes and methods available on [`Jar`][Jar] are also available on [`ShadowJar`][ShadowJar].
 
+## ShadowJar Execution Flow
+
+The following diagram and breakdown illustrate how the `shadowJar` task processes inputs from dependency configurations and source files to the final shadowed output JAR:
+
+```mermaid
+flowchart TD
+    subgraph Inputs["1. Inputs & Configuration"]
+        A1["Project SourceSets / Files<br/>(from(...) / tasks.jar)"]
+        A2["Dependency Configurations<br/>(runtimeClasspath, etc.)"]
+        A3["shadow Configuration<br/>(Unmerged runtime deps)"]
+        A4["dependencies { include(...) / exclude(...) }"]
+        A2 --> A4
+        A4 -->|"includedDependencies"| A5["Dependency Artifacts"]
+    end
+
+    subgraph Preparation["2. Task Preparation (ShadowJar.copy)"]
+        B1["addIncludedDependencies()"]
+        A5 --> B1
+        B1 -->|"Directory"| B2["from(dir)"]
+        B1 -->|"JAR / ZIP"| B3["from(zipTree(jar))"]
+        B1 -->|"AAR"| B4["Fail: AAR not supported<br/>(Use Fused Library Plugin)"]
+        B5["injectManifestAttributes()<br/>• Main-Class<br/>• Class-Path (from shadow)<br/>• Multi-Release flag"]
+        A3 -.-> B5
+    end
+
+    subgraph CopySpecProcessing["3. Gradle CopySpec & Duplicate Handling"]
+        C1["Pattern Filtering<br/>(include / exclude)"]
+        B2 & B3 & A1 --> C1
+        C1 --> C2{"Duplicate Path?<br/>(duplicatesStrategy)"}
+        C2 -->|"EXCLUDE (default)"| C3["Keep 1st occurrence;<br/>Drop subsequent duplicates"]
+        C2 -->|"INCLUDE / WARN"| C4["Pass entries to CopyAction"]
+        C2 -->|"FAIL / INHERIT"| C5["Fail build / Warn"]
+    end
+
+    subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
+        D1{"Entry Type?"}
+        C3 & C4 --> D1
+
+        subgraph ClassBranch["Class Files (*.class)"]
+            D2{"Minimize Analyzer?<br/>In unusedClasses?"}
+            D2 -->|"Yes"| D3["Drop Unused Class"]
+            D2 -->|"No"| D4["ASM Bytecode Remap<br/>(Relocators)"]
+            D4 --> D5["Relocate Class Path<br/>(handle META-INF/versions/)"]
+            D5 --> D6["Write Entry to ZIP"]
+        end
+
+        subgraph ResourceBranch["Resource Files & Others"]
+            E1["Relocate Path (Relocators)"]
+            E1 --> E2{"Matched by<br/>ResourceTransformer?"}
+            E2 -->|"Yes"| E3["Accumulate in Transformer<br/>(e.g., Service files, XML, properties)"]
+            E2 -->|"No"| E4["Write Entry to ZIP"]
+        end
+
+        D1 -->|"*.class"| D2
+        D1 -->|"Resource"| E1
+        D1 -->|"Directory"| D7["Record in visitedDirs"]
+    end
+
+    subgraph Finalization["5. Output Finalization & Post-Processing"]
+        F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
+        E3 --> F1
+        F2["addDirs()<br/>Generate parent directory entries"]
+        F3{"failOnDuplicateEntries?"}
+        F1 & D6 & E4 --> F2 --> F3
+        F3 -->|"Duplicates Found & Enabled"| F4["Fail Build"]
+        F3 -->|"Passed / Disabled"| F5["Close Intermediate ZIP"]
+
+        F6{"Minimize Tool == R8?"}
+        F5 --> F6
+        F6 -->|"Yes"| F7["runR8Minimization()<br/>R8 ProGuard/keep rules optimization"]
+        F7 --> F8["Final Shadowed JAR"]
+        F6 -->|"No"| F8
+    end
+```
+
+### Execution Lifecycle Breakdown
+
+1. **Input Resolution & Filtering**:
+    - **Configurations**: Shadow resolves dependencies from configured configurations (such as `runtimeClasspath`).
+    - **Dependency Filtering**: The [`dependencies`][DependencyFilter] block (`include`/`exclude`) filters artifacts before merging, producing `includedDependencies`.
+    - **Unmerged Dependencies**: Dependencies added to `configurations.shadow` are not bundled into the JAR; instead, their file names are added to the `Class-Path` manifest attribute.
+    - **Extra Inputs**: Additional files or directories can be included via standard [`from(...)`][Jar.from] calls.
+
+2. **Task Preparation (`ShadowJar.copy()`)**:
+    - **`addIncludedDependencies()`**: Analyzes each dependency file:
+        - Regular JAR/ZIP files are unpacked and added as copy specs via `archiveOperations.zipTree(jar)`.
+        - Directories are added via `from(dir)`.
+        - AAR files are rejected with a helpful error suggesting the Android Fused Library plugin.
+    - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path` (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release` attribute if enabled.
+
+3. **Gradle `CopySpec` & `duplicatesStrategy` Intervention**:
+    - File-level `include` and `exclude` pattern filters are evaluated.
+    - **Duplicate Handling**: Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach Shadow's transformers or relocators:
+        - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped by Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
+        - `INCLUDE` / `WARN`: Allows duplicate files to pass through to the `CopyAction` so [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
+        - See [Handling Duplicates Strategy](merging/README.md#handling-duplicates-strategy) for best practices on combining `duplicatesStrategy` and transformers.
+
+4. **Stream Processing (`ShadowCopyAction`)**:
+    - **Class Files (`*.class`)**:
+        - *Dependency Analyzer Minimization*: If minimization with `MinimizeTool.DEPENDENCY_ANALYZER` is enabled, unused classes are identified and dropped.
+        - *Relocation & Remapping*: ASM remappers rewrite bytecode references according to configured [`relocators`][Relocator] and auto-relocation rules.
+        - *Path Relocation*: The class path is relocated (including handling Multi-Release version prefixes under `META-INF/versions/`) and written to the ZIP stream.
+    - **Resource & Other Files**:
+        - *Path Relocation*: Relocates resource paths matching configured relocators.
+        - *Resource Transformers*: Checks if a registered [`ResourceTransformer`][ResourceTransformer] matches the file (`canTransformResource`). If matched, the file stream is passed to the transformer (`transform`) to buffer and merge in memory.
+        - *Unmatched Resources*: Written directly to the ZIP output stream.
+    - **Directories**: Tracked in memory to generate required parent directory entries.
+
+5. **Output Finalization**:
+    - **`processTransformers()`**: Calls `modifyOutputStream` on all active [`ResourceTransformer`][ResourceTransformer]s, writing merged contents (e.g. `META-INF/services/`, merged properties, appended files, XML) into the ZIP stream.
+    - **`addDirs()`**: Creates synthetic directory entries in the ZIP for proper archive structure.
+    - **`checkDuplicateEntries()`**: If [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled, verifies that no duplicate entry names exist in the final output ZIP, failing the build or logging a warning if any duplicates are found.
+    - The intermediate ZIP output stream is closed.
+
+6. **Post-Processing Optimization (R8 Minimization)**:
+    - If minimization is configured with `MinimizeTool.R8`, Shadow invokes R8 on the intermediate JAR.
+    - R8 applies ProGuard/keep rules, treeshaking, and optimization, outputting the final optimized fat JAR.
+
+
 ## Configuring Output Name
 
 Shadow configures the default [`ShadowJar`][ShadowJar] task to set the output JAR's
@@ -215,6 +334,10 @@ See also [Embedding Local Jar Files Into Your Shadowed Jar](dependencies/README.
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[ShadowJar.failOnDuplicateEntries]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
+[DependencyFilter]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
+[Relocator]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.relocation/-relocator/index.html
+[ResourceTransformer]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-resource-transformer/index.html
 [application]: https://docs.gradle.org/current/userguide/application_plugin.html
 [archiveAppendix]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveAppendix
 [archiveBaseName]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:archiveBaseName

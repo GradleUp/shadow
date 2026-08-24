@@ -63,6 +63,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
     Because `ShadowJar` is a subclass of Gradle's `AbstractCopyTask`, duplicate filtering configured via
     `duplicatesStrategy` is performed at Gradle's `CopySpec` processing layer **before** entries are passed to Shadow's
     internal [`ResourceTransformer`][ResourceTransformer] engine.
+    See the [ShadowJar Execution Flow](../README.md#shadowjar-execution-flow) for the complete lifecycle diagram.
 
 If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
 [`ResourceTransformer`][ResourceTransformer] like below:
