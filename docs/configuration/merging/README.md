@@ -330,9 +330,9 @@ runtime, this file is read and used to configure library or application behavior
 Multiple dependencies may use the same service descriptor file name. In this case, it is generally desired to merge the
 content of each instance of the file into a single output file. The [`ServiceFileTransformer`][ServiceFileTransformer]
 class is used to perform this merging. By default, it will merge each copy of a file under `META-INF/services` into a
-single file in the output JAR. You can use either the short syntax method [
-`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to add
-the [`ServiceFileTransformer`][ServiceFileTransformer]:
+single file in the output JAR. You can use either the short syntax method
+[`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to
+add the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
 === "Kotlin"
 
@@ -444,9 +444,9 @@ from merging.
 ## Merging Groovy Extension Modules
 
 Shadow provides a specific transformer for dealing with Groovy extension module files. This is due to their special
-syntax and how they need to be merged together. The [
-`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files. The [
-`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
+syntax and how they need to be merged together. The
+[`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files. The
+[`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
 
 === "Kotlin"
 

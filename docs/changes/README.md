@@ -1153,7 +1153,7 @@ type.
 
 - Make service files root path configurable for
   `ServiceFileTransformer`, [#72](https://github.com/GradleUp/shadow/issues/72)
-- [Andres Almiray](https://github.com/aalmiray - Added
+- [Andres Almiray](https://github.com/aalmiray) - Added
   PropertiesFileTransformer, [#73](https://github.com/GradleUp/shadow/issues/73)
 - [Brandon Kearby](https://github.com/brandonkearby) - Fixed StackOverflow when a cycle occurs in the resolved
   dependency grap, [#69](https://github.com/GradleUp/shadow/pull/69)

@@ -3,8 +3,8 @@
 Shadow reacts to the presence of Gradle's [`application`][application] plugin and will automatically configure
 additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.
 
-Just like the normal [`Jar`][Jar] task, when the [`application`][application] plugin is applied, the [
-`ShadowJar`][ShadowJar] manifest will be configured to contain the `Main-Class` attribute with the value specified in
+Just like the normal [`Jar`][Jar] task, when the [`application`][application] plugin is applied, the
+[`ShadowJar`][ShadowJar] manifest will be configured to contain the `Main-Class` attribute with the value specified in
 the project's `application.mainClass` attribute.
 
 === "Kotlin"
