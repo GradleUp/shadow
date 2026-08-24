@@ -20,34 +20,31 @@ flowchart TD
     end
 
     subgraph Preparation["2. Task Preparation (ShadowJar.copy)"]
-        B1{"Dependency File Type?<br/>(addIncludedDependencies)"}
+        B1{"More Dependencies?<br/>(addIncludedDependencies)"}
         A5 --> B1
         B1 -->|"AAR"| B4["Fail Build<br/>(AAR not supported; use Fused Library)"]
+        B1 -->|"Dir: from(dir)<br/>JAR/ZIP: from(zipTree)"| B1
         B5["injectManifestAttributes()<br/>• Main-Class<br/>• Class-Path (from shadow)<br/>• Multi-Release flag"]
-        B1 -->|"Dir / JAR / ZIP"| B5
+        B1 -->|"Done / Empty"| B5
         A3 -.-> B5
         B5 --> B6["super.copy()"]
     end
 
     subgraph CopySpecProcessing["3. Gradle Copy Engine & Duplicate Handling"]
-        PreStream["createCopyAction()<br/>• findUnusedClasses()<br/>• Instantiate ShadowCopyAction"]
+        PreStream["createCopyAction()<br/>• findUnusedClasses()<br/>• createZipOutputStream()"]
         B6 --> PreStream
-        A1 -.->|"Configured specs"| PreStream
-        ExecuteStream["ShadowCopyAction.execute()<br/>• Initialize ZipOutputStream<br/>• stream.process entries"]
+        ExecuteStream["ShadowCopyAction.execute()<br/>• zipOutStream.use { ... }<br/>• stream.process entries"]
         PreStream --> ExecuteStream
 
         C1["Pattern Filtering<br/>(include / exclude)"]
         ExecuteStream --> C1
         C1 --> C2{"Duplicate Path?<br/>(duplicatesStrategy)"}
-        C2 -->|"EXCLUDE (default)"| C3["Keep 1st occurrence;<br/>Drop subsequent duplicates"]
-        C2 -->|"INCLUDE / WARN"| C4["Pass entries to ShadowCopyAction<br/>(WARN logs warning)"]
-        C2 -->|"FAIL / INHERIT"| C5["Fail build<br/>(DuplicateFileCopyingException / no strategy set)"]
+        C2 -->|"EXCLUDE (default)"| NextEntry["Next Entry / Drop"]
+        C2 -->|"INCLUDE / WARN"| D1{"Entry Type?"}
+        C2 -->|"FAIL / INHERIT"| F4Close
     end
 
     subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
-        D1{"Entry Type?"}
-        C3 & C4 --> D1
-
         subgraph ClassBranch["Class Files (*.class)"]
             D2{"In pre-computed<br/>unusedClasses?"}
             D2 -->|"Yes"| D3["Drop Unused Class"]
@@ -67,15 +64,19 @@ flowchart TD
         D1 -->|"*.class"| D2
         D1 -->|"Resource"| E1
         D1 -->|"Directory"| D8["Record in visitedDirs<br/>(timestamp & permissions)"]
+
+        D3 & D5 & D7 & E3 & E4 & D8 --> NextEntry
+        NextEntry -->|"More Entries"| C1
     end
 
     subgraph Finalization["5. Output Finalization & Post-Processing"]
         F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
-        E3 --> F1
+        NextEntry -->|"All Entries Processed"| F1
         F2["addDirs()<br/>Generate parent directory entries"]
+        F1 --> F2
         D8 -.->|"Directory Metadata"| F2
         F3{"Duplicates found in ZIP?<br/>(checkDuplicateEntries)"}
-        F1 & D5 & D7 & E4 --> F2 --> F3
+        F2 --> F3
         F3 -->|"Duplicates found & failOnDuplicateEntries = true"| F4Close["Close ZIP Stream"]
         F4Close --> F4Delete["Delete Intermediate ZIP"] --> F4Fail["Fail Build"]
         F3 -->|"Duplicates found & failOnDuplicateEntries = false (default)"| F4Warn["Log Warning"]
