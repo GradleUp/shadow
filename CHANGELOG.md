@@ -68,7 +68,8 @@
 ### Changed
 
 - Rename `ShadowDslMarker` to `ShadowDsl`. (#2091)
-- **POTENTIALLY BREAKING:** Apply `@ShadowDsl` to `ShadowJar`, `ResourceTransformer`, `DependencyFilter`, and `Relocator`. (#2090)  
+- **POTENTIALLY BREAKING:** Apply `@ShadowDsl` to `ShadowJar`, `ResourceTransformer`, `DependencyFilter`, and
+  `Relocator`. (#2090)  
   This restricts nested DSL configuration blocks from implicitly calling outer receiver APIs in Kotlin script files.
 
 ### Fixed
@@ -104,7 +105,8 @@
 ### Added
 
 - Check `DuplicatesStrategy` for merging transformers. (#2026)  
-  This will log warnings when an incompatible `DuplicatesStrategy` (e.g., `EXCLUDE`) is applied in Gradle configuration for built-in `ResourceTransformer`s.
+  This will log warnings when an incompatible `DuplicatesStrategy` (e.g., `EXCLUDE`) is applied in Gradle configuration
+  for built-in `ResourceTransformer`s.
 - Add `KotlinModuleMetadataTransformer`. (#2073)
 - Add R8 as an opt-in `minimize { r8 { ... } }` tool for shrinking the final shadowed JAR. (#2077)
 
@@ -116,8 +118,8 @@
 ### Deprecated
 
 - Deprecate `enableKotlinModuleRemapping` for `ShadowJar`. (#2073)  
-  Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files.
-  This flag will be disabled and removed in the next major release.
+  Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files. This
+  flag will be disabled and removed in the next major release.
 - Deprecate everything under `ShadowCopyAction`. (#2083)
 
 ### Fixed
@@ -247,10 +249,11 @@
 - Provide more task accessors in `ShadowApplicationPlugin.Companion`. (#1771)
 - Support relocating Kotlin module files. (#1539)  
   The current implementation relocates all properties in `KotlinModuleMetadata` but `KmModule.optionalAnnotationClasses`
-  due to very limited usage of it. See more discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
+  due to very limited usage of it. See more
+  discussion [here](https://github.com/GradleUp/shadow/pull/1539#discussion_r2344237151).
 - Allow overriding `BUNDLING_ATTRIBUTE` in GMM. (#1773)  
-  The `org.gradle.dependency.bundling` in shadowed JAR's Gradle Module Metadata is set to `shadowed` by default.
-  You can override it for now by:
+  The `org.gradle.dependency.bundling` in shadowed JAR's Gradle Module Metadata is set to `shadowed` by default. You can
+  override it for now by:
   ```kotlin
   shadow {
     bundlingAttribute = Bundling.EMBEDDED
@@ -357,7 +360,8 @@
   - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
   - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
   - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
-  - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+  - See more details about the strategies
+    at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ### Fixed
 
@@ -414,8 +418,8 @@
 - Let `assemble` depend on `shadowJar`. (#1524)
 - Fail build when inputting AAR files or using Shadow with AGP. (#1530)
 - Add `PreserveFirstFoundResourceTransformer`. (#1548)  
-  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` and
-  want to ensure that only the first found resource is included in the final JAR.
+  This is useful when you set `shadowJar.duplicatesStrategy = DuplicatesStrategy.INCLUDE` and want to ensure that only
+  the first found resource is included in the final JAR.
 - Fail build if the ZIP entries in the shadowed JAR are duplicate. (#1552)  
   This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
@@ -440,16 +444,19 @@
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. (#1233)
   - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
   - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
-  - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate resources to be merged.
-  - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
+  - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate
+    resources to be merged.
+  - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added
+    `PreserveFirstFoundResourceTransformer`.
   - Use `filesMatching` to override the default strategy for specific files.
   - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
-  - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+  - See more details
+    at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
   - **Note:** The default `duplicatesStrategy` is changed back to `EXCLUDE` in 9.0.1 release.
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. (#1233)  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
-  issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
-  the files, only copy the files as-is. If you still want to shadow the unzipped files, try out something like:
+  issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip the
+  files, only copy the files as-is. If you still want to shadow the unzipped files, try out something like:
   ```kotlin
   tasks.shadowJar {
     // Unzip the files before pass them to `from` by using `zipTree`.
@@ -557,12 +564,14 @@ If you used Shadow for merging service files, the following steps are recommende
 1. Make sure to leave `duplicatesStrategy` as `INCLUDE` or `WARN`.
 2. Apply `mergeServiceFiles` or `ServiceFileTransformer` stuff as you did in your previous setup.
 3. Diff the JARs from upgrading or not.
-4. Remove the extra entries that are added by `INCLUDE` by `eachFile`, `filesMatching`, or `PreserveFirstFoundResourceTransformer`.
+4. Remove the extra entries that are added by `INCLUDE` by `eachFile`, `filesMatching`, or
+   `PreserveFirstFoundResourceTransformer`.
 5. Diff the JARs again, and check that only the entries you want to preserve remain.
-6. Optionally, if you want a stricter check for the shadowed JAR entries, enable `failOnDuplicateEntries`.
-   This can also ensure the regressions are caught in the future.
+6. Optionally, if you want a stricter check for the shadowed JAR entries, enable `failOnDuplicateEntries`. This can also
+   ensure the regressions are caught in the future.
 
-See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+See more details about the fixed `DuplicatesStrategy` behaviors
+at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ## [8.3.11](https://github.com/GradleUp/shadow/releases/tag/8.3.11) - 2026-05-28
 
@@ -638,8 +647,7 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ### Fixed
 
-- Apply legacy plugin last, and declare capabilities for old plugins,
-  fixes #964. (#991)
+- Apply legacy plugin last, and declare capabilities for old plugins, fixes #964. (#991)
 
 ## [8.3.3](https://github.com/GradleUp/shadow/releases/tag/8.3.3) - 2024-10-02
 
@@ -655,9 +663,8 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ### Changed
 
-- **BREAKING CHANGE:** update
-  to [jdependency 2.11](https://github.com/tcurdt/jdependency/releases/tag/jdependency-2.11), this requires Java 11 or
-  above to run. (#974)
+- **BREAKING CHANGE:** update to [jdependency 2.11](https://github.com/tcurdt/jdependency/releases/tag/jdependency-2.11),
+  this requires Java 11 or above to run. (#974)
 
 ### Deprecated
 
@@ -672,8 +679,8 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ### Added
 
-- Apply an empty plugin that has the legacy `com.github.johnrengelman.shadow` plugin ID.
-  This allows existing build logic to keep on reacting to the legacy plugin as the replacement is drop-in currently.
+- Apply an empty plugin that has the legacy `com.github.johnrengelman.shadow` plugin ID. This allows existing build
+  logic to keep on reacting to the legacy plugin as the replacement is drop-in currently.
 
 ### Fixed
 
@@ -686,8 +693,8 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 - **BREAKING CHANGE:** the GitHub has been transferred from `johnrengelman/shadow` to `GradleUp/shadow`, you can view
   more details in #908.  
-  We also update the plugin ID from `com.github.johnrengelman.shadow` to `com.gradleup.shadow`, and the
-  Maven coordinate from `com.github.johnrengelman:shadow` to `com.gradleup.shadow:shadow-gradle-plugin`.
+  We also update the plugin ID from `com.github.johnrengelman.shadow` to `com.gradleup.shadow`, and the Maven coordinate
+  from `com.github.johnrengelman:shadow` to `com.gradleup.shadow:shadow-gradle-plugin`.
 - Bump the min Gradle requirement from `8.0.0` to `8.3`. (#876)
 - Support Java 21. (#876)
 - Use new file permission API from Gradle 8.3. (#876)
@@ -725,15 +732,13 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 ## [8.1.0](https://github.com/GradleUp/shadow/releases/tag/8.1.0) - 2023-02-26
 
 **BREAKING CHANGE:** Due to adoption of the latest version of the `com.gradle.plugin-publish` plugin, the maven GAV
-coordinates have changed as of this version.
-The correct coordinates now align with the plugin ID itself:
-`group=com.github.johnrengelman, artifact=shadow, version=<version>`.
-For example, `classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct configuration for this version.
+coordinates have changed as of this version. The correct coordinates now align with the plugin ID itself:
+`group=com.github.johnrengelman, artifact=shadow, version=<version>`. For example,
+`classpath("com.github.johnrengelman:shadow:8.1.0")` is the correct configuration for this version.
 
 **BREAKING CHANGE:** The `ConfigureShadowRelocation` task was removed as of this version to better support Gradle
-configuration caching.
-Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on the `ShadowJar` task
-type.
+configuration caching. Instead, use the `enableRelocation = true` and `relocationPrefix = "<new package>"` settings on
+the `ShadowJar` task type.
 
 ### What's Changed
 
@@ -797,7 +802,8 @@ type.
 - **BREAKING** - The maven coordinates for the plugins have changed as of this version. The proper `group:artifact` is
   `gradle.plugin.com.github.johnrengelman:shadow`
 - Fix `shadowJar` Out-Of-Date with configuration caching #708 by @mathjeff
-- Better support for statically typed languages. This change may require code changes if you are utilizing the Groovy generated getters for properties in some Shadow transformers #706 by @Fiouz
+- Better support for statically typed languages. This change may require code changes if you are utilizing the Groovy
+  generated getters for properties in some Shadow transformers #706 by @Fiouz
 - Various cleanups #672, #700, #701, #702 by @helfper
 - Support JVM Toolchains #691 by @rpalcolea
 - Fix `Project.afterEvaluate` conflicts #675 by @mjulianotq
@@ -838,8 +844,7 @@ type.
 ## [6.1.0](https://github.com/GradleUp/shadow/releases/tag/6.1.0) - 2020-10-05
 
 - As of this version, Shadow is compiled with Java 8 source and target compatibility. This aligns the plugin with the
-  minimum required Java version
-  for Gradle 6.0 (https://docs.gradle.org/6.0/release-notes.html).
+  minimum required Java version for Gradle 6.0 (https://docs.gradle.org/6.0/release-notes.html).
 - Update ASM to 9.0 to support JDK 16.
 - Enable Configuration Caching for Gradle 6.6+ #591 by @timyates, @britter
 - doc updates #593 by @MuffinTheMan
@@ -908,10 +913,9 @@ type.
 ## [4.0.1](https://github.com/GradleUp/shadow/releases/tag/4.0.1) - 2018-09-30
 
 - **Breaking Change!** `Transform.modifyOutputStream(ZipOutputStream os)` to
-  `Transform.modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)`.
-  Typically breaking changes are reserved for major version releases, but this change was necessary for
-  `preserverFileTimestamps` (introduced in v4.0.0) to work correctly
-  in the presence of transformers, #404
+  `Transform.modifyOutputStream(ZipOutputStream jos, boolean preserveFileTimestamps)`. Typically breaking changes are
+  reserved for major version releases, but this change was necessary for
+  `preserverFileTimestamps` (introduced in v4.0.0) to work correctly in the presence of transformers, #404
 - Fix regression in support Java 10+ during relocation, #403
 
 ## [4.0.0](https://github.com/GradleUp/shadow/releases/tag/4.0.0) - 2018-09-25
@@ -922,12 +926,13 @@ type.
   use this feature, you will need to declare your own `ConfigureShadowRelocation` task. See
   section [2.9.2](https://gradleup.com/shadow/#automatically_relocating_dependencies) of the User Guide
 - Upgrade to ASM 6.2.1 to support Java 11 by @SerCeMan
-- Add support for `shadowJar.preserveFileTimestamps` property. See [Jar.preserveFileTimestamps](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps) by @Macil
+- Add support for `shadowJar.preserveFileTimestamps` property.
+  See [Jar.preserveFileTimestamps](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps)
+  by @Macil
 - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files during merge. by @nikole-dunixi
 - Fix the long standing "No property `mainClassName`" issue. by @felipecsl
 - Implement JAR minimization actions. This will attempt to exclude unused classes in your shadowed JAR. by @debanne
-- Configure exclusion of `module-info.class` from `shadowJar` when using the Shadow the Java
-  plugin, #352
+- Configure exclusion of `module-info.class` from `shadowJar` when using the Shadow the Java plugin, #352
 
 ## [2.0.4](https://github.com/GradleUp/shadow/releases/tag/2.0.4) - 2018-04-27
 
@@ -945,8 +950,7 @@ type.
 
 - documentation by @ghost, @tylerbenson
 - Support multi-project builds with Build-Scan integration by @mark-vieira
-- Upgrade to ASM
-  6, #294, #303
+- Upgrade to ASM 6, #294, #303
 - Fix integration with `application` plugin in Gradle 4.3, #339 by @rspieldenner
 - Fixed deprecation warning from Gradle 4.2+, #326
 
@@ -1012,42 +1016,40 @@ type.
   package.
 - Upgrade JDOM library from 1.1 to 2.0.5 (change dependency from `jdom:jdom:1.1` to
   `org.jdom:jdom2:2.0.5`), #98
-- Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle
-  2.2, #106
+- Convert ShadowJar.groovy to ShadowJar.java to workaround binary incompatibility introduced by Gradle 2.2, #106
 - Updated ASM library to `5.0.3` to support JDK8, #97
-- Allows for regex pattern matching in the `dependency` string when
-  including/excluding, #83
+- Allows for regex pattern matching in the `dependency` string when including/excluding, #83
 - Apply package relocations to resource files, #93
 
 ## [1.1.2](https://github.com/GradleUp/shadow/releases/tag/1.1.2) - 2014-09-09
 
-- fix bug in `runShadow` where dependencies from the `shadow` configuration are not
-  available, #94
+- fix bug in `runShadow` where dependencies from the `shadow` configuration are not available, #94
 
 ## [1.1.1](https://github.com/GradleUp/shadow/releases/tag/1.1.1) - 2014-08-27
 
 - Fix bug in `'createStartScripts'` task that was causing it to not execute `'shadowJar'`
   task, #90
-- Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for
-  it, #92
+- Do not include `null` in ShadowJar Manifest `'Class-Path'` value when `jar` task does not specify a value for it, #92
 - ShadowJar Manifest `'Class-Path'` should reference jars from `'shadow'` config as relative to location of `shadowJar`
   output, #91
 
 ## [1.1.0](https://github.com/GradleUp/shadow/releases/tag/1.1.0) - 2014-08-26
 
-- **Breaking Change!** Fix leaking of `shadowJar.manifest` into
-  `jar.manifest`, #82
-  To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with `shadowJar.manifest`
+- **Breaking Change!** Fix leaking of `shadowJar.manifest` into `jar.manifest`, #82.  
+  To simplify behavior, the `shadowJar.appendManifest` method has been removed. Replace uses with
+  `shadowJar.manifest`
 - `ShadowTask` now has a `configurations` property that is resolved to the files in the resolved configuration before
-  being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task
-  has the convention of adding the `'runtime'` scope to this list. Manually created instances of `ShadowTask` have no
+  being added to the copy spec. This allows for an easier implementation for filtering. The default 'shadowJar' task has
+  the convention of adding the `'runtime'` scope to this list. Manually created instances of `ShadowTask` have no
   configurations added by default and can be configured by setting `task.configurations`.
 - Properly configure integration with the `'maven'` plugin when added. When adding `'maven'` the `'uploadShadow'` task
   will now properly configure the POM dependencies by removing the `'compile'` and `'runtime'` configurations from the
   POM and adding the `'shadow'` configuration as a `RUNTIME` scope in the POM. This behavior matches the behavior when
   using the `'maven-publish'` plugin.
-- Allow `ServiceFileTransformer` to specify include/exclude patterns for files within the configured path to merge. by @matthurne
-- Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module descriptor files. The existing `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default. by @matthurne
+- Allow `ServiceFileTransformer` to specify include/exclude patterns for files within the configured path to merge. by
+  @matthurne
+- Added `GroovyExtensionModuleTransformer` for merging Groovy Extension module descriptor files. The existing
+  `ServiceFileTransformer` now excludes Groovy Extension Module descriptors by default. by @matthurne
 - `distShadowZip` and `distShadowZip` now contain the shadow library and run scripts instead of the default from the
   `'application'` plugin, #89
 
@@ -1057,8 +1059,7 @@ type.
   `ServiceFileTransformer`, #72
 - Added PropertiesFileTransformer, #73 by @aalmiray
 - Fixed StackOverflow when a cycle occurs in the resolved dependency grap, #69 by @brandonkearby
-- Apply Transformers to project
-  resources, #70, #71
+- Apply Transformers to project resources, #70, #71
 - Do not drop non-class files from dependencies when relocation is enabled, #61 by @Minecrell
 - Remove support for applying individual sub-plugins by Id (easier maintenance and cleaner presentation in Gradle
   Portal)
@@ -1069,15 +1070,13 @@ type.
 - `runShadow` now registers `shadowJar` as an input. Previously, `runShadow` did not execute `shadowJar` and an error
   occurred.
 - Support Gradle 2.0, #66
-- Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead
-  combine, #65
+- Do not override existing 'Class-Path' Manifest attribute settings from Jar configuration. Instead combine, #65
 
 ## [1.0.1](https://github.com/GradleUp/shadow/releases/tag/1.0.1) - 2014-06-28
 
 - Fix issue where non-class files are dropped when using relocation, #58
 - Do not create a `/` directory inside the output jar.
-- Fix `runShadow` task to evaluate the `shadowJar.archiveFile` property at execution
-  time, #60
+- Fix `runShadow` task to evaluate the `shadowJar.archiveFile` property at execution time, #60
 
 ## [1.0.0](https://github.com/GradleUp/shadow/releases/tag/1.0.0) - 2014-06-27
 
@@ -1086,8 +1085,7 @@ type.
 - Properly configure the ShadowJar task inputs to observe the include/excludes from the `dependencies` block. This
   allows UP-TO-DATE checking to work properly when changing the `dependencies`
   rulea, #54
-- Apply relocation remappings to classes and imports in source
-  project, #55
+- Apply relocation remappings to classes and imports in source project, #55
 - Do not create directories in jar for source of remapped class, created directories in jar for destination of remapped
   classes, #53
 
@@ -1106,11 +1104,11 @@ type.
   for dependencies.
 - Dependencies added to the `shadow` configuration are automatically added to the `Class-Path` attribute in the manifest
   for `shadowJar`
-- Applying `application` plugin and settings `mainClassName` automatically configures the `Main-Class` attribute in
-  the manifest for `shadowJar`
+- Applying `application` plugin and settings `mainClassName` automatically configures the `Main-Class` attribute in the
+  manifest for `shadowJar`
 - `runShadow` now utilizes the output of the `shadowJar` and executes using `java -jar <shadow jar file>`
-- Start Scripts for shadow distribution now utilize `java -jar` to execute instead of placing all files on classpath
-  and executing main class.
+- Start Scripts for shadow distribution now utilize `java -jar` to execute instead of placing all files on classpath and
+  executing main class.
 - Excluding/Including dependencies no longer includes transitive dependencies. All dependencies for inclusion/exclusion
   must be explicitly configured via a spec.
 
