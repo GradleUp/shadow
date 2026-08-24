@@ -248,7 +248,7 @@ relocating), you can try out the trick like:
     }
     ```
 
-This is useful in some cases like [#759] mentioned. See
+This is useful in some cases, as mentioned in [#759]. See
 [Configuring Shadowed Dependencies][configuring-shadowed-dependencies] for more information about `configurations`.
 
 ## Relocating with R8
