@@ -76,6 +76,20 @@ flowchart TD
         F7 --> F8["Final Shadowed JAR"]
         F6 -->|"No"| F8
     end
+
+    click A2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html" "ShadowJar.configurations"
+    click A3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow/-shadow-base-plugin/-companion/-c-o-n-f-i-g-u-r-a-t-i-o-n_-n-a-m-e.html" "ShadowBasePlugin.CONFIGURATION_NAME"
+    click A4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html" "ShadowJar.dependencies"
+    click A5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-dependencies.html" "ShadowJar.includedDependencies"
+    click B5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/add-multi-release-attribute.html" "ShadowJar.addMultiReleaseAttribute"
+    click C2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
+    click D2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/minimize.html" "ShadowJar.minimize"
+    click D4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
+    click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
+    click E2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
+    click F1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
+    click F3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html" "ShadowJar.failOnDuplicateEntries"
+    click F7 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-r8-spec/index.html" "R8Spec"
 ```
 
 ### Execution Lifecycle Breakdown
