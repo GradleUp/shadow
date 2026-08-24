@@ -89,12 +89,12 @@
     With the introduction of `DuplicatesStrategy` checking for transformers, you may see warnings like:
 
     ```
-'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+    'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
     ```
 
     If you do not need Kotlin module metadata remapping, you can disable it:
 
-    ```kt
+    ```kotlin
     tasks.shadowJar {
       @Suppress("DEPRECATION") // This flag will be disabled and removed in the next major version of Shadow.
       enableKotlinModuleRemapping = false
@@ -451,17 +451,17 @@
   issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip
   the files, only copy the files as-is. If you still want to shadow the unzipped files, try out something like:
   ```kotlin
-    tasks.shadowJar {
-      // Unzip the files before pass them to `from` by using `zipTree`.
-      from(zipTree(files('path/to/your/file.zip')))
-    }
+  tasks.shadowJar {
+    // Unzip the files before pass them to `from` by using `zipTree`.
+    from(zipTree(files("path/to/your/file.zip")))
+  }
   ```
   or
   ```kotlin
-    dependencies {
-      // Add the files to `implementation` configuration, Shadow will unzip them automatically.
-      implementation(files('path/to/your/file.zip'))
-    }
+  dependencies {
+    // Add the files to `implementation` configuration, Shadow will unzip them automatically.
+    implementation(files("path/to/your/file.zip"))
+  }
   ```
 - **BREAKING CHANGE:** Rename `Transformer` to `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
   Aims to better align with the name `org.apache.maven.plugins.shade.resource.ResourceTransformer.java`
@@ -863,7 +863,7 @@ type.
   `gradle.plugin.com.github.jengelman.gradle.plugins`. Users explicitly declaring the buildscript classpath will need to
   update their configuration.
 
-  ```
+  ```groovy
   buildscript {
     repositories {
       gradlePluginPortal()
