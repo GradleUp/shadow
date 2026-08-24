@@ -124,7 +124,7 @@ Optional steps:
 
 - Enable [`ShadowJar.failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] to check duplicate entries in the final JAR.
   This can also ensure the regressions are caught in the future.
-- Use [Diffuse](https://github.com/JakeWharton/diffuse) to diff the JARs.
+- Use [Diffuse][Diffuse] to diff the JARs.
 
 Here are some examples:
 
@@ -472,7 +472,7 @@ The [`ShadowJar`][ShadowJar] task also provides a short syntax method to add thi
 [`ResourceTransformer`][ResourceTransformer] that merges
 `META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat` plugin caches from all the jars
 containing Log4j 2.x Core components. It's a Gradle equivalent of
-[Log4j Plugin Descriptor Transformer](https://logging.apache.org/log4j/transform/log4j-transform-maven-shade-plugin-extensions.html#log4j-plugin-cache-transformer).
+[Log4j Plugin Descriptor Transformer][log4j-plugin-descriptor-transformer].
 
 === "Kotlin"
 
@@ -966,3 +966,5 @@ You can then run the task to scan each entry on the classpath and print any matc
 [mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
 [CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
 [shadowjar-execution-flow]: ../README.md#shadowjar-execution-flow
+[Diffuse]: https://github.com/JakeWharton/diffuse
+[log4j-plugin-descriptor-transformer]: https://logging.apache.org/log4j/transform/log4j-transform-maven-shade-plugin-extensions.html#log4j-plugin-cache-transformer

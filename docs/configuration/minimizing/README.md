@@ -350,6 +350,8 @@ To enable both:
     }
     ```
 
+
+
 [-printmapping]: https://www.guardsquare.com/manual/configuration/usage#printmapping
 [-printseeds]: https://www.guardsquare.com/manual/configuration/usage#printseeds
 [-printusage]: https://www.guardsquare.com/manual/configuration/usage#printusage

@@ -109,7 +109,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
 !!! note
 
     The correct maven coordinates for each version of Shadow can be found by referencing the Gradle Plugin
-    documentation [here](https://plugins.gradle.org/plugin/com.gradleup.shadow).
+    documentation [here][gradle-plugin-portal].
 
 Shadow is a reactive plugin.
 This means that applying Shadow by itself will perform no configuration on your project.
@@ -171,8 +171,7 @@ Also, you can view more information about the [`ShadowJar`][ShadowJar] task by r
 ./gradlew -q help --task shadowJar
 ```
 
-Refer to
-[listing command line options](https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options).
+Refer to [listing command line options][listing-command-line-options].
 
 
 
@@ -180,3 +179,5 @@ Refer to
 [JavaPlugin]: https://docs.gradle.org/current/userguide/java_plugin.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[gradle-plugin-portal]: https://plugins.gradle.org/plugin/com.gradleup.shadow
+[listing-command-line-options]: https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options

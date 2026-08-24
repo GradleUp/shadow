@@ -95,16 +95,14 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
     }
     ```
 
-See also [Adding Extra Files](../README.md#adding-extra-files)
+See also [Adding Extra Files][adding-extra-files]
 
 ## Embedding Non-JAR Dependencies into Your Shadowed JAR
 
 Dependencies added into `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`) will be unzipped and
-merged into the shadowed JAR. Not all dependencies are JAR files, e.g. some of them are
-[POM files](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
-[SO files](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/),
-and so on. If such dependencies are added into `runtimeClasspath`, you will encounter the following error when building
-the shadowed JAR:
+merged into the shadowed JAR. Not all dependencies are JAR files, e.g. some of them are [POM files][pom-files],
+[SO files][so-files], and so on. If such dependencies are added into `runtimeClasspath`, you will encounter the
+following error when building the shadowed JAR:
 
 ```
 * What went wrong:
@@ -489,3 +487,6 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [Project.configurations]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:configurations
 [Project.zipTree]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:zipTree(java.lang.Object)
+[adding-extra-files]: ../README.md#adding-extra-files
+[pom-files]: https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/
+[so-files]: https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/

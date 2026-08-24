@@ -166,8 +166,7 @@ You can also add more files into the distribution like:
     }
     ```
 
-View [The Distribution Plugin](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
-for more information about configuring distributions.
+View [The Distribution Plugin][distribution-plugin] for more information about configuring distributions.
 
 
 
@@ -175,3 +174,4 @@ for more information about configuring distributions.
 [JavaExec]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [application]: https://docs.gradle.org/current/userguide/application_plugin.html
+[distribution-plugin]: https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin

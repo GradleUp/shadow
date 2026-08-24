@@ -8,7 +8,7 @@ these settings too.
 Besides file timestamps and file order, this configuration also ensures that all files in the JAR are set to have the
 same permissions, irrespective of the locally configured umask.
 
-More information about reproducible builds can be found at [reproducible-builds.org](https://reproducible-builds.org/).
+More information about reproducible builds can be found at [reproducible-builds.org][reproducible-builds.org].
 
 === "Kotlin"
 
@@ -56,6 +56,9 @@ One effect that this configuration will have is that the timestamps of all files
 consistent value. If your code or any files being included into the JAR depend on the timestamps being set accurately
 within the JAR, then this may not be the correct choice for you.
 
-See
-the [Reproducible archives section in Gradle's documentation](https://docs.gradle.org/4.9/userguide/working_with_files.html#sec:reproducible_archives)
-for more information.
+See the [Reproducible archives section in Gradle's documentation][reproducible-archives-section] for more information.
+
+
+
+[reproducible-builds.org]: https://reproducible-builds.org/
+[reproducible-archives-section]: https://docs.gradle.org/4.9/userguide/working_with_files.html#sec:reproducible_archives

@@ -264,6 +264,7 @@ method can be used to add extra files.
 See also [Embedding Local Jar Files Into Your Shadowed Jar][embedding-local-jar-files-into-your-shadowed-jar].
 
 
+
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
