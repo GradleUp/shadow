@@ -457,10 +457,10 @@
   }
   ```
   or
-  ```kotlin
+  ```groovy
   dependencies {
     // Add the files to `implementation` configuration, Shadow will unzip them automatically.
-    implementation(files("path/to/your/file.zip"))
+    implementation(files('path/to/your/file.zip'))
   }
   ```
 - **BREAKING CHANGE:** Rename `Transformer` to `ResourceTransformer`. ([#1288](https://github.com/GradleUp/shadow/pull/1288))  
