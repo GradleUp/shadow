@@ -120,25 +120,25 @@ This means, that for most users, the `java` or `groovy` plugins must be _explici
 In the presence of the `java`, `org.jetbrains.kotlin.jvm` or `groovy` plugins (that apply [`JavaPlugin`][JavaPlugin]
 in their build logic), Shadow will automatically configure the following behavior:
 
-* Adds a [`ShadowJar`][ShadowJar] task to the project.
-* Adds a `shadow` configuration to the project.
-* Adds a `shadow` variant to the project.
-* Adds a `shadow` component to the project.
-* Configures the [`ShadowJar`][ShadowJar] task to include all sources from the project's `main` sourceSet.
-* Configures the [`ShadowJar`][ShadowJar] task to bundle all dependencies from the `runtimeClasspath` configuration.
-* Configures the _classifier_ attribute of the [`ShadowJar`][ShadowJar] task to be `'all'` .
-* Configures the [`ShadowJar`][ShadowJar] task to generate a `Manifest` with:
-  * Inheriting all configuration from the standard [`Jar`][Jar] task.
-  * Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
-* Configures the [`ShadowJar`][ShadowJar] task to _exclude_ any JAR index or cryptographic signature files matching the
+- Adds a [`ShadowJar`][ShadowJar] task to the project.
+- Adds a `shadow` configuration to the project.
+- Adds a `shadow` variant to the project.
+- Adds a `shadow` component to the project.
+- Configures the [`ShadowJar`][ShadowJar] task to include all sources from the project's `main` sourceSet.
+- Configures the [`ShadowJar`][ShadowJar] task to bundle all dependencies from the `runtimeClasspath` configuration.
+- Configures the _classifier_ attribute of the [`ShadowJar`][ShadowJar] task to be `'all'` .
+- Configures the [`ShadowJar`][ShadowJar] task to generate a `Manifest` with:
+  - Inheriting all configuration from the standard [`Jar`][Jar] task.
+  - Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
+- Configures the [`ShadowJar`][ShadowJar] task to _exclude_ any JAR index or cryptographic signature files matching the
   following patterns:
-  * `META-INF/INDEX.LIST`
-  * `META-INF/*.SF`
-  * `META-INF/*.DSA`
-  * `META-INF/*.RSA`
-  * `META-INF/versions/**/module-info.class`
-  * `module-info.class`
-* Creates and registers the `shadow` component in the project (used for integrating with
+  - `META-INF/INDEX.LIST`
+  - `META-INF/*.SF`
+  - `META-INF/*.DSA`
+  - `META-INF/*.RSA`
+  - `META-INF/versions/**/module-info.class`
+  - `module-info.class`
+- Creates and registers the `shadow` component in the project (used for integrating with
   [`maven-publish`][maven-publish]).
 
 ## ShadowJar Command Line options

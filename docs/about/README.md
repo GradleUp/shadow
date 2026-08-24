@@ -14,8 +14,8 @@ the [Gradle Plugin Portal][gradle-plugin-portal] and so Shadow was published the
 
 ## Maintainers
 
-* [John Engelman][john-engelman]
-* [Zongle Wang][zongle-wang]
+- [John Engelman][john-engelman]
+- [Zongle Wang][zongle-wang]
 
 ## Contributors
 
