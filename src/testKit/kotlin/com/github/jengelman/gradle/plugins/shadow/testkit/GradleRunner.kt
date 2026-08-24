@@ -27,6 +27,7 @@ val enableNoImplicitLookupInParentProjects: String
     }
 
 // TODO: this could be inlined after bumping the min Gradle requirement to 9.7 or above.
+// https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
 private val isolatedProjectsFlag: String
   get() =
     when {
@@ -41,11 +42,9 @@ val commonGradleArgs =
     "--build-cache",
     "--stacktrace",
     "--warning-mode=fail",
+    "-Dorg.gradle.configuration-cache.parallel=true",
     "-Dorg.gradle.kotlin.dsl.allWarningsAsErrors=true",
     "-Dorg.gradle.tooling.parallel=true",
-    // https://docs.gradle.org/current/userguide/configuration_cache.html#config_cache:usage:parallel
-    "-Dorg.gradle.configuration-cache.parallel=true",
-    // https://docs.gradle.org/current/userguide/isolated_projects.html#how_do_i_use_it
     isolatedProjectsFlag,
   )
 
