@@ -10,7 +10,7 @@ The following diagram and breakdown illustrate how the `shadowJar` task processe
 ```mermaid
 flowchart TD
     subgraph Inputs["1. Inputs & Configuration"]
-        A1["Project SourceSets / Files<br/>(from(...) / tasks.jar)"]
+        A1["Project Outputs & Extra Files<br/>(sourceSets.main.output / from(...))"]
         A2["Dependency Configurations<br/>(runtimeClasspath, etc.)"]
         A3["shadow Configuration<br/>(Unmerged runtime deps)"]
         A4["dependencies { include(...) / exclude(...) }"]
@@ -65,14 +65,16 @@ flowchart TD
         F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
         E3 --> F1
         F2["addDirs()<br/>Generate parent directory entries"]
-        F3{"failOnDuplicateEntries?"}
+        F3{"Duplicates found in ZIP?<br/>(checkDuplicateEntries)"}
         F1 & D6 & E4 --> F2 --> F3
-        F3 -->|"Duplicates Found & Enabled"| F4["Fail Build"]
-        F3 -->|"Passed / Disabled"| F5["Close Intermediate ZIP"]
+        F3 -->|"Duplicates found & failOnDuplicateEntries = true"| F4["Fail Build"]
+        F3 -->|"Duplicates found & failOnDuplicateEntries = false (default)"| F4Warn["Log Warning"]
+        F3 -->|"No duplicates"| F5["Close Intermediate ZIP"]
+        F4Warn --> F5
 
         F6{"Minimize Tool == R8?"}
         F5 --> F6
-        F6 -->|"Yes"| F7["runR8Minimization()<br/>R8 ProGuard/keep rules optimization"]
+        F6 -->|"Yes"| F7["runR8Minimization()<br/>R8 shrinking (and optional optimization/obfuscation)"]
         F7 --> F8["Final Shadowed JAR"]
         F6 -->|"No"| F8
     end
@@ -105,14 +107,14 @@ flowchart TD
         - Regular JAR/ZIP files are unpacked and added as copy specs via `archiveOperations.zipTree(jar)`.
         - Directories are added via `from(dir)`.
         - AAR files are rejected with a helpful error suggesting the Android Fused Library plugin.
-    - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path` (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release` attribute if enabled.
+    - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path` (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release` attribute if enabled. Note that the manifest itself inherits from the standard `jar` task, but the `jar` task's archive contents are not input to `shadowJar`.
 
 3. **Gradle `CopySpec` & `duplicatesStrategy` Intervention**:
     - File-level `include` and `exclude` pattern filters are evaluated.
     - **Duplicate Handling**: Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach Shadow's transformers or relocators:
         - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped by Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
         - `INCLUDE` / `WARN`: Allows duplicate files to pass through to the `CopyAction` so [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
-        - See [Handling Duplicates Strategy](merging/README.md#handling-duplicates-strategy) for best practices on combining `duplicatesStrategy` and transformers.
+        - See [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining `duplicatesStrategy` and transformers.
 
 4. **Stream Processing (`ShadowCopyAction`)**:
     - **Class Files (`*.class`)**:
@@ -128,12 +130,12 @@ flowchart TD
 5. **Output Finalization**:
     - **`processTransformers()`**: Calls `modifyOutputStream` on all active [`ResourceTransformer`][ResourceTransformer]s, writing merged contents (e.g. `META-INF/services/`, merged properties, appended files, XML) into the ZIP stream.
     - **`addDirs()`**: Creates synthetic directory entries in the ZIP for proper archive structure.
-    - **`checkDuplicateEntries()`**: If [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled, verifies that no duplicate entry names exist in the final output ZIP, failing the build or logging a warning if any duplicates are found.
+    - **`checkDuplicateEntries()`**: Always scans all entries in the final output ZIP for duplicate paths. If duplicates are found, it fails the build when [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled (`true`), or logs a warning message by default when disabled (`false`).
     - The intermediate ZIP output stream is closed.
 
 6. **Post-Processing Optimization (R8 Minimization)**:
     - If minimization is configured with `MinimizeTool.R8`, Shadow invokes R8 on the intermediate JAR.
-    - R8 applies ProGuard/keep rules, treeshaking, and optimization, outputting the final optimized fat JAR.
+    - By default, R8 performs shrinking (dead code removal) based on keep rules. Optimization and obfuscation only occur if explicitly enabled in `r8 { ... }`. Shadow then outputs the final shadowed fat JAR.
 
 
 ## Configuring Output Name

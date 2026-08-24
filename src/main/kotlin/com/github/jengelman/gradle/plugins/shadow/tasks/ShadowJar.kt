@@ -309,9 +309,10 @@ public abstract class ShadowJar : Jar() {
    * - [FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate
    *   `foo/bar` files.
    * - [INCLUDE]: **Duplicate** `foo/bar` entries will be included in the final JAR.
-   * - [INHERIT]: **Inherit** the strategy from the parent copy specification. If set at the task
-   *   root (or if no explicit strategy is set), encountering duplicates will fail the build with an
-   *   exception like `Entry .* is a duplicate but no duplicate handling strategy has been set`.
+   * - [INHERIT]: **Inherit** the strategy from the parent copy specification. If explicitly set to
+   *   [INHERIT] on the root task (where no parent specification exists to inherit from),
+   *   encountering duplicates will fail the build with an exception like `Entry .* is a duplicate
+   *   but no duplicate handling strategy has been set`.
    * - [WARN]: **Warn** about duplicates in the build log; this behaves exactly as [INCLUDE]
    *   otherwise.
    *
