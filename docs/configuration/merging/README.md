@@ -548,8 +548,8 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
 ## Appending XML Files
 
-XML files require a special transformer for merging. The [`XmlAppendingTransformer`][XmlAppendingTransformer] reads
-each XML document and merges each root element into a single document. There is no short syntax method for the
+XML files require a special transformer for merging. The [`XmlAppendingTransformer`][XmlAppendingTransformer] reads each
+XML document and merges each root element into a single document. There is no short syntax method for the
 [`XmlAppendingTransformer`][XmlAppendingTransformer]. It must be added using the [`transform`][ShadowJar.transform]
 methods.
 

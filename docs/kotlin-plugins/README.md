@@ -59,9 +59,8 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
     ```
 
-You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins, easily organize
-your build logic for [Publishing Libraries][publishing-libraries], [Running Applications][running-applications],
-and so on.
+You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins, easily organize your
+build logic for [Publishing Libraries][publishing-libraries], [Running Applications][running-applications], and so on.
 
 ## For Kotlin Multiplatform Plugin
 
