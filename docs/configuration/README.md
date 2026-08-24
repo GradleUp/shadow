@@ -22,10 +22,14 @@ flowchart TD
     subgraph Preparation["2. Task Preparation (ShadowJar.copy)"]
         B1{"More Dependencies?<br/>(addIncludedDependencies)"}
         A5 --> B1
-        B1 -->|"AAR"| B4["Fail Build<br/>(AAR not supported; use Fused Library)"]
-        B1 -->|"Dir: from(dir)<br/>JAR/ZIP: from(zipTree)"| B1
+        B1 -->|"Yes"| B2{"Dependency File Type?"}
+        B2 -->|"Missing"| B3["Log & Skip"]
+        B2 -->|"Directory"| B4["from(dir)"]
+        B2 -->|"AAR"| BFail["Fail Build<br/>(AAR not supported; use Fused Library)"]
+        B2 -->|"Other File"| BArchive["from(zipTree(file))"]
+        B3 & B4 & BArchive --> B1
         B5["injectManifestAttributes()<br/>• Main-Class<br/>• Class-Path (from shadow)<br/>• Multi-Release flag"]
-        B1 -->|"Done / Empty"| B5
+        B1 -->|"No / Empty"| B5
         A3 -.-> B5
         B5 --> B6["super.copy()"]
     end
@@ -35,13 +39,21 @@ flowchart TD
         B6 --> PreStream
         ExecuteStream["ShadowCopyAction.execute()<br/>• zipOutStream.use { ... }<br/>• stream.process entries"]
         PreStream --> ExecuteStream
+        A1 -.->|"Configured Specs"| ExecuteStream
 
-        C1["Pattern Filtering<br/>(include / exclude)"]
-        ExecuteStream --> C1
-        C1 --> C2{"Duplicate Path?<br/>(duplicatesStrategy)"}
-        C2 -->|"EXCLUDE (default)"| NextEntry["Next Entry / Drop"]
-        C2 -->|"INCLUDE / WARN"| D1{"Entry Type?"}
-        C2 -->|"FAIL / INHERIT"| F4Close
+        EntryLoop{"More Entries?"}
+        ExecuteStream --> EntryLoop
+        EntryLoop -->|"Yes"| C1{"Included by Patterns?<br/>(include / exclude)"}
+        EntryLoop -->|"No"| F1
+        C1 -->|"No"| EntryLoop
+        C1 -->|"Yes"| C2{"Path Already Seen?"}
+        C2 -->|"No"| D1{"Entry Type?"}
+        C2 -->|"Yes"| CStrategy{"Effective<br/>duplicatesStrategy?"}
+        CStrategy -->|"EXCLUDE (default)"| EntryLoop
+        CStrategy -->|"INCLUDE"| D1
+        CStrategy -->|"WARN"| CWarn["Log Warning"]
+        CWarn --> D1
+        CStrategy -->|"FAIL / unresolved INHERIT"| F4Close
     end
 
     subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
@@ -65,13 +77,11 @@ flowchart TD
         D1 -->|"Resource"| E1
         D1 -->|"Directory"| D8["Record in visitedDirs<br/>(timestamp & permissions)"]
 
-        D3 & D5 & D7 & E3 & E4 & D8 --> NextEntry
-        NextEntry -->|"More Entries"| C1
+        D3 & D5 & D7 & E3 & E4 & D8 --> EntryLoop
     end
 
     subgraph Finalization["5. Output Finalization & Post-Processing"]
         F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
-        NextEntry -->|"All Entries Processed"| F1
         F2["addDirs()<br/>Generate parent directory entries"]
         F1 --> F2
         D8 -.->|"Directory Metadata"| F2
@@ -95,7 +105,7 @@ flowchart TD
     click A4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html" "ShadowJar.dependencies"
     click A5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-dependencies.html" "ShadowJar.includedDependencies"
     click B5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/add-multi-release-attribute.html" "ShadowJar.addMultiReleaseAttribute"
-    click C2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
+    click CStrategy href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
     click D2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/minimize.html" "ShadowJar.minimize"
     click D6 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
     click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
