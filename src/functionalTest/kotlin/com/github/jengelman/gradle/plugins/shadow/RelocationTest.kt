@@ -678,7 +678,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Test
+  @Test // #1534
   fun relocateCaseSensitiveAndInsensitiveClassesInJar() {
     val fooJar =
       buildJar("foo.jar") {
