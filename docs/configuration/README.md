@@ -20,29 +20,33 @@ flowchart TD
     end
 
     subgraph Preparation["2. Task Preparation (ShadowJar.copy)"]
-        B1["addIncludedDependencies()<br/>• Dir -> from(dir)<br/>• JAR/ZIP -> from(zipTree)<br/>• AAR -> Fail"]
+        B1{"Dependency File Type?<br/>(addIncludedDependencies)"}
         A5 --> B1
+        B1 -->|"AAR"| B4["Fail Build<br/>(AAR not supported; use Fused Library)"]
         B5["injectManifestAttributes()<br/>• Main-Class<br/>• Class-Path (from shadow)<br/>• Multi-Release flag"]
+        B1 -->|"Dir / JAR / ZIP"| B5
         A3 -.-> B5
-        B1 --> B5
-        B6["super.copy()"]
-        B5 --> B6
+        B5 --> B6["super.copy()"]
     end
 
-    subgraph CopySpecProcessing["3. Gradle CopySpec & Duplicate Handling"]
+    subgraph CopySpecProcessing["3. Gradle Copy Engine & Duplicate Handling"]
+        PreStream["createCopyAction()<br/>• findUnusedClasses()<br/>• Instantiate ShadowCopyAction"]
+        B6 --> PreStream
+        A1 -.->|"Configured specs"| PreStream
+        ExecuteStream["ShadowCopyAction.execute()<br/>• Initialize ZipOutputStream<br/>• stream.process entries"]
+        PreStream --> ExecuteStream
+
         C1["Pattern Filtering<br/>(include / exclude)"]
-        A1 & B6 --> C1
+        ExecuteStream --> C1
         C1 --> C2{"Duplicate Path?<br/>(duplicatesStrategy)"}
         C2 -->|"EXCLUDE (default)"| C3["Keep 1st occurrence;<br/>Drop subsequent duplicates"]
-        C2 -->|"INCLUDE / WARN"| C4["Pass entries to CopyAction<br/>(WARN logs warning)"]
+        C2 -->|"INCLUDE / WARN"| C4["Pass entries to ShadowCopyAction<br/>(WARN logs warning)"]
         C2 -->|"FAIL / INHERIT"| C5["Fail build<br/>(DuplicateFileCopyingException / no strategy set)"]
     end
 
     subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
-        PreStream["createCopyAction()<br/>• findUnusedClasses() (Dependency Analyzer)<br/>• Initialize ZipOutputStream"]
-        C3 & C4 --> PreStream
         D1{"Entry Type?"}
-        PreStream --> D1
+        C3 & C4 --> D1
 
         subgraph ClassBranch["Class Files (*.class)"]
             D2{"In pre-computed<br/>unusedClasses?"}
@@ -114,28 +118,30 @@ flowchart TD
     - **`addIncludedDependencies()`**: Analyzes each dependency file:
         - Regular JAR/ZIP files are unpacked and added as copy specs via `archiveOperations.zipTree(jar)`.
         - Directories are added via `from(dir)`.
-        - AAR files are rejected with a helpful error suggesting the Android Fused Library plugin.
+        - AAR files immediately fail the build with an error suggesting the Android Fused Library plugin.
     - **`injectManifestAttributes()`**: Populates the JAR manifest with `Main-Class` (if specified), `Class-Path`
       (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release`
       attribute if enabled. Note that the manifest itself inherits from the standard `jar` task, but the `jar` task's
       archive contents are not input to `shadowJar`.
-    - **`super.copy()`**: Triggers Gradle's standard copy engine with all configured specs.
+    - **`super.copy()`**: Enters Gradle's copy engine execution pipeline.
 
-3. **Gradle `CopySpec` & `duplicatesStrategy` Intervention**:
-    - File-level `include` and `exclude` pattern filters are evaluated.
-    - **Duplicate Handling**: Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach
-      Shadow's transformers or relocators:
-        - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped by
-          Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
-        - `INCLUDE` / `WARN`: Allows duplicate files to pass through to the `CopyAction` so
-          [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
-        - See [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining
-          `duplicatesStrategy` and transformers.
-
-4. **Stream Processing (`ShadowCopyAction`)**:
-    - **Initialization & Analysis (`createCopyAction`)**: Before file iteration begins, if minimization with
+3. **Gradle Copy Engine & Duplicate Handling**:
+    - **`createCopyAction()`**: Before file iteration begins, if minimization with
       `MinimizeTool.DEPENDENCY_ANALYZER` is enabled, Shadow runs `findUnusedClasses()` once upfront to pre-calculate
-      the set of unused classes.
+      the set of unused classes, then instantiates `ShadowCopyAction`.
+    - **`ShadowCopyAction.execute()`**: Opens the output `ZipOutputStream` and starts stream processing.
+    - **`CopySpec` Filtering & Duplicate Handling**: For each entry encountered during the copy stream:
+        - File-level `include` and `exclude` pattern filters are evaluated.
+        - Gradle's `duplicatesStrategy` operates at the `CopySpec` layer **before** entries reach Shadow's transformers
+          or relocators:
+            - `EXCLUDE` (default): Only the first occurrence of a file path is kept. Subsequent duplicates are dropped
+              by Gradle and will **not** reach [`ResourceTransformer`][ResourceTransformer]s.
+            - `INCLUDE` / `WARN`: Allows duplicate files to pass through to `ShadowCopyAction.visitFile` so
+              [`ResourceTransformer`][ResourceTransformer]s can aggregate and merge them.
+            - See [Handling Duplicates Strategy][handling-duplicates-strategy] for best practices on combining
+              `duplicatesStrategy` and transformers.
+
+4. **Stream Processing (`ShadowCopyAction.visitFile`)**:
     - **Class Files (`*.class`)**:
         - *Unused Class Filter*: Checks if the class name is present in the pre-computed `unusedClasses` set, dropping
           it if found.
