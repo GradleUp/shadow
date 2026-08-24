@@ -1,70 +1,111 @@
-# pip install mkdocs-material mdx_truly_sane_lists
+# pipx install mkdocs --include-deps
+# pipx inject mkdocs mkdocs-material mdx_truly_sane_lists
 # mkdocs serve
-# mkdocs gh-deploy
 
 site_name: Shadow Gradle Plugin
+site_url: https://gradleup.com/shadow/
 repo_name: Shadow
 repo_url: https://github.com/GradleUp/shadow
 site_description: "A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin."
 site_author: GradleUp developers
-remote_branch: gh-pages
 edit_uri: edit/main/docs
+copyright: 'Copyright &copy; GradleUp developers'
 
 theme:
   name: 'material'
+  language: 'en'
+  icon:
+    repo: fontawesome/brands/github
   favicon: images/logo.orig.svg
   logo: images/logo.svg
   palette:
+    - media: '(prefers-color-scheme)'
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
     - media: '(prefers-color-scheme: light)'
       scheme: default
       primary: 'white'
+      accent: 'indigo'
       toggle:
         icon: material/brightness-7
         name: Switch to dark mode
     - media: '(prefers-color-scheme: dark)'
       scheme: slate
       primary: 'black'
+      accent: 'indigo'
       toggle:
         icon: material/brightness-4
-        name: Switch to light mode
+        name: Switch to system preference
   font:
     text: 'Lato'
     code: 'JetBrains Mono'
   features:
     - content.action.edit
+    - content.action.view
     - content.code.copy
     - content.code.select
+    - content.code.annotate
     - content.tabs.link
-    - toc.integrate
+    - content.tooltips
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.top
+    - navigation.path
+    - navigation.footer
+    - toc.follow
+    - search.suggest
+    - search.highlight
+    - search.share
+
+plugins:
+  - search:
+      separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
 
 markdown_extensions:
   - smarty
-  - codehilite:
-      guess_lang: false
   - footnotes
   - meta
+  - tables
+  - admonition
+  - attr_list
+  - md_in_html
   - toc:
       permalink: true
-  - pymdownx.betterem:
-      smart_enable: all
-  - pymdownx.caret
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
   - pymdownx.inlinehilite
-  - pymdownx.magiclink
-  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      base_path: ['.']
   - pymdownx.superfences:
       custom_fences:
         - name: mermaid
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
-  - pymdownx.emoji
-  - pymdownx.snippets:
-      base_path: ['.']
   - pymdownx.tabbed:
       alternate_style: true
-  - tables
-  - admonition
-  - attr_list
-  - md_in_html
+      combine_header_slug: true
+      slugify: !!python/object/apply:pymdownx.slugs.slugify
+        kwds:
+          case: lower
+  - pymdownx.details
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.keys
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.magiclink
+  - pymdownx.smartsymbols
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - mdx_truly_sane_lists:
       nested_indent: 2
       truly_sane: true
@@ -88,9 +129,10 @@ nav:
   - 'Publishing': publishing/README.md
   - 'Multi-Project': multi-project/README.md
   - 'Changes': changes/README.md
-  - 'API': api/index.html
+  - 'API ↗': api/index.html
   - 'About': about/README.md
 
 validation:
-  unrecognized_links: warn
-  anchors: warn
+  links:
+    unrecognized_links: warn
+    anchors: warn
