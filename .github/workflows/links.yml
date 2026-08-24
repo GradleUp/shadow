@@ -10,6 +10,7 @@ on:
       - README.md
       - RELEASING.md
       - .github/workflows/links.yml
+      - mkdocs.yml
   pull_request:
     paths:
       - docs/**
@@ -17,6 +18,7 @@ on:
       - README.md
       - RELEASING.md
       - .github/workflows/links.yml
+      - mkdocs.yml
   workflow_dispatch:
 
 jobs:

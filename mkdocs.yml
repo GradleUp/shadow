@@ -57,6 +57,8 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_code_format
   - pymdownx.emoji
+  - pymdownx.snippets:
+      base_path: ['.']
   - pymdownx.tabbed:
       alternate_style: true
   - tables
