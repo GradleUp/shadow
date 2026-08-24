@@ -354,10 +354,10 @@
 
 - Improve the error message for empty `mainClassName`. ([#1601](https://github.com/GradleUp/shadow/pull/1601))
 - Default `duplicatesStrategy` back to `EXCLUDE`. ([#1617](https://github.com/GradleUp/shadow/pull/1617))
-    - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
-    - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
-    - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
-    - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+  - This strategy is consistent with 8.x series behavior, which is more compatible for most users upgrading.
+  - For most `ResourceTransformer` users, you need to override the strategy to `INCLUDE` to make them work.
+  - Strongly suggest declaring the `duplicatesStrategy` explicitly in your `ShadowJar` configuration to avoid confusion.
+  - See more details about the strategies at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
 
 ### Fixed
 
@@ -419,9 +419,9 @@
 - Fail build if the ZIP entries in the shadowed JAR are duplicate. ([#1552](https://github.com/GradleUp/shadow/pull/1552))  
   This feature is controlled by the `shadowJar.failOnDuplicateEntries` property, which is `false` by default.  
   Related to setting `duplicatesStrategy = DuplicatesStrategy.FAIL` but there are some differences:
-    - It only checks the entries in the shadowed jar, not the input files.
-    - It works with setting `duplicatesStrategy` to any value.
-    - It provides a stricter fallback check before the JAR is created.
+  - It only checks the entries in the shadowed jar, not the input files.
+  - It works with setting `duplicatesStrategy` to any value.
+  - It provides a stricter fallback check before the JAR is created.
 
 ### Changed
 
@@ -438,14 +438,14 @@
 - **BREAKING CHANGE:** Move tracking unused classes logic out of `ShadowCopyAction`. ([#1257](https://github.com/GradleUp/shadow/pull/1257))
 - **BREAKING CHANGE:** Move `DependencyFilter` into `tasks` package. ([#1272](https://github.com/GradleUp/shadow/pull/1272))
 - **BREAKING CHANGE:** Change the default `duplicatesStrategy` from `EXCLUDE` to `INCLUDE`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))
-    - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
-    - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
-    - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate resources to be merged.
-    - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
-    - Use `filesMatching` to override the default strategy for specific files.
-    - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
-    - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
-    - **Note:** The default `duplicatesStrategy` is changed back to `EXCLUDE` in 9.0.1 release.
+  - `ShadowJar` recognized `EXCLUDE` as the default, but the other strategies didn't work properly.
+  - Now `ShadowJar` honors `INCLUDE` as the default, and aligns all the strategy behaviors with the Gradle side.
+  - Some `ResourceTransformer`s (e.g. `ServiceFileTransformer`) do not work with `EXCLUDE`, as it will exclude duplicate resources to be merged.
+  - Duplicate entries might be bundled due to this change, but you can reduce them by using the newly added `PreserveFirstFoundResourceTransformer`.
+  - Use `filesMatching` to override the default strategy for specific files.
+  - Set `failOnDuplicateEntries = true` to fail the build to check for duplicate entries.
+  - See more details at [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy).
+  - **Note:** The default `duplicatesStrategy` is changed back to `EXCLUDE` in 9.0.1 release.
 - **BREAKING CHANGE:** Align the behavior of `ShadowTask.from` with Gradle's `AbstractCopyTask.from`. ([#1233](https://github.com/GradleUp/shadow/pull/1233))  
   In the previous versions, `ShadowTask.from` would always unzip the files before processing them, which caused serial
   issues that are hard to fix. Now it behaves like Gradle's `AbstractCopyTask.from`, which means it will not unzip

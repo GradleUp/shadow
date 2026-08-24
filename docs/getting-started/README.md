@@ -128,16 +128,16 @@ in their build logic), Shadow will automatically configure the following behavio
 * Configures the [`ShadowJar`][ShadowJar] task to bundle all dependencies from the `runtimeClasspath` configuration.
 * Configures the _classifier_ attribute of the [`ShadowJar`][ShadowJar] task to be `'all'` .
 * Configures the [`ShadowJar`][ShadowJar] task to generate a `Manifest` with:
-    * Inheriting all configuration from the standard [`Jar`][Jar] task.
-    * Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
+  * Inheriting all configuration from the standard [`Jar`][Jar] task.
+  * Adds a `Class-Path` attribute to the `Manifest` that appends all dependencies from the `shadow` configuration
 * Configures the [`ShadowJar`][ShadowJar] task to _exclude_ any JAR index or cryptographic signature files matching the
   following patterns:
-    * `META-INF/INDEX.LIST`
-    * `META-INF/*.SF`
-    * `META-INF/*.DSA`
-    * `META-INF/*.RSA`
-    * `META-INF/versions/**/module-info.class`
-    * `module-info.class`
+  * `META-INF/INDEX.LIST`
+  * `META-INF/*.SF`
+  * `META-INF/*.DSA`
+  * `META-INF/*.RSA`
+  * `META-INF/versions/**/module-info.class`
+  * `module-info.class`
 * Creates and registers the `shadow` component in the project (used for integrating with
   [`maven-publish`][maven-publish]).
 

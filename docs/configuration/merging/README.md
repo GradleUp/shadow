@@ -105,12 +105,12 @@ steps to take:
 1. Set the default strategy to `INCLUDE` or `WARN`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Remove duplicate entries by
-    - overriding the default strategy for specific files to `EXCLUDE` or `FAIL` using
-      [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
-      functions
-    - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
-    - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
-    - or mechanism similar.
+  - overriding the default strategy for specific files to `EXCLUDE` or `FAIL` using
+    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
+    functions
+  - or applying [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer] for specific files
+  - or write your own [`ResourceTransformer`][ResourceTransformer] to handle duplicates
+  - or mechanism similar.
 
 Alternatively, you can follow these steps:
 
