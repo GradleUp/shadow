@@ -45,29 +45,30 @@ flowchart TD
         subgraph ClassBranch["Class Files (*.class)"]
             D2{"Minimize Analyzer?<br/>In unusedClasses?"}
             D2 -->|"Yes"| D3["Drop Unused Class"]
-            D2 -->|"No"| D4["ASM Bytecode Remap<br/>(Relocators)"]
-            D4 --> D5["Relocate Class Path<br/>(handle META-INF/versions/)"]
-            D5 --> D6["Write Entry to ZIP"]
+            D2 -->|"No"| D4{"Relocators configured?"}
+            D4 -->|"No"| D5["Write Original Bytes to ZIP"]
+            D4 -->|"Yes"| D6["ASM Bytecode Remap<br/>& Relocate Class Path<br/>(handle META-INF/versions/)"]
+            D6 --> D7["Write Relocated Entry to ZIP"]
         end
 
         subgraph ResourceBranch["Resource Files & Others"]
-            E1["Relocate Path (Relocators)"]
-            E1 --> E2{"Matched by<br/>ResourceTransformer?"}
-            E2 -->|"Yes"| E3["Accumulate in Transformer<br/>(e.g., Service files, XML, properties)"]
-            E2 -->|"No"| E4["Write Entry to ZIP"]
+            E1{"Matched by<br/>ResourceTransformer?<br/>(canTransformResource using fileDetails)"}
+            E1 -->|"Yes"| E2["Accumulate in Transformer<br/>(receives relocated path in TransformerContext)"]
+            E1 -->|"No"| E3["Relocate Path (if relocators configured)"]
+            E3 --> E4["Write Entry to ZIP"]
         end
 
         D1 -->|"*.class"| D2
         D1 -->|"Resource"| E1
-        D1 -->|"Directory"| D7["Record in visitedDirs"]
+        D1 -->|"Directory"| D8["Record in visitedDirs"]
     end
 
     subgraph Finalization["5. Output Finalization & Post-Processing"]
         F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
-        E3 --> F1
+        E2 --> F1
         F2["addDirs()<br/>Generate parent directory entries"]
         F3{"Duplicates found in ZIP?<br/>(checkDuplicateEntries)"}
-        F1 & D6 & E4 --> F2 --> F3
+        F1 & D5 & D7 & E4 --> F2 --> F3
         F3 -->|"Duplicates found & failOnDuplicateEntries = true"| F4["Fail Build"]
         F3 -->|"Duplicates found & failOnDuplicateEntries = false (default)"| F4Warn["Log Warning"]
         F3 -->|"No duplicates"| F5["Close Intermediate ZIP"]
@@ -87,9 +88,9 @@ flowchart TD
     click B5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/add-multi-release-attribute.html" "ShadowJar.addMultiReleaseAttribute"
     click C2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
     click D2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/minimize.html" "ShadowJar.minimize"
-    click D4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
-    click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
-    click E2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
+    click D6 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
+    click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
+    click E3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
     click F1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
     click F3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html" "ShadowJar.failOnDuplicateEntries"
     click F7 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-r8-spec/index.html" "R8Spec"
@@ -130,16 +131,21 @@ flowchart TD
     - **Class Files (`*.class`)**:
         - *Dependency Analyzer Minimization*: If minimization with `MinimizeTool.DEPENDENCY_ANALYZER` is enabled,
           unused classes are identified and dropped.
-        - *Relocation & Remapping*: ASM remappers rewrite bytecode references according to configured
-          [`relocators`][Relocator] and auto-relocation rules.
-        - *Path Relocation*: The class path is relocated (including handling Multi-Release version prefixes under
-          `META-INF/versions/`) and written to the ZIP stream.
+        - *Direct Write if No Relocators*: If no relocators are configured, the class file is written directly to the
+          ZIP stream with its original bytecode and path.
+        - *Relocation & Remapping*: When relocators are configured, ASM remappers rewrite bytecode references, relocate
+          the class path (including handling Multi-Release version prefixes under `META-INF/versions/`), and write the
+          remapped bytes to the ZIP stream.
     - **Resource & Other Files**:
-        - *Path Relocation*: Relocates resource paths matching configured relocators.
-        - *Resource Transformers*: Checks if a registered [`ResourceTransformer`][ResourceTransformer] matches the file
-          (`canTransformResource`). If matched, the file stream is passed to the transformer (`transform`) to buffer
-          and merge in memory.
-        - *Unmatched Resources*: Written directly to the ZIP output stream.
+        - *Resource Transformers Matching*: Shadow tests whether any registered
+          [`ResourceTransformer`][ResourceTransformer] matches the resource via `canTransformResource(fileDetails)`
+          using the original `FileCopyDetails`.
+        - *Transformation*: If matched, the file stream is passed to the transformer via
+          `transform(TransformerContext(path = relocated, ...))`, allowing the transformer to buffer and merge entries
+          using their relocated paths.
+        - *Direct Write / Path Relocation*: If unmatched, the resource path is relocated according to configured
+          [`relocators`][Relocator] (or kept as-is if no relocator matches) and written directly to the ZIP output
+          stream.
     - **Directories**: Tracked in memory to generate required parent directory entries.
 
 5. **Output Finalization**:
