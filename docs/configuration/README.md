@@ -20,18 +20,18 @@ flowchart TD
     end
 
     subgraph Preparation["2. Task Preparation (ShadowJar.copy)"]
-        B1["addIncludedDependencies()"]
+        B1["addIncludedDependencies()<br/>• Dir -> from(dir)<br/>• JAR/ZIP -> from(zipTree)<br/>• AAR -> Fail"]
         A5 --> B1
-        B1 -->|"Directory"| B2["from(dir)"]
-        B1 -->|"JAR / ZIP"| B3["from(zipTree(jar))"]
-        B1 -->|"AAR"| B4["Fail: AAR not supported<br/>(Use Fused Library Plugin)"]
         B5["injectManifestAttributes()<br/>• Main-Class<br/>• Class-Path (from shadow)<br/>• Multi-Release flag"]
         A3 -.-> B5
+        B1 --> B5
+        B6["super.copy()"]
+        B5 --> B6
     end
 
     subgraph CopySpecProcessing["3. Gradle CopySpec & Duplicate Handling"]
         C1["Pattern Filtering<br/>(include / exclude)"]
-        B2 & B3 & A1 --> C1
+        A1 & B6 --> C1
         C1 --> C2{"Duplicate Path?<br/>(duplicatesStrategy)"}
         C2 -->|"EXCLUDE (default)"| C3["Keep 1st occurrence;<br/>Drop subsequent duplicates"]
         C2 -->|"INCLUDE / WARN"| C4["Pass entries to CopyAction<br/>(WARN logs warning)"]
@@ -39,11 +39,13 @@ flowchart TD
     end
 
     subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
+        PreStream["createCopyAction()<br/>• findUnusedClasses() (Dependency Analyzer)<br/>• Initialize ZipOutputStream"]
+        C3 & C4 --> PreStream
         D1{"Entry Type?"}
-        C3 & C4 --> D1
+        PreStream --> D1
 
         subgraph ClassBranch["Class Files (*.class)"]
-            D2{"Minimize Analyzer?<br/>In unusedClasses?"}
+            D2{"In pre-computed<br/>unusedClasses?"}
             D2 -->|"Yes"| D3["Drop Unused Class"]
             D2 -->|"No"| D4{"Relocators configured?"}
             D4 -->|"No"| D5["Write Original Bytes to ZIP"]
@@ -52,24 +54,26 @@ flowchart TD
         end
 
         subgraph ResourceBranch["Resource Files & Others"]
-            E1{"Matched by<br/>ResourceTransformer?<br/>(canTransformResource using fileDetails)"}
-            E1 -->|"Yes"| E2["Accumulate in Transformer<br/>(receives relocated path in TransformerContext)"]
-            E1 -->|"No"| E3["Relocate Path (if relocators configured)"]
-            E3 --> E4["Write Entry to ZIP"]
+            E1["Compute Relocated Path<br/>(relocators.relocatePath)"]
+            E1 --> E2{"Matched by<br/>ResourceTransformer?<br/>(canTransformResource using fileDetails)"}
+            E2 -->|"Yes"| E3["Accumulate in Transformer<br/>(receives pre-computed relocated path)"]
+            E2 -->|"No"| E4["Write Entry to ZIP<br/>(using pre-computed relocated path)"]
         end
 
         D1 -->|"*.class"| D2
         D1 -->|"Resource"| E1
-        D1 -->|"Directory"| D8["Record in visitedDirs"]
+        D1 -->|"Directory"| D8["Record in visitedDirs<br/>(timestamp & permissions)"]
     end
 
     subgraph Finalization["5. Output Finalization & Post-Processing"]
         F1["processTransformers()<br/>Flush transformed/merged resources to ZIP"]
-        E2 --> F1
+        E3 --> F1
         F2["addDirs()<br/>Generate parent directory entries"]
+        D8 -.->|"Directory Metadata"| F2
         F3{"Duplicates found in ZIP?<br/>(checkDuplicateEntries)"}
         F1 & D5 & D7 & E4 --> F2 --> F3
-        F3 -->|"Duplicates found & failOnDuplicateEntries = true"| F4["Fail Build"]
+        F3 -->|"Duplicates found & failOnDuplicateEntries = true"| F4Close["Close ZIP Stream"]
+        F4Close --> F4Delete["Delete Intermediate ZIP"] --> F4Fail["Fail Build"]
         F3 -->|"Duplicates found & failOnDuplicateEntries = false (default)"| F4Warn["Log Warning"]
         F3 -->|"No duplicates"| F5["Close Intermediate ZIP"]
         F4Warn --> F5
@@ -89,8 +93,8 @@ flowchart TD
     click C2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/get-duplicates-strategy.html" "ShadowJar.duplicatesStrategy"
     click D2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/minimize.html" "ShadowJar.minimize"
     click D6 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
-    click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
-    click E3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
+    click E1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocators.html" "ShadowJar.relocators"
+    click E2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
     click F1 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transformers.html" "ShadowJar.transformers"
     click F3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html" "ShadowJar.failOnDuplicateEntries"
     click F7 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-r8-spec/index.html" "R8Spec"
@@ -115,6 +119,7 @@ flowchart TD
       (from `configurations.shadow`), and checks dependencies for `Multi-Release: true` to inject the `Multi-Release`
       attribute if enabled. Note that the manifest itself inherits from the standard `jar` task, but the `jar` task's
       archive contents are not input to `shadowJar`.
+    - **`super.copy()`**: Triggers Gradle's standard copy engine with all configured specs.
 
 3. **Gradle `CopySpec` & `duplicatesStrategy` Intervention**:
     - File-level `include` and `exclude` pattern filters are evaluated.
@@ -128,34 +133,37 @@ flowchart TD
           `duplicatesStrategy` and transformers.
 
 4. **Stream Processing (`ShadowCopyAction`)**:
+    - **Initialization & Analysis (`createCopyAction`)**: Before file iteration begins, if minimization with
+      `MinimizeTool.DEPENDENCY_ANALYZER` is enabled, Shadow runs `findUnusedClasses()` once upfront to pre-calculate
+      the set of unused classes.
     - **Class Files (`*.class`)**:
-        - *Dependency Analyzer Minimization*: If minimization with `MinimizeTool.DEPENDENCY_ANALYZER` is enabled,
-          unused classes are identified and dropped.
+        - *Unused Class Filter*: Checks if the class name is present in the pre-computed `unusedClasses` set, dropping
+          it if found.
         - *Direct Write if No Relocators*: If no relocators are configured, the class file is written directly to the
           ZIP stream with its original bytecode and path.
         - *Relocation & Remapping*: When relocators are configured, ASM remappers rewrite bytecode references, relocate
           the class path (including handling Multi-Release version prefixes under `META-INF/versions/`), and write the
           remapped bytes to the ZIP stream.
     - **Resource & Other Files**:
-        - *Resource Transformers Matching*: Shadow tests whether any registered
-          [`ResourceTransformer`][ResourceTransformer] matches the resource via `canTransformResource(fileDetails)`
-          using the original `FileCopyDetails`.
-        - *Transformation*: If matched, the file stream is passed to the transformer via
-          `transform(TransformerContext(path = relocated, ...))`, allowing the transformer to buffer and merge entries
-          using their relocated paths.
-        - *Direct Write / Path Relocation*: If unmatched, the resource path is relocated according to configured
-          [`relocators`][Relocator] (or kept as-is if no relocator matches) and written directly to the ZIP output
-          stream.
-    - **Directories**: Tracked in memory to generate required parent directory entries.
+        - *Path Relocation Computation*: Computes the relocated path upfront via `relocators.relocatePath(path)`.
+        - *Resource Transformers Matching*: Evaluates registered [`ResourceTransformer`][ResourceTransformer]s against
+          the resource via `canTransformResource(fileDetails)` using the original `FileCopyDetails`.
+        - *Transformation*: If matched, the file stream and pre-computed relocated path are passed to
+          `transform(TransformerContext(path = relocated, ...))`, allowing the transformer to buffer and merge entries.
+        - *Direct Write*: If unmatched, the resource is written directly to the ZIP output stream using the
+          pre-computed relocated path.
+    - **Directories**: Recorded in `visitedDirs` with their timestamp and permission metadata.
 
 5. **Output Finalization**:
     - **`processTransformers()`**: Calls `modifyOutputStream` on all active
       [`ResourceTransformer`][ResourceTransformer]s, writing merged contents (e.g. `META-INF/services/`, merged
       properties, appended files, XML) into the ZIP stream.
-    - **`addDirs()`**: Creates synthetic directory entries in the ZIP for proper archive structure.
+    - **`addDirs()`**: Derives required parent directory paths from all written archive entries, querying
+      `visitedDirs` to preserve timestamp and permission metadata.
     - **`checkDuplicateEntries()`**: Always scans all entries in the final output ZIP for duplicate paths. If duplicates
-      are found, it fails the build when [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled
-      (`true`), or logs a warning message by default when disabled (`false`).
+      are found and [`failOnDuplicateEntries`][ShadowJar.failOnDuplicateEntries] is enabled (`true`), an exception is
+      thrown; the stream is closed, the incomplete intermediate ZIP is deleted, and the build fails. When disabled
+      (`false`), a warning message is logged by default.
     - The intermediate ZIP output stream is closed.
 
 6. **Post-Processing Optimization (R8 Minimization)**:
