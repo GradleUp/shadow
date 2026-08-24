@@ -29,9 +29,9 @@
 ### Deprecated
 
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  
-  Calling `proguardRules` and `proguardRuleFiles` instead. The properties will be removed in Shadow 10.
+  Use `proguardRules` and `proguardRuleFiles` instead. The properties will be removed in Shadow 10.
 - Deprecate `ShadowJar.minimizeJar`. ([#2124](https://github.com/GradleUp/shadow/pull/2124))  
-  Calling `ShadowJar.minimize()` explicitly instead. The property will be made non-public in Shadow 10.
+  Use `ShadowJar.minimize()` explicitly instead. The property will be made non-public in Shadow 10.
 - Deprecate `DontIncludeResourceTransformer` and `IncludeResourceTransformer`. ([#2143](https://github.com/GradleUp/shadow/pull/2143))  
   Use `ShadowJar.exclude` or `ShadowJar.from` instead. The classes will be removed in Shadow 10.
 - Deprecate `TransformerContext.Builder`. ([#2184](https://github.com/GradleUp/shadow/pull/2184))  
