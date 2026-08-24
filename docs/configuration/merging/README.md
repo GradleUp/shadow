@@ -331,8 +331,8 @@ Multiple dependencies may use the same service descriptor file name. In this cas
 content of each instance of the file into a single output file. The [`ServiceFileTransformer`][ServiceFileTransformer]
 class is used to perform this merging. By default, it will merge each copy of a file under `META-INF/services` into a
 single file in the output JAR. You can use either the short syntax method
-[`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to
-add the [`ServiceFileTransformer`][ServiceFileTransformer]:
+[`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to add
+the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
 === "Kotlin"
 
