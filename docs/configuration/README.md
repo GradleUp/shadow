@@ -33,8 +33,8 @@ flowchart TD
         B2 & B3 & A1 --> C1
         C1 --> C2{"Duplicate Path?<br/>(duplicatesStrategy)"}
         C2 -->|"EXCLUDE (default)"| C3["Keep 1st occurrence;<br/>Drop subsequent duplicates"]
-        C2 -->|"INCLUDE / WARN"| C4["Pass entries to CopyAction"]
-        C2 -->|"FAIL / INHERIT"| C5["Fail build / Warn"]
+        C2 -->|"INCLUDE / WARN"| C4["Pass entries to CopyAction<br/>(WARN logs warning)"]
+        C2 -->|"FAIL / INHERIT"| C5["Fail build<br/>(DuplicateFileCopyingException / no strategy set)"]
     end
 
     subgraph StreamAction["4. Stream Processing (ShadowCopyAction)"]
