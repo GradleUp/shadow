@@ -23,7 +23,7 @@ jobs:
       - name: Build Site
         run: |
           # Don't cache it to track updates.
-          pip install mkdocs-material
+          pip install mkdocs-material mdx_truly_sane_lists
           mkdocs build
       - uses: actions/upload-pages-artifact@v5
         with:
