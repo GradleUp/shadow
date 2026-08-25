@@ -127,7 +127,6 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       )
     }
 
-    writeR8Repository()
     projectScript.appendText(
       """
       |dependencies {

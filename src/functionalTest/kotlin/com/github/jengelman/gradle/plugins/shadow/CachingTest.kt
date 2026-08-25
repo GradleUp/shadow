@@ -317,7 +317,6 @@ class CachingTest : BasePluginTest() {
     val previousTaskPath = taskPath
     taskPath = serverShadowJarPath
     try {
-      writeR8Repository()
       writeR8ClientAndServerModules()
       val proguardRules = path("server/r8-rules.pro")
       proguardRules.writeText("")
@@ -353,7 +352,6 @@ class CachingTest : BasePluginTest() {
     val previousTaskPath = taskPath
     taskPath = serverShadowJarPath
     try {
-      writeR8Repository()
       writeR8ClientAndServerModules()
       path("server/r8-rules.pro").writeText("")
 
