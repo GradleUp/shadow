@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import kotlin.io.path.readText
@@ -320,7 +321,7 @@ class CachingTest : BasePluginTest() {
       writeR8Repository()
       writeR8ClientAndServerModules()
       val proguardRules = path("server/r8-rules.pro")
-      proguardRules.writeText("")
+      proguardRules.deleteExisting()
 
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
@@ -355,7 +356,7 @@ class CachingTest : BasePluginTest() {
     try {
       writeR8Repository()
       writeR8ClientAndServerModules()
-      path("server/r8-rules.pro").writeText("")
+      path("server/r8-rules.pro").deleteExisting()
 
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
@@ -568,7 +569,7 @@ class CachingTest : BasePluginTest() {
       """
         .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("client/src/main/java/client/Used.java")
       .writeText(

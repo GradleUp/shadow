@@ -28,6 +28,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
@@ -285,7 +286,7 @@ abstract class BasePluginTest {
       """
         .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("client/src/main/java/client/Client.java")
       .writeText(

@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -340,7 +341,7 @@ class MinimizeTest : BasePluginTest() {
       |"""
         .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("lib/src/main/java/lib/LibEntity.java")
       .writeText(

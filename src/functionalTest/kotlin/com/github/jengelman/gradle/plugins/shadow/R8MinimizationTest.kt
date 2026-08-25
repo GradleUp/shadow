@@ -13,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadService
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 import org.gradle.api.JavaVersion
@@ -433,7 +434,7 @@ class R8MinimizationTest : BasePluginTest() {
       """
         .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("lib/src/main/java/lib/Used.java")
       .writeText(
@@ -509,7 +510,7 @@ class R8MinimizationTest : BasePluginTest() {
       """
         .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("service/src/main/java/service/Greeter.java")
       .writeText(

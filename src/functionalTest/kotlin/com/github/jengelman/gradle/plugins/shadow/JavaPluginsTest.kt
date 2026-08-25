@@ -198,7 +198,7 @@ class JavaPluginsTest : BasePluginTest() {
       """
         .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("client/src/main/java/client/Client.java")
       .writeText(
@@ -271,7 +271,7 @@ class JavaPluginsTest : BasePluginTest() {
   @Test // #1893
   fun excludeRulesPreventBundledDepsOnConsumerClasspath() {
     settingsScript.appendText("include 'foo', 'consumer'\n")
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("foo/build.gradle")
       .writeText(
