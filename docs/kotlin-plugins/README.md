@@ -11,7 +11,7 @@ kotlin.stdlib.default.dependency=false
 Kotlin compilations may still require the standard libraries, you can add them into `compileOnly` (`compileClasspath`)
 to make sure compilations success and avoid shadowing as follows:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -19,7 +19,7 @@ to make sure compilations success and avoid shadowing as follows:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -33,7 +33,7 @@ See more information about [Dependency on the standard library][dependency-on-th
 
 Shadow works well for Kotlin JVM projects like Java projects. Here is an example:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -46,7 +46,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -67,7 +67,7 @@ build logic for [Publishing Libraries][publishing-libraries], [Running Applicati
 Shadow honors Kotlin's [`org.jetbrains.kotlin.multiplatform`][org.jetbrains.kotlin.multiplatform] plugin and will
 automatically configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -104,7 +104,7 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -148,7 +148,7 @@ is enabled by default via the deprecated `enableKotlinModuleRemapping` property.
 To explicitly apply this remapping (recommended for future compatibility), add
 [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer] to your task configuration:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -156,7 +156,7 @@ To explicitly apply this remapping (recommended for future compatibility), add
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {

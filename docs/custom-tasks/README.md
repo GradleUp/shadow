@@ -5,7 +5,7 @@ possible to add arbitrary [`ShadowJar`][ShadowJar] tasks to a project. When doin
 [`configurations`][ShadowJar.configurations] property is specified to inform Shadow which dependencies to merge into the
 output.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     val testShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("testShadowJar") {
@@ -28,7 +28,7 @@ output.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     def testShadowJar = tasks.register('testShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -61,7 +61,7 @@ It is also possible to create a shadow JAR that contains *only* the dependencies
 code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task and configuring the
 [`configurations`][ShadowJar.configurations] property, but **not** adding any project sources with `from(...)`.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     val dependencyShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("dependencyShadowJar") {
@@ -71,7 +71,7 @@ code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task an
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {

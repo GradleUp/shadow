@@ -10,7 +10,7 @@ same permissions, irrespective of the locally configured umask.
 
 More information about reproducible builds can be found at [reproducible-builds.org][reproducible-builds.org].
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     import java.nio.file.Files
@@ -31,7 +31,7 @@ More information about reproducible builds can be found at [reproducible-builds.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     import java.nio.file.Files

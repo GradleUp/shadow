@@ -3,7 +3,7 @@
 Shadow can automatically remove all JARs and classes of dependencies that are not used by the project, thereby
 minimizing the resulting shadowed JAR.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -11,7 +11,7 @@ minimizing the resulting shadowed JAR.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -24,7 +24,7 @@ when the dependency analyzer cannot find the usage of a class programmatically, 
 dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
 `dependency` is interpreted as a regular expression.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -34,7 +34,7 @@ dynamically via `Class.forName(String)`. Each of the `group`, `name` and `versio
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -51,7 +51,7 @@ dynamically via `Class.forName(String)`. Each of the `group`, `name` and `versio
 
 Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also be excluded.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -61,7 +61,7 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -85,7 +85,7 @@ descriptors in `META-INF/services` are used to keep service providers.
 The default R8 configuration only shrinks unused code. It disables name minification and optimization. R8 also applies
 rules published in dependency JARs, for example under `META-INF/proguard`.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -104,7 +104,7 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     repositories {
@@ -134,7 +134,7 @@ R8 also supports ProGuard reporting options such as
 
 Add them as `proguardRules` when you want to retain name mappings, matched keep rules, or removed code:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -156,7 +156,7 @@ Add them as `proguardRules` when you want to retain name mappings, matched keep 
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     repositories {
@@ -190,7 +190,7 @@ library authors should not publish as consumer keep rules.
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
 published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -198,7 +198,7 @@ published by Google Maven rather than Maven Central. Add `google()` to your repo
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -212,7 +212,7 @@ are independent and can be used together.
 
 For example, to downgrade R8 warnings to info:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -228,7 +228,7 @@ For example, to downgrade R8 warnings to info:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     repositories {
@@ -246,7 +246,7 @@ For example, to downgrade R8 warnings to info:
 
 To enable name obfuscation:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -262,7 +262,7 @@ To enable name obfuscation:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     repositories {
@@ -280,7 +280,7 @@ To enable name obfuscation:
 
 To enable optimization:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -296,7 +296,7 @@ To enable optimization:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     repositories {
@@ -314,7 +314,7 @@ To enable optimization:
 
 To enable both:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -331,7 +331,7 @@ To enable both:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     repositories {
