@@ -4,6 +4,8 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -17,11 +19,15 @@ import org.gradle.api.JavaVersion
 import org.junit.jupiter.api.Test
 
 class R8MinimizationTest : BasePluginTest() {
+  private val appShadowJarPath = ":app:$SHADOW_JAR_TASK_NAME"
+  private val outputAppShadowedJar: JarPath
+    get() = jarPath("app/build/libs/app-1.0-all.jar")
+
   @Test
   fun shrinkUnusedDependencyClasses() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {}
@@ -30,28 +36,28 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "client/Used.class",
-        "server/Server.class",
+        "app/App.class",
+        "lib/Used.class",
         manifestEntry,
       )
       classLoader {
-        loadClass("server.Server")
-        loadClass("client.Used")
+        loadClass("app.App")
+        loadClass("lib.Used")
       }
     }
-    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
-    assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
+    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("app/build/shadowJar/r8").toRealPath()
+    assertThat(path("app/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfigPath
         |-basedirectory '$outputConfigDir'
         |-dontoptimize
-        |-keep,includedescriptorclasses class server.Server { *; }
+        |-keep,includedescriptorclasses class app.App { *; }
         |# End of content from $inputConfigPath
         |"""
           .trimMargin()
@@ -61,13 +67,13 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun keepServiceProviders() {
     writeR8Repository()
-    writeR8ServiceModules()
+    writeR8AppAndServiceModules()
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "server/Server.class",
+        "app/App.class",
         "service/DefaultGreeter.class",
         "service/Greeter.class",
         manifestEntry,
@@ -84,12 +90,12 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun honorCustomProguardRules() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {
-        |    proguardRules.add("-keep class client.Reflective { *; }")
+        |    proguardRules.add("-keep class lib.Reflective { *; }")
         |    configurationFile.set(layout.buildDirectory.file("r8/config/final-configuration.txt"))
         |  }
         |}
@@ -97,31 +103,31 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "client/Reflective.class",
-        "client/Used.class",
-        "server/Server.class",
+        "app/App.class",
+        "lib/Reflective.class",
+        "lib/Used.class",
         manifestEntry,
       )
       classLoader {
-        loadClass("server.Server")
-        loadClass("client.Used")
-        loadClass("client.Reflective")
+        loadClass("app.App")
+        loadClass("lib.Used")
+        loadClass("lib.Reflective")
       }
     }
-    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val outputConfigDir = path("server/build/r8/config").toRealPath()
-    assertThat(path("server/build/r8/config/final-configuration.txt").readText().invariantEolString)
+    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("app/build/r8/config").toRealPath()
+    assertThat(path("app/build/r8/config/final-configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfigPath
         |-basedirectory '$outputConfigDir'
         |-dontoptimize
-        |-keep,includedescriptorclasses class server.Server { *; }
-        |-keep class client.Reflective { *; }
+        |-keep,includedescriptorclasses class app.App { *; }
+        |-keep class lib.Reflective { *; }
         |# End of content from $inputConfigPath
         |"""
           .trimMargin()
@@ -131,8 +137,8 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun canKeepDirectories() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {
@@ -143,19 +149,19 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "client/Used.class",
-        "server/Server.class",
+        "app/App.class",
+        "lib/Used.class",
         *manifestEntries,
-        "client/",
-        "server/",
+        "app/",
+        "lib/",
       )
       classLoader {
-        loadClass("server.Server")
-        loadClass("client.Used")
+        loadClass("app.App")
+        loadClass("lib.Used")
       }
     }
   }
@@ -163,8 +169,8 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun generateReportsRelativeToConfigurationFile() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {
@@ -181,17 +187,17 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val outputConfigDir = path("server/build/r8").toRealPath()
-    assertThat(path("server/build/r8/configuration.txt").readText().invariantEolString)
+    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("app/build/r8").toRealPath()
+    assertThat(path("app/build/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfigPath
         |-basedirectory '$outputConfigDir'
         |-dontoptimize
-        |-keep,includedescriptorclasses class server.Server { *; }
+        |-keep,includedescriptorclasses class app.App { *; }
         |-printmapping reports/mapping.txt
         |-printseeds reports/seeds.txt
         |-printusage reports/usage.txt
@@ -199,17 +205,17 @@ class R8MinimizationTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
-    assertThat(path("server/build/r8/reports/mapping.txt").readText()).contains("client.Used")
-    assertThat(path("server/build/r8/reports/seeds.txt").readText()).contains("server.Server")
-    assertThat(path("server/build/r8/reports/usage.txt").readText())
-      .contains("client.Reflective", "client.Unused")
+    assertThat(path("app/build/r8/reports/mapping.txt").readText()).contains("lib.Used")
+    assertThat(path("app/build/r8/reports/seeds.txt").readText()).contains("app.App")
+    assertThat(path("app/build/r8/reports/usage.txt").readText())
+      .contains("lib.Reflective", "lib.Unused")
   }
 
   @Test
   fun useClasspathRules() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {}
@@ -217,39 +223,39 @@ class R8MinimizationTest : BasePluginTest() {
         """
           .trimMargin()
     )
-    path("client/src/main/resources/META-INF/proguard/client.pro")
-      .writeText("-keep class client.Reflective { *; }")
+    path("lib/src/main/resources/META-INF/proguard/lib.pro")
+      .writeText("-keep class lib.Reflective { *; }")
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "client/Reflective.class",
-        "client/Used.class",
-        "server/Server.class",
+        "app/App.class",
+        "lib/Reflective.class",
+        "lib/Used.class",
         manifestEntry,
-        "META-INF/proguard/client.pro",
+        "META-INF/proguard/lib.pro",
       )
       classLoader {
-        loadClass("server.Server")
-        loadClass("client.Used")
-        loadClass("client.Reflective")
+        loadClass("app.App")
+        loadClass("lib.Used")
+        loadClass("lib.Reflective")
       }
     }
-    val inputConfigPath = path("server/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val outputConfigDir = path("server/build/shadowJar/r8").toRealPath()
+    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("app/build/shadowJar/r8").toRealPath()
     val embeddedConfigPath =
-      "${path("server/build/libs/server-1.0-all.jar").toRealPath()}:META-INF/proguard/client.pro"
-    assertThat(path("server/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
+      "${path("app/build/libs/app-1.0-all.jar").toRealPath()}:META-INF/proguard/lib.pro"
+    assertThat(path("app/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
       .isEqualTo(
         """
         |# The proguard configuration file for the following section is $inputConfigPath
         |-basedirectory '$outputConfigDir'
         |-dontoptimize
-        |-keep,includedescriptorclasses class server.Server { *; }
+        |-keep,includedescriptorclasses class app.App { *; }
         |# End of content from $inputConfigPath
         |# The proguard configuration file for the following section is $embeddedConfigPath
-        |-keep class client.Reflective { *; }
+        |-keep class lib.Reflective { *; }
         |# End of content from $embeddedConfigPath
         |"""
           .trimMargin()
@@ -259,8 +265,8 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun preserveRepeatedLinesInClasspathRules() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {}
@@ -268,35 +274,35 @@ class R8MinimizationTest : BasePluginTest() {
         """
           .trimMargin()
     )
-    path("client/src/main/resources/META-INF/proguard/client.pro")
+    path("lib/src/main/resources/META-INF/proguard/lib.pro")
       .writeText(
         """
-        |-keep class client.Reflective {
+        |-keep class lib.Reflective {
         |  public <init>();
         |}
-        |-keep class client.Unused {
+        |-keep class lib.Unused {
         |  public <init>();
         |}
         """
           .trimMargin()
       )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "client/Reflective.class",
-        "client/Unused.class",
-        "client/Used.class",
-        "server/Server.class",
+        "app/App.class",
+        "lib/Reflective.class",
+        "lib/Unused.class",
+        "lib/Used.class",
         manifestEntry,
-        "META-INF/proguard/client.pro",
+        "META-INF/proguard/lib.pro",
       )
       classLoader {
-        loadClass("server.Server")
-        loadClass("client.Used")
-        loadClass("client.Reflective")
-        loadClass("client.Unused")
+        loadClass("app.App")
+        loadClass("lib.Used")
+        loadClass("lib.Reflective")
+        loadClass("lib.Unused")
       }
     }
   }
@@ -304,8 +310,8 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun canEnableObfuscation() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {
@@ -316,16 +322,16 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
         "a/a.class",
-        "server/Server.class",
+        "app/App.class",
         manifestEntry,
       )
       classLoader {
-        loadClass("server.Server")
+        loadClass("app.App")
         loadClass("a.a")
       }
     }
@@ -334,8 +340,8 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun canEnableOptimization() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
         |  r8 {
@@ -346,11 +352,11 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "server/Server.class",
+        "app/App.class",
         manifestEntry,
       )
     }
@@ -359,32 +365,32 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun honorDependencyExcludes() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverShadowBlock =
+    writeR8AppAndLibModules(
+      appShadowBlock =
         """
         |minimize {
-        |  exclude(project(':client'))
+        |  exclude(project(':lib'))
         |  r8 {}
         |}
         """
           .trimMargin()
     )
 
-    runWithSuccess(serverShadowJarPath)
+    runWithSuccess(appShadowJarPath)
 
-    assertThat(outputServerShadowedJar).useAll {
+    assertThat(outputAppShadowedJar).useAll {
       containsExactly(
-        "client/Reflective.class",
-        "client/Unused.class",
-        "client/Used.class",
-        "server/Server.class",
+        "app/App.class",
+        "lib/Reflective.class",
+        "lib/Unused.class",
+        "lib/Used.class",
         manifestEntry,
       )
       classLoader {
-        loadClass("server.Server")
-        loadClass("client.Used")
-        loadClass("client.Unused")
-        loadClass("client.Reflective")
+        loadClass("app.App")
+        loadClass("lib.Used")
+        loadClass("lib.Unused")
+        loadClass("lib.Reflective")
       }
     }
   }
@@ -392,15 +398,15 @@ class R8MinimizationTest : BasePluginTest() {
   @Test
   fun useJavaToolchain() {
     writeR8Repository()
-    writeR8ClientAndServerModules(
-      serverProjectBlock =
+    writeR8AppAndLibModules(
+      appProjectBlock =
         """
         |java {
         |  toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
         |}
         """
           .trimMargin(),
-      serverShadowBlock =
+      appShadowBlock =
         """
         |doFirst {
         |  logger.lifecycle("R8 launcher JDK " + javaLauncher.get().metadata.languageVersion.asInt())
@@ -412,27 +418,27 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin(),
     )
 
-    val result = runWithSuccess(serverShadowJarPath)
+    val result = runWithSuccess(appShadowJarPath)
 
     assertThat(result.output).contains("R8 launcher JDK ${JavaVersion.current().majorVersion}")
   }
 
-  private fun writeR8ClientAndServerModules(
-    serverShadowBlock: String,
-    serverProjectBlock: String = "",
+  private fun writeR8AppAndLibModules(
+    appShadowBlock: String,
+    appProjectBlock: String = "",
   ) {
     settingsScript.appendText(
       """
-      |include 'client', 'server'
+      |include 'app', 'lib'
       """
         .trimMargin()
     )
     projectScript.writeText("")
 
-    path("client/src/main/java/client/Used.java")
+    path("lib/src/main/java/lib/Used.java")
       .writeText(
         """
-        |package client;
+        |package lib;
         |public class Used {
         |  public static String name() {
         |    return "used";
@@ -441,23 +447,23 @@ class R8MinimizationTest : BasePluginTest() {
         """
           .trimMargin()
       )
-    path("client/src/main/java/client/Unused.java")
+    path("lib/src/main/java/lib/Unused.java")
       .writeText(
         """
-        |package client;
+        |package lib;
         |public class Unused {}
         """
           .trimMargin()
       )
-    path("client/src/main/java/client/Reflective.java")
+    path("lib/src/main/java/lib/Reflective.java")
       .writeText(
         """
-        |package client;
+        |package lib;
         |public class Reflective {}
         """
           .trimMargin()
       )
-    path("client/build.gradle")
+    path("lib/build.gradle")
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
@@ -466,12 +472,12 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
       )
 
-    path("server/src/main/java/server/Server.java")
+    path("app/src/main/java/app/App.java")
       .writeText(
         """
-        |package server;
-        |import client.Used;
-        |public class Server {
+        |package app;
+        |import lib.Used;
+        |public class App {
         |  public String name() {
         |    return Used.name();
         |  }
@@ -479,16 +485,16 @@ class R8MinimizationTest : BasePluginTest() {
         """
           .trimMargin()
       )
-    path("server/build.gradle")
+    path("app/build.gradle")
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
-        |$serverProjectBlock
+        |$appProjectBlock
         |dependencies {
-        |  implementation project(':client')
+        |  implementation project(':lib')
         |}
         |$shadowJarTask {
-        |  $serverShadowBlock
+        |  $appShadowBlock
         |}
         |
         """
@@ -496,10 +502,10 @@ class R8MinimizationTest : BasePluginTest() {
       )
   }
 
-  private fun writeR8ServiceModules() {
+  private fun writeR8AppAndServiceModules() {
     settingsScript.appendText(
       """
-      |include 'service', 'server'
+      |include 'app', 'service'
       """
         .trimMargin()
     )
@@ -538,15 +544,15 @@ class R8MinimizationTest : BasePluginTest() {
           .trimMargin()
       )
 
-    path("server/src/main/java/server/Server.java")
+    path("app/src/main/java/app/App.java")
       .writeText(
         """
-        |package server;
-        |public class Server {}
+        |package app;
+        |public class App {}
         """
           .trimMargin()
       )
-    path("server/build.gradle")
+    path("app/build.gradle")
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
