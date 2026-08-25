@@ -5,7 +5,7 @@ import assertk.assertions.contains
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
@@ -33,12 +33,12 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
-        "server/",
-        "server/Server.class",
+      containsExactly(
+        *manifestEntries,
         "client/",
         "client/Used.class",
-        *manifestEntries,
+        "server/",
+        "server/Server.class",
       )
       classLoader {
         loadClass("server.Server")
@@ -68,15 +68,15 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
+      containsExactly(
+        *manifestEntries,
+        "META-INF/services/",
+        "META-INF/services/service.Greeter",
         "server/",
         "server/Server.class",
         "service/",
-        "service/Greeter.class",
         "service/DefaultGreeter.class",
-        "META-INF/services/",
-        "META-INF/services/service.Greeter",
-        *manifestEntries,
+        "service/Greeter.class",
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
       classLoader {
@@ -105,13 +105,13 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
+      containsExactly(
+        *manifestEntries,
+        "client/",
+        "client/Reflective.class",
+        "client/Used.class",
         "server/",
         "server/Server.class",
-        "client/",
-        "client/Used.class",
-        "client/Reflective.class",
-        *manifestEntries,
       )
       classLoader {
         loadClass("server.Server")
@@ -198,15 +198,15 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
-        "client/",
-        "client/Used.class",
-        "client/Reflective.class",
-        "server/",
-        "server/Server.class",
+      containsExactly(
+        *manifestEntries,
         "META-INF/proguard/",
         "META-INF/proguard/client.pro",
-        *manifestEntries,
+        "client/",
+        "client/Reflective.class",
+        "client/Used.class",
+        "server/",
+        "server/Server.class",
       )
       classLoader {
         loadClass("server.Server")
@@ -262,16 +262,16 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
-        "client/",
-        "client/Used.class",
-        "client/Reflective.class",
-        "client/Unused.class",
-        "server/",
-        "server/Server.class",
+      containsExactly(
+        *manifestEntries,
         "META-INF/proguard/",
         "META-INF/proguard/client.pro",
-        *manifestEntries,
+        "client/",
+        "client/Reflective.class",
+        "client/Unused.class",
+        "client/Used.class",
+        "server/",
+        "server/Server.class",
       )
       classLoader {
         loadClass("server.Server")
@@ -300,12 +300,12 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
-        "server/",
-        "server/Server.class",
+      containsExactly(
+        *manifestEntries,
         "a/",
         "a/a.class",
-        *manifestEntries,
+        "server/",
+        "server/Server.class",
       )
       classLoader {
         loadClass("server.Server")
@@ -332,10 +332,10 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
+      containsExactly(
+        *manifestEntries,
         "server/",
         "server/Server.class",
-        *manifestEntries,
       )
     }
   }
@@ -357,14 +357,14 @@ class R8MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly(
+      containsExactly(
+        *manifestEntries,
+        "client/",
+        "client/Reflective.class",
+        "client/Unused.class",
+        "client/Used.class",
         "server/",
         "server/Server.class",
-        "client/",
-        "client/Used.class",
-        "client/Unused.class",
-        "client/Reflective.class",
-        *manifestEntries,
       )
       classLoader {
         loadClass("server.Server")

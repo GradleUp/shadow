@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.Assert
 import assertk.assertions.containsAtLeast
+import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import assertk.assertions.isTrue
@@ -70,6 +71,9 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
  * [containsNone].
  */
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
+
+/** Ensures the JAR contains exactly the specified entries in the exact order. */
+fun Assert<JarPath>.containsExactly(vararg entries: String) = toEntries().containsExactly(*entries)
 
 fun Assert<JarPath>.classLoader(
   parent: ClassLoader? = null,
