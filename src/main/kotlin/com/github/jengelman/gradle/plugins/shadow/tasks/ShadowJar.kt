@@ -713,15 +713,6 @@ public abstract class ShadowJar : Jar() {
       sourceSetsClassesDirs = sourceSetsClassesDirs,
       keptDependencyFiles = includedDependencies - toMinimize,
       relocators = relocators.get() + packageRelocators,
-      preserveFileTimestamps = isPreserveFileTimestamps,
-      reproducibleFileOrder = isReproducibleFileOrder,
-      zosProvider = { destination ->
-        destination.createZipOutputStream(
-          entryCompression = entryCompression,
-          isZip64 = isZip64,
-          encoding = metadataCharset,
-        )
-      },
     )
   }
 

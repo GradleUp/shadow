@@ -151,17 +151,11 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "relocated/",
-        "relocated/bar/",
         "relocated/bar/BarDriver.class",
-        "relocated/com/",
-        "relocated/com/example/",
         "relocated/com/example/Driver.class",
-        "relocated/foo/",
         "relocated/foo/FooDriver.class",
-        "META-INF/services/",
         "META-INF/services/relocated.com.example.Driver",
-        *manifestEntries,
+        manifestEntry,
       )
       getContent("META-INF/services/relocated.com.example.Driver")
         .isEqualTo(

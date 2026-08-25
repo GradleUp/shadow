@@ -126,6 +126,10 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
 R8 writes the collective ProGuard configuration it used to `build/shadowJar/r8/configuration.txt` by default. Shadow
 passes this location to R8 with `--pg-conf-output`. Set `configurationFile` to retain it elsewhere.
 
+By default, R8 removes directory entries from the resulting JAR to reduce archive size. If your application or
+dependencies require directory entries at runtime (e.g. for classpath resource discovery),
+add [`-keepdirectories`][-keepdirectories] to `proguardRules`.
+
 R8 also supports ProGuard reporting options such as
 
 - [`-printmapping`][-printmapping]
@@ -352,6 +356,7 @@ To enable both:
 [-printmapping]: https://www.guardsquare.com/manual/configuration/usage#printmapping
 [-printseeds]: https://www.guardsquare.com/manual/configuration/usage#printseeds
 [-printusage]: https://www.guardsquare.com/manual/configuration/usage#printusage
+[-keepdirectories]: https://www.guardsquare.com/manual/configuration/usage#keepdirectories
 [library-optimization-guidance]: https://developer.android.com/topic/performance/app-optimization/library-optimization
 [R8]: https://r8.googlesource.com/r8
 [ProguardConfigurationParser]: https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java

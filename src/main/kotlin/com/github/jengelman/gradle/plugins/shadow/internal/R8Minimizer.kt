@@ -6,8 +6,6 @@ import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.jar.JarFile
 import kotlin.io.path.moveTo
-import org.apache.tools.zip.ZipFile
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
@@ -20,9 +18,6 @@ import org.gradle.process.ExecOperations
  *
  * Shadow first writes the complete jar, including relocations, resource transformers, merged
  * service files, and duplicate handling. R8 then processes that exact artifact.
- *
- * R8 does not know about Shadow's reproducible archive settings, so its output is normalized before
- * replacing the original jar.
  *
  * Shadow-generated rules are based on the final jar contents. Source-set classes are kept as roots,
  * dependencies excluded from minimization are kept, and service descriptors keep providers for
@@ -44,9 +39,6 @@ internal fun minimizeWithR8(
   sourceSetsClassesDirs: Iterable<File>,
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
-  preserveFileTimestamps: Boolean,
-  reproducibleFileOrder: Boolean,
-  zosProvider: ZosProvider,
 ) {
   if (r8Classpath.isEmpty) {
     throw GradleException(
@@ -58,7 +50,6 @@ internal fun minimizeWithR8(
   val rulesFile = r8Dir.resolve("rules.pro")
   val configurationFile = r8Spec.configurationFile.get().asFile
   val r8Output = r8Dir.resolve("output.jar")
-  val normalizedOutput = r8Dir.resolve("normalized-output.jar")
   val launcher = javaLauncher.orNull
   val javaHome =
     launcher?.metadata?.installationPath?.asFile?.absolutePath ?: System.getProperty("java.home")
@@ -104,14 +95,7 @@ internal fun minimizeWithR8(
     it.args(arguments)
   }
 
-  normalizeJar(
-    inputJar = r8Output,
-    outputJar = normalizedOutput,
-    preserveFileTimestamps = preserveFileTimestamps,
-    reproducibleFileOrder = reproducibleFileOrder,
-    zosProvider = zosProvider,
-  )
-  normalizedOutput.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
+  r8Output.toPath().moveTo(inputJar.toPath(), REPLACE_EXISTING)
 }
 
 private fun createRules(
@@ -281,70 +265,8 @@ private fun String.toClassName(): String? {
 
 private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
-// R8 writes a fresh jar, so rewrite it through Shadow's archive settings to preserve
-// reproducible ordering, timestamps, compression, zip64, and metadata charset behavior.
-internal fun normalizeJar(
-  inputJar: File,
-  outputJar: File,
-  preserveFileTimestamps: Boolean,
-  reproducibleFileOrder: Boolean,
-  zosProvider: ZosProvider,
-) {
-  // Use org.apache.tools.zip.ZipFile instead of java.util.jar.JarFile to access entry.unixMode
-  // permissions and ensure uniform Zip structure handling.
-  ZipFile(inputJar).use { zipFile ->
-    val entries =
-      zipFile.entries
-        .asSequence()
-        .filter { !it.isDirectory }
-        .map { entry ->
-          R8JarEntry(
-            name = entry.name,
-            time = entry.time,
-            unixMode = entry.unixMode,
-          )
-        }
-        .toList()
-
-    val orderedEntries = if (reproducibleFileOrder) entries.sortedBy { it.name } else entries
-
-    zosProvider(outputJar).use { zos ->
-      val added = mutableSetOf<String>()
-
-      orderedEntries.forEach { entry ->
-        entry.name.parentDirectoryEntries().forEach { entryName ->
-          if (!added.add(entryName)) return@forEach
-          zos.writeEntry(
-            name = entryName,
-            preserveLastModified = preserveFileTimestamps,
-            unixMode = UnixMode.directory(),
-          )
-        }
-        if (added.add(entry.name)) {
-          val zipEntry = zipFile.getEntry(entry.name)
-          val unixMode = if (entry.unixMode != 0) UnixMode.raw(entry.unixMode) else UnixMode.file()
-          zos.writeEntry(
-            name = entry.name,
-            preserveLastModified = preserveFileTimestamps,
-            lastModified = entry.time,
-            unixMode = unixMode,
-          ) {
-            zipFile.getInputStream(zipEntry).use { input ->
-              input.copyTo(this)
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
 private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
 private const val SERVICES_PATH = "META-INF/services/"
 // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
 // service lines, comments, malformed providers, and JVM-only names R8 would reject.
 private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
-
-private data class R8JarEntry(val name: String, val time: Long, val unixMode: Int)
-
-private typealias ZosProvider = (destination: File) -> ZipOutputStream

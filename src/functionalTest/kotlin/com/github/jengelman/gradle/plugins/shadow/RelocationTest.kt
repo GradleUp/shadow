@@ -664,12 +664,9 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly(
-        "my/",
         "my/Main.class",
-        "relocated/",
-        "relocated/foo/",
         "relocated/foo/Foo.class",
-        *manifestEntries,
+        manifestEntry,
       )
       classLoader {
         loadClass("my.Main")
