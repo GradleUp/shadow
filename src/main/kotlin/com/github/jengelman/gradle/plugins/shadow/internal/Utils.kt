@@ -15,12 +15,6 @@ internal val classPathAttributeKey = JarAttributeName.CLASS_PATH.toString()
 /** Known as `Multi-Release` in the manifest file. */
 internal val multiReleaseAttributeKey = JarAttributeName.MULTI_RELEASE.toString()
 
-/**
- * Unsafe cast, copied from
- * https://github.com/JetBrains/kotlin/blob/d3200b2c65b829b85244c4ec4cb19f6e479b06ba/core/util.runtime/src/org/jetbrains/kotlin/utils/addToStdlib.kt#L111
- */
-internal inline fun <reified T : Any> Any?.cast(): T = this as T
-
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun <T : Any> unsafeLazy(noinline initializer: () -> T): Lazy<T> =
   lazy(LazyThreadSafetyMode.NONE, initializer)

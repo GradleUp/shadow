@@ -5,7 +5,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
-import com.github.jengelman.gradle.plugins.shadow.internal.cast
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
@@ -234,8 +233,10 @@ internal constructor(
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
     private val ZipOutputStream.entries: List<ZipEntry>
+      @Suppress("UNCHECKED_CAST")
       get() =
-        this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
+        this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this)
+          as List<ZipEntry>
 
     @Deprecated(
       message =
