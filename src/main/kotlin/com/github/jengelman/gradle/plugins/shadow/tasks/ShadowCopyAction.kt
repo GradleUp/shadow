@@ -5,6 +5,7 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
+import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
@@ -15,7 +16,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
 import org.apache.tools.zip.Zip64RequiredException
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
@@ -231,12 +231,6 @@ internal constructor(
   public companion object {
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
-
-    private val ZipOutputStream.entries: List<ZipEntry>
-      @Suppress("UNCHECKED_CAST")
-      get() =
-        this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this)
-          as List<ZipEntry>
 
     @Deprecated(
       message =
