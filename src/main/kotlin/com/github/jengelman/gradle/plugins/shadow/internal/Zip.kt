@@ -38,8 +38,13 @@ internal class TrackingZipOutputStream : ZipOutputStream {
   }
 }
 
+// TODO: remove this glue after ShadowCopyAction has been moved into internal.
 internal val ZipOutputStream.entries: List<ZipEntry>
-  get() = (this as? TrackingZipOutputStream)?.entries.orEmpty()
+  @Suppress("UNCHECKED_CAST")
+  get() =
+    (this as? TrackingZipOutputStream)?.entries
+      ?: this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this)
+        as List<ZipEntry>
 
 internal fun File.createZipOutputStream(
   entryCompression: ZipEntryCompression,
