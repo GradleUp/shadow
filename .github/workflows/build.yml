@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
@@ -47,7 +47,7 @@ jobs:
     if: github.event.repository.fork == false && github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v7
-      - uses: actions/setup-java@v5
+      - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
