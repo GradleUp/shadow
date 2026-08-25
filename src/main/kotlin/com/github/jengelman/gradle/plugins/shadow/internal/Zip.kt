@@ -18,8 +18,6 @@ internal value class UnixMode private constructor(internal val value: Int) {
 
     fun file(permissions: Int = UnixStat.DEFAULT_FILE_PERM): UnixMode =
       UnixMode(UnixStat.FILE_FLAG or permissions)
-
-    fun raw(mode: Int): UnixMode = UnixMode(mode)
   }
 }
 

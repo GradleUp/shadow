@@ -34,11 +34,9 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "client/",
         "client/Used.class",
-        "server/",
         "server/Server.class",
+        manifestEntry,
       )
       classLoader {
         loadClass("server.Server")
@@ -69,14 +67,11 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "META-INF/services/",
-        "META-INF/services/service.Greeter",
-        "server/",
         "server/Server.class",
-        "service/",
         "service/DefaultGreeter.class",
         "service/Greeter.class",
+        manifestEntry,
+        "META-INF/services/service.Greeter",
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
       classLoader {
@@ -106,12 +101,10 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "client/",
         "client/Reflective.class",
         "client/Used.class",
-        "server/",
         "server/Server.class",
+        manifestEntry,
       )
       classLoader {
         loadClass("server.Server")
@@ -133,6 +126,38 @@ class R8MinimizeTest : BasePluginTest() {
         |"""
           .trimMargin()
       )
+  }
+
+  @Test
+  fun minimizeWithR8CanKeepDirectories() {
+    writeR8Repository()
+    writeR8ClientAndServerModules(
+      serverShadowBlock =
+        """
+        |minimize {
+        |  r8 {
+        |    proguardRules.add("-keepdirectories")
+        |  }
+        |}
+        """
+          .trimMargin()
+    )
+
+    runWithSuccess(serverShadowJarPath)
+
+    assertThat(outputServerShadowedJar).useAll {
+      containsExactly(
+        "client/Used.class",
+        "server/Server.class",
+        *manifestEntries,
+        "client/",
+        "server/",
+      )
+      classLoader {
+        loadClass("server.Server")
+        loadClass("client.Used")
+      }
+    }
   }
 
   @Test
@@ -199,14 +224,11 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "META-INF/proguard/",
-        "META-INF/proguard/client.pro",
-        "client/",
         "client/Reflective.class",
         "client/Used.class",
-        "server/",
         "server/Server.class",
+        manifestEntry,
+        "META-INF/proguard/client.pro",
       )
       classLoader {
         loadClass("server.Server")
@@ -263,15 +285,12 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "META-INF/proguard/",
-        "META-INF/proguard/client.pro",
-        "client/",
         "client/Reflective.class",
         "client/Unused.class",
         "client/Used.class",
-        "server/",
         "server/Server.class",
+        manifestEntry,
+        "META-INF/proguard/client.pro",
       )
       classLoader {
         loadClass("server.Server")
@@ -301,11 +320,9 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "a/",
         "a/a.class",
-        "server/",
         "server/Server.class",
+        manifestEntry,
       )
       classLoader {
         loadClass("server.Server")
@@ -333,9 +350,8 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "server/",
         "server/Server.class",
+        manifestEntry,
       )
     }
   }
@@ -358,13 +374,11 @@ class R8MinimizeTest : BasePluginTest() {
 
     assertThat(outputServerShadowedJar).useAll {
       containsExactly(
-        *manifestEntries,
-        "client/",
         "client/Reflective.class",
         "client/Unused.class",
         "client/Used.class",
-        "server/",
         "server/Server.class",
+        manifestEntry,
       )
       classLoader {
         loadClass("server.Server")

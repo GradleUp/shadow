@@ -325,11 +325,9 @@ class CachingTest : BasePluginTest() {
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
         containsOnly(
-          "client/",
           "client/Used.class",
-          "server/",
           "server/Server.class",
-          *manifestEntries,
+          manifestEntry,
         )
       }
 
@@ -338,12 +336,10 @@ class CachingTest : BasePluginTest() {
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
         containsOnly(
-          "client/",
           "client/Used.class",
           "client/Reflective.class",
-          "server/",
           "server/Server.class",
-          *manifestEntries,
+          manifestEntry,
         )
       }
       assertExecutionsFromCacheAndUpToDate()
@@ -364,11 +360,9 @@ class CachingTest : BasePluginTest() {
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
         containsOnly(
-          "client/",
           "client/Used.class",
-          "server/",
           "server/Server.class",
-          *manifestEntries,
+          manifestEntry,
         )
       }
 
@@ -378,14 +372,11 @@ class CachingTest : BasePluginTest() {
       assertExecutionSuccess()
       assertThat(outputServerShadowedJar).useAll {
         containsOnly(
-          "client/",
           "client/Used.class",
           "client/Reflective.class",
-          "server/",
           "server/Server.class",
-          "META-INF/proguard/",
           "META-INF/proguard/client.pro",
-          *manifestEntries,
+          manifestEntry,
         )
       }
       assertExecutionsFromCacheAndUpToDate()
