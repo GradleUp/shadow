@@ -21,14 +21,14 @@ internal value class UnixMode private constructor(internal val value: Int) {
   }
 }
 
+/** Wrapper for accessing private [entries] in [ZipOutputStream]. */
 internal class TrackingZipOutputStream : ZipOutputStream {
   constructor(out: OutputStream) : super(out)
 
   constructor(file: File) : super(file)
 
   private val _entries = mutableListOf<ZipEntry>()
-  val entries: List<ZipEntry>
-    get() = _entries
+  val entries: List<ZipEntry> = _entries
 
   override fun putNextEntry(archiveEntry: ZipEntry) {
     super.putNextEntry(archiveEntry)
