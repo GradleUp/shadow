@@ -21,7 +21,7 @@ internal value class UnixMode private constructor(internal val value: Int) {
   }
 }
 
-/** Wrapper for accessing private [entries] in [ZipOutputStream]. */
+/** Workaround to provide access to written [ZipOutputStream.entries]. */
 internal class TrackingZipOutputStream : ZipOutputStream {
   constructor(out: OutputStream) : super(out)
 
