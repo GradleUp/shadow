@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import java.io.File
+import java.io.OutputStream
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipEntry
@@ -22,11 +23,29 @@ internal value class UnixMode private constructor(internal val value: Int) {
   }
 }
 
+internal class TrackingZipOutputStream : ZipOutputStream {
+  constructor(out: OutputStream) : super(out)
+
+  constructor(file: File) : super(file)
+
+  private val _entries = mutableListOf<ZipEntry>()
+  val entries: List<ZipEntry>
+    get() = _entries
+
+  override fun putNextEntry(archiveEntry: ZipEntry) {
+    super.putNextEntry(archiveEntry)
+    _entries.add(archiveEntry)
+  }
+}
+
+internal val ZipOutputStream.entries: List<ZipEntry>
+  get() = (this as? TrackingZipOutputStream)?.entries.orEmpty()
+
 internal fun File.createZipOutputStream(
   entryCompression: ZipEntryCompression,
   isZip64: Boolean,
   encoding: String?,
-): ZipOutputStream {
+): TrackingZipOutputStream {
   val destination = this
   val method =
     when (entryCompression) {
@@ -35,11 +54,11 @@ internal fun File.createZipOutputStream(
     }
   val stream =
     if (method == ZipOutputStream.STORED) {
-      ZipOutputStream(destination)
+      TrackingZipOutputStream(destination)
     } else {
       // Improve performance by avoiding lots of small writes to the file system.
       // STORED entries require a RandomAccessFile so their CRC can be updated after writing.
-      ZipOutputStream(destination.outputStream().buffered())
+      TrackingZipOutputStream(destination.outputStream().buffered())
     }
   return stream.apply {
     setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
