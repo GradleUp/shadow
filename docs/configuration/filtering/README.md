@@ -7,7 +7,7 @@ When using `exclude`/`include` with a [`ShadowJar`][ShadowJar] task, the resulti
 JAR contents. This means that, the configuration is applied to the individual files from both the project source set or
 _any_ of the dependencies to be merged.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -15,7 +15,7 @@ _any_ of the dependencies to be merged.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -26,7 +26,7 @@ _any_ of the dependencies to be merged.
 Excludes and includes can be combined just like a normal [`Jar`][Jar] task, with `excludes` taking precedence over
 `includes`. Additionally, ANT style patterns can be used to match multiple files.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -36,7 +36,7 @@ Excludes and includes can be combined just like a normal [`Jar`][Jar] task, with
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {

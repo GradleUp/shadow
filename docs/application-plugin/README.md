@@ -7,7 +7,7 @@ Just like the normal [`Jar`][Jar] task, when the [`application`][application] pl
 [`ShadowJar`][ShadowJar] manifest will be configured to contain the `Main-Class` attribute with the value specified in
 the project's `application.mainClass` attribute.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -20,7 +20,7 @@ the project's `application.mainClass` attribute.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -39,7 +39,7 @@ When applied along with the `application` plugin, the `runShadow` task will be c
 the shadowed JAR. The `runShadow` task is a [`JavaExec`][JavaExec] task that is configured to execute
 `java -jar myproject-all.jar`. It can be configured the same as any other [`JavaExec`][JavaExec] task.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -58,7 +58,7 @@ the shadowed JAR. The `runShadow` task is a [`JavaExec`][JavaExec] task that is 
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -88,7 +88,7 @@ files for a distribution to `build/install/<project name>-shadow/`.
 
 You can also add more files into the distribution like:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -126,7 +126,7 @@ You can also add more files into the distribution like:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {

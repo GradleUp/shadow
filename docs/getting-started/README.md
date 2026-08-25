@@ -1,6 +1,6 @@
 # Getting Started
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -9,7 +9,7 @@
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -20,7 +20,7 @@
 
 Alternatively, the plugin can be added to the buildscript classpath and applied:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     buildscript {
@@ -37,7 +37,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     apply(plugin = "com.gradleup.shadow")
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     buildscript {
@@ -54,7 +54,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     apply plugin: 'com.gradleup.shadow'
     ```
 
-===! "build.gradle.kts"
+===! ":material-language-kotlin: build.gradle.kts"
 
     <details>
     <summary>Snapshots of the development version are available in Central Portal Snapshots.
@@ -80,7 +80,7 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     </p>
     </details>
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     <details>
     <summary>Snapshots of the development version are available in Central Portal Snapshots.

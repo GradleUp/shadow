@@ -33,7 +33,7 @@ see more details about them in [`DuplicatesStrategy`][DuplicatesStrategy].
 
 `ShadowJar` recognizes `EXCLUDE` as the default, if you want to change the strategy, you can override it like:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -41,7 +41,7 @@ see more details about them in [`DuplicatesStrategy`][DuplicatesStrategy].
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -70,7 +70,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
 If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
 [`ResourceTransformer`][ResourceTransformer] like below:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -79,7 +79,7 @@ If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -133,7 +133,7 @@ Optional steps:
 
 Here are some examples:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -174,7 +174,7 @@ Here are some examples:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -219,7 +219,7 @@ Here are some examples:
 
 For simpler use cases, you can create a basic transformer:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -239,7 +239,7 @@ For simpler use cases, you can create a basic transformer:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -263,7 +263,7 @@ Additionally, a [`ResourceTransformer`][ResourceTransformer] can accept a closur
 [`ResourceTransformer`][ResourceTransformer]. An instantiated instance of a [`ResourceTransformer`][ResourceTransformer]
 can also be provided.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -291,7 +291,7 @@ can also be provided.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -334,7 +334,7 @@ single file in the output JAR. You can use either the short syntax method
 [`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to add
 the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -346,7 +346,7 @@ the [`ServiceFileTransformer`][ServiceFileTransformer]:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -372,7 +372,7 @@ the [`ServiceFileTransformer`][ServiceFileTransformer]:
 By default, the [`ServiceFileTransformer`][ServiceFileTransformer] is configured to merge files in `META-INF/services`.
 This directory can be overridden to merge descriptor files in a different location.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -388,7 +388,7 @@ This directory can be overridden to merge descriptor files in a different locati
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -409,7 +409,7 @@ This directory can be overridden to merge descriptor files in a different locati
 The [`ServiceFileTransformer`][ServiceFileTransformer] class supports specifying specific files to include or exclude
 from merging.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -425,7 +425,7 @@ from merging.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -448,7 +448,7 @@ syntax and how they need to be merged together. The
 [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files. The
 [`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -460,7 +460,7 @@ syntax and how they need to be merged together. The
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -480,7 +480,7 @@ syntax and how they need to be merged together. The
 Log4j 2.x Core components. It's a Gradle equivalent of
 [Log4j Plugin Descriptor Transformer][log4j-plugin-descriptor-transformer].
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -488,7 +488,7 @@ Log4j 2.x Core components. It's a Gradle equivalent of
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -502,7 +502,7 @@ Generic text files can be appended together using the [`AppendingTransformer`][A
 appended using separators (defaults to `\n`) to separate content. The [`ShadowJar`][ShadowJar] task provides a short
 syntax method of [`append(String)`][ShadowJar.append] to configure this transformer.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -510,7 +510,7 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -518,7 +518,7 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
     }
     ```
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -532,7 +532,7 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -553,7 +553,7 @@ XML document and merges each root element into a single document. There is no sh
 [`XmlAppendingTransformer`][XmlAppendingTransformer]. It must be added using the [`transform`][ShadowJar.transform]
 methods.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -563,7 +563,7 @@ methods.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -582,7 +582,7 @@ relocates matched class names and package patterns within the rules according to
 
 You can add this transformer using [`transform`][ShadowJar.transform]:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -590,7 +590,7 @@ You can add this transformer using [`transform`][ShadowJar.transform]:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -615,7 +615,7 @@ There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provide
 You can use `include`/`exclude` and more methods to configure the patterns for those
 [`ResourceTransformer`][ResourceTransformer]s that support it. For example:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -626,7 +626,7 @@ You can use `include`/`exclude` and more methods to configure the patterns for t
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -654,7 +654,7 @@ You can also specify specific file paths or regular expressions to match using `
 strategies using `mappings`, rewrite property keys using `keyTransformer`, or change file encoding using
 `charsetName` (defaults to `ISO-8859-1`).
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
@@ -669,7 +669,7 @@ strategies using `mappings`, rewrite property keys using `keyTransformer`, or ch
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
@@ -698,7 +698,7 @@ You can configure:
 - `firstSeparator`: Separator between the project's license and dependency licenses.
 - `separator`: Separator between individual dependency licenses.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -709,7 +709,7 @@ You can configure:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -723,7 +723,7 @@ You can configure:
 If you instead want to discard all license files from the output JAR, you can simply use
 [`ShadowJar.exclude`][ShadowJar.exclude]:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -731,7 +731,7 @@ If you instead want to discard all license files from the output JAR, you can si
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -748,7 +748,7 @@ formatting requirements.
 You can configure properties such as `projectName`, `copyright`, `organizationName`, `organizationURL`,
 `inceptionYear`, `outputPath` (defaults to `META-INF/NOTICE`), `addHeader`, and `charsetName` (defaults to `UTF-8`).
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -761,7 +761,7 @@ You can configure properties such as `projectName`, `copyright`, `organizationNa
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -781,7 +781,7 @@ Maven plugins and components using the Plexus IoC container provide component de
 aggregates these component definitions into a single file and relocates the `role` and `implementation` class names
 matching the configured relocators.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -789,7 +789,7 @@ matching the configured relocators.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -807,7 +807,7 @@ relocating class and package names within configured manifest attributes (such a
 To remove a specific attribute from the manifest, map its name to
 [`ManifestResourceTransformer.NULL`][ManifestResourceTransformer.NULL].
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
@@ -822,7 +822,7 @@ To remove a specific attribute from the manifest, map its name to
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     import com.github.jengelman.gradle.plugins.shadow.transformers.ManifestResourceTransformer
@@ -845,7 +845,7 @@ the specified patterns and discards any subsequent duplicates found with the sam
 This transformer is useful when `duplicatesStrategy` is set to `INCLUDE` or `WARN`, ensuring that project resources take
 precedence and duplicate dependency resources at the same path are omitted.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -855,7 +855,7 @@ precedence and duplicate dependency resources at the same path are omitted.
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -883,7 +883,7 @@ or `pom.xml` files from different dependency versions), you can exclude those pa
     [`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer], as they handle duplicates differently and
     combining them leads to redundant or unexpected behavior.
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -893,7 +893,7 @@ or `pom.xml` files from different dependency versions), you can exclude those pa
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -911,7 +911,7 @@ resources. Shadow provides a [`FindResourceInClasspath`][FindResourceInClasspath
 To scan for resources, register a [`FindResourceInClasspath`][FindResourceInClasspath] task in your build script and
 configure its `classpath` and the resource patterns to look for:
 
-=== "build.gradle.kts"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath>("findResources") {
@@ -920,7 +920,7 @@ configure its `classpath` and the resource patterns to look for:
     }
     ```
 
-=== "build.gradle"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.register('findResources', com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath) {
