@@ -25,7 +25,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun shrinkUnusedDependencyClasses() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -66,7 +65,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun keepServiceProviders() {
-    writeR8Repository()
     writeR8AppAndServiceModules()
 
     runWithSuccess(appShadowJarPath)
@@ -89,7 +87,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun honorCustomProguardRules() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -136,7 +133,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun canKeepDirectories() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -168,7 +164,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun generateReportsRelativeToConfigurationFile() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -213,7 +208,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun useClasspathRules() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -264,7 +258,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun preserveRepeatedLinesInClasspathRules() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -309,7 +302,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun canEnableObfuscation() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -339,7 +331,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun canEnableOptimization() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -364,7 +355,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun honorDependencyExcludes() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appShadowBlock =
         """
@@ -397,7 +387,6 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun useJavaToolchain() {
-    writeR8Repository()
     writeR8AppAndLibModules(
       appProjectBlock =
         """

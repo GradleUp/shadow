@@ -641,7 +641,6 @@ class RelocationTest : BasePluginTest() {
         insert("foo/Foo.class", createEmptyClassBytes("foo/Foo"))
       }
 
-    writeR8Repository()
     projectScript.appendText(
       """
       |dependencies {

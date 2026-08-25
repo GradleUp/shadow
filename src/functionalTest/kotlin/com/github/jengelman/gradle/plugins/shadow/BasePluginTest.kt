@@ -176,6 +176,7 @@ abstract class BasePluginTest {
            |  repositories {
            |    maven { url = '${localRepo.root.toUri()}' }
            |    mavenCentral()
+           |    google()
            |  }
            |}
            |buildCache {
@@ -188,12 +189,6 @@ abstract class BasePluginTest {
            |
            """
       .trimMargin()
-  }
-
-  fun writeR8Repository() {
-    settingsScript.writeText(
-      settingsScript.readText().replace("mavenCentral()", "mavenCentral()\n          google()")
-    )
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
