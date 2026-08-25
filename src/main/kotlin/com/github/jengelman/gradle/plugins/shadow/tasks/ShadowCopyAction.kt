@@ -111,7 +111,7 @@ internal constructor(
   }
 
   private fun addDirs(zos: ZipOutputStream) {
-    @Suppress("UNCHECKED_CAST") val entries = zos.entries.map { it.name }
+    val entries = zos.entries.map { it.name }
     val added = entries.toMutableSet()
     val currentTimeMillis = System.currentTimeMillis()
 
