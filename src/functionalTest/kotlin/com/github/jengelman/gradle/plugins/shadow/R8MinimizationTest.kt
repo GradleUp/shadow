@@ -16,9 +16,9 @@ import kotlin.io.path.writeText
 import org.gradle.api.JavaVersion
 import org.junit.jupiter.api.Test
 
-class R8MinimizeTest : BasePluginTest() {
+class R8MinimizationTest : BasePluginTest() {
   @Test
-  fun minimizeWithR8ShrinksUnusedDependencyClasses() {
+  fun shrinkUnusedDependencyClasses() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -59,7 +59,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8KeepsServiceProviders() {
+  fun keepServiceProviders() {
     writeR8Repository()
     writeR8ServiceModules()
 
@@ -82,7 +82,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8HonorsCustomProguardRules() {
+  fun honorCustomProguardRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -129,7 +129,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8CanKeepDirectories() {
+  fun canKeepDirectories() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -161,7 +161,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8GeneratesReportsRelativeToConfigurationFile() {
+  fun generateReportsRelativeToConfigurationFile() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -206,7 +206,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8UsesClasspathRules() {
+  fun useClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -257,7 +257,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8PreservesRepeatedLinesInClasspathRules() {
+  fun preserveRepeatedLinesInClasspathRules() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -302,7 +302,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8CanEnableObfuscation() {
+  fun canEnableObfuscation() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -332,7 +332,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8CanEnableOptimization() {
+  fun canEnableOptimization() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -357,7 +357,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8HonorsDependencyExcludes() {
+  fun honorDependencyExcludes() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverShadowBlock =
@@ -390,7 +390,7 @@ class R8MinimizeTest : BasePluginTest() {
   }
 
   @Test
-  fun minimizeWithR8UsesJavaToolchain() {
+  fun useJavaToolchain() {
     writeR8Repository()
     writeR8ClientAndServerModules(
       serverProjectBlock =
