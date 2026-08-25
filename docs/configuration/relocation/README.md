@@ -11,7 +11,7 @@ downstream project.
 Shadow uses the ASM library to modify class byte code to replace the package name and any import statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -19,7 +19,7 @@ Any non-class files that are stored within a package structure are also relocate
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -45,7 +45,7 @@ class `junit.framework.TestCase` becomes `shadow.junit.TestCase`. In the resulti
 Specific classes or files can be `included`/`excluded` from the relocation operation if necessary. Use
 [Ant Path Matcher][ant-path-matcher] syntax to specify matching path for your files and directories.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -58,7 +58,7 @@ Specific classes or files can be `included`/`excluded` from the relocation opera
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -74,7 +74,7 @@ Specific classes or files can be `included`/`excluded` from the relocation opera
 For a more advanced path matching you might want to use [Regular Expressions][regular-expressions] instead. Wrap the
 expression in `%regex[]` before passing it to `include`/`exclude`.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -84,7 +84,7 @@ expression in `%regex[]` before passing it to `include`/`exclude`.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -98,7 +98,7 @@ It may be desirable to relocate all packages in a Shadow JAR except for a select
 specifying a relocation with an empty string `''` as the pattern to match on all packages. An `exclude` filter can then
 be used to prevent relocation of specific packages.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -110,7 +110,7 @@ be used to prevent relocation of specific packages.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -138,7 +138,7 @@ public class Bar {
 
 in your project, and you configure the relocation like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -146,7 +146,7 @@ in your project, and you configure the relocation like:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -157,7 +157,7 @@ in your project, and you configure the relocation like:
 the string constant `"foo.Bar"` will be relocated to `"my.foo.Bar"` by default. This may not be what you want, you can
 skip relocating string constants in the classes like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -168,7 +168,7 @@ skip relocating string constants in the classes like:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -188,7 +188,7 @@ removed for clarity reasons in version 4.0.0.
 To configure automatic dependency relocation, set `enableAutoRelocation = true` and optionally specify a custom
 `relocationPrefix` to override the default value of `"shadow"`.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -197,7 +197,7 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -226,7 +226,7 @@ runtime. See more details and discussion in [#1622][#1622].
 If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with
 relocating), you can try out the trick like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -236,7 +236,7 @@ relocating), you can try out the trick like:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -265,7 +265,7 @@ and [-keeppackagenames][keeppackagenames].
 To use R8 for package relocation, enable R8 under `minimize` and provide ProGuard repackaging directives via
 `proguardRules` or an external rule file:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     repositories {
@@ -288,7 +288,7 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     repositories {

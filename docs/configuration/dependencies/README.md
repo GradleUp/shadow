@@ -5,7 +5,7 @@ Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all depende
 merging can be configured using the [`configurations`][ShadowJar.configurations] property of the
 [`ShadowJar`][ShadowJar] task type.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -13,7 +13,7 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -40,7 +40,7 @@ be included in the final JAR.
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -56,7 +56,7 @@ method can be used to add extra files.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -74,7 +74,7 @@ method can be used to add extra files.
 
 Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Project.zipTree]
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -85,7 +85,7 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -122,7 +122,7 @@ Caused by: java.util.zip.ZipException: Archive is not a ZIP archive
 To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
 configuration.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     val nonJar = configurations.create("nonJar")
@@ -145,7 +145,7 @@ configuration.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     def nonJar = configurations.create('nonJar')
@@ -173,7 +173,7 @@ configuration.
 If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need in your
 shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -186,7 +186,7 @@ shadowed JAR, you can exclude it using the `dependencies` block instead of embed
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -208,7 +208,7 @@ dependency does not exclude any of its dependencies from the final JAR.
 The `dependency` blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle's [`project.configurations`][Project.configurations] block.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -222,7 +222,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -236,7 +236,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -250,7 +250,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -275,7 +275,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
 Dependencies can be filtered using regex patterns. Coupled with the `<group>:<artifact>:<version>` notation for
 dependencies, this allows for excluding/including using any of these individual fields.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -289,7 +289,7 @@ dependencies, this allows for excluding/including using any of these individual 
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -305,7 +305,7 @@ dependencies, this allows for excluding/including using any of these individual 
 
 Any of the individual fields can be safely absent and will function as though a wildcard was specified.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -319,7 +319,7 @@ Any of the individual fields can be safely absent and will function as though a 
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -344,7 +344,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
 - `.*:log4j-core:.*`
 - ...
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -358,7 +358,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -372,7 +372,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -386,7 +386,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -404,7 +404,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
 
 You can also use type-safe project accessors or version catalog accessors to filter dependencies.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -422,7 +422,7 @@ You can also use type-safe project accessors or version catalog accessors to fil
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -446,7 +446,7 @@ If more complex decisions are needed to select the dependencies to be included, 
 [`ShadowJar.dependencies`][ShadowJar.dependencies]
 block provides a method that accepts a `Closure` for selecting dependencies.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -462,7 +462,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {

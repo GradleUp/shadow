@@ -6,7 +6,7 @@ The Shadow plugin will automatically configure the necessary tasks in the presen
 [`maven-publish`][maven-publish] plugin. The plugin provides the `shadow` component to configure the publication with
 the necessary artifact and dependencies in the POM file.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -27,7 +27,7 @@ the necessary artifact and dependencies in the POM file.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -56,7 +56,7 @@ JAR. This allows consumers of the published library to choose between the standa
 This feature is enabled by default. It can be disabled by setting the `addShadowVariantIntoJavaComponent` property in
 the `shadow` extension to `false`. If you want to publish the standard JAR only, disable this feature like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -81,7 +81,7 @@ the `shadow` extension to `false`. If you want to publish the standard JAR only,
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -110,7 +110,7 @@ The target JVM version attribute (`org.gradle.jvm.version`) of the shadowed vari
 for consumers to select the correct variant based on their target JVM version. But it may cause issues in some cases,
 you can disable this by setting the `addTargetJvmVersionAttribute` property in the `shadow` extension to `false`:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     shadow {
@@ -118,7 +118,7 @@ you can disable this by setting the `addTargetJvmVersionAttribute` property in t
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     shadow {
@@ -130,7 +130,7 @@ The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed varian
 useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by setting
 the `bundlingAttribute` property in the `shadow` extension:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     shadow {
@@ -139,7 +139,7 @@ the `bundlingAttribute` property in the `shadow` extension:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     shadow {
@@ -161,7 +161,7 @@ No other dependencies are automatically configured for inclusion in the POM file
 This automatic configuration occurs _only_ when using the above methods for configuring publishing. If this behavior is
 not desirable, then publishing **must** be manually configured.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -202,7 +202,7 @@ not desirable, then publishing **must** be manually configured.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -248,7 +248,7 @@ not desirable, then publishing **must** be manually configured.
 You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming the
 `archiveClassifier` of the shadowed JAR like the following:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -271,7 +271,7 @@ You may want to publish the shadowed JAR instead of the original JAR. This can b
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -298,7 +298,7 @@ Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting
 [`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases. If
 you don't need the standard JAR, you can disable the `jar` task like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.jar {
@@ -306,7 +306,7 @@ you don't need the standard JAR, you can disable the `jar` task like:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('jar', Jar) {
@@ -316,7 +316,7 @@ you don't need the standard JAR, you can disable the `jar` task like:
 
 Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.jar {
@@ -324,7 +324,7 @@ Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('jar', Jar) {
@@ -340,7 +340,7 @@ publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artif
 the [Gradle Plugin Publish docs][gradle-plugin-publish-docs] for details. The only thing you need to do from the Shadow
 side is to empty the `archiveClassifier` like:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -357,7 +357,7 @@ side is to empty the `archiveClassifier` like:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -379,7 +379,7 @@ side is to empty the `archiveClassifier` like:
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
 [`MavenPublication.artifact()`][MavenPublication.artifact] method.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -411,7 +411,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -448,7 +448,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
 It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
 customizable properties listed in [Configuring Output Name][configuring-output-name]. e.g.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -480,7 +480,7 @@ customizable properties listed in [Configuring Output Name][configuring-output-n
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {

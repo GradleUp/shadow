@@ -78,7 +78,7 @@ If working with a Gradle project with the name `myApp` and version `1.0`, the de
 output a file at: `build/libs/myApp-1.0-all.jar`. You can override the properties listed above to change the output name
 of the shadowed JAR file. e.g.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -86,7 +86,7 @@ of the shadowed JAR file. e.g.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -112,7 +112,7 @@ Additionally, Shadow automatically configures the manifest of the [`ShadowJar`][
 `Class-Path` entry in the JAR manifest. The value of the `Class-Path` entry is the name of all dependencies resolved in
 the `shadow` configuration for the project.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -120,7 +120,7 @@ the `shadow` configuration for the project.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     dependencies {
@@ -144,7 +144,7 @@ Class-Path: junit-3.8.2.jar
 The [`ShadowJar`][ShadowJar] manifest is configured in a number of ways. First, the manifest for the `shadowJar` task is
 configured to __inherit__ from the manifest of the standard `jar` task.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.jar {
@@ -154,7 +154,7 @@ configured to __inherit__ from the manifest of the standard `jar` task.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('jar', Jar) {
@@ -173,7 +173,7 @@ Main-Class: my.Main
 If it is desired to merge a manifest from another [`Jar`][Jar] task, the `manifest.from` methods can be used to
 configure the upstream.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     val testJar = tasks.register<Jar>("testJar") {
@@ -187,7 +187,7 @@ configure the upstream.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     def testJar = tasks.register('testJar', Jar) {
@@ -212,7 +212,7 @@ into the shadow JAR. If any dependency JAR has the `Multi-Release` manifest attr
 
 You can disable this behavior by setting `addMultiReleaseAttribute` to `false`:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -220,7 +220,7 @@ You can disable this behavior by setting `addMultiReleaseAttribute` to `false`:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -236,7 +236,7 @@ dependencies.
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -247,7 +247,7 @@ method can be used to add extra files.
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {

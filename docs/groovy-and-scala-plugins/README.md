@@ -4,7 +4,7 @@ Shadow also works well for Groovy and Scala, here are integration examples:
 
 For Groovy:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -20,7 +20,7 @@ For Groovy:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
@@ -38,7 +38,7 @@ For Groovy:
 
 For Scala:
 
-=== "Kotlin"
+=== "build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -54,7 +54,7 @@ For Scala:
     }
     ```
 
-=== "Groovy"
+=== "build.gradle"
 
     ```groovy
     plugins {
