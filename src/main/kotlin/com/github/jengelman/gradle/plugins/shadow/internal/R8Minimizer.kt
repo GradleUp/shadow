@@ -194,14 +194,14 @@ private fun File.classNames(): Set<String> {
   return when {
     isDirectory ->
       walkTopDown()
-        .filter { it.isFile && it.name.endsWith(".class") }
+        .filter { it.name.endsWith(".class") && it.isFile }
         .mapNotNull { it.toClassName(base = this) }
         .toSet()
     isFile ->
       useZip {
         entries()
           .asSequence()
-          .filter { !it.isDirectory && it.name.endsWith(".class") }
+          .filter { it.name.endsWith(".class") }
           .mapNotNull { it.name.toClassName() }
           .toSet()
       }
