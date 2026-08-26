@@ -161,10 +161,11 @@ private fun File.analyzeInputJar(): Pair<Set<String>, Set<String>> {
     entries().asSequence().forEach { entry ->
       val name = entry.name
       when {
+        entry.isDirectory -> Unit
         name.endsWith(".class") -> {
           name.toClassName()?.let { classes += it }
         }
-        !entry.isDirectory && name.startsWith(SERVICES_PATH) -> {
+        name.startsWith(SERVICES_PATH) -> {
           serviceEntries += entry
         }
       }
