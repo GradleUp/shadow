@@ -106,7 +106,7 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
+  val jarClasses = inputJar.classNames().toSet()
   return buildList {
     add(baseDirectory.toBaseDirectoryRule())
     if (shouldDisableOptimization(r8Spec, r8Args)) {
@@ -196,17 +196,6 @@ private fun serviceProguardRules(inputJar: File): List<String> {
   return rules.toList()
 }
 
-private fun jarClassEntries(inputJar: File): Set<String> {
-  return inputJar.useZip { jarFile ->
-    jarFile
-      .entries()
-      .asSequence()
-      .filter { !it.isDirectory && it.name.endsWith(".class") }
-      .mapNotNull { it.name.toClassName() }
-      .toSet()
-  }
-}
-
 private fun File.toClassName(relativeTo: File): String? {
   if (name == "module-info.class" || name == "package-info.class") return null
   return toRelativeString(relativeTo).removeSuffix(".class").replace(File.separatorChar, '.')
@@ -224,18 +213,15 @@ private fun File.classNames(): Sequence<String> {
     isDirectory ->
       walkTopDown()
         .filter { it.isFile && it.name.endsWith(".class") }
-        .mapNotNull {
-          it.toClassName(relativeTo = this)
-        }
-    isFile -> useZip { jarFile ->
+        .mapNotNull { it.toClassName(relativeTo = this) }
+    isFile ->
+      useZip { jarFile ->
         jarFile
           .entries()
           .asSequence()
           .filter { !it.isDirectory && it.name.endsWith(".class") }
           .mapNotNull { it.name.toClassName() }
-          .toList()
       }
-        .asSequence()
     else -> emptySequence()
   }
 }
