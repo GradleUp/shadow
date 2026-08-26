@@ -97,6 +97,14 @@ descriptors in `META-INF/services` are used to keep service providers.
 The default R8 configuration only shrinks unused code. It disables name minification and optimization. R8 also applies
 rules published in dependency JARs, for example under `META-INF/proguard`.
 
+!!! note "Relocating Embedded ProGuard Rules"
+
+    If you relocate classes from a dependency that publishes embedded ProGuard or R8 rules (for example under
+    `META-INF/proguard`), those rules are not rewritten automatically. Add
+    [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] so class names and package patterns inside
+    embedded rules are updated to match your relocations.
+
+
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -374,3 +382,5 @@ To enable both:
 [ProguardConfigurationParser]: https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
 [DependencyFilter]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
+[ProGuardFilesResourceTransformer]: ../merging/README.md#merging-r8proguard-rule-files
+
