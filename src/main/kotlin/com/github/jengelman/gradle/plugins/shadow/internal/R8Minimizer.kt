@@ -256,30 +256,10 @@ private fun String.toClassName(): String? {
   return removeSuffix(".class").replace('/', '.')
 }
 
-// Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
-// service lines, comments, malformed providers, and JVM-only names R8 would reject.
-private fun String.isJavaTypeName(): Boolean {
-  if (isEmpty()) return false
-  var startOfIdentifier = true
-  for (i in indices) {
-    val c = this[i]
-    if (c == '.') {
-      if (startOfIdentifier) return false
-      startOfIdentifier = true
-    } else if (startOfIdentifier) {
-      if (!c.isJavaTypeNameStart()) return false
-      startOfIdentifier = false
-    } else {
-      if (!c.isJavaTypeNamePart()) return false
-    }
-  }
-  return !startOfIdentifier
-}
-
-private fun Char.isJavaTypeNameStart(): Boolean =
-  this in 'a'..'z' || this in 'A'..'Z' || this == '_' || this == '$'
-
-private fun Char.isJavaTypeNamePart(): Boolean = isJavaTypeNameStart() || this in '0'..'9'
+private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
 private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
 private const val SERVICES_PATH = "META-INF/services/"
+// Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
+// service lines, comments, malformed providers, and JVM-only names R8 would reject.
+private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
