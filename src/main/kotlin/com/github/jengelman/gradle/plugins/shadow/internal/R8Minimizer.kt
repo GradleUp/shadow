@@ -87,7 +87,7 @@ internal fun minimizeWithR8(
   logger.info("Running R8 to minimize {}.", inputJar)
   execOperations.javaexec {
     it.classpath = r8Classpath
-    it.mainClass.set(R8_MAIN_CLASS)
+    it.mainClass.set("com.android.tools.r8.R8")
     if (launcher != null) {
       it.executable = launcher.executablePath.asFile.absolutePath
     }
@@ -248,7 +248,6 @@ private fun String.toClassName(): String? {
 
 private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
-private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
 private const val SERVICES_PATH = "META-INF/services/"
 // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
 // service lines, comments, malformed providers, and JVM-only names R8 would reject.
