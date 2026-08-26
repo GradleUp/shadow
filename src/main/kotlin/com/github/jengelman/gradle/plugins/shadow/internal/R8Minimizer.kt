@@ -209,10 +209,7 @@ private fun jarClassEntries(inputJar: File): Set<String> {
 
 private fun File.toClassName(relativeTo: File): String? {
   if (name == "module-info.class" || name == "package-info.class") return null
-  return toRelativeString(relativeTo)
-    .removeSuffix(".class")
-    .replace(File.separatorChar, '.')
-    .replace('/', '.')
+  return toRelativeString(relativeTo).removeSuffix(".class").replace(File.separatorChar, '.')
 }
 
 private fun File.toBaseDirectoryRule(): String {
