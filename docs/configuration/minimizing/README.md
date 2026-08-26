@@ -44,10 +44,9 @@ loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and 
     }
     ```
 
-!!! note
-
-    Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on
-    minimization.
+> [!NOTE]
+> Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on
+> minimization.
 
 Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also be excluded.
 
@@ -71,22 +70,20 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
     }
     ```
 
-!!! note
+> [!NOTE]
+> When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
+> minimization as well.
 
-    When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
-    minimization as well.
-
-!!! tip "Difference between `dependencies` filter and `minimize` filter"
-
-    Both `dependencies { ... }` and `minimize { ... }` implement [`DependencyFilter`][DependencyFilter], sharing the
-    same `include` / `exclude` syntax, but they control completely different operations:
-
-    - **`shadowJar.dependencies` (Packaging filter)**:
-        - `exclude(...)`: Excludes matching dependencies from being bundled into the shadow JAR at all.
-        - `include(...)`: Bundles *only* matching dependencies into the shadow JAR, discarding all other dependencies.
-    - **`shadowJar.minimize` (Shrinking filter)**:
-        - `exclude(...)`: Excludes matching dependencies from *minimization / code shrinking*. The dependencies are still bundled into the shadow JAR, and all of their classes and methods are fully preserved without being stripped.
-        - `include(...)`: Applies code shrinking *only* to matching dependencies. All other dependencies are bundled and fully preserved.
+> [!TIP] Difference between `dependencies` filter and `minimize` filter
+> Both `dependencies { ... }` and `minimize { ... }` implement [`DependencyFilter`][DependencyFilter], sharing the
+> same `include` / `exclude` syntax, but they control completely different operations:
+>
+> - **`shadowJar.dependencies` (Packaging filter)**:
+>   - `exclude(...)`: Excludes matching dependencies from being bundled into the shadow JAR at all.
+>   - `include(...)`: Bundles *only* matching dependencies into the shadow JAR, discarding all other dependencies.
+> - **`shadowJar.minimize` (Shrinking filter)**:
+>   - `exclude(...)`: Excludes matching dependencies from *minimization / code shrinking*. The dependencies are still bundled into the shadow JAR, and all of their classes and methods are fully preserved without being stripped.
+>   - `include(...)`: Applies code shrinking *only* to matching dependencies. All other dependencies are bundled and fully preserved.
 
 ## Minimizing with R8
 
@@ -97,15 +94,15 @@ descriptors in `META-INF/services` are used to keep service providers.
 The default R8 configuration only shrinks unused code. It disables name minification and optimization. R8 also applies
 rules published in dependency JARs, for example under `META-INF/proguard`.
 
-!!! note "Relocating Embedded ProGuard Rules"
-
-    If you relocate classes using Shadow's `relocate` configuration from a dependency that publishes embedded R8/ProGuard
-    rules (for example under `META-INF/proguard`), those rules are not rewritten automatically. Add
-    [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] so class names and package patterns inside
-    embedded rules are updated to match your relocations.
-
-    Alternatively, if you use [R8 Repackaging][r8-repackaging] (e.g. `-repackageclasses`), R8 applies embedded rules
-    natively without needing rule rewriting.
+> [!NOTE] Relocating Embedded ProGuard Rules
+>
+> If you relocate classes using Shadow's `relocate` configuration from a dependency that publishes embedded R8/ProGuard
+> rules (for example under `META-INF/proguard`), those rules are not rewritten automatically. Add
+> [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] so class names and package patterns inside
+> embedded rules are updated to match your relocations.
+>
+> Alternatively, if you use [R8 Repackaging][r8-repackaging] (e.g. `-repackageclasses`), R8 applies embedded rules
+> natively without needing rule rewriting.
 
 === ":material-language-kotlin: build.gradle.kts"
 

@@ -85,22 +85,21 @@
 
 ## [9.5.0](https://github.com/GradleUp/shadow/releases/tag/9.5.0) - 2026-07-06
 
-!!! note
-
-    With the introduction of `DuplicatesStrategy` checking for transformers, you may see warnings like:
-
-    ```
-    'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
-    ```
-
-    If you do not need Kotlin module metadata remapping, you can disable it:
-
-    ```
-    tasks.shadowJar {
-      @Suppress("DEPRECATION") // This flag will be disabled and removed in the next major version of Shadow.
-      enableKotlinModuleRemapping = false
-    }
-    ```
+> [!NOTE]
+> With the introduction of `DuplicatesStrategy` checking for transformers, you may see warnings like:
+>
+> ```
+> 'META-INF/...kotlin_module' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.
+> ```
+>
+> If you do not need Kotlin module metadata remapping, you can disable it:
+>
+> ```
+> tasks.shadowJar {
+>   @Suppress("DEPRECATION") // This flag will be disabled and removed in the next major version of Shadow.
+>   enableKotlinModuleRemapping = false
+> }
+> ```
 
 ### Added
 
@@ -342,14 +341,12 @@
 
 ## [9.0.1](https://github.com/GradleUp/shadow/releases/tag/9.0.1) - 2025-08-09
 
-!!! note
+> [!NOTE]
+> If you are upgrading from 8.x versions, please read 9.0.0 release notes first.
 
-    If you are upgrading from 8.x versions, please read 9.0.0 release notes first.
-
-!!! tip
-
-    You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
-    If there are any things missing in the changelog or the doc site, please report them to us.
+> [!TIP]
+> You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
+> If there are any things missing in the changelog or the doc site, please report them to us.
 
 ### Changed
 
@@ -367,23 +364,20 @@
 
 ## [9.0.0](https://github.com/GradleUp/shadow/releases/tag/9.0.0) - 2025-08-07
 
-!!! warning
+> [!WARNING]
+> This release is a major update from the 8.x series. The plugin has been fully rewritten in Kotlin, bringing
+> significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
+> enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
+> the [new doc site](https://gradleup.com/shadow/) before upgrading.  
+>
+> *If you really don't want to upgrade, you can still use the 8.3.x, which is also Gradle 9 compatible. But no additional features or crucial bug fixes will be included in the 8.x line.*
 
-    This release is a major update from the 8.x series. The plugin has been fully rewritten in Kotlin, bringing
-    significant improvements to maintainability, performance, and future extensibility. It introduces many new features,
-    enhancements, and bug fixes, and includes several breaking changes. Please review the changelog carefully and consult
-    the [new doc site](https://gradleup.com/shadow/) before upgrading.  
+> [!TIP]
+> You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
+> If there are any things missing in the changelog or the doc site, please report them to us.
 
-    *If you really don't want to upgrade, you can still use the 8.3.x, which is also Gradle 9 compatible. But no additional features or crucial bug fixes will be included in the 8.x line.*
-
-!!! tip
-
-    You can diff the shadowed JARs when upgrading from 8.x to 9.x by using [Diffuse](https://github.com/JakeWharton/diffuse).  
-    If there are any things missing in the changelog or the doc site, please report them to us.
-
-!!! note
-
-    Release notes for 9.0.0 beta and rc versions are available on [GitHub Releases](https://github.com/GradleUp/shadow/releases).
+> [!NOTE]
+> Release notes for 9.0.0 beta and rc versions are available on [GitHub Releases](https://github.com/GradleUp/shadow/releases).
 
 ### Added
 
@@ -567,10 +561,9 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ## [8.3.11](https://github.com/GradleUp/shadow/releases/tag/8.3.11) - 2026-05-28
 
-!!! warning
-
-    Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be
-    included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
+> [!WARNING]
+> Only Gradle 9 support is being backported to this version. No additional features or crucial bug fixes will be
+> included in the 8.x line. Please migrate to Shadow 9 as soon as possible.
 
 ### Changed
 
@@ -700,10 +693,9 @@ See more details about the fixed `DuplicatesStrategy` behaviors at [Handling Dup
 
 ## [8.1.1](https://github.com/GradleUp/shadow/releases/tag/8.1.1) - 2023-03-20
 
-!!! note
-
-    As of this version, the GitHub repository has migrated to the `main` branch as the default branch for
-    releases.
+> [!NOTE]
+> As of this version, the GitHub repository has migrated to the `main` branch as the default branch for
+> releases.
 
 ### What's Changed
 

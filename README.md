@@ -8,7 +8,7 @@ with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 [![CI](https://github.com/GradleUp/shadow/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/GradleUp/shadow/actions/workflows/build.yml?query=branch:main+event:push)
 [![License](https://img.shields.io/github/license/GradleUp/shadow.svg)](LICENSE)
 
-> [!NOTE]\
+> [!NOTE]
 > Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the
 > ID [`com.github.johnrengelman.shadow`][johnrengelman's] before maintenance was transferred to the
 > [GradleUp organization](https://github.com/GradleUp) to ensure future development, see

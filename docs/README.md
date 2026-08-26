@@ -7,15 +7,15 @@
 A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications with
 R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 
-!!! warning "Plugin ID Change"
-
-    Previously this plugin was developed by [@johnrengelman][johnrengelman] and published under the ID
-    [`com.github.johnrengelman.shadow`][johnrengelman's] before maintenance was transferred to the
-    [GradleUp organization][GradleUp] to ensure future development, see [#908].
-
-    If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID
-    [`com.gradleup.shadow`][gradleup's] and update to the latest version to receive all the latest bug fixes and
-    improvements.
+> [!WARNING] Plugin ID Change
+>
+> Previously this plugin was developed by [@johnrengelman][johnrengelman] and published under the ID
+> [`com.github.johnrengelman.shadow`][johnrengelman's] before maintenance was transferred to the
+> [GradleUp organization][GradleUp] to ensure future development, see [#908].
+>
+> If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID
+> [`com.gradleup.shadow`][gradleup's] and update to the latest version to receive all the latest bug fixes and
+> improvements.
 
 | Shadow Version | Min Gradle Version | Min Java Version | Plugin ID                                            |
 |----------------|--------------------|------------------|------------------------------------------------------|
