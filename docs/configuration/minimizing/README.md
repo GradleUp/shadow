@@ -107,8 +107,6 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
     Alternatively, if you use [R8 Repackaging][r8-repackaging] (e.g. `-repackageclasses`), R8 applies embedded rules
     natively without needing rule rewriting.
 
-
-
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -388,5 +386,3 @@ To enable both:
 [DependencyFilter]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
 [ProGuardFilesResourceTransformer]: ../merging/README.md#merging-r8proguard-rule-files
 [r8-repackaging]: ../relocation/README.md#relocating-with-r8
-
-
