@@ -19,9 +19,9 @@ minimizing the resulting shadowed JAR.
     }
     ```
 
-A dependency can be excluded from the minimization process, thereby forcing its inclusion the shadow JAR. This is useful
-when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is loaded
-dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
+A dependency can be excluded from the minimization process, thereby forcing its inclusion in the shadow JAR. This is
+useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is
+loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
 `dependency` is interpreted as a regular expression.
 
 === ":material-language-kotlin: build.gradle.kts"
@@ -75,6 +75,18 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 
     When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
     minimization as well.
+
+!!! tip "Difference between `dependencies` filter and `minimize` filter"
+
+    Both `dependencies { ... }` and `minimize { ... }` implement [`DependencyFilter`][DependencyFilter], sharing the
+    same `include` / `exclude` syntax, but they control completely different operations:
+
+    - **`shadowJar.dependencies` (Packaging filter)**:
+        - `exclude(...)`: Excludes matching dependencies from being bundled into the shadow JAR at all.
+        - `include(...)`: Bundles *only* matching dependencies into the shadow JAR, discarding all other dependencies.
+    - **`shadowJar.minimize` (Shrinking filter)**:
+        - `exclude(...)`: Excludes matching dependencies from *minimization / code shrinking*. The dependencies are still bundled into the shadow JAR, and all of their classes and methods are fully preserved without being stripped.
+        - `include(...)`: Applies code shrinking *only* to matching dependencies. All other dependencies are bundled and fully preserved.
 
 ## Minimizing with R8
 
@@ -361,3 +373,4 @@ To enable both:
 [R8]: https://r8.googlesource.com/r8
 [ProguardConfigurationParser]: https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
+[DependencyFilter]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
