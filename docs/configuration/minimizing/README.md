@@ -99,8 +99,8 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
 
 !!! note "Relocating Embedded ProGuard Rules"
 
-    If you relocate classes using Shadow's `relocate` configuration from a dependency that publishes embedded ProGuard
-    or R8 rules (for example under `META-INF/proguard`), those rules are not rewritten automatically. Add
+    If you relocate classes using Shadow's `relocate` configuration from a dependency that publishes embedded R8/ProGuard
+    rules (for example under `META-INF/proguard`), those rules are not rewritten automatically. Add
     [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] so class names and package patterns inside
     embedded rules are updated to match your relocations.
 
