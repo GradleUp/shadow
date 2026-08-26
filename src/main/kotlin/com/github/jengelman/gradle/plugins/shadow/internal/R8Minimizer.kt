@@ -143,8 +143,8 @@ private fun Iterable<File>.toKeepRules(
   return asSequence()
     .flatMap { it.classNames() }
     .map { relocators.relocateClass(it) }
-    .filter { it.isJavaTypeName() }
     .filter { className -> className in jarClasses }
+    .filter { it.isJavaTypeName() }
     .toSortedSet()
     .map { "$rulePrefix class $it { *; }" }
 }
@@ -152,7 +152,7 @@ private fun Iterable<File>.toKeepRules(
 // Extracts all class names and generates keep rules for service descriptors in a single pass.
 // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
 // interface and every listed provider even if R8 sees no direct references.
-private fun File.analyzeInputJar(): Pair<Set<String>, List<String>> {
+private fun File.analyzeInputJar(): Pair<Set<String>, Set<String>> {
   val classes = mutableSetOf<String>()
   val serviceEntries = mutableListOf<ZipEntry>()
   val serviceRules = linkedSetOf<String>()
@@ -186,7 +186,7 @@ private fun File.analyzeInputJar(): Pair<Set<String>, List<String>> {
       }
   }
 
-  return classes to serviceRules.toList()
+  return classes to serviceRules
 }
 
 private fun File.toClassName(base: File): String? {
