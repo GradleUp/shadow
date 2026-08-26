@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
+import java.util.zip.ZipEntry
 import kotlin.io.path.moveTo
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
@@ -106,7 +107,7 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = inputJar.classNames()
+  val (jarClasses, serviceRules) = inputJar.analyzeInputJar()
   return buildList {
     add(baseDirectory.toBaseDirectoryRule())
     if (shouldDisableOptimization(r8Spec, r8Args)) {
@@ -120,7 +121,7 @@ private fun createRules(
     // Keep dependencies users explicitly excluded from minimization, matching the existing
     // minimize { exclude(...) } contract for the default analyzer.
     addAll(keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep"))
-    addAll(serviceProguardRules(inputJar))
+    addAll(serviceRules)
     r8Spec.proguardRuleFiles
       .sortedBy { it.absolutePath }
       .forEach { file ->
@@ -147,35 +148,48 @@ private fun Iterable<File>.toKeepRules(
     .map { relocators.relocateClass(it) }
     .filter { it.isJavaTypeName() }
     .filter { className -> className in jarClasses }
-    .distinct()
-    .sorted()
+    .toSortedSet()
     .map { "$rulePrefix class $it { *; }" }
-    .toList()
 }
 
+// Extracts all class names and generates keep rules for service descriptors in a single pass.
 // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
 // interface and every listed provider even if R8 sees no direct references.
-private fun serviceProguardRules(inputJar: File): List<String> {
-  val rules = linkedSetOf<String>()
-  inputJar.useZip {
-    entries()
-      .asSequence()
-      .filter { !it.isDirectory && it.name.startsWith(SERVICES_PATH) }
+private fun File.analyzeInputJar(): Pair<Set<String>, List<String>> {
+  val classes = mutableSetOf<String>()
+  val serviceEntries = mutableListOf<ZipEntry>()
+  val serviceRules = linkedSetOf<String>()
+
+  useZip {
+    entries().asSequence().forEach { entry ->
+      val name = entry.name
+      when {
+        name.endsWith(".class") -> {
+          name.toClassName()?.let { classes += it }
+        }
+        !entry.isDirectory && name.startsWith(SERVICES_PATH) -> {
+          serviceEntries += entry
+        }
+      }
+    }
+
+    serviceEntries
       .sortedBy { it.name }
       .forEach { entry ->
         val serviceClass = entry.name.removePrefix(SERVICES_PATH).replace('/', '.')
         if (serviceClass.isJavaTypeName()) {
-          rules += "-keep,allowrepackage class $serviceClass { *; }"
+          serviceRules += "-keep,allowrepackage class $serviceClass { *; }"
         }
         getInputStream(entry).bufferedReader().useLines { lines ->
           lines
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() && it.isJavaTypeName() }
-            .forEach { provider -> rules += "-keep,allowrepackage class $provider { *; }" }
+            .forEach { provider -> serviceRules += "-keep,allowrepackage class $provider { *; }" }
         }
       }
   }
-  return rules.toList()
+
+  return classes to serviceRules.toList()
 }
 
 private fun File.toClassName(base: File): String? {
