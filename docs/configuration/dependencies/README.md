@@ -205,6 +205,12 @@ Individual dependencies can be filtered from the final JAR by using the `depende
 [`ShadowJar`][ShadowJar] task. Dependency filtering does **not** apply to transitive dependencies. That is, excluding a
 dependency does not exclude any of its dependencies from the final JAR.
 
+!!! note
+
+    Excluding a dependency via `dependencies { exclude(...) }` removes it entirely from the shadow JAR. If you instead
+    want the dependency to be bundled into the shadow JAR but prevented from having its unused classes stripped during
+    minimization, see [`minimize { exclude(...) }`][minimizing].
+
 The `dependency` blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle's [`project.configurations`][Project.configurations] block.
 
@@ -489,3 +495,4 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 [adding-extra-files]: ../README.md#adding-extra-files
 [pom-files]: https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/
 [so-files]: https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/
+[minimizing]: ../minimizing/README.md

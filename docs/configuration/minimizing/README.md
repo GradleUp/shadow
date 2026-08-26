@@ -19,9 +19,9 @@ minimizing the resulting shadowed JAR.
     }
     ```
 
-A dependency can be excluded from the minimization process, thereby forcing its inclusion the shadow JAR. This is useful
-when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is loaded
-dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
+A dependency can be excluded from the minimization process, thereby forcing its inclusion in the shadow JAR. This is
+useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is
+loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
 `dependency` is interpreted as a regular expression.
 
 === ":material-language-kotlin: build.gradle.kts"
@@ -48,6 +48,13 @@ dynamically via `Class.forName(String)`. Each of the `group`, `name` and `versio
 
     Dependencies scoped as `api` will be automatically excluded from minimization and used as "entry points" on
     minimization.
+
+!!! tip "Difference between `dependencies.exclude` and `minimize.exclude`"
+
+    It is important to distinguish between `shadowJar.dependencies.exclude` and `shadowJar.minimize.exclude`:
+
+    - **`shadowJar.dependencies { exclude(...) }`**: Excludes matching dependencies from being bundled into the shadow JAR at all.
+    - **`shadowJar.minimize { exclude(...) }`**: Excludes matching dependencies from the *minimization / code shrinking* process. The dependencies are still bundled into the shadow JAR, and all of their classes and methods are fully preserved without being stripped.
 
 Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also be excluded.
 
