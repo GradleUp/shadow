@@ -45,7 +45,7 @@ internal val ZipOutputStream.entries: List<ZipEntry>
       ?: this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this)
         as List<ZipEntry>
 
-internal inline fun <R> File.useZip(block: (ZipFile) -> R): R = ZipFile(this).use(block)
+internal inline fun <R> File.useZip(block: ZipFile.() -> R): R = ZipFile(this).use(block)
 
 internal fun File.createZipOutputStream(
   entryCompression: ZipEntryCompression,

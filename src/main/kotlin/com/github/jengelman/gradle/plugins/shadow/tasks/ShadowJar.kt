@@ -591,9 +591,8 @@ public abstract class ShadowJar : Jar() {
       }
       val prefix = relocationPrefix.get()
       return includedDependencies.flatMap { file ->
-        file.useZip { jarFile ->
-          jarFile
-            .entries()
+        file.useZip {
+          entries()
             .toList()
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
             .map { it.name.substringBeforeLast('/').replace('/', '.') }
@@ -607,7 +606,7 @@ public abstract class ShadowJar : Jar() {
     val isAar: File.() -> Boolean = {
       try {
         extension.equals("aar", ignoreCase = true) &&
-          useZip { zip -> zip.getEntry("AndroidManifest.xml") != null }
+          useZip { getEntry("AndroidManifest.xml") != null }
       } catch (_: ZipException) {
         // File is not a valid ZIP, so it cannot be an AAR.
         false
