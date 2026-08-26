@@ -106,7 +106,7 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = inputJar.classNames().toSet()
+  val jarClasses = inputJar.classNames()
   return buildList {
     add(baseDirectory.toBaseDirectoryRule())
     if (shouldDisableOptimization(r8Spec, r8Args)) {
@@ -208,12 +208,13 @@ private fun File.toBaseDirectoryRule(): String {
   return "-basedirectory '$normalizedPath'"
 }
 
-private fun File.classNames(): Sequence<String> {
+private fun File.classNames(): Set<String> {
   return when {
     isDirectory ->
       walkTopDown()
         .filter { it.isFile && it.name.endsWith(".class") }
         .mapNotNull { it.toClassName(relativeTo = this) }
+        .toSet()
     isFile ->
       useZip { jarFile ->
         jarFile
@@ -221,8 +222,9 @@ private fun File.classNames(): Sequence<String> {
           .asSequence()
           .filter { !it.isDirectory && it.name.endsWith(".class") }
           .mapNotNull { it.name.toClassName() }
+          .toSet()
       }
-    else -> emptySequence()
+    else -> emptySet()
   }
 }
 
