@@ -123,12 +123,9 @@ private fun createRules(
     addAll(keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep"))
     addAll(serviceRules)
     r8Spec.proguardRuleFiles
+      .filter { it.isFile }
       .sortedBy { it.absolutePath }
-      .forEach { file ->
-        if (file.isFile) {
-          addAll(file.readLines())
-        }
-      }
+      .forEach { file -> addAll(file.readLines()) }
     addAll(r8Spec.proguardRules.get())
   }
 }
