@@ -178,9 +178,9 @@ private fun serviceProguardRules(inputJar: File): List<String> {
   return rules.toList()
 }
 
-private fun File.toClassName(relativeTo: File): String? {
+private fun File.toClassName(base: File): String? {
   if (name == "module-info.class" || name == "package-info.class") return null
-  return toRelativeString(relativeTo).removeSuffix(".class").replace(File.separatorChar, '.')
+  return toRelativeString(base).removeSuffix(".class").replace(File.separatorChar, '.')
 }
 
 private fun File.toBaseDirectoryRule(): String {
@@ -195,7 +195,7 @@ private fun File.classNames(): Set<String> {
     isDirectory ->
       walkTopDown()
         .filter { it.isFile && it.name.endsWith(".class") }
-        .mapNotNull { it.toClassName(relativeTo = this) }
+        .mapNotNull { it.toClassName(base = this) }
         .toSet()
     isFile ->
       useZip {
