@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import java.util.jar.JarFile
+import java.util.zip.ZipFile
 import kotlin.io.path.moveTo
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
@@ -107,13 +107,14 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
+  val jarClasses = jarClassEntries(inputJar)
   return buildList {
     add(baseDirectory.toBaseDirectoryRule())
     if (shouldDisableOptimization(r8Spec, r8Args)) {
       add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
     }
-    addAll(sourceProguardRules(inputJar, sourceSetsClassesDirs, relocators))
-    addAll(keptDependencyRules(inputJar, keptDependencyFiles, relocators))
+    addAll(sourceProguardRules(jarClasses, sourceSetsClassesDirs, relocators))
+    addAll(keptDependencyRules(jarClasses, keptDependencyFiles, relocators))
     addAll(serviceProguardRules(inputJar))
     r8Spec.proguardRuleFiles
       .sortedBy { it.absolutePath }
@@ -134,11 +135,10 @@ private fun shouldDisableOptimization(r8Spec: DefaultR8Spec, r8Args: List<String
 // Project classes are the public surface of the shadowed jar, even when nothing in the input jar
 // refers to every class directly.
 private fun sourceProguardRules(
-  inputJar: File,
+  jarClasses: Set<String>,
   sourceSetsClassesDirs: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
   return sourceSetsClassesDirs
     .asSequence()
     .filter(File::isDirectory)
@@ -162,11 +162,10 @@ private fun sourceProguardRules(
 // Keep dependencies users explicitly excluded from minimization, matching the existing
 // minimize { exclude(...) } contract for the default analyzer.
 private fun keptDependencyRules(
-  inputJar: File,
+  jarClasses: Set<String>,
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
   return keptDependencyFiles
     .asSequence()
     .flatMap { it.classNames() }
@@ -183,8 +182,8 @@ private fun keptDependencyRules(
 // interface and every listed provider even if R8 sees no direct references.
 private fun serviceProguardRules(inputJar: File): List<String> {
   val rules = linkedSetOf<String>()
-  JarFile(inputJar).use { jarFile ->
-    jarFile
+  ZipFile(inputJar).use { zipFile ->
+    zipFile
       .entries()
       .asSequence()
       .filter { !it.isDirectory && it.name.startsWith(SERVICES_PATH) }
@@ -194,7 +193,7 @@ private fun serviceProguardRules(inputJar: File): List<String> {
         if (serviceClass.isJavaTypeName()) {
           rules += "-keep,allowrepackage class $serviceClass { *; }"
         }
-        jarFile.getInputStream(entry).bufferedReader().useLines { lines ->
+        zipFile.getInputStream(entry).bufferedReader().useLines { lines ->
           lines
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() && it.isJavaTypeName() }
@@ -206,8 +205,8 @@ private fun serviceProguardRules(inputJar: File): List<String> {
 }
 
 private fun jarClassEntries(inputJar: File): Set<String> {
-  return JarFile(inputJar).use { jarFile ->
-    jarFile
+  return ZipFile(inputJar).use { zipFile ->
+    zipFile
       .entries()
       .asSequence()
       .filter { !it.isDirectory && it.name.endsWith(".class") }
@@ -243,9 +242,9 @@ private fun File.classNames(): Sequence<String> {
           it.toClassName(relativeTo = this)
         }
     isFile ->
-      JarFile(this)
-        .use { jarFile ->
-          jarFile
+      ZipFile(this)
+        .use { zipFile ->
+          zipFile
             .entries()
             .asSequence()
             .filter { !it.isDirectory && it.name.endsWith(".class") }
