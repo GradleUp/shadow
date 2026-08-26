@@ -134,10 +134,9 @@ Inspecting the `META-INF/MANIFEST.MF` entry in the JAR file will reveal the foll
 Class-Path: junit-3.8.2.jar
 ```
 
-!!! important
-
-    When deploying a shadowed JAR as an execution JAR, any non-bundled runtime dependencies **must** be deployed in the
-    location specified in the `Class-Path` entry in the manifest.
+> [!IMPORTANT]
+> When deploying a shadowed JAR as an execution JAR, any non-bundled runtime dependencies **must** be deployed in the
+> location specified in the `Class-Path` entry in the manifest.
 
 ## Configuring the JAR Manifest
 

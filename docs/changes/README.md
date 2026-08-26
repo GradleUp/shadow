@@ -1,1 +1,1 @@
---8<-- "CHANGELOG.md"
+../../CHANGELOG.md

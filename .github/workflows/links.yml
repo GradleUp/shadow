@@ -35,7 +35,7 @@ jobs:
       - name: Mkdocs build validation
         run: |
           # Don't cache it to track updates.
-          pip install mkdocs-material mdx_truly_sane_lists
+          pip install mkdocs-material mdx_truly_sane_lists mkdocs-callouts
           mkdocs build --strict
       - uses: umbrelladocs/action-linkspector@v1
         with:

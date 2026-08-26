@@ -4,9 +4,8 @@ Shadow is capable of scanning a project's classes and relocating specific depend
 required when one of the dependencies is susceptible to breaking changes in versions or to classpath pollution in a
 downstream project.
 
-!!! tip
-
-    Google's Guava and the ASM library are typical cases where package relocation can come in handy.
+> [!TIP]
+> Google's Guava and the ASM library are typical cases where package relocation can come in handy.
 
 Shadow uses the ASM library to modify class byte code to replace the package name and any import statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
@@ -31,14 +30,15 @@ The code snippet will rewrite the location for any class in the `junit.framework
 class `junit.framework.TestCase` becomes `shadow.junit.TestCase`. In the resulting JAR, the class file is relocated from
 `junit/framework/TestCase.class` to `shadow/junit/TestCase.class`.
 
-!!! warning "Scope of Relocation"
-
-    Relocation operates at a package level.
-    It is not necessary to specify any patterns for matching, it will operate simply on the prefix provided.
-
-    Relocation will be applied globally to all instances of the matched prefix.
-    That is, it does **not** scope to _only_ the dependencies being shadowed.
-    Be specific as possible when configuring relocation as to avoid unintended relocations.
+> [!WARNING]
+> **Scope of Relocation**
+>
+> Relocation operates at a package level.
+> It is not necessary to specify any patterns for matching, it will operate simply on the prefix provided.
+>
+> Relocation will be applied globally to all instances of the matched prefix.
+> That is, it does **not** scope to _only_ the dependencies being shadowed.
+> Be specific as possible when configuring relocation as to avoid unintended relocations.
 
 ## Filtering Relocation
 
@@ -206,14 +206,15 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
     }
     ```
 
-!!! warning "Performance & Transitive Dependencies"
-
-    Configuring package auto relocation can add significant time to the shadow process as it will process all
-    dependencies in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath`
-    configurations.
-
-    Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove
-    these dependencies if you do not intend to shadow them into your library.
+> [!WARNING]
+> **Performance & Transitive Dependencies**
+>
+> Configuring package auto relocation can add significant time to the shadow process as it will process all
+> dependencies in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath`
+> configurations.
+>
+> Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove
+> these dependencies if you do not intend to shadow them into your library.
 
 ## Relocating Kotlin Standard Library
 

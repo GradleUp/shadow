@@ -84,10 +84,9 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
     }
     ```
 
-!!! important
-
-    Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during
-    compilation.
+> [!IMPORTANT]
+> Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during
+> compilation.
 
 **Consuming projects can then depend on `:api` without specifying the `shadow` configuration:**
 

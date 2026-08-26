@@ -1,5 +1,5 @@
 # pipx install mkdocs --include-deps
-# pipx inject mkdocs mkdocs-material mdx_truly_sane_lists
+# pipx inject mkdocs mkdocs-material mdx_truly_sane_lists mkdocs-callouts
 # mkdocs serve
 
 site_name: Shadow Gradle Plugin
@@ -63,6 +63,7 @@ theme:
 plugins:
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
+  - callouts # TODO: https://github.com/mkdocs/mkdocs/issues/3997
 
 markdown_extensions:
   - smarty
