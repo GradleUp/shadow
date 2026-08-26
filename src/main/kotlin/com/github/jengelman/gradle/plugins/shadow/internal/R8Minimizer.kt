@@ -174,8 +174,8 @@ private fun Iterable<File>.findJarClasses(
 // interface and every listed provider even if R8 sees no direct references.
 private fun serviceProguardRules(inputJar: File): List<String> {
   val rules = linkedSetOf<String>()
-  inputJar.useZip { zipFile ->
-    zipFile
+  inputJar.useZip { jarFile ->
+    jarFile
       .entries()
       .asSequence()
       .filter { !it.isDirectory && it.name.startsWith(SERVICES_PATH) }
@@ -185,7 +185,7 @@ private fun serviceProguardRules(inputJar: File): List<String> {
         if (serviceClass.isJavaTypeName()) {
           rules += "-keep,allowrepackage class $serviceClass { *; }"
         }
-        zipFile.getInputStream(entry).bufferedReader().useLines { lines ->
+        jarFile.getInputStream(entry).bufferedReader().useLines { lines ->
           lines
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() && it.isJavaTypeName() }
@@ -197,8 +197,8 @@ private fun serviceProguardRules(inputJar: File): List<String> {
 }
 
 private fun jarClassEntries(inputJar: File): Set<String> {
-  return inputJar.useZip { zipFile ->
-    zipFile
+  return inputJar.useZip { jarFile ->
+    jarFile
       .entries()
       .asSequence()
       .filter { !it.isDirectory && it.name.endsWith(".class") }
@@ -230,8 +230,8 @@ private fun File.classNames(): Sequence<String> {
         .mapNotNull {
           it.toClassName(relativeTo = this)
         }
-    isFile -> useZip { zipFile ->
-        zipFile
+    isFile -> useZip { jarFile ->
+        jarFile
           .entries()
           .asSequence()
           .filter { !it.isDirectory && it.name.endsWith(".class") }

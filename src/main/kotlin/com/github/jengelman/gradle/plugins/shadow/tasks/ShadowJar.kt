@@ -591,8 +591,8 @@ public abstract class ShadowJar : Jar() {
       }
       val prefix = relocationPrefix.get()
       return includedDependencies.flatMap { file ->
-        file.useZip { zipFile ->
-          zipFile
+        file.useZip { jarFile ->
+          jarFile
             .entries()
             .toList()
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
