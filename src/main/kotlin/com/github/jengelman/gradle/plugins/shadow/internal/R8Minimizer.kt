@@ -152,7 +152,7 @@ private fun sourceProguardRules(
     }
     .map { relocators.relocateClass(it) }
     .filter { it.isJavaTypeName() }
-    .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
+    .filter { className -> className in jarClasses }
     .distinct()
     .sorted()
     .map { "-keep,includedescriptorclasses class $it { *; }" }
@@ -171,7 +171,7 @@ private fun keptDependencyRules(
     .flatMap { it.classNames() }
     .map { relocators.relocateClass(it) }
     .filter { it.isJavaTypeName() }
-    .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
+    .filter { className -> className in jarClasses }
     .distinct()
     .sorted()
     .map { "-keep class $it { *; }" }
@@ -210,19 +210,16 @@ private fun jarClassEntries(inputJar: File): Set<String> {
       .entries()
       .asSequence()
       .filter { !it.isDirectory && it.name.endsWith(".class") }
-      .map { it.name }
+      .mapNotNull { it.name.toClassName() }
       .toSet()
   }
 }
 
 private fun File.toClassName(relativeTo: File): String? {
   if (name == "module-info.class" || name == "package-info.class") return null
-  return relativeTo
-    .toPath()
-    .relativize(toPath())
-    .toString()
-    .replace(File.separatorChar, '/')
+  return toRelativeString(relativeTo)
     .removeSuffix(".class")
+    .replace(File.separatorChar, '.')
     .replace('/', '.')
 }
 
@@ -262,10 +259,30 @@ private fun String.toClassName(): String? {
   return removeSuffix(".class").replace('/', '.')
 }
 
-private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
+// Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
+// service lines, comments, malformed providers, and JVM-only names R8 would reject.
+private fun String.isJavaTypeName(): Boolean {
+  if (isEmpty()) return false
+  var startOfIdentifier = true
+  for (i in indices) {
+    val c = this[i]
+    if (c == '.') {
+      if (startOfIdentifier) return false
+      startOfIdentifier = true
+    } else if (startOfIdentifier) {
+      if (!c.isJavaTypeNameStart()) return false
+      startOfIdentifier = false
+    } else {
+      if (!c.isJavaTypeNamePart()) return false
+    }
+  }
+  return !startOfIdentifier
+}
+
+private fun Char.isJavaTypeNameStart(): Boolean =
+  this in 'a'..'z' || this in 'A'..'Z' || this == '_' || this == '$'
+
+private fun Char.isJavaTypeNamePart(): Boolean = isJavaTypeNameStart() || this in '0'..'9'
 
 private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
 private const val SERVICES_PATH = "META-INF/services/"
-// Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
-// service lines, comments, malformed providers, and JVM-only names R8 would reject.
-private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
