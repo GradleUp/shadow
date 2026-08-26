@@ -30,7 +30,8 @@ The code snippet will rewrite the location for any class in the `junit.framework
 class `junit.framework.TestCase` becomes `shadow.junit.TestCase`. In the resulting JAR, the class file is relocated from
 `junit/framework/TestCase.class` to `shadow/junit/TestCase.class`.
 
-> [!WARNING] Scope of Relocation
+> [!WARNING]
+> **Scope of Relocation**
 >
 > Relocation operates at a package level.
 > It is not necessary to specify any patterns for matching, it will operate simply on the prefix provided.
@@ -205,7 +206,8 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
     }
     ```
 
-> [!WARNING] Performance & Transitive Dependencies
+> [!WARNING]
+> **Performance & Transitive Dependencies**
 >
 > Configuring package auto relocation can add significant time to the shadow process as it will process all
 > dependencies in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath`

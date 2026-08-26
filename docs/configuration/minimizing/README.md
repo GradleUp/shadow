@@ -74,7 +74,9 @@ Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also
 > When excluding a `project`, all dependencies of the excluded `project` are automatically excluded from
 > minimization as well.
 
-> [!TIP] Difference between `dependencies` filter and `minimize` filter
+> [!TIP]
+> **Difference between `dependencies` filter and `minimize` filter**
+>
 > Both `dependencies { ... }` and `minimize { ... }` implement [`DependencyFilter`][DependencyFilter], sharing the
 > same `include` / `exclude` syntax, but they control completely different operations:
 >
@@ -94,7 +96,8 @@ descriptors in `META-INF/services` are used to keep service providers.
 The default R8 configuration only shrinks unused code. It disables name minification and optimization. R8 also applies
 rules published in dependency JARs, for example under `META-INF/proguard`.
 
-> [!NOTE] Relocating Embedded ProGuard Rules
+> [!NOTE]
+> **Relocating Embedded ProGuard Rules**
 >
 > If you relocate classes using Shadow's `relocate` configuration from a dependency that publishes embedded R8/ProGuard
 > rules (for example under `META-INF/proguard`), those rules are not rewritten automatically. Add

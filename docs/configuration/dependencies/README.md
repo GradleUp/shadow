@@ -25,7 +25,8 @@ The above code sample would configure the [`ShadowJar`][ShadowJar] task to merge
 `compileClasspath` configuration. This means any dependency declared in the `runtimeOnly` configuration would be **not**
 be included in the final JAR.
 
-> [!WARNING] Required Configuration
+> [!WARNING]
+> **Required Configuration**
 >
 > Note the literal use of [`project.configurations`][Project.configurations] when setting the
 > [`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
