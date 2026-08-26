@@ -313,12 +313,13 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 
 ### Comparison: Shadow `relocate` vs. R8 Repackaging
 
-| Feature                     | Shadow `relocate` (`SimpleRelocator`)             | R8 Repackaging (`-repackageclasses`)                |
-|:----------------------------|:--------------------------------------------------|:----------------------------------------------------|
-| **Execution Stage**         | During JAR merging (ASM bytecode transformation)  | Post-merge whole-program optimization               |
-| **Relocation Scope**        | Explicit per-prefix or per-class pattern matching | Whole-program automatic relocation                  |
-| **Visibility Handling**     | Direct string/type renaming (no visibility check) | Analyzes package-private & protected constraints    |
-| **Shrinking / Obfuscation** | Relocation only                                   | Combined with shrinking (optional name obfuscation) |
+| Feature                        | Shadow `relocate` (`SimpleRelocator`)                                     | R8 Repackaging (`-repackageclasses`)                |
+|:-------------------------------|:--------------------------------------------------------------------------|:----------------------------------------------------|
+| **Execution Stage**            | During JAR merging (ASM bytecode transformation)                          | Post-merge whole-program optimization               |
+| **Relocation Scope**           | Explicit per-prefix or per-class pattern matching                         | Whole-program automatic relocation                  |
+| **Visibility Handling**        | Direct string/type renaming (no visibility check)                         | Analyzes package-private & protected constraints    |
+| **Embedded R8/ProGuard Rules** | Requires [transformer][ProGuardFilesResourceTransformer] to rewrite rules | Handled natively without extra transformers         |
+| **Shrinking / Obfuscation**    | Relocation only                                                           | Combined with shrinking (optional name obfuscation) |
 
 
 [#1622]: https://github.com/GradleUp/shadow/issues/1622
@@ -333,3 +334,4 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 [ant-path-matcher]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html
 [regular-expressions]: https://regexr.com/
 [configuring-shadowed-dependencies]: ../dependencies/README.md
+[ProGuardFilesResourceTransformer]: ../merging/README.md#merging-r8proguard-rule-files
