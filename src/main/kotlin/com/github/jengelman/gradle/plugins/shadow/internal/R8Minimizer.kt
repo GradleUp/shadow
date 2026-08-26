@@ -204,26 +204,27 @@ private fun File.toBaseDirectoryRule(): String {
   return "-basedirectory '$normalizedPath'"
 }
 
-private fun File.classNames(): Set<String> {
+private fun File.classNames(): List<String> {
   return when {
     isDirectory ->
       walkTopDown()
         .filter { it.name.endsWith(".class") && it.isFile }
         .mapNotNull { it.toClassName(base = this) }
-        .toSet()
+        .toList()
     isFile ->
       useZip {
         entries()
           .asSequence()
           .filter { it.name.endsWith(".class") }
           .mapNotNull { it.name.toClassName() }
-          .toSet()
+          .toList()
       }
-    else -> emptySet()
+    else -> emptyList()
   }
 }
 
 private fun String.toClassName(): String? {
+  if (startsWith("META-INF/")) return null
   val name = substringAfterLast('/')
   if (name == "module-info.class" || name == "package-info.class") return null
   return removeSuffix(".class").replace('/', '.')
