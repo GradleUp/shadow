@@ -99,10 +99,14 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
 
 !!! note "Relocating Embedded ProGuard Rules"
 
-    If you relocate classes from a dependency that publishes embedded ProGuard or R8 rules (for example under
-    `META-INF/proguard`), those rules are not rewritten automatically. Add
+    If you relocate classes using Shadow's `relocate` configuration from a dependency that publishes embedded ProGuard
+    or R8 rules (for example under `META-INF/proguard`), those rules are not rewritten automatically. Add
     [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer] so class names and package patterns inside
     embedded rules are updated to match your relocations.
+
+    Alternatively, if you use [R8 Repackaging][r8-repackaging] (e.g. `-repackageclasses`), R8 applies embedded rules
+    natively without needing rule rewriting.
+
 
 
 === ":material-language-kotlin: build.gradle.kts"
@@ -383,4 +387,6 @@ To enable both:
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
 [DependencyFilter]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
 [ProGuardFilesResourceTransformer]: ../merging/README.md#merging-r8proguard-rule-files
+[r8-repackaging]: ../relocation/README.md#relocating-with-r8
+
 

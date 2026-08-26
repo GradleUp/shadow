@@ -318,6 +318,7 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 | **Execution Stage**         | During JAR merging (ASM bytecode transformation)  | Post-merge whole-program optimization               |
 | **Relocation Scope**        | Explicit per-prefix or per-class pattern matching | Whole-program automatic relocation                  |
 | **Visibility Handling**     | Direct string/type renaming (no visibility check) | Analyzes package-private & protected constraints    |
+| **Embedded ProGuard Rules** | Requires [transformer][ProGuardFilesResourceTransformer] to rewrite rules | Handled natively without extra transformers         |
 | **Shrinking / Obfuscation** | Relocation only                                   | Combined with shrinking (optional name obfuscation) |
 
 
@@ -333,3 +334,5 @@ To use R8 for package relocation, enable R8 under `minimize` and provide ProGuar
 [ant-path-matcher]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html
 [regular-expressions]: https://regexr.com/
 [configuring-shadowed-dependencies]: ../dependencies/README.md
+[ProGuardFilesResourceTransformer]: ../merging/README.md#merging-r8proguard-rule-files
+
