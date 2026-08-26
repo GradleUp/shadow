@@ -112,8 +112,14 @@ private fun createRules(
     if (shouldDisableOptimization(r8Spec, r8Args)) {
       add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
     }
-    addAll(sourceProguardRules(jarClasses, sourceSetsClassesDirs, relocators))
-    addAll(keptDependencyRules(jarClasses, keptDependencyFiles, relocators))
+    // Project classes are the public surface of the shadowed jar, even when nothing in the input
+    // jar refers to every class directly.
+    addAll(
+      sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses")
+    )
+    // Keep dependencies users explicitly excluded from minimization, matching the existing
+    // minimize { exclude(...) } contract for the default analyzer.
+    addAll(keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep"))
     addAll(serviceProguardRules(inputJar))
     r8Spec.proguardRuleFiles
       .sortedBy { it.absolutePath }
@@ -131,36 +137,11 @@ private fun shouldDisableOptimization(r8Spec: DefaultR8Spec, r8Args: List<String
     (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
 }
 
-// Project classes are the public surface of the shadowed jar, even when nothing in the input jar
-// refers to every class directly.
-private fun sourceProguardRules(
+private fun Iterable<File>.toKeepRules(
   jarClasses: Set<String>,
-  sourceSetsClassesDirs: Iterable<File>,
   relocators: Iterable<Relocator>,
+  rulePrefix: String,
 ): List<String> {
-  return sourceSetsClassesDirs
-    .findJarClasses(jarClasses, relocators)
-    .map { "-keep,includedescriptorclasses class $it { *; }" }
-    .toList()
-}
-
-// Keep dependencies users explicitly excluded from minimization, matching the existing
-// minimize { exclude(...) } contract for the default analyzer.
-private fun keptDependencyRules(
-  jarClasses: Set<String>,
-  keptDependencyFiles: Iterable<File>,
-  relocators: Iterable<Relocator>,
-): List<String> {
-  return keptDependencyFiles
-    .findJarClasses(jarClasses, relocators)
-    .map { "-keep class $it { *; }" }
-    .toList()
-}
-
-private fun Iterable<File>.findJarClasses(
-  jarClasses: Set<String>,
-  relocators: Iterable<Relocator>,
-): Sequence<String> {
   return asSequence()
     .flatMap { it.classNames() }
     .map { relocators.relocateClass(it) }
@@ -168,6 +149,8 @@ private fun Iterable<File>.findJarClasses(
     .filter { className -> className in jarClasses }
     .distinct()
     .sorted()
+    .map { "$rulePrefix class $it { *; }" }
+    .toList()
 }
 
 // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
