@@ -139,21 +139,7 @@ private fun sourceProguardRules(
   relocators: Iterable<Relocator>,
 ): List<String> {
   return sourceSetsClassesDirs
-    .asSequence()
-    .filter(File::isDirectory)
-    .flatMap { dir ->
-      dir
-        .walkTopDown()
-        .filter { it.isFile && it.name.endsWith(".class") }
-        .mapNotNull { file ->
-          file.toClassName(relativeTo = dir)
-        }
-    }
-    .map { relocators.relocateClass(it) }
-    .filter { it.isJavaTypeName() }
-    .filter { className -> className in jarClasses }
-    .distinct()
-    .sorted()
+    .findJarClasses(jarClasses, relocators)
     .map { "-keep,includedescriptorclasses class $it { *; }" }
     .toList()
 }
@@ -166,15 +152,22 @@ private fun keptDependencyRules(
   relocators: Iterable<Relocator>,
 ): List<String> {
   return keptDependencyFiles
-    .asSequence()
+    .findJarClasses(jarClasses, relocators)
+    .map { "-keep class $it { *; }" }
+    .toList()
+}
+
+private fun Iterable<File>.findJarClasses(
+  jarClasses: Set<String>,
+  relocators: Iterable<Relocator>,
+): Sequence<String> {
+  return asSequence()
     .flatMap { it.classNames() }
     .map { relocators.relocateClass(it) }
     .filter { it.isJavaTypeName() }
     .filter { className -> className in jarClasses }
     .distinct()
     .sorted()
-    .map { "-keep class $it { *; }" }
-    .toList()
 }
 
 // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
