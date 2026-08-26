@@ -4,7 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import java.util.zip.ZipFile
 import kotlin.io.path.moveTo
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
@@ -182,7 +181,7 @@ private fun keptDependencyRules(
 // interface and every listed provider even if R8 sees no direct references.
 private fun serviceProguardRules(inputJar: File): List<String> {
   val rules = linkedSetOf<String>()
-  ZipFile(inputJar).use { zipFile ->
+  inputJar.useZip { zipFile ->
     zipFile
       .entries()
       .asSequence()
@@ -205,7 +204,7 @@ private fun serviceProguardRules(inputJar: File): List<String> {
 }
 
 private fun jarClassEntries(inputJar: File): Set<String> {
-  return ZipFile(inputJar).use { zipFile ->
+  return inputJar.useZip { zipFile ->
     zipFile
       .entries()
       .asSequence()
@@ -238,16 +237,14 @@ private fun File.classNames(): Sequence<String> {
         .mapNotNull {
           it.toClassName(relativeTo = this)
         }
-    isFile ->
-      ZipFile(this)
-        .use { zipFile ->
-          zipFile
-            .entries()
-            .asSequence()
-            .filter { !it.isDirectory && it.name.endsWith(".class") }
-            .mapNotNull { it.name.toClassName() }
-            .toList()
-        }
+    isFile -> useZip { zipFile ->
+        zipFile
+          .entries()
+          .asSequence()
+          .filter { !it.isDirectory && it.name.endsWith(".class") }
+          .mapNotNull { it.name.toClassName() }
+          .toList()
+      }
         .asSequence()
     else -> emptySequence()
   }

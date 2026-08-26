@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import java.io.File
 import java.io.OutputStream
+import java.util.zip.ZipFile
 import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipEntry
@@ -43,6 +44,8 @@ internal val ZipOutputStream.entries: List<ZipEntry>
     (this as? TrackingZipOutputStream)?.entries
       ?: this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this)
         as List<ZipEntry>
+
+internal inline fun <R> File.useZip(block: (ZipFile) -> R): R = ZipFile(this).use(block)
 
 internal fun File.createZipOutputStream(
   entryCompression: ZipEntryCompression,
