@@ -63,7 +63,8 @@ theme:
 plugins:
   - search:
       separator: '[\s\u200b\-_,:!=\[\]()"`/]+|\.(?!\d)|&[lg]t;|(?!\b)(?=[A-Z][a-z])'
-  - callouts # TODO: https://github.com/mkdocs/mkdocs/issues/3997
+  - callouts: # TODO: https://github.com/mkdocs/mkdocs/issues/3997
+      title_from_first_bold: true
 
 markdown_extensions:
   - smarty
