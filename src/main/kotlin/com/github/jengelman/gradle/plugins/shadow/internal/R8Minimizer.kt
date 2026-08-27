@@ -142,16 +142,13 @@ private fun Iterable<File>.toKeepRules(
   relocators: Iterable<Relocator>,
   rulePrefix: String,
 ): List<String> {
-  val classNames = sortedSetOf<String>()
-  forEach { file ->
-    file.forEachClassName { className ->
-      val relocatedClassName = relocators.relocateClass(className)
-      if (relocatedClassName in jarClasses && relocatedClassName.isJavaTypeName()) {
-        classNames += relocatedClassName
-      }
-    }
-  }
-  return classNames.map { "$rulePrefix class $it { *; }" }
+  return asSequence()
+    .flatMap { it.classNames() }
+    .map { relocators.relocateClass(it) }
+    .filter { className -> className in jarClasses }
+    .filter { it.isJavaTypeName() }
+    .toSortedSet()
+    .map { "$rulePrefix class $it { *; }" }
 }
 
 // Extracts all class names and generates keep rules for service descriptors in a single pass.
@@ -200,22 +197,22 @@ private fun File.toClassName(base: File): String? {
   return toRelativeString(base).removeSuffix(".class").replace(File.separatorChar, '.')
 }
 
-private inline fun File.forEachClassName(action: (String) -> Unit) {
+private fun File.classNames(): List<String> {
   return when {
     isDirectory ->
       walkTopDown()
         .filter { it.name.endsWith(".class") && it.isFile }
         .mapNotNull { it.toClassName(base = this) }
-        .forEach(action)
+        .toList()
     isFile ->
       useZip {
         entries()
           .asSequence()
           .filter { it.name.endsWith(".class") }
           .mapNotNull { it.name.toClassName() }
-          .forEach(action)
+          .toList()
       }
-    else -> Unit
+    else -> emptyList()
   }
 }
 
