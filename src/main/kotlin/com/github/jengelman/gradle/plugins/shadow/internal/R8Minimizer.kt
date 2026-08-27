@@ -107,28 +107,31 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
-  val (jarClasses, serviceRules) = inputJar.analyzeInputJar()
   return buildList {
     add("-basedirectory '${baseDirectory.escapedAbsPath}'")
 
-    val shouldDisableOptimization =
-      !r8Spec.optimizationEnabled.get() &&
-        (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
-    if (shouldDisableOptimization) {
-      add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
+    if (r8Spec.useDefaultRules.get()) {
+      val shouldDisableOptimization =
+        !r8Spec.optimizationEnabled.get() &&
+          (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
+      if (shouldDisableOptimization) {
+        add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
+      }
+
+      val (jarClasses, serviceRules) = inputJar.analyzeInputJar()
+      addAll(
+        // Project classes are the public surface of the shadowed jar, even when nothing in the
+        // input jar refers to every class directly.
+        sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses")
+      )
+      addAll(
+        // Keep dependencies users explicitly excluded from minimization, matching the existing
+        // minimize { exclude(...) } contract for the default analyzer.
+        keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep")
+      )
+      addAll(serviceRules)
     }
 
-    addAll(
-      // Project classes are the public surface of the shadowed jar, even when nothing in the input
-      // jar refers to every class directly.
-      sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses")
-    )
-    addAll(
-      // Keep dependencies users explicitly excluded from minimization, matching the existing
-      // minimize { exclude(...) } contract for the default analyzer.
-      keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep")
-    )
-    addAll(serviceRules)
     r8Spec.proguardRuleFiles
       .filter { it.isFile }
       .sortedBy { it.absolutePath }

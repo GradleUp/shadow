@@ -22,6 +22,8 @@ constructor(
 
   @get:Input val optimizationEnabled: Property<Boolean> = objectFactory.property(false)
 
+  override val useDefaultRules: Property<Boolean> = objectFactory.property(true)
+
   override val args: ListProperty<String> = objectFactory.listProperty(defaultArgs)
 
   override val proguardRules: ListProperty<String> = objectFactory.listProperty()
