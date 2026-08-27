@@ -720,10 +720,11 @@ public abstract class ShadowJar : Jar() {
     public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
 
     /**
+     * The minimum timestamp that can be stored in a zip entry, as a UTC instant. MS-DOS date/time
+     * cannot represent dates before 1980, so smaller values are raised to this minimum.
+     *
      * A copy of
      * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
-     *
-     * 1980-02-01 00:00:00 (318182400000).
      */
     @JvmField
     public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
