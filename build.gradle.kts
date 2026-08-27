@@ -70,7 +70,7 @@ spotless {
   }
 }
 
-@Suppress("UNCHECKED_CAST") // For calling NamedDomainObjectProvider<Configuration>.invoke accessor.
+@Suppress("UNCHECKED_CAST") // TODO: https://github.com/gradle/gradle/issues/38970
 val testPluginClasspath =
   configurations.resolvable("testPluginClasspath") {
     description = "Plugins used in integration tests could be resolved in classpath."
