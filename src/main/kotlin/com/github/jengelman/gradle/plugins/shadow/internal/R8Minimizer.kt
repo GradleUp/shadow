@@ -118,14 +118,16 @@ private fun createRules(
       add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
     }
 
-    // Project classes are the public surface of the shadowed jar, even when nothing in the input
-    // jar refers to every class directly.
     addAll(
+      // Project classes are the public surface of the shadowed jar, even when nothing in the input
+      // jar refers to every class directly.
       sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses")
     )
-    // Keep dependencies users explicitly excluded from minimization, matching the existing
-    // minimize { exclude(...) } contract for the default analyzer.
-    addAll(keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep"))
+    addAll(
+      // Keep dependencies users explicitly excluded from minimization, matching the existing
+      // minimize { exclude(...) } contract for the default analyzer.
+      keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep")
+    )
     addAll(serviceRules)
     r8Spec.proguardRuleFiles
       .filter { it.isFile }
