@@ -1,9 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.hasMessage
 import assertk.assertions.hasSize
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
@@ -452,6 +455,65 @@ class R8MinimizationTest : BasePluginTest() {
     val result = runWithSuccess(appShadowJarPath)
 
     assertThat(result.output).contains("R8 launcher JDK ${JavaVersion.current().majorVersion}")
+  }
+
+  @Test
+  fun supportClasspathInR8() {
+    writeR8AppAndLibModules(
+      appShadowBlock =
+        """
+        |minimize {
+        |  r8 {
+        |    classpath.from(project.configurations.compileClasspath)
+        |  }
+        |}
+        """
+          .trimMargin(),
+      appProjectBlock =
+        """
+        |dependencies {
+        |  compileOnly 'junit:junit:3.8.2'
+        |}
+        """
+          .trimMargin(),
+    )
+
+    path("app/src/main/java/app/App.java")
+      .writeText(
+        """
+        |package app;
+        |import junit.framework.Test;
+        |import junit.framework.TestResult;
+        |import lib.Used;
+        |public class App implements Test {
+        |  @Override
+        |  public int countTestCases() {
+        |    return 1;
+        |  }
+        |  @Override
+        |  public void run(TestResult result) {
+        |    Used.name();
+        |  }
+        |}
+        """
+          .trimMargin()
+      )
+
+    runWithSuccess(appShadowJarPath)
+
+    assertThat(outputAppShadowedJar).useAll {
+      containsExactly(
+        "app/App.class",
+        "lib/Used.class",
+        manifestEntry,
+      )
+      classLoader {
+        loadClass("lib.Used")
+        assertFailure { loadClass("app.App") }
+          .isInstanceOf<NoClassDefFoundError>()
+          .hasMessage("junit/framework/Test") // Compile only on junit dependency.
+      }
+    }
   }
 
   private fun writeR8AppAndLibModules(

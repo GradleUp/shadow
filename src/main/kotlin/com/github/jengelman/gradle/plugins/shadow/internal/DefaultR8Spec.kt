@@ -30,6 +30,8 @@ constructor(
 
   override val proguardRuleFiles: ConfigurableFileCollection = objectFactory.fileCollection()
 
+  override val classpath: ConfigurableFileCollection = objectFactory.fileCollection()
+
   override val configurationFile: RegularFileProperty =
     objectFactory
       .fileProperty()

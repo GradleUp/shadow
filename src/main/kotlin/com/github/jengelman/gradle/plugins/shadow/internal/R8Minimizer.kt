@@ -81,6 +81,12 @@ internal fun minimizeWithR8(
     add(configurationFile.absolutePath)
     add("--lib")
     add(javaHome)
+    r8Spec.classpath
+      .filter { it.exists() }
+      .forEach { file ->
+        add("--classpath")
+        add(file.absolutePath)
+      }
     addAll(r8Args)
     add(inputJar.absolutePath)
   }

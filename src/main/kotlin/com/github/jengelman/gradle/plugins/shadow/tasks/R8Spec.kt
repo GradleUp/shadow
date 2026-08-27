@@ -5,6 +5,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CompileClasspath
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -60,6 +61,14 @@ public interface R8Spec {
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public val proguardRuleFiles: ConfigurableFileCollection
+
+  /**
+   * Classpath files used by R8 for class hierarchy and dependency analysis, but not included in the
+   * output JAR (e.g. `compileOnly` dependencies, `gradleApi()`).
+   *
+   * Defaults to empty.
+   */
+  @get:CompileClasspath public val classpath: ConfigurableFileCollection
 
   /**
    * The collective ProGuard configuration output by R8.
