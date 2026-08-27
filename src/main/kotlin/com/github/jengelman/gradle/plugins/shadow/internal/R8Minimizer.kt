@@ -4,7 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
-import java.util.jar.JarFile
+import java.util.zip.ZipEntry
 import kotlin.io.path.moveTo
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
@@ -88,7 +88,7 @@ internal fun minimizeWithR8(
   logger.info("Running R8 to minimize {}.", inputJar)
   execOperations.javaexec {
     it.classpath = r8Classpath
-    it.mainClass.set(R8_MAIN_CLASS)
+    it.mainClass.set("com.android.tools.r8.R8")
     if (launcher != null) {
       it.executable = launcher.executablePath.asFile.absolutePath
     }
@@ -107,157 +107,120 @@ private fun createRules(
   keptDependencyFiles: Iterable<File>,
   relocators: Iterable<Relocator>,
 ): List<String> {
+  val (jarClasses, serviceRules) = inputJar.analyzeInputJar()
   return buildList {
-    add(baseDirectory.toBaseDirectoryRule())
-    if (shouldDisableOptimization(r8Spec, r8Args)) {
+    add("-basedirectory '${baseDirectory.escapedAbsPath}'")
+
+    val shouldDisableOptimization =
+      !r8Spec.optimizationEnabled.get() &&
+        (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
+    if (shouldDisableOptimization) {
       add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
     }
-    addAll(sourceProguardRules(inputJar, sourceSetsClassesDirs, relocators))
-    addAll(keptDependencyRules(inputJar, keptDependencyFiles, relocators))
-    addAll(serviceProguardRules(inputJar))
+
+    addAll(
+      // Project classes are the public surface of the shadowed jar, even when nothing in the input
+      // jar refers to every class directly.
+      sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses")
+    )
+    addAll(
+      // Keep dependencies users explicitly excluded from minimization, matching the existing
+      // minimize { exclude(...) } contract for the default analyzer.
+      keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep")
+    )
+    addAll(serviceRules)
     r8Spec.proguardRuleFiles
+      .filter { it.isFile }
       .sortedBy { it.absolutePath }
-      .forEach { file ->
-        if (file.isFile) {
-          addAll(file.readLines())
-        }
-      }
+      .forEach { file -> addAll(file.readLines()) }
     addAll(r8Spec.proguardRules.get())
   }
 }
 
-private fun shouldDisableOptimization(r8Spec: DefaultR8Spec, r8Args: List<String>): Boolean {
-  return !r8Spec.optimizationEnabled.get() &&
-    (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
-}
-
-// Project classes are the public surface of the shadowed jar, even when nothing in the input jar
-// refers to every class directly.
-private fun sourceProguardRules(
-  inputJar: File,
-  sourceSetsClassesDirs: Iterable<File>,
+private fun Iterable<File>.toKeepRules(
+  jarClasses: Set<String>,
   relocators: Iterable<Relocator>,
+  rulePrefix: String,
 ): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
-  return sourceSetsClassesDirs
-    .asSequence()
-    .filter(File::isDirectory)
-    .flatMap { dir ->
-      dir
-        .walkTopDown()
-        .filter { it.isFile && it.name.endsWith(".class") }
-        .mapNotNull { file ->
-          file.toClassName(relativeTo = dir)
-        }
-    }
-    .map { relocators.relocateClass(it) }
-    .filter { it.isJavaTypeName() }
-    .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
-    .distinct()
-    .sorted()
-    .map { "-keep,includedescriptorclasses class $it { *; }" }
-    .toList()
-}
-
-// Keep dependencies users explicitly excluded from minimization, matching the existing
-// minimize { exclude(...) } contract for the default analyzer.
-private fun keptDependencyRules(
-  inputJar: File,
-  keptDependencyFiles: Iterable<File>,
-  relocators: Iterable<Relocator>,
-): List<String> {
-  val jarClasses = jarClassEntries(inputJar)
-  return keptDependencyFiles
-    .asSequence()
+  return asSequence()
     .flatMap { it.classNames() }
     .map { relocators.relocateClass(it) }
+    .filter { className -> className in jarClasses }
     .filter { it.isJavaTypeName() }
-    .filter { className -> "${className.replace('.', '/')}.class" in jarClasses }
-    .distinct()
-    .sorted()
-    .map { "-keep class $it { *; }" }
-    .toList()
+    .toSortedSet()
+    .map { "$rulePrefix class $it { *; }" }
 }
 
+// Extracts all class names and generates keep rules for service descriptors in a single pass.
 // Service descriptors are usage edges for downstream ServiceLoader calls, so keep the service
 // interface and every listed provider even if R8 sees no direct references.
-private fun serviceProguardRules(inputJar: File): List<String> {
-  val rules = linkedSetOf<String>()
-  JarFile(inputJar).use { jarFile ->
-    jarFile
-      .entries()
-      .asSequence()
-      .filter { !it.isDirectory && it.name.startsWith(SERVICES_PATH) }
+private fun File.analyzeInputJar(): Pair<Set<String>, Set<String>> {
+  val classes = mutableSetOf<String>()
+  val serviceEntries = mutableListOf<ZipEntry>()
+  val serviceRules = linkedSetOf<String>()
+
+  useZip {
+    entries().asSequence().forEach { entry ->
+      val name = entry.name
+      when {
+        entry.isDirectory -> Unit
+        name.endsWith(".class") -> {
+          name.toClassName()?.let { classes += it }
+        }
+        name.startsWith(SERVICES_PATH) -> {
+          serviceEntries += entry
+        }
+      }
+    }
+
+    serviceEntries
       .sortedBy { it.name }
       .forEach { entry ->
         val serviceClass = entry.name.removePrefix(SERVICES_PATH).replace('/', '.')
         if (serviceClass.isJavaTypeName()) {
-          rules += "-keep,allowrepackage class $serviceClass { *; }"
+          serviceRules += "-keep,allowrepackage class $serviceClass { *; }"
         }
-        jarFile.getInputStream(entry).bufferedReader().useLines { lines ->
+        getInputStream(entry).bufferedReader().useLines { lines ->
           lines
             .map { it.substringBefore('#').trim() }
             .filter { it.isNotEmpty() && it.isJavaTypeName() }
-            .forEach { provider -> rules += "-keep,allowrepackage class $provider { *; }" }
+            .forEach { provider -> serviceRules += "-keep,allowrepackage class $provider { *; }" }
         }
       }
   }
-  return rules.toList()
+
+  return classes to serviceRules
 }
 
-private fun jarClassEntries(inputJar: File): Set<String> {
-  return JarFile(inputJar).use { jarFile ->
-    jarFile
-      .entries()
-      .asSequence()
-      .filter { !it.isDirectory && it.name.endsWith(".class") }
-      .map { it.name }
-      .toSet()
-  }
-}
-
-private fun File.toClassName(relativeTo: File): String? {
+private fun File.toClassName(base: File): String? {
   if (name == "module-info.class" || name == "package-info.class") return null
-  return relativeTo
-    .toPath()
-    .relativize(toPath())
-    .toString()
-    .replace(File.separatorChar, '/')
-    .removeSuffix(".class")
-    .replace('/', '.')
+  return toRelativeString(base).removeSuffix(".class").replace(File.separatorChar, '.')
 }
 
-private fun File.toBaseDirectoryRule(): String {
-  // Preserve Windows separators: escaping backslashes changes the paths R8 writes to the
-  // collective configuration produced through --pg-conf-output.
-  val normalizedPath = absolutePath.replace("'", "\\'")
-  return "-basedirectory '$normalizedPath'"
-}
-
-private fun File.classNames(): Sequence<String> {
+private fun File.classNames(): List<String> {
   return when {
     isDirectory ->
       walkTopDown()
-        .filter { it.isFile && it.name.endsWith(".class") }
-        .mapNotNull {
-          it.toClassName(relativeTo = this)
-        }
+        .filter { it.name.endsWith(".class") && it.isFile }
+        .mapNotNull { it.toClassName(base = this) }
+        .toList()
     isFile ->
-      JarFile(this)
-        .use { jarFile ->
-          jarFile
-            .entries()
-            .asSequence()
-            .filter { !it.isDirectory && it.name.endsWith(".class") }
-            .mapNotNull { it.name.toClassName() }
-            .toList()
-        }
-        .asSequence()
-    else -> emptySequence()
+      useZip {
+        entries()
+          .asSequence()
+          .filter { it.name.endsWith(".class") }
+          .mapNotNull { it.name.toClassName() }
+          .toList()
+      }
+    else -> emptyList()
   }
 }
 
+private val File.escapedAbsPath: String
+  get() = absolutePath.replace("'", "\\'")
+
 private fun String.toClassName(): String? {
+  if (startsWith("META-INF/")) return null
   val name = substringAfterLast('/')
   if (name == "module-info.class" || name == "package-info.class") return null
   return removeSuffix(".class").replace('/', '.')
@@ -265,7 +228,6 @@ private fun String.toClassName(): String? {
 
 private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 
-private const val R8_MAIN_CLASS = "com.android.tools.r8.R8"
 private const val SERVICES_PATH = "META-INF/services/"
 // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
 // service lines, comments, malformed providers, and JVM-only names R8 would reject.

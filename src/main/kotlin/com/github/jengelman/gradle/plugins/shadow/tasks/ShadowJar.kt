@@ -20,6 +20,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttribute
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.internal.useZip
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -35,7 +36,6 @@ import java.io.IOException
 import java.util.GregorianCalendar
 import java.util.jar.JarFile
 import java.util.zip.ZipException
-import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
 import org.gradle.api.Action
@@ -591,9 +591,8 @@ public abstract class ShadowJar : Jar() {
       }
       val prefix = relocationPrefix.get()
       return includedDependencies.flatMap { file ->
-        JarFile(file).use { jarFile ->
-          jarFile
-            .entries()
+        file.useZip {
+          entries()
             .toList()
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
             .map { it.name.substringBeforeLast('/').replace('/', '.') }
@@ -607,7 +606,7 @@ public abstract class ShadowJar : Jar() {
     val isAar: File.() -> Boolean = {
       try {
         extension.equals("aar", ignoreCase = true) &&
-          ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
+          useZip { getEntry("AndroidManifest.xml") != null }
       } catch (_: ZipException) {
         // File is not a valid ZIP, so it cannot be an AAR.
         false
