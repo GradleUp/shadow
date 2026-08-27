@@ -30,20 +30,22 @@
 
 ### Deprecated
 
+The following APIs are deprecated and will be removed or made non-public in the next major release.
+
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  
-  Use `proguardRules` and `proguardRuleFiles` instead. The properties will be removed in Shadow 10.
+  Use `proguardRules` and `proguardRuleFiles` instead.
 - Deprecate `ShadowJar.minimizeJar`. ([#2124](https://github.com/GradleUp/shadow/pull/2124))  
-  Use `ShadowJar.minimize()` explicitly instead. The property will be made non-public in Shadow 10.
+  Use `ShadowJar.minimize()` explicitly instead.
 - Deprecate `DontIncludeResourceTransformer` and `IncludeResourceTransformer`. ([#2143](https://github.com/GradleUp/shadow/pull/2143))  
-  Use `ShadowJar.exclude` or `ShadowJar.from` instead. The classes will be removed in Shadow 10.
+  Use `ShadowJar.exclude` or `ShadowJar.from` instead.
 - Deprecate `TransformerContext.Builder`. ([#2184](https://github.com/GradleUp/shadow/pull/2184))  
-  Use `TransformerContext` constructor instead. The Builder API will be removed in Shadow 10.
+  Use `TransformerContext` constructor instead.
 - Deprecate `ManifestResourceTransformer.attributes(Map)`. ([#2200](https://github.com/GradleUp/shadow/pull/2200))  
-  Use `manifestEntries` instead. The method will be removed in Shadow 10.
+  Use `manifestEntries` instead.
 - Deprecate `ApacheLicenseResourceTransformer`. ([#2221](https://github.com/GradleUp/shadow/pull/2221))  
-  Use `ShadowJar.exclude` or `MergeLicenseResourceTransformer` instead. The class will be removed in Shadow 10.
+  Use `ShadowJar.exclude` or `MergeLicenseResourceTransformer` instead.
 - Deprecate `ManifestAppenderTransformer`. ([#2221](https://github.com/GradleUp/shadow/pull/2221))  
-  Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead. The class will be removed in Shadow 10.
+  Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead.
 
 ### Fixed
 
@@ -116,9 +118,10 @@
 
 ### Deprecated
 
+The following APIs are deprecated and will be removed or made non-public in the next major release.
+
 - Deprecate `enableKotlinModuleRemapping` for `ShadowJar`. ([#2073](https://github.com/GradleUp/shadow/pull/2073))  
   Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files.
-  This flag will be disabled and removed in the next major release.
 - Deprecate everything under `ShadowCopyAction`. ([#2083](https://github.com/GradleUp/shadow/pull/2083))
 
 ### Fixed
@@ -215,9 +218,10 @@
 
 ### Deprecated
 
+The following APIs are deprecated and will be removed or made non-public in the next major release.
+
 - Deprecate `PreserveFirstFoundResourceTransformer.resources`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
-- Deprecate `ShadowCopyAction`. ([#1876](https://github.com/GradleUp/shadow/pull/1876))  
-  It should not be used as a public API. Will be made internal in a future release.
+- Deprecate `ShadowCopyAction`. ([#1876](https://github.com/GradleUp/shadow/pull/1876))
 
 ### Fixed
 
@@ -273,6 +277,8 @@
 - Make assemble depend on shadowJar even if it is added later. ([#1766](https://github.com/GradleUp/shadow/pull/1766))
 
 ### Deprecated
+
+The following APIs are deprecated and will be removed or made non-public in the next major release.
 
 - Deprecate `InheritManifest` and `inheritFrom`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
   ```kotlin
