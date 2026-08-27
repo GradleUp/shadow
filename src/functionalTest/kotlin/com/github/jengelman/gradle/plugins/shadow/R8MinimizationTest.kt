@@ -94,7 +94,7 @@ class R8MinimizationTest : BasePluginTest() {
         |minimize {
         |  r8 {
         |    proguardRules.add("-keep class lib.Reflective { *; }")
-        |    configurationFile.set(layout.buildDirectory.file("r8/config/final-configuration.txt"))
+        |    configurationFile = layout.buildDirectory.file("r8/config/final-configuration.txt")
         |  }
         |}
         """
@@ -212,7 +212,7 @@ class R8MinimizationTest : BasePluginTest() {
         |minimize {
         |  r8 {
         |    enableObfuscation()
-        |    configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+        |    configurationFile = layout.buildDirectory.file("r8/configuration.txt")
         |    proguardRules.addAll(
         |      "-printmapping reports/mapping.txt",
         |      "-printseeds reports/seeds.txt",

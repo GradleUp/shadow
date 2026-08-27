@@ -120,7 +120,7 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
           // Optional extra configuration
           proguardRules.add("-keep class com.example.ReflectiveApi { *; }")
           proguardRuleFiles.from(layout.projectDirectory.file("r8-rules.pro"))
-          configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+          configurationFile = layout.buildDirectory.file("r8/configuration.txt")
         }
       }
     }
@@ -139,7 +139,7 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
           // Optional extra configuration
           proguardRules.add('-keep class com.example.ReflectiveApi { *; }')
           proguardRuleFiles.from(layout.projectDirectory.file('r8-rules.pro'))
-          configurationFile.set(layout.buildDirectory.file('r8/configuration.txt'))
+          configurationFile = layout.buildDirectory.file('r8/configuration.txt')
         }
       }
     }
@@ -171,7 +171,7 @@ Add them as `proguardRules` when you want to retain name mappings, matched keep 
       minimize {
         r8 {
           enableObfuscation()
-          configurationFile.set(layout.buildDirectory.file("r8/configuration.txt"))
+          configurationFile = layout.buildDirectory.file("r8/configuration.txt")
           proguardRules.addAll(
             "-printmapping reports/mapping.txt",
             "-printseeds reports/seeds.txt",
@@ -193,7 +193,7 @@ Add them as `proguardRules` when you want to retain name mappings, matched keep 
       minimize {
         r8 {
           enableObfuscation()
-          configurationFile.set(layout.buildDirectory.file('r8/configuration.txt'))
+          configurationFile = layout.buildDirectory.file('r8/configuration.txt')
           proguardRules.addAll(
             '-printmapping reports/mapping.txt',
             '-printseeds reports/seeds.txt',
