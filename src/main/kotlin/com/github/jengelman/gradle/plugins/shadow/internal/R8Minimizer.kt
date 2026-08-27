@@ -109,10 +109,15 @@ private fun createRules(
 ): List<String> {
   val (jarClasses, serviceRules) = inputJar.analyzeInputJar()
   return buildList {
-    add(baseDirectory.toBaseDirectoryRule())
-    if (shouldDisableOptimization(r8Spec, r8Args)) {
+    add("-basedirectory '${baseDirectory.escapedAbsPath}'")
+
+    val shouldDisableOptimization =
+      !r8Spec.optimizationEnabled.get() &&
+        (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
+    if (shouldDisableOptimization) {
       add(DefaultR8Spec.DONT_OPTIMIZE_RULE)
     }
+
     // Project classes are the public surface of the shadowed jar, even when nothing in the input
     // jar refers to every class directly.
     addAll(
@@ -128,11 +133,6 @@ private fun createRules(
       .forEach { file -> addAll(file.readLines()) }
     addAll(r8Spec.proguardRules.get())
   }
-}
-
-private fun shouldDisableOptimization(r8Spec: DefaultR8Spec, r8Args: List<String>): Boolean {
-  return !r8Spec.optimizationEnabled.get() &&
-    (r8Spec.obfuscationEnabled.get() || DefaultR8Spec.NO_MINIFICATION_ARG in r8Args)
 }
 
 private fun Iterable<File>.toKeepRules(
@@ -195,13 +195,6 @@ private fun File.toClassName(base: File): String? {
   return toRelativeString(base).removeSuffix(".class").replace(File.separatorChar, '.')
 }
 
-private fun File.toBaseDirectoryRule(): String {
-  // Preserve Windows separators: escaping backslashes changes the paths R8 writes to the
-  // collective configuration produced through --pg-conf-output.
-  val normalizedPath = absolutePath.replace("'", "\\'")
-  return "-basedirectory '$normalizedPath'"
-}
-
 private fun File.classNames(): List<String> {
   return when {
     isDirectory ->
@@ -220,6 +213,9 @@ private fun File.classNames(): List<String> {
     else -> emptyList()
   }
 }
+
+private val File.escapedAbsPath: String
+  get() = absolutePath.replace("'", "\\'")
 
 private fun String.toClassName(): String? {
   if (startsWith("META-INF/")) return null
