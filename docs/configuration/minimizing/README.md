@@ -374,6 +374,54 @@ To enable both:
     }
     ```
 
+### Customizing Rules Without Defaults
+
+By default, Shadow generates fallback keep rules for project classes, excluded dependencies, and service descriptors,
+and generates `-dontoptimize` to disable optimization unless explicitly enabled.
+
+To take full control over Shadow-generated rules and maximize R8 optimizations (such as shrinking unused project classes
+or methods and running optimizations), disable `useDefaultRules`:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          useDefaultRules = false
+          proguardRules.add("-keep class com.example.Main { public static void main(java.lang.String[]); }")
+        }
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          useDefaultRules = false
+          proguardRules.add('-keep class com.example.Main { public static void main(java.lang.String[]); }')
+        }
+      }
+    }
+    ```
+
+> [!NOTE]
+> Setting `useDefaultRules = false` only disables Shadow's auto-generated rules. This does not disable consumer rules
+> embedded in dependency JARs (e.g. under `META-INF/proguard`). Furthermore, name obfuscation remains disabled by
+> default unless `enableObfuscation()` is called or `args` is customized.
+
+
 
 [-printmapping]: https://www.guardsquare.com/manual/configuration/usage#printmapping
 [-printseeds]: https://www.guardsquare.com/manual/configuration/usage#printseeds

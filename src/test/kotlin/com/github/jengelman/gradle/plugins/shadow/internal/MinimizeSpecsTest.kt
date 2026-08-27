@@ -36,6 +36,7 @@ class MinimizeSpecsTest {
   @Test
   fun defaultR8SpecIsShrinkOnly() =
     with(project.objects.newInstance(DefaultR8Spec::class.java)) {
+      assertThat(useDefaultRules.get()).isTrue()
       assertThat(args.get()).containsExactly(DefaultR8Spec.NO_MINIFICATION_ARG)
       assertThat(obfuscationEnabled.get()).isFalse()
       assertThat(optimizationEnabled.get()).isFalse()

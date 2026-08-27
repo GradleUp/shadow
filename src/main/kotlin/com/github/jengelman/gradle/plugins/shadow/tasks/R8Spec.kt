@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -13,6 +14,21 @@ import org.gradle.api.tasks.PathSensitivity
 /** Minimal R8 configuration for [ShadowJar.minimize]. */
 @ShadowDsl
 public interface R8Spec {
+  /**
+   * Whether to apply Shadow's default ProGuard rules for R8 minimization.
+   *
+   * When enabled (default), Shadow automatically generates keep rules for project classes, excluded
+   * dependencies, and service descriptors, and disables optimization unless explicitly enabled.
+   *
+   * When disabled, Shadow-generated default rules are omitted, giving full control over Shadow's
+   * rule generation and maximizing R8 optimization potential. Note that consumer rules embedded in
+   * dependency JARs may still be applied by R8, and name obfuscation remains disabled by default
+   * unless [enableObfuscation] is called or [args] is customized.
+   *
+   * Defaults to `true`.
+   */
+  @get:Input public val useDefaultRules: Property<Boolean>
+
   /**
    * Additional R8 command line arguments.
    *

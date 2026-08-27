@@ -133,6 +133,47 @@ class R8MinimizationTest : BasePluginTest() {
   }
 
   @Test
+  fun disableDefaultRules() {
+    writeR8AppAndLibModules(
+      appShadowBlock =
+        """
+        |minimize {
+        |  r8 {
+        |    useDefaultRules = false
+        |    proguardRules.add("-keep class lib.Reflective { *; }")
+        |    configurationFile = layout.buildDirectory.file("r8/config/final-configuration.txt")
+        |  }
+        |}
+        """
+          .trimMargin()
+    )
+
+    runWithSuccess(appShadowJarPath)
+
+    assertThat(outputAppShadowedJar).useAll {
+      containsExactly(
+        "lib/Reflective.class",
+        manifestEntry,
+      )
+      classLoader {
+        loadClass("lib.Reflective")
+      }
+    }
+    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("app/build/r8/config").toRealPath()
+    assertThat(path("app/build/r8/config/final-configuration.txt").readText().invariantEolString)
+      .isEqualTo(
+        """
+        |# The proguard configuration file for the following section is $inputConfigPath
+        |-basedirectory '$outputConfigDir'
+        |-keep class lib.Reflective { *; }
+        |# End of content from $inputConfigPath
+        |"""
+          .trimMargin()
+      )
+  }
+
+  @Test
   fun canKeepDirectories() {
     writeR8AppAndLibModules(
       appShadowBlock =
