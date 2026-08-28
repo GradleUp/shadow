@@ -29,7 +29,7 @@ loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and 
     ```kotlin
     tasks.shadowJar {
       minimize {
-        exclude(dependency("org.scala-lang:.*:.*"))
+        exclude(dependency("org.apache.logging.log4j:.*:.*"))
       }
     }
     ```
@@ -39,7 +39,7 @@ loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       minimize {
-        exclude(dependency('org.scala-lang:.*:.*'))
+        exclude(dependency('org.apache.logging.log4j:.*:.*'))
       }
     }
     ```
@@ -409,6 +409,49 @@ To enable both:
         r8 {
           enableObfuscation()
           enableOptimization()
+        }
+      }
+    }
+    ```
+
+### Excluding Dependencies from R8 Minimization
+
+The `include` and `exclude` filters configured on `minimize { ... }` apply to R8 minimization as well. When a
+dependency or project is excluded (or when only specific dependencies are included), Shadow automatically generates
+`-keep` rules for all classes in the excluded dependencies so R8 preserves them entirely without requiring manual
+ProGuard keep rules:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        exclude(dependency("org.apache.logging.log4j:.*:.*"))
+        exclude(project(":api"))
+        r8 {
+          // Optional extra configuration
+        }
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        exclude(dependency('org.apache.logging.log4j:.*:.*'))
+        exclude(project(':api'))
+        r8 {
+          // Optional extra configuration
         }
       }
     }
