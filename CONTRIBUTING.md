@@ -11,6 +11,13 @@ help you get started.
 
 ## Development Commands
 
+### Building and Verifying
+
+- **Run full build and verification**: `./gradlew build`
+  This runs all checks including compilation, Spotless formatting check, all test suites (unit, documentation, and
+  functional tests), ABI validation, and Android Lint. Gradle handles caching, task ordering, and incremental execution
+  automatically.
+
 ### Code Style
 
 Shadow uses [Spotless](https://github.com/diffplug/spotless) to maintain consistent code formatting.
@@ -29,7 +36,7 @@ Shadow has multiple test suites to ensure code quality:
 
 #### Running Specific Tests
 
-To speed up local development, you can run specific test classes or methods:
+To speed up local development during incremental changes, you can run specific test classes or methods:
 
 - Run a specific unit test: `./gradlew test --tests "com.example.YourTestClass"`
 - Run functional tests against a specific Gradle version: `./gradlew functionalTest -PtestGradleVersion=9.1.0` (useful
@@ -55,6 +62,15 @@ Shadow uses [Android Lint](https://developer.android.com/studio/write/lint) to c
 - **Run lint checks**: `./gradlew lint`
 - **Update lint baseline**: `./gradlew updateLintBaseline`
 
+### Publishing to Maven Local
+
+To test the plugin in a separate local project:
+
+- **Publish to local Maven repository**: `./gradlew publishToMavenLocal`
+
+This publishes the plugin artifacts to `~/.m2/repository`, allowing you to test your changes with `mavenLocal()` in
+other Gradle builds.
+
 ### Documentation Preview
 
 Shadow's user guide is built using [MkDocs Material](https://squidfunk.github.io/mkdocs-material/). You can build and
@@ -72,7 +88,7 @@ When fixing bugs or issues:
 
 1. Ensure all existing tests pass
 2. Add regression tests that verify the fix for the reported issue
-3. Run the full test suite to ensure no unintended side effects
+3. Run `./gradlew build` to ensure no unintended side effects
 4. Update documentation if the fix changes behavior
 
 ### Adding New Features or APIs
@@ -96,10 +112,7 @@ When adding new features or public APIs:
 ### Before Submitting a Pull Request
 
 1. Run `./gradlew spotlessApply` to format your code
-2. Run all test suites: `./gradlew test documentTest functionalTest`
-3. Run `./gradlew checkKotlinAbi` to ensure API compatibility
-4. Run `./gradlew lint` to check for potential issues
-5. Optionally, run `./gradlew build` to run compilation, tests, and standard verification tasks configured for the
-   project
-6. Ensure your commit messages are clear and descriptive
-7. Update the `Unreleased` section in [CHANGELOG](CHANGELOG.md) if applicable
+2. If public APIs were added or modified, run `./gradlew updateKotlinAbi` and commit the updated API dump files
+3. Run `./gradlew build` to execute the full verification suite
+4. Ensure your commit messages are clear and descriptive
+5. Update the `Unreleased` section in [CHANGELOG](CHANGELOG.md) if applicable
