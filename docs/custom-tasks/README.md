@@ -36,7 +36,7 @@ output.
 
       archiveClassifier = 'test'
       from sourceSets.named('test').map { it.output }
-      mergedDependencies = project.configurations.testRuntimeClasspath
+      mergedDependencies.setFrom project.configurations.named('testRuntimeClasspath')
 
       manifest {
         // Optionally, set the main class for the JAR.
@@ -77,7 +77,7 @@ code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task an
     tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       description = 'Create a shadow JAR of all dependencies'
       archiveClassifier = 'dep'
-      mergedDependencies = project.configurations.runtimeClasspath
+      mergedDependencies.setFrom project.configurations.named('runtimeClasspath')
     }
     ```
 
