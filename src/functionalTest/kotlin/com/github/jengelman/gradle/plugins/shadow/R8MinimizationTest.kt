@@ -10,7 +10,9 @@ import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactly
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
@@ -496,106 +498,43 @@ class R8MinimizationTest : BasePluginTest() {
 
   @Test
   fun honorDependencyIncludes() {
-    settingsScript.appendText(
-      """
-      |include 'app', 'lib1', 'lib2'
-      """
-        .trimMargin()
-    )
-    projectScript.deleteExisting()
-
-    path("lib1/src/main/java/lib1/Used.java")
-      .writeText(
+    writeR8AppAndLibModules(
+      appProjectBlock =
         """
-        |package lib1;
-        |public class Used {
-        |  public static String name() {
-        |    return "used";
-        |  }
-        |}
-        """
-          .trimMargin()
-      )
-    path("lib1/src/main/java/lib1/Unused.java")
-      .writeText(
-        """
-        |package lib1;
-        |public class Unused {}
-        """
-          .trimMargin()
-      )
-    path("lib1/build.gradle").writeText(getDefaultProjectBuildScript("java"))
-
-    path("lib2/src/main/java/lib2/Unused.java")
-      .writeText(
-        """
-        |package lib2;
-        |public class Unused {}
-        """
-          .trimMargin()
-      )
-    path("lib2/build.gradle").writeText(getDefaultProjectBuildScript("java"))
-
-    path("app/src/main/java/app/App.java")
-      .writeText(
-        """
-        |package app;
-        |import lib1.Used;
-        |public class App {
-        |  public String name() {
-        |    return Used.name();
-        |  }
-        |}
-        """
-          .trimMargin()
-      )
-    path("app/build.gradle")
-      .writeText(
-        """
-        |${getDefaultProjectBuildScript("java")}
         |dependencies {
-        |  implementation project(':lib1')
-        |  implementation project(':lib2')
-        |}
-        |$shadowJarTask {
-        |  minimize {
-        |    include(project(':lib1'))
-        |    r8 {}
-        |  }
+        |  implementation 'junit:junit:3.8.2'
         |}
         """
-          .trimMargin()
-      )
+          .trimMargin(),
+      appShadowBlock =
+        """
+        |minimize {
+        |  include(project(':lib'))
+        |  r8 {}
+        |}
+        """
+          .trimMargin(),
+    )
 
     runWithSuccess(appShadowJarPath)
 
     assertThat(outputAppShadowedJar).useAll {
-      containsExactly(
+      containsAtLeast(
         "app/App.class",
-        "lib1/Used.class",
-        "lib2/Unused.class",
+        "lib/Used.class",
+        *junitEntries.filterNot { it.endsWith('/') }.toTypedArray(),
         manifestEntry,
+      )
+      containsNone(
+        "lib/Reflective.class",
+        "lib/Unused.class",
       )
       classLoader {
         loadClass("app.App")
-        loadClass("lib1.Used")
-        loadClass("lib2.Unused")
+        loadClass("lib.Used")
+        loadClass("junit.framework.Test")
       }
     }
-    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
-    val outputConfigDir = path("app/build/shadowJar/r8").toRealPath()
-    assertThat(path("app/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
-      .isEqualTo(
-        """
-        |# The proguard configuration file for the following section is $inputConfigPath
-        |-basedirectory '$outputConfigDir'
-        |-dontoptimize
-        |-keep,includedescriptorclasses class app.App { *; }
-        |-keep class lib2.Unused { *; }
-        |# End of content from $inputConfigPath
-        |"""
-          .trimMargin()
-      )
   }
 
   @Test
