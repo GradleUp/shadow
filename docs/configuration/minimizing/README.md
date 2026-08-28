@@ -213,6 +213,46 @@ These reporting options belong in the build's R8 configuration, not in rules pub
 Android's [library optimization guidance][library-optimization-guidance] lists them among the global options that
 library authors should not publish as consumer keep rules.
 
+When your classes reference types that are available on the compile classpath but not bundled into the shadowed JAR
+(such as `compileOnly` dependencies or `gradleApi()`), supply them to R8 via `classpath` so R8 can analyze the complete
+class hierarchy without bundling those dependencies into the output archive:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    val compileClasspath = configurations.compileClasspath
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          classpath.from(compileClasspath)
+        }
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    def compileClasspath = configurations.compileClasspath
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          classpath.from(compileClasspath)
+        }
+      }
+    }
+    ```
+
 Shadow resolves R8 from the `shadowR8` configuration. The default dependency is `com.android.tools:r8`, which is
 published by Google Maven rather than Maven Central. Add `google()` to your repositories or override the dependency:
 
