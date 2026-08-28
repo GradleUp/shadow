@@ -416,12 +416,13 @@ To enable both:
 
 ### Filtering Dependencies in R8 Minimization
 
-The `include` and `exclude` filters configured on `minimize { ... }` apply to R8 minimization as well:
+The `include` and `exclude` filters configured on `minimize { ... }` apply to R8 minimization when default rules are
+enabled (the default):
 
 - **`exclude(...)` (Keep specific dependencies)**: Excludes matching dependencies from R8 shrinking. Shadow
   automatically generates `-keep` rules for all classes in the excluded dependencies so they are fully preserved.
-- **`include(...)` (Shrink only specific dependencies)**: Applies R8 shrinking *only* to matching dependencies.
-  All other dependencies are automatically kept in full.
+- **`include(...)` (Shrink only specific dependencies)**: Applies R8 shrinking *only* to matching dependencies. All
+  other dependencies are automatically kept in full.
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -510,9 +511,10 @@ or methods and running optimizations), disable `useDefaultRules`:
     ```
 
 > [!NOTE]
-> Setting `useDefaultRules = false` only disables Shadow's auto-generated rules. This does not disable consumer rules
-> embedded in dependency JARs (e.g. under `META-INF/proguard`). Furthermore, name obfuscation remains disabled by
-> default unless `enableObfuscation()` is called or `args` is customized.
+> Setting `useDefaultRules = false` disables Shadow's auto-generated rules, including `-keep` rules generated from
+> `minimize` `include` / `exclude` filters. This does not disable consumer rules embedded in dependency JARs
+> (e.g. under `META-INF/proguard`). Furthermore, name obfuscation remains disabled by default unless
+> `enableObfuscation()` is called or `args` is customized.
 
 
 
