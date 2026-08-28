@@ -414,12 +414,14 @@ To enable both:
     }
     ```
 
-### Excluding Dependencies from R8 Minimization
+### Filtering Dependencies in R8 Minimization
 
-The `include` and `exclude` filters configured on `minimize { ... }` apply to R8 minimization as well. When a
-dependency or project is excluded (or when only specific dependencies are included), Shadow automatically generates
-`-keep` rules for all classes in the excluded dependencies so R8 preserves them entirely without requiring manual
-ProGuard keep rules:
+The `include` and `exclude` filters configured on `minimize { ... }` apply to R8 minimization as well:
+
+- **`exclude(...)` (Keep specific dependencies)**: Excludes matching dependencies from R8 shrinking. Shadow
+  automatically generates `-keep` rules for all classes in the excluded dependencies so they are fully preserved.
+- **`include(...)` (Shrink only specific dependencies)**: Applies R8 shrinking *only* to matching dependencies.
+  All other dependencies are automatically kept in full.
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -430,8 +432,13 @@ ProGuard keep rules:
 
     tasks.shadowJar {
       minimize {
+        // Exclude specific dependencies from R8 shrinking (kept completely)
         exclude(dependency("org.apache.logging.log4j:.*:.*"))
         exclude(project(":api"))
+
+        // Or shrink only specific dependencies (all others are kept completely)
+        // include(dependency("org.apache.logging.log4j:.*:.*"))
+
         r8 {
           // Optional extra configuration
         }
@@ -448,8 +455,13 @@ ProGuard keep rules:
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       minimize {
+        // Exclude specific dependencies from R8 shrinking (kept completely)
         exclude(dependency('org.apache.logging.log4j:.*:.*'))
         exclude(project(':api'))
+
+        // Or shrink only specific dependencies (all others are kept completely)
+        // include(dependency('org.apache.logging.log4j:.*:.*'))
+
         r8 {
           // Optional extra configuration
         }
