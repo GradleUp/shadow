@@ -30,8 +30,6 @@
 
 ### Deprecated
 
-The following APIs are deprecated and will be removed or made non-public in the next major release.
-
 - Deprecate `keepRules` and `keepRuleFiles` in `R8Spec`. ([#2120](https://github.com/GradleUp/shadow/pull/2120))  
   Use `proguardRules` and `proguardRuleFiles` instead.
 - Deprecate `ShadowJar.minimizeJar`. ([#2124](https://github.com/GradleUp/shadow/pull/2124))  
@@ -117,8 +115,6 @@ The following APIs are deprecated and will be removed or made non-public in the 
 - Remove `afterEvaluate` when adding variants. ([#2056](https://github.com/GradleUp/shadow/pull/2056))
 
 ### Deprecated
-
-The following APIs are deprecated and will be removed or made non-public in the next major release.
 
 - Deprecate `enableKotlinModuleRemapping` for `ShadowJar`. ([#2073](https://github.com/GradleUp/shadow/pull/2073))  
   Apply `KotlinModuleMetadataTransformer` explicitly to support relocating inside Kotlin module metadata files.
@@ -218,8 +214,6 @@ The following APIs are deprecated and will be removed or made non-public in the 
 
 ### Deprecated
 
-The following APIs are deprecated and will be removed or made non-public in the next major release.
-
 - Deprecate `PreserveFirstFoundResourceTransformer.resources`. ([#1855](https://github.com/GradleUp/shadow/pull/1855))
 - Deprecate `ShadowCopyAction`. ([#1876](https://github.com/GradleUp/shadow/pull/1876))
 
@@ -277,8 +271,6 @@ The following APIs are deprecated and will be removed or made non-public in the 
 - Make assemble depend on shadowJar even if it is added later. ([#1766](https://github.com/GradleUp/shadow/pull/1766))
 
 ### Deprecated
-
-The following APIs are deprecated and will be removed or made non-public in the next major release.
 
 - Deprecate `InheritManifest` and `inheritFrom`. ([#1722](https://github.com/GradleUp/shadow/pull/1722))
   ```kotlin
