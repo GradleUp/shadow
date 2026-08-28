@@ -1,6 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import java.io.Serializable
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.Dependency
@@ -11,9 +11,10 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
+import org.gradle.api.tasks.Internal
 
-// DependencyFilter is used as Gradle Input in ShadowJar, so it must be Serializable.
-public interface DependencyFilter : Serializable {
+@ShadowDsl
+public interface DependencyFilter {
   /** Resolve a [configuration] against the [include]/[exclude] rules in the filter. */
   public fun resolve(configuration: Configuration): FileCollection
 
@@ -44,8 +45,12 @@ public interface DependencyFilter : Serializable {
 
   public abstract class AbstractDependencyFilter(
     @Transient private val project: Project,
-    @Transient protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
-    @Transient protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+    @get:Internal
+    @Transient
+    protected val includeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
+    @get:Internal
+    @Transient
+    protected val excludeSpecs: MutableList<Spec<ResolvedDependency>> = mutableListOf(),
   ) : DependencyFilter {
 
     protected abstract fun resolve(
@@ -144,8 +149,7 @@ public interface DependencyFilter : Serializable {
         val versionMatch =
           version?.let {
             // Version like `1.0.0+1` can't be converted to regex directly because `+` is a special
-            // character in regex.
-            // So we check for exact match first, then fallback to regex match.
+            // character in regex. So we check for exact match first, then fallback to regex match.
             it == resolvedDependency.moduleVersion ||
               resolvedDependency.moduleVersion.matches(it.toRegex())
           } ?: true

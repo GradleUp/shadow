@@ -79,6 +79,29 @@ class RelocatorsTest {
           "()Lorg/package/ClassA;Lorg/package/ClassB;",
           "()Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;",
         ),
+        // Class name in slashy format (used in capturing class, impl class, and functional
+        // interface class of SerializedLambda)
+        Arguments.of(
+          "org/package/ClassA",
+          "shadow/org/package/ClassA",
+        ),
+        // Method descriptor formats found in lambda deserialization metadata
+        Arguments.of(
+          "(Lorg/package/ClassA;)Ljava/lang/String;",
+          "(Lshadow/org/package/ClassA;)Ljava/lang/String;",
+        ),
+        Arguments.of(
+          "(Lorg/package/ClassA;I)V",
+          "(Lshadow/org/package/ClassA;I)V",
+        ),
+        Arguments.of(
+          "(ILorg/package/ClassA;)V",
+          "(ILshadow/org/package/ClassA;)V",
+        ),
+        Arguments.of(
+          "(Lorg/package/ClassA;Lorg/package/ClassB;)Lorg/package/ClassA;",
+          "(Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;)Lshadow/org/package/ClassA;",
+        ),
       ) + primitiveTypePatterns
   }
 }

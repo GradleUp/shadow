@@ -1,11 +1,12 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
-import java.nio.charset.StandardCharsets.UTF_8
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.util.LinkedHashSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -88,17 +89,20 @@ public open class MergeLicenseResourceTransformer(
   ) : this(
     objectFactory,
     patternSet =
-      PatternSet().apply {
-        include(
+      PatternSet()
+        .include(
           "META-INF/LICENSE",
           "META-INF/LICENSE.txt",
           "META-INF/LICENSE.md",
           "LICENSE",
           "LICENSE.txt",
           "LICENSE.md",
-        )
-      },
+        ),
   )
+
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
 
   override fun transform(context: TransformerContext) {
     transformInternal(context.inputStream.readAllBytes())
@@ -107,13 +111,13 @@ public open class MergeLicenseResourceTransformer(
   override fun hasTransformedResource(): Boolean = true
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
-    os.write(buildLicense().toByteArray())
-    os.closeEntry()
+    os.writeEntry(outputPath.get(), preserveFileTimestamps) {
+      write(buildLicense().toByteArray())
+    }
   }
 
   internal fun transformInternal(bytes: ByteArray) {
-    val content = bytes.toString(UTF_8).trim('\n', '\r')
+    val content = bytes.toString(Charsets.UTF_8).trim('\n', '\r')
     if (content.isNotEmpty()) {
       elements.add(content)
     }

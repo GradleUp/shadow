@@ -386,78 +386,78 @@ class SimpleRelocatorTest {
   private companion object {
     val sourceFile =
       """
-      package org.apache.maven.hello;
-      package org.objectweb.asm;
-
-      import foo.bar.Bar;
-      import zot.baz.Baz;
-      import org.apache.maven.exclude1.Ex1;
-      import org.apache.maven.exclude1.a.b.Ex1AB;
-      import org.apache.maven.sub.exclude2.Ex2;
-      import org.apache.maven.sub.exclude2.c.d.Ex2CD;
-      import org.apache.maven.In;
-      import org.apache.maven.e.InE;
-      import org.apache.maven.f.g.InFG;
-      import java.io.IOException;
-
-      /**
-       * Also check out {@link org.apache.maven.hello.OtherClass} and {@link
-       * org.apache.maven.hello.YetAnotherClass}
-       */
-      public class MyClass {
-        private org.apache.maven.exclude1.x.X myX;
-        private org.apache.maven.h.H h;
-        private String ioInput;
-
-        /** Javadoc, followed by default visibility method with fully qualified return type */
-        org.apache.maven.MyReturnType doSomething( org.apache.maven.Bar bar, org.objectweb.asm.sub.Something something) {
-          org.apache.maven.Bar bar;
-          org.objectweb.asm.sub.Something something;
-          String io, val;
-          String noRelocation = "NoWordBoundaryXXXorg.apache.maven.In";
-          String relocationPackage = "org.apache.maven.In";
-          String relocationPath = "org/apache/maven/In";
-        }
-      }
+      |package org.apache.maven.hello;
+      |package org.objectweb.asm;
+      |
+      |import foo.bar.Bar;
+      |import zot.baz.Baz;
+      |import org.apache.maven.exclude1.Ex1;
+      |import org.apache.maven.exclude1.a.b.Ex1AB;
+      |import org.apache.maven.sub.exclude2.Ex2;
+      |import org.apache.maven.sub.exclude2.c.d.Ex2CD;
+      |import org.apache.maven.In;
+      |import org.apache.maven.e.InE;
+      |import org.apache.maven.f.g.InFG;
+      |import java.io.IOException;
+      |
+      |/**
+      | * Also check out {@link org.apache.maven.hello.OtherClass} and {@link
+      | * org.apache.maven.hello.YetAnotherClass}
+      | */
+      |public class MyClass {
+      |  private org.apache.maven.exclude1.x.X myX;
+      |  private org.apache.maven.h.H h;
+      |  private String ioInput;
+      |
+      |  /** Javadoc, followed by default visibility method with fully qualified return type */
+      |  org.apache.maven.MyReturnType doSomething( org.apache.maven.Bar bar, org.objectweb.asm.sub.Something something) {
+      |    org.apache.maven.Bar bar;
+      |    org.objectweb.asm.sub.Something something;
+      |    String io, val;
+      |    String noRelocation = "NoWordBoundaryXXXorg.apache.maven.In";
+      |    String relocationPackage = "org.apache.maven.In";
+      |    String relocationPath = "org/apache/maven/In";
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
 
     val relocatedFile =
       """
-      package com.acme.maven.hello;
-      package aj.org.objectweb.asm;
-
-      import foo.bar.Bar;
-      import zot.baz.Baz;
-      import org.apache.maven.exclude1.Ex1;
-      import org.apache.maven.exclude1.a.b.Ex1AB;
-      import org.apache.maven.sub.exclude2.Ex2;
-      import org.apache.maven.sub.exclude2.c.d.Ex2CD;
-      import com.acme.maven.In;
-      import com.acme.maven.e.InE;
-      import com.acme.maven.f.g.InFG;
-      import java.io.IOException;
-
-      /**
-       * Also check out {@link com.acme.maven.hello.OtherClass} and {@link
-       * com.acme.maven.hello.YetAnotherClass}
-       */
-      public class MyClass {
-        private org.apache.maven.exclude1.x.X myX;
-        private com.acme.maven.h.H h;
-        private String ioInput;
-
-        /** Javadoc, followed by default visibility method with fully qualified return type */
-        com.acme.maven.MyReturnType doSomething( com.acme.maven.Bar bar, aj.org.objectweb.asm.sub.Something something) {
-          com.acme.maven.Bar bar;
-          aj.org.objectweb.asm.sub.Something something;
-          String io, val;
-          String noRelocation = "NoWordBoundaryXXXorg.apache.maven.In";
-          String relocationPackage = "com.acme.maven.In";
-          String relocationPath = "com/acme/maven/In";
-        }
-      }
+      |package com.acme.maven.hello;
+      |package aj.org.objectweb.asm;
+      |
+      |import foo.bar.Bar;
+      |import zot.baz.Baz;
+      |import org.apache.maven.exclude1.Ex1;
+      |import org.apache.maven.exclude1.a.b.Ex1AB;
+      |import org.apache.maven.sub.exclude2.Ex2;
+      |import org.apache.maven.sub.exclude2.c.d.Ex2CD;
+      |import com.acme.maven.In;
+      |import com.acme.maven.e.InE;
+      |import com.acme.maven.f.g.InFG;
+      |import java.io.IOException;
+      |
+      |/**
+      | * Also check out {@link com.acme.maven.hello.OtherClass} and {@link
+      | * com.acme.maven.hello.YetAnotherClass}
+      | */
+      |public class MyClass {
+      |  private org.apache.maven.exclude1.x.X myX;
+      |  private com.acme.maven.h.H h;
+      |  private String ioInput;
+      |
+      |  /** Javadoc, followed by default visibility method with fully qualified return type */
+      |  com.acme.maven.MyReturnType doSomething( com.acme.maven.Bar bar, aj.org.objectweb.asm.sub.Something something) {
+      |    com.acme.maven.Bar bar;
+      |    aj.org.objectweb.asm.sub.Something something;
+      |    String io, val;
+      |    String noRelocation = "NoWordBoundaryXXXorg.apache.maven.In";
+      |    String relocationPackage = "com.acme.maven.In";
+      |    String relocationPath = "com/acme/maven/In";
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
   }
 }

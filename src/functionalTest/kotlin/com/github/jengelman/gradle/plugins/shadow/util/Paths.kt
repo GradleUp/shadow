@@ -4,4 +4,4 @@ import java.nio.file.Path
 import kotlin.io.path.readText
 import kotlin.io.path.writeText
 
-fun Path.prependText(text: String) = writeText(text + readText())
+fun Path.prependText(text: String) = writeText("$text${readText()}")

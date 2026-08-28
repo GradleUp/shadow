@@ -14,7 +14,7 @@ jobs:
       id-token: write
       pages: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: gradle/actions/setup-gradle@v6
         with:
           cache-read-only: true
@@ -23,7 +23,7 @@ jobs:
       - name: Build Site
         run: |
           # Don't cache it to track updates.
-          pip install mkdocs-material
+          pip install mkdocs-material mdx_truly_sane_lists mkdocs-callouts
           mkdocs build
       - uses: actions/upload-pages-artifact@v5
         with:

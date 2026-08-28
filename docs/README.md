@@ -4,21 +4,19 @@
 
 # Introduction
 
-Shadow is a Gradle plugin for combining a project's dependency classes and resources into a single
-output Jar. The combined Jar is often referred to a _fat-jar_ or _uber-jar_.
-Shadow utilizes [`JarInputStream`][JarInputStream] and [`JarOutputStream`][JarOutputStream] to efficiently process
-dependent libraries into the output jar without incurring the I/O overhead of expanding the jars to disk.
+A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications with
+R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 
-!!! warning "Plugin ID Change"
-
-    Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the ID [
-    `com.github.johnrengelman.shadow`][johnrengelman's]
-    before maintenance was transferred to the [GradleUp organization](https://github.com/GradleUp) to ensure future
-    development, see [#908](https://github.com/GradleUp/shadow/issues/908).
-    
-    If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID [
-    `com.gradleup.shadow`][gradleup's] 
-    and update to the latest version to receive all the latest bug fixes and improvements.
+> [!WARNING]
+> **Plugin ID Change**
+>
+> Previously this plugin was developed by [@johnrengelman][johnrengelman] and published under the ID
+> [`com.github.johnrengelman.shadow`][johnrengelman's] before maintenance was transferred to the
+> [GradleUp organization][GradleUp] to ensure future development, see [#908].
+>
+> If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID
+> [`com.gradleup.shadow`][gradleup's] and update to the latest version to receive all the latest bug fixes and
+> improvements.
 
 | Shadow Version | Min Gradle Version | Min Java Version | Plugin ID                                            |
 |----------------|--------------------|------------------|------------------------------------------------------|
@@ -27,6 +25,8 @@ dependent libraries into the output jar without incurring the I/O overhead of ex
 | 9.0.0+         | 8.11               | 11               | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.2.0+         | 8.11               | 17               | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.3.0+         | 9.0                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
+| 9.5.0+         | 9.2                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
+| 9.7.0+         | 9.4                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
 
 ## Benefits of Shadow
 
@@ -38,35 +38,31 @@ Shadowing a project output has 2 major use cases:
 ### Executable Distributions
 
 Executable distribution is the main use case for deploying an _application_ that can be executed/run in the runtime
-environment.
-In the case of Shadow, this is a single _uber_ or _fat_ JAR.
-The JAR file contains all the application code and dependent libraries to execute (not including the standard JVM
-libraries).
-The shadow JAR does **not** include the JRE itself.
-It must be available on the target system.
+environment. In the case of Shadow, this is a single _uber_ or _fat_ JAR. The JAR file contains all the application code
+and dependent libraries to execute (not including the standard JVM libraries). The shadow JAR does **not** include the
+JRE itself. It must be available on the target system.
 
-Executable JARs contain a JAR MANIFEST that specifies the application Main Class.
-This allows the application to be started with a single command:
+Executable JARs contain a JAR MANIFEST that specifies the application Main Class. This allows the application to be
+started with a single command:
 
-```sh
+```shell
 java -jar application-shadow.jar
 ```
 
 ### Library Bundling
 
-Dependency bundling and relocation is the main use case for _library_ authors.
-The goal of a bundled library is to create a pre-packaged dependency for other libraries or applications to utilize.
-Often in these scenarios, a library may contain a dependency that a downstream library or application also uses.
-In _some_ cases, different versions of this common dependency can cause an issue in either the upstream library or
-the downstream application.
-These issues often manifest themselves as binary incompatibilities in either the library or application code.
+Dependency bundling and relocation is the main use case for _library_ authors. The goal of a bundled library is to
+create a pre-packaged dependency for other libraries or applications to utilize. Often in these scenarios, a library may
+contain a dependency that a downstream library or application also uses. In _some_ cases, different versions of this
+common dependency can cause an issue in either the upstream library or the downstream application. These issues often
+manifest themselves as binary incompatibilities in either the library or application code.
 
 By utilizing Shadow's ability to _relocate_ the package names for dependencies, a library author can ensure that the
 library's dependencies will not conflict with the same dependency being declared by the downstream application.
 
 
-
-[JarInputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarInputStream.html
-[JarOutputStream]: https://docs.oracle.com/javase/8/docs/api/java/util/jar/JarOutputStream.html
 [johnrengelman's]: https://plugins.gradle.org/plugin/com.github.johnrengelman.shadow
 [gradleup's]: https://plugins.gradle.org/plugin/com.gradleup.shadow
+[johnrengelman]: https://github.com/johnrengelman
+[GradleUp]: https://github.com/GradleUp
+[#908]: https://github.com/GradleUp/shadow/issues/908

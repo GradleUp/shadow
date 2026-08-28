@@ -1,13 +1,10 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.contains
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
-import java.io.ByteArrayOutputStream
-import java.nio.charset.Charset
-import java.util.zip.ZipInputStream
-import org.apache.tools.zip.ZipOutputStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import org.junit.jupiter.api.Test
 
 /**
@@ -21,39 +18,79 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
   }
 
   @Test
-  fun canTransformResource() {
-    assertThat(transformer.canTransformResource("META-INF/NOTICE")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.TXT")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/Notice.txt")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.md")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/Notice.md")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/MANIFEST.MF")).isFalse()
-  }
+  fun canTransformResource() =
+    with(transformer) {
+      assertThat(canTransformResource("META-INF/NOTICE")).isTrue()
+      assertThat(canTransformResource("META-INF/NOTICE.TXT")).isTrue()
+      assertThat(canTransformResource("META-INF/Notice.txt")).isTrue()
+      assertThat(canTransformResource("META-INF/NOTICE.md")).isTrue()
+      assertThat(canTransformResource("META-INF/Notice.md")).isTrue()
+      assertThat(canTransformResource("META-INF/MANIFEST.MF")).isFalse()
+    }
 
   @Test
-  fun canTransformByPattern() {
-    transformer.exclude("META-INF/NOTICE.txt")
-    transformer.include("META-INF/NOTICE.*")
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.txt")).isFalse()
-    assertThat(transformer.canTransformResource("META-INF/NOTICE.log")).isTrue()
-  }
+  fun canTransformByPattern() =
+    with(transformer) {
+      exclude("META-INF/NOTICE.txt")
+      include("META-INF/NOTICE.*")
+      assertThat(canTransformResource("META-INF/NOTICE.txt")).isFalse()
+      assertThat(canTransformResource("META-INF/NOTICE.log")).isTrue()
+    }
 
   @Test
-  fun preamble1ShouldHaveATrailingSpace() {
-    val baos = ByteArrayOutputStream()
-    val zos = ZipOutputStream(baos)
+  fun preamble1ShouldHaveATrailingSpace() =
+    with(transformer) {
+      projectName.set("test-project")
+      copyright.set("test-project\nCopyright 2006 The Apache Software Foundation\n")
+      transform(textContext(NOTICE_RESOURCE))
 
-    transformer.projectName.set("test-project")
-    transformer.transform(textContext(NOTICE_RESOURCE))
-    transformer.modifyOutputStream(zos, false)
-    zos.close()
+      val content = transformToJar().use { it.getContent(NOTICE_RESOURCE) }
 
-    val zis = ZipInputStream(baos.toByteArray().inputStream())
-    zis.nextEntry
-    val output = zis.readAllBytes().toString(Charset.forName(transformer.charsetName.get()))
+      assertThat(content)
+        .isEqualTo(
+          """
+          |// ------------------------------------------------------------------
+          |// NOTICE file corresponding to the section 4d of The Apache License,
+          |// Version 2.0, in this case for test-project
+          |// ------------------------------------------------------------------
+          |
+          |test-project
+          |Copyright 2006 The Apache Software Foundation
+          |
+          |This product includes software developed at
+          |The Apache Software Foundation (https://www.apache.org/).
+          """
+            .trimMargin()
+        )
+    }
 
-    assertThat(output).contains("in this case for test-project")
-  }
+  @Test
+  fun overrideOutputPath() =
+    with(transformer) {
+      val customNoticeEntry = "META-INF/CUSTOM_NOTICE"
+      addHeader.set(false)
+      copyright.set("Copyright 2006 The Apache Software Foundation\n")
+      outputPath.set(customNoticeEntry)
+      transform(textContext(NOTICE_RESOURCE, "Notice from A"))
+      transform(textContext(NOTICE_RESOURCE, "Notice from B"))
+
+      val content = transformToJar().use { it.getContent(customNoticeEntry) }
+
+      assertThat(content)
+        .isEqualTo(
+          """
+          |Copyright 2006 The Apache Software Foundation
+          |
+          |This product includes software developed at
+          |The Apache Software Foundation (https://www.apache.org/).
+          |
+          |Notice from A
+          |
+          |Notice from B
+          """
+            .trimMargin()
+        )
+    }
 
   private companion object {
     const val NOTICE_RESOURCE = "META-INF/NOTICE"

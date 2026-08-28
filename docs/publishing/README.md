@@ -3,11 +3,10 @@
 ## Publishing with Maven-Publish Plugin
 
 The Shadow plugin will automatically configure the necessary tasks in the presence of Gradle's
-[`maven-publish`][maven-publish] plugin.
-The plugin provides the `shadow` component to configure the publication with the necessary
-artifact and dependencies in the POM file.
+[`maven-publish`][maven-publish] plugin. The plugin provides the `shadow` component to configure the publication with
+the necessary artifact and dependencies in the POM file.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -28,7 +27,7 @@ artifact and dependencies in the POM file.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -57,7 +56,7 @@ JAR. This allows consumers of the published library to choose between the standa
 This feature is enabled by default. It can be disabled by setting the `addShadowVariantIntoJavaComponent` property in
 the `shadow` extension to `false`. If you want to publish the standard JAR only, disable this feature like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -82,7 +81,7 @@ the `shadow` extension to `false`. If you want to publish the standard JAR only,
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -111,7 +110,7 @@ The target JVM version attribute (`org.gradle.jvm.version`) of the shadowed vari
 for consumers to select the correct variant based on their target JVM version. But it may cause issues in some cases,
 you can disable this by setting the `addTargetJvmVersionAttribute` property in the `shadow` extension to `false`:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     shadow {
@@ -119,7 +118,7 @@ you can disable this by setting the `addTargetJvmVersionAttribute` property in t
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     shadow {
@@ -127,11 +126,11 @@ you can disable this by setting the `addTargetJvmVersionAttribute` property in t
     }
     ```
 
-The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed variant is set to `shadowed` by default,
-it is useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by
-setting the `bundlingAttribute` property in the `shadow` extension:
+The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed variant is set to `shadowed` by default, it is
+useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by setting
+the `bundlingAttribute` property in the `shadow` extension:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     shadow {
@@ -140,7 +139,7 @@ setting the `bundlingAttribute` property in the `shadow` extension:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     shadow {
@@ -151,24 +150,18 @@ setting the `bundlingAttribute` property in the `shadow` extension:
 
 ## Shadow Configuration and Publishing
 
-The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify
-runtime dependencies that are **not** merged into the final JAR file.
-When configuring publishing with the Shadow plugin, the dependencies in the `shadow`
-configuration, are translated to become `RUNTIME` scoped dependencies of the
-published artifact.
+The Shadow plugin provides a custom configuration (`configurations.shadow`) to specify runtime dependencies that are
+**not** merged into the final JAR file. When configuring publishing with the Shadow plugin, the dependencies in the
+`shadow` configuration, are translated to become `RUNTIME` scoped dependencies of the published artifact.
 
-No other dependencies are automatically configured for inclusion in the POM file.
-For example, excluded dependencies are **not** automatically added to the POM file or
-if the configuration for merging are modified by specifying
-`shadowJar.configurations.setFrom(configurations.myConfiguration)`, there is no automatic
-configuration of the POM file.
+No other dependencies are automatically configured for inclusion in the POM file. For example, excluded dependencies are
+**not** automatically added to the POM file or if the configuration for merging are modified by specifying
+`shadowJar.configurations.setFrom(configurations.myConfiguration)`, there is no automatic configuration of the POM file.
 
-This automatic configuration occurs _only_ when using the above methods for
-configuring publishing. If this behavior is not desirable, then publishing **must**
-be manually configured.
+This automatic configuration occurs _only_ when using the above methods for configuring publishing. If this behavior is
+not desirable, then publishing **must** be manually configured.
 
-
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -177,15 +170,14 @@ be manually configured.
       id("com.gradleup.shadow")
     }
 
-    val retrofitVersion = "2.12.0"
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
-      implementation("com.squareup.retrofit2:retrofit:$retrofitVersion")
+      implementation("com.squareup.retrofit2:retrofit:<version>")
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
       // file's `Class-Path` entry, and also in the POM file.
-      shadow("com.squareup.retrofit2:converter-java8:$retrofitVersion")
+      shadow("com.squareup.retrofit2:converter-java8:<version>")
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
-      compileOnly("com.squareup.retrofit2:converter-scalars:$retrofitVersion")
+      compileOnly("com.squareup.retrofit2:converter-scalars:<version>")
     }
 
     publishing {
@@ -199,7 +191,7 @@ be manually configured.
             val node = (dependenciesNode as groovy.util.Node).appendNode("dependency")
             node.appendNode("groupId", "com.squareup.retrofit2")
             node.appendNode("artifactId", "converter-gson")
-            node.appendNode("version", retrofitVersion)
+            node.appendNode("version", "<version>")
             node.appendNode("scope", "runtime")
           }
         }
@@ -210,7 +202,7 @@ be manually configured.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -219,15 +211,14 @@ be manually configured.
       id 'com.gradleup.shadow'
     }
 
-    def retrofitVersion = '2.12.0'
     dependencies {
       // This will be bundled in the shadowed JAR and not declared in the POM.
-      implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+      implementation "com.squareup.retrofit2:retrofit:<version>"
       // This will be excluded from the shadowed JAR but declared as a runtime dependency in `META-INF/MANIFEST.MF`
       // file's `Class-Path` entry, and also in the POM file.
-      shadow "com.squareup.retrofit2:converter-java8:$retrofitVersion"
+      shadow "com.squareup.retrofit2:converter-java8:<version>"
       // This will be excluded from the shadowed JAR and not declared in the POM or `META-INF/MANIFEST.MF`.
-      compileOnly "com.squareup.retrofit2:converter-scalars:$retrofitVersion"
+      compileOnly "com.squareup.retrofit2:converter-scalars:<version>"
     }
 
     publishing {
@@ -241,7 +232,7 @@ be manually configured.
             def node = dependenciesNode.appendNode('dependency')
             node.appendNode('groupId', 'com.squareup.retrofit2')
             node.appendNode('artifactId', 'converter-gson')
-            node.appendNode('version', retrofitVersion)
+            node.appendNode('version', '<version>')
             node.appendNode('scope', 'runtime')
           }
         }
@@ -254,10 +245,10 @@ be manually configured.
 
 ## Publishing the Shadowed JAR instead of the Original JAR
 
-You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming
-the `archiveClassifier` of the shadowed JAR like the following:
+You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming the
+`archiveClassifier` of the shadowed JAR like the following:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -280,7 +271,7 @@ the `archiveClassifier` of the shadowed JAR like the following:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -304,10 +295,10 @@ the `archiveClassifier` of the shadowed JAR like the following:
     ```
 
 Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting the `archiveClassifier` of
-[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases.
-If you don't need the standard JAR, you can disable the `jar` task like:
+[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases. If
+you don't need the standard JAR, you can disable the `jar` task like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.jar {
@@ -315,7 +306,7 @@ If you don't need the standard JAR, you can disable the `jar` task like:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('jar', Jar) {
@@ -325,7 +316,7 @@ If you don't need the standard JAR, you can disable the `jar` task like:
 
 Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.jar {
@@ -333,7 +324,7 @@ Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('jar', Jar) {
@@ -343,14 +334,13 @@ Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
 
 ## Publishing the Shadowed Gradle Plugins
 
-The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0.
-Starting with this version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be
-automatically configured to publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the
-plugin. See the
-[Gradle Plugin Publish docs](https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies)
-for details. The only thing you need to do from the Shadow side is to empty the `archiveClassifier` like:
+The Gradle Publish Plugin introduced support for plugins packaged with Shadow in version 1.0.0. Starting with this
+version, plugin projects that apply both Shadow and the Gradle Plugin Publish plugin will be automatically configured to
+publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artifact for the plugin. See
+the [Gradle Plugin Publish docs][gradle-plugin-publish-docs] for details. The only thing you need to do from the Shadow
+side is to empty the `archiveClassifier` like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -367,7 +357,7 @@ for details. The only thing you need to do from the Shadow side is to empty the 
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -389,7 +379,7 @@ for details. The only thing you need to do from the Shadow side is to empty the 
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
 [`MavenPublication.artifact()`][MavenPublication.artifact] method.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -398,7 +388,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
       id("com.gradleup.shadow")
     }
 
-    val testShadowJar by tasks.registering(com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar::class) {
+    val testShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("testShadowJar") {
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
@@ -421,7 +411,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -456,9 +446,9 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
 ## Publishing the Shadowed JAR with Custom Artifact Name
 
 It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
-customizable properties listed in [Configuring Output Name](../configuration/README.md#configuring-output-name). e.g.
+customizable properties listed in [Configuring Output Name][configuring-output-name]. e.g.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -490,7 +480,7 @@ customizable properties listed in [Configuring Output Name](../configuration/REA
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -526,8 +516,9 @@ We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in thi
 be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
 
-
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
+[gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
+[configuring-output-name]: ../configuration/README.md#configuring-output-name

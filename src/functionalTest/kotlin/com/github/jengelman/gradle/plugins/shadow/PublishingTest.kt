@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.squareup.moshi.JsonAdapter
@@ -44,8 +43,6 @@ import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.testkit.runner.BuildResult
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -56,26 +53,20 @@ class PublishingTest : BasePluginTest() {
   @BeforeEach
   override fun beforeEach() {
     super.beforeEach()
-    settingsScript.appendText("rootProject.name = 'maven'$lineSeparator")
+    settingsScript.appendText("rootProject.name = 'maven'\n")
   }
 
-  @DisabledOnOs(
-    OS.WINDOWS,
-    architectures = ["aarch64"],
-    disabledReason =
-      "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
-  )
   @Test
   fun publishShadowJarWithCorrectTargetJvm() {
     projectScript.appendText(
       publishConfiguration(
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent()
-      ) + lineSeparator
+            .trimMargin()
+      )
     )
 
     val assertions = { variantAttrs: Array<Pair<String, String>> ->
@@ -97,73 +88,72 @@ class PublishingTest : BasePluginTest() {
 
     settingsScript.prependText(
       """
-      plugins {
-        id 'org.gradle.toolchains.foojay-resolver-convention'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |plugins {
+      |  id 'org.gradle.toolchains.foojay-resolver-convention'
+      |}
+      |"""
+        .trimMargin()
     )
     projectScript.appendText(
       """
-      java {
-        toolchain.languageVersion = JavaLanguageVersion.of(17)
-      }
-      """
-        .trimIndent() + lineSeparator
+      |java {
+      |  toolchain.languageVersion = JavaLanguageVersion.of(17)
+      |}
+      |"""
+        .trimMargin()
     )
     assertions(attrsWithoutTargetJvm + targetJvmAttr17)
 
     projectScript.appendText(
       """
-      java {
-        targetCompatibility = JavaVersion.VERSION_11
-      }
-      """
-        .trimIndent() + lineSeparator
+      |java {
+      |  targetCompatibility = JavaVersion.VERSION_11
+      |}
+      |"""
+        .trimMargin()
     )
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
     projectScript.appendText(
       """
-      java {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-      }
-      """
-        .trimIndent() + lineSeparator
+      |java {
+      |  sourceCompatibility = JavaVersion.VERSION_1_8
+      |}
+      |"""
+        .trimMargin()
     )
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
     projectScript.appendText(
       """
-      tasks.named('compileJava') {
-        options.release = 8
-      }
-      """
-        .trimIndent() + lineSeparator
+      |tasks.named('compileJava') {
+      |  options.release = 8
+      |}
+      |"""
+        .trimMargin()
     )
     // options.release flag is honored.
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1665")
-  @Test
+  @Test // #1665
   fun dontInjectTargetJvmVersionWhenAutoTargetJvmDisabled() {
     projectScript.appendText(
       publishConfiguration(
         projectBlock =
           """
-          java {
-            disableAutoTargetJvm()
-          }
+          |java {
+          |  disableAutoTargetJvm()
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -188,17 +178,17 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          shadow {
-            addTargetJvmVersionAttribute = false
-          }
+          |shadow {
+          |  addTargetJvmVersionAttribute = false
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -223,17 +213,17 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          shadow {
-            bundlingAttribute = Bundling.EMBEDDED
-          }
+          |shadow {
+          |  bundlingAttribute = Bundling.EMBEDDED
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = ''
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -256,16 +246,16 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         shadowBlock =
           """
-          archiveClassifier = ''
+          |archiveClassifier = ''
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            from components.shadow
-          }
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -301,26 +291,26 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
-            description = 'Create a combined JAR of project and test dependencies'
-            archiveClassifier = 'tests'
-            from sourceSets.named('test').map { it.output }
-            configurations.setFrom project.configurations.named('testRuntimeClasspath')
-          }
-        """
-            .trimIndent(),
+          |def testShadowJar = tasks.register('testShadowJar', ${ShadowJar::class.java.name}) {
+          |  description = 'Create a combined JAR of project and test dependencies'
+          |  archiveClassifier = 'tests'
+          |  from sourceSets.named('test').map { it.output }
+          |  configurations.setFrom project.configurations.named('testRuntimeClasspath')
+          |}
+          """
+            .trimMargin(),
         dependenciesBlock =
           """
-          testImplementation 'junit:junit:3.8.2'
+          |testImplementation 'junit:junit:3.8.2'
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            artifact testShadowJar
-          }
+          |shadow(MavenPublication) {
+          |  artifact testShadowJar
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -338,23 +328,23 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         projectBlock =
           """
-          apply plugin: 'com.gradle.plugin-publish'
-          group = 'my.plugin'
-          version = '1.0'
+          |apply plugin: 'com.gradle.plugin-publish'
+          |group = 'my.plugin'
+          |version = '1.0'
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = ''
+          |archiveClassifier = ''
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          pluginMaven(MavenPublication) {
-            artifactId = 'my-gradle-plugin'
-          }
+          |pluginMaven(MavenPublication) {
+          |  artifactId = 'my-gradle-plugin'
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -375,36 +365,31 @@ class PublishingTest : BasePluginTest() {
     )
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/614",
-    "https://github.com/GradleUp/shadow/issues/860",
-    "https://github.com/GradleUp/shadow/issues/945",
-  )
-  @Test
+  @Test // #614, #860, #945
   fun publishShadowJarWithCustomArtifactName() {
     projectScript.appendText(
       publishConfiguration(
         projectBlock =
           """
-          group = 'my-group'
-          version = '2.0'
+          |group = 'my-group'
+          |version = '2.0'
           """
-            .trimIndent(),
+            .trimMargin(),
         shadowBlock =
           """
-          archiveClassifier = 'my-classifier'
-          archiveExtension = 'my-ext'
-          archiveBaseName = 'maven-all'
+          |archiveClassifier = 'my-classifier'
+          |archiveExtension = 'my-ext'
+          |archiveBaseName = 'maven-all'
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            from components.shadow
-            artifactId = 'my-artifact'
-          }
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |  artifactId = 'my-artifact'
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -441,22 +426,22 @@ class PublishingTest : BasePluginTest() {
       publishConfiguration(
         dependenciesBlock =
           """
-          implementation 'my:a:1.0'
-          implementation 'my:b:1.0'
-          shadow 'my:b:1.0'
+          |implementation 'my:a:1.0'
+          |implementation 'my:b:1.0'
+          |shadow 'my:b:1.0'
           """
-            .trimIndent(),
+            .trimMargin(),
         publicationsBlock =
           """
-          java(MavenPublication) {
-            from components.java
-          }
-          shadow(MavenPublication) {
-            from components.shadow
-            artifactId = "maven-all"
-          }
+          |java(MavenPublication) {
+          |  from components.java
+          |}
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |  artifactId = "maven-all"
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -548,30 +533,29 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/651")
-  @ParameterizedTest
+  @ParameterizedTest // #651
   @ValueSource(booleans = [false, true])
   fun publishShadowVariantJar(addShadowVariant: Boolean) {
     projectScript.appendText(
       publishingBlock(
         projectBlock =
           """
-          dependencies {
-            implementation 'my:a:1.0'
-            shadow 'my:b:1.0'
-          }
-          shadow {
-            addShadowVariantIntoJavaComponent = $addShadowVariant
-          }
-        """
-            .trimIndent(),
+          |dependencies {
+          |  implementation 'my:a:1.0'
+          |  shadow 'my:b:1.0'
+          |}
+          |shadow {
+          |  addShadowVariantIntoJavaComponent = $addShadowVariant
+          |}
+          """
+            .trimMargin(),
         publicationsBlock =
           """
-          shadow(MavenPublication) {
-            from components.java
-          }
+          |shadow(MavenPublication) {
+          |  from components.java
+          |}
           """
-            .trimIndent(),
+            .trimMargin(),
       )
     )
 
@@ -672,46 +656,47 @@ class PublishingTest : BasePluginTest() {
     projectBlock: String = "",
     dependenciesBlock: String =
       """
-      implementation 'my:a:1.0'
-      shadow 'my:b:1.0'
+      |implementation 'my:a:1.0'
+      |shadow 'my:b:1.0'
       """
-        .trimIndent(),
+        .trimMargin(),
     shadowBlock: String = "",
     publicationsBlock: String =
       """
-      shadow(MavenPublication) {
-        from components.shadow
-        artifactId = 'maven-all'
-      }
+      |shadow(MavenPublication) {
+      |  from components.shadow
+      |  artifactId = 'maven-all'
+      |}
       """
-        .trimIndent(),
+        .trimMargin(),
   ): String {
     return """
-      dependencies {
-        $dependenciesBlock
-      }
-      $shadowJarTask {
-        $shadowBlock
-      }
-      ${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
-    """
-      .trimIndent()
+           |dependencies {
+           |  $dependenciesBlock
+           |}
+           |$shadowJarTask {
+           |  $shadowBlock
+           |}
+           |${publishingBlock(projectBlock = projectBlock, publicationsBlock = publicationsBlock)}
+           |
+           """
+      .trimMargin()
   }
 
   private fun publishingBlock(projectBlock: String, publicationsBlock: String): String {
     return """
-      apply plugin: 'maven-publish'
-      $projectBlock
-      publishing {
-        publications {
-          $publicationsBlock
-        }
-        repositories {
-          maven { url = '${remoteRepoPath.toUri()}' }
-        }
-      }
-    """
-      .trimIndent()
+           |apply plugin: 'maven-publish'
+           |$projectBlock
+           |publishing {
+           |  publications {
+           |    $publicationsBlock
+           |  }
+           |  repositories {
+           |    maven { url = '${remoteRepoPath.toUri()}' }
+           |  }
+           |}
+           """
+      .trimMargin()
   }
 
   private fun assertPomCommon(pomPath: Path, coordinates: Array<String> = arrayOf("my:b:1.0")) {

@@ -4,16 +4,14 @@ import assertk.Assert
 import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.isDirectory
 import kotlin.io.path.name
 import kotlin.io.path.readText
@@ -30,12 +28,12 @@ class CachingTest : BasePluginTest() {
   fun dependenciesChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly(*entriesInAB, *manifestEntries) }
@@ -50,23 +48,23 @@ class CachingTest : BasePluginTest() {
   fun outputFileChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
+      |"""
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly(*entriesInAB, *manifestEntries) }
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          archiveBaseName = "foo"
-        }
+      |$shadowJarTask {
+      |  archiveBaseName = "foo"
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertExecutionsFromCacheAndUpToDate()
@@ -76,45 +74,17 @@ class CachingTest : BasePluginTest() {
   }
 
   @Test
-  fun dependencyFilterChanged() {
-    projectScript.appendText(
-      """
-      dependencies {
-        implementation 'my:d:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
-    )
-    val assertions = {
-      assertCompositeExecutions { containsOnly("c.properties", "d.properties", *manifestEntries) }
-    }
-
-    assertions()
-
-    projectScript.appendText(
-      """
-        $shadowJarTask {
-          dependencyFilter = new ${MinimizeDependencyFilter::class.java.name}(project)
-        }
-      """
-        .trimIndent()
-    )
-
-    assertions()
-  }
-
-  @Test
   fun duplicatesStrategyChanged() {
     listOf(DuplicatesStrategy.EXCLUDE, DuplicatesStrategy.INCLUDE, DuplicatesStrategy.WARN)
       .forEach { strategy ->
         projectScript.writeText(
           """
-            ${getDefaultProjectBuildScript()}
-            $shadowJarTask {
-              duplicatesStrategy = DuplicatesStrategy.$strategy
-            }
-        """
-            .trimIndent()
+          |${getDefaultProjectBuildScript()}
+          |$shadowJarTask {
+          |  duplicatesStrategy = DuplicatesStrategy.$strategy
+          |}
+          """
+            .trimMargin()
         )
 
         assertCompositeExecutions()
@@ -125,18 +95,18 @@ class CachingTest : BasePluginTest() {
   fun manifestAttrsChanged() {
     projectScript.appendText(
       """
-        $jarTask {
-          manifest {
-            attributes 'Foo': 'Foo1'
-          }
-        }
-        $shadowJarTask {
-          manifest {
-            attributes 'Bar': 'Bar1'
-          }
-        }
+      |$jarTask {
+      |  manifest {
+      |    attributes 'Foo': 'Foo1'
+      |  }
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes 'Bar': 'Bar1'
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val assertions = { valueFoo: String, valueBar: String ->
@@ -171,14 +141,14 @@ class CachingTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
-        kotlin {
-          jvm().mainRun {
-            it.mainClass.set('$mainClassName')
-          }
-        }
+      |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")}
+      |kotlin {
+      |  jvm().mainRun {
+      |    it.mainClass.set('$mainClassName')
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName) }
@@ -196,12 +166,12 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        apply plugin: 'application'
-        application {
-          mainClass = '$mainClassName'
-        }
+      |apply plugin: 'application'
+      |application {
+      |  mainClass = '$mainClassName'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName) }
@@ -212,19 +182,18 @@ class CachingTest : BasePluginTest() {
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(main2ClassName) }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/717")
-  @Test
+  @Test // #717
   fun jarIncludesExcludesChanged() {
     val mainClassEntry = writeClass(className = "Main")
     val main2ClassEntry = writeClass(className = "Main2")
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        implementation 'my:b:1.0'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  implementation 'my:b:1.0'
+      |}
+      |"""
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -233,11 +202,12 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          exclude '**.properties'
-        }
+      |$shadowJarTask {
+      |  exclude '**.properties'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -246,22 +216,24 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          include '$mainClassEntry'
-        }
+      |$shadowJarTask {
+      |  include '$mainClassEntry'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          include '$main2ClassEntry'
-        }
+      |$shadowJarTask {
+      |  include '$main2ClassEntry'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -274,11 +246,11 @@ class CachingTest : BasePluginTest() {
     val mainClassEntry = writeClass(withImports = true)
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |"""
+        .trimMargin()
     )
 
     assertCompositeExecutions {
@@ -287,13 +259,13 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          dependencies {
-            exclude(dependency('junit:junit'))
-          }
-        }
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency('junit:junit'))
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
@@ -307,10 +279,10 @@ class CachingTest : BasePluginTest() {
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        public class Server {}
+        |package server;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
@@ -327,13 +299,13 @@ class CachingTest : BasePluginTest() {
     path("server/build.gradle")
       .appendText(
         """
-        $shadowJarTask {
-          minimize {
-            exclude(dependency('junit:junit:.*'))
-          }
-        }
-      """
-          .trimIndent()
+        |$shadowJarTask {
+        |  minimize {
+        |    exclude(dependency('junit:junit:.*'))
+        |  }
+        |}
+        """
+          .trimMargin()
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
@@ -342,14 +314,85 @@ class CachingTest : BasePluginTest() {
   }
 
   @Test
+  fun r8KeepRuleFileChanged() {
+    val previousTaskPath = taskPath
+    taskPath = serverShadowJarPath
+    try {
+      writeR8ClientAndServerModules()
+      val proguardRules = path("server/r8-rules.pro")
+      proguardRules.deleteExisting()
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsOnly(
+          "client/Used.class",
+          "server/Server.class",
+          manifestEntry,
+        )
+      }
+
+      proguardRules.writeText("-keep class client.Reflective { *; }")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsOnly(
+          "client/Used.class",
+          "client/Reflective.class",
+          "server/Server.class",
+          manifestEntry,
+        )
+      }
+      assertExecutionsFromCacheAndUpToDate()
+    } finally {
+      taskPath = previousTaskPath
+    }
+  }
+
+  @Test
+  fun r8ClasspathRuleChanged() {
+    val previousTaskPath = taskPath
+    taskPath = serverShadowJarPath
+    try {
+      writeR8ClientAndServerModules()
+      path("server/r8-rules.pro").deleteExisting()
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsOnly(
+          "client/Used.class",
+          "server/Server.class",
+          manifestEntry,
+        )
+      }
+
+      path("client/src/main/resources/META-INF/proguard/client.pro")
+        .writeText("-keep class client.Reflective { *; }")
+
+      assertExecutionSuccess()
+      assertThat(outputServerShadowedJar).useAll {
+        containsOnly(
+          "client/Used.class",
+          "client/Reflective.class",
+          "server/Server.class",
+          "META-INF/proguard/client.pro",
+          manifestEntry,
+        )
+      }
+      assertExecutionsFromCacheAndUpToDate()
+    } finally {
+      taskPath = previousTaskPath
+    }
+  }
+
+  @Test
   fun relocatorChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |"""
+        .trimMargin()
     )
     val mainClassEntry = writeClass(withImports = true)
 
@@ -359,11 +402,11 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          relocate 'junit.framework', 'foo.junit.framework'
-        }
+      |$shadowJarTask {
+      |  relocate 'junit.framework', 'foo.junit.framework'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val relocatedEntries =
       junitEntries.map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
@@ -373,19 +416,19 @@ class CachingTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1932")
-  @Test
+  @Test // #1932
   fun relocatorPatternChanged() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
-      $shadowJarTask {
-        relocate 'junit.framework', 'foo.junit.framework'
-      }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate 'junit.framework', 'foo.junit.framework'
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
     val mainClassEntry = writeClass(withImports = true)
     val fooEntries =
@@ -418,9 +461,9 @@ class CachingTest : BasePluginTest() {
       transform<ServiceFileTransformer>(
         transformerBlock =
           """
-          path = 'META-INF/foo'
+          |path = 'META-INF/foo'
           """
-            .trimIndent()
+            .trimMargin()
       )
     )
 
@@ -436,34 +479,36 @@ class CachingTest : BasePluginTest() {
   fun disableCacheIfAnyTransformerIsNotCacheable() {
     projectScript.appendText(
       """
-        $shadowJarTask {
-          mergeServiceFiles()
-        }
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions()
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          mergeGroovyExtensionModules()
-        }
+      |$shadowJarTask {
+      |  mergeGroovyExtensionModules()
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     assertCompositeExecutions()
 
     projectScript.appendText(
       """
-        $shadowJarTask {
-          // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
-          transform(${ResourceTransformer.Companion::class.java.name})
-        }
+      |$shadowJarTask {
+      |  // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
+      |  transform(${ResourceTransformer.Companion::class.java.name})
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     assertExecutionSuccess()
@@ -474,7 +519,6 @@ class CachingTest : BasePluginTest() {
 
   private fun cleanOutputs() {
     runWithSuccess("clean")
-    @OptIn(ExperimentalPathApi::class)
     val buildDirs = projectRoot.walk().filter { it.isDirectory() && it.name == "build" }
     // Make sure build folders are deleted by clean task.
     assertThat(buildDirs).isEmpty()
@@ -514,5 +558,84 @@ class CachingTest : BasePluginTest() {
   private fun assertRunWithResult(expectedOutcome: TaskOutcome) {
     val result = runWithSuccess(taskPath)
     assertThat(result).taskOutcomeEquals(taskPath, expectedOutcome)
+  }
+
+  private fun writeR8ClientAndServerModules() {
+    settingsScript.appendText(
+      """
+      |include 'client', 'server'
+      """
+        .trimMargin()
+    )
+    projectScript.deleteExisting()
+
+    path("client/src/main/java/client/Used.java")
+      .writeText(
+        """
+        |package client;
+        |public class Used {
+        |  public static String name() {
+        |    return "used";
+        |  }
+        |}
+        """
+          .trimMargin()
+      )
+    path("client/src/main/java/client/Unused.java")
+      .writeText(
+        """
+        |package client;
+        |public class Unused {}
+        """
+          .trimMargin()
+      )
+    path("client/src/main/java/client/Reflective.java")
+      .writeText(
+        """
+        |package client;
+        |public class Reflective {}
+        """
+          .trimMargin()
+      )
+    path("client/build.gradle")
+      .writeText(
+        """
+        |${getDefaultProjectBuildScript("java")}
+        |
+        """
+          .trimMargin()
+      )
+
+    path("server/src/main/java/server/Server.java")
+      .writeText(
+        """
+        |package server;
+        |import client.Used;
+        |public class Server {
+        |  public String name() {
+        |    return Used.name();
+        |  }
+        |}
+        """
+          .trimMargin()
+      )
+    path("server/build.gradle")
+      .writeText(
+        """
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation project(':client')
+        |}
+        |$shadowJarTask {
+        |  minimize {
+        |    r8 {
+        |      proguardRuleFiles.from(file("r8-rules.pro"))
+        |    }
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
+      )
   }
 }

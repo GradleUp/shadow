@@ -13,12 +13,10 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.Path
 import java.util.zip.ZipFile
-import kotlin.io.path.ExperimentalPathApi
 import kotlin.io.path.appendText
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.isRegularFile
@@ -27,18 +25,10 @@ import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.condition.DisabledOnOs
-import org.junit.jupiter.api.condition.OS
 
 class ApplicationPluginTest : BasePluginTest() {
   private lateinit var mainClass: String
 
-  @DisabledOnOs(
-    OS.WINDOWS,
-    architectures = ["aarch64"],
-    disabledReason =
-      "Cannot use toolchain on Windows ARM64", // TODO: remove when min Gradle is bumped to 9.2+
-  )
   @Test
   fun integrationWithApplicationPluginAndJavaToolchains() {
     prepare(
@@ -46,25 +36,25 @@ class ApplicationPluginTest : BasePluginTest() {
       dependenciesBlock = "implementation 'junit:junit:3.8.2'",
       projectBlock =
         """
-        java {
-          toolchain.languageVersion = JavaLanguageVersion.of(17)
-        }
+        |java {
+        |  toolchain.languageVersion = JavaLanguageVersion.of(17)
+        |}
         """
-          .trimIndent(),
+          .trimMargin(),
       settingsBlock =
         """
-        plugins {
-          id 'org.gradle.toolchains.foojay-resolver-convention'
-        }
+        |plugins {
+        |  id 'org.gradle.toolchains.foojay-resolver-convention'
+        |}
         """
-          .trimIndent(),
+          .trimMargin(),
       runShadowBlock =
         $$"""
-        doFirst {
-          logger.lifecycle("Running application with JDK ${it.javaLauncher.get().metadata.languageVersion.asInt()}")
-        }
+        |doFirst {
+        |  logger.lifecycle("Running application with JDK ${it.javaLauncher.get().metadata.languageVersion.asInt()}")
+        |}
         """
-          .trimIndent(),
+          .trimMargin(),
     )
 
     val result = runWithSuccess(runShadowPath)
@@ -135,20 +125,19 @@ class ApplicationPluginTest : BasePluginTest() {
     commonAssertions(jarPath("build/install/myapp-shadow/lib/myapp-1.0-all.jar"))
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/613")
-  @Test
+  @Test // #613
   fun overrideMainClassAttrInManifestBlock() {
     val main2ClassEntry = writeClass(className = "Main2")
     prepare(
       projectBlock =
         """
-        shadowJar {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main2'
-          }
-        }
-      """
-          .trimIndent()
+        |shadowJar {
+        |  manifest {
+        |    attributes '$mainClassAttributeKey': 'my.Main2'
+        |  }
+        |}
+        """
+          .trimMargin()
     )
 
     var result = runWithSuccess(runShadowPath)
@@ -169,11 +158,11 @@ class ApplicationPluginTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-      run {
-        args 'bar'
-      }
+      |run {
+      |  args 'bar'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     result = runWithSuccess(":run")
@@ -186,11 +175,11 @@ class ApplicationPluginTest : BasePluginTest() {
     prepare()
     projectScript.appendText(
       """
-        $shadowJarTask {
-          mainClass = 'my.Main2' // Different from application.mainClass.
-        }
+      |$shadowJarTask {
+      |  mainClass = 'my.Main2' // Different from application.mainClass.
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(runShadowPath) // Run without errors.
@@ -216,20 +205,20 @@ class ApplicationPluginTest : BasePluginTest() {
     prepare(
       projectBlock =
         """
-        distributions.named('$DISTRIBUTION_NAME') {
-          contents.from('extra/echo.sh') {
-            into 'extra'
-          }
-        }
-      """
-          .trimIndent(),
+        |distributions.named('$DISTRIBUTION_NAME') {
+        |  contents.from('extra/echo.sh') {
+        |    into 'extra'
+        |  }
+        |}
+        """
+          .trimMargin(),
       applicationBlock =
         """
-        applicationDistribution.from('some/dir') {
-          include '*.txt'
-        }
+        |applicationDistribution.from('some/dir') {
+        |  include '*.txt'
+        |}
         """
-          .trimIndent(),
+          .trimMargin(),
     )
 
     runWithSuccess(shadowDistZipPath)
@@ -279,10 +268,10 @@ class ApplicationPluginTest : BasePluginTest() {
     prepare(
       applicationBlock =
         """
-        applicationName = '${applicationNames.first}'
-        executableDir = '${executableDirs.first}'
-      """
-          .trimIndent()
+        |applicationName = '${applicationNames.first}'
+        |executableDir = '${executableDirs.first}'
+        """
+          .trimMargin()
     )
 
     runWithSuccess(installShadowDistPath, shadowDistZipPath)
@@ -317,21 +306,22 @@ class ApplicationPluginTest : BasePluginTest() {
     mainClass = writeClass(withImports = mainClassWithImports)
     projectScript.appendText(
       """
-        apply plugin: 'application'
-        $projectBlock
-        application {
-          $mainClassBlock
-          $applicationBlock
-        }
-        dependencies {
-          $dependenciesBlock
-        }
-        $runShadowTask {
-          args 'foo'
-          $runShadowBlock
-        }
+      |apply plugin: 'application'
+      |$projectBlock
+      |application {
+      |  $mainClassBlock
+      |  $applicationBlock
+      |}
+      |dependencies {
+      |  $dependenciesBlock
+      |}
+      |$runShadowTask {
+      |  args 'foo'
+      |  $runShadowBlock
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
     settingsScript.writeText(
       getDefaultSettingsBuildScript(
@@ -355,7 +345,6 @@ class ApplicationPluginTest : BasePluginTest() {
   }
 
   private companion object {
-    @OptIn(ExperimentalPathApi::class)
     fun Path.walkEntries(includeDirs: Boolean = false): Sequence<String> =
       walk()
         .filter { includeDirs || it.isRegularFile() }

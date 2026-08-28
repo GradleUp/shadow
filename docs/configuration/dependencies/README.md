@@ -5,7 +5,7 @@ Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all depende
 merging can be configured using the [`configurations`][ShadowJar.configurations] property of the
 [`ShadowJar`][ShadowJar] task type.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -13,7 +13,7 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -22,21 +22,26 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
     ```
 
 The above code sample would configure the [`ShadowJar`][ShadowJar] task to merge dependencies from only the
-`compileClasspath` configuration.
-This means any dependency declared in the `runtimeOnly` configuration would be **not** be included in the final JAR.
+`compileClasspath` configuration. This means any dependency declared in the `runtimeOnly` configuration would be **not**
+be included in the final JAR.
 
+> [!WARNING]
+> **Required Configuration**
+>
 > Note the literal use of [`project.configurations`][Project.configurations] when setting the
 > [`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
-> This is **required**. It may be tempting to specify `configurations.setFrom(configurations.compileClasspath)` but this will
-> not have the intended effect, as `configurations.compile` will try to delegate to the
-> [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the `project`
+>
+> This is **required**. It may be tempting to specify `configurations.setFrom(configurations.compileClasspath)` but
+> this will not have the intended effect, as `configurations.compile` will try to delegate to the
+> [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the
+> `project`.
 
 ## Embedding Local Jar Files into Your Shadowed JAR
 
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -52,7 +57,7 @@ method can be used to add extra files.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -70,7 +75,7 @@ method can be used to add extra files.
 
 Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Project.zipTree]
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -81,7 +86,7 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -92,16 +97,14 @@ Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Proje
     }
     ```
 
-See also [Adding Extra Files](../README.md#adding-extra-files)
+See also [Adding Extra Files][adding-extra-files]
 
 ## Embedding Non-JAR Dependencies into Your Shadowed JAR
 
 Dependencies added into `runtimeClasspath` configuration (`api`, `implementation`, `runtimeOnly`) will be unzipped and
-merged into the shadowed JAR. Not all dependencies are JAR files, e.g. some of them are
-[POM files](https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/),
-[SO files](https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/),
-and so on. If such dependencies are added into `runtimeClasspath`, you will encounter the following error when building
-the shadowed JAR:
+merged into the shadowed JAR. Not all dependencies are JAR files, e.g. some of them are [POM files][pom-files],
+[SO files][so-files], and so on. If such dependencies are added into `runtimeClasspath`, you will encounter the
+following error when building the shadowed JAR:
 
 ```
 * What went wrong:
@@ -120,10 +123,10 @@ Caused by: java.util.zip.ZipException: Archive is not a ZIP archive
 To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
 configuration.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
-    val nonJar by configurations.creating
+    val nonJar = configurations.create("nonJar")
 
     // This is necessary to make the dependencies in `nonJar` available at compile time.
     // If you don't need that, you can skip this step.
@@ -143,7 +146,7 @@ configuration.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     def nonJar = configurations.create('nonJar')
@@ -168,10 +171,10 @@ configuration.
 
 ### Excluding Non-JAR Transitive Dependencies
 
-If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need
-in your shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
+If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need in your
+shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -184,7 +187,7 @@ in your shadowed JAR, you can exclude it using the `dependencies` block instead 
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -200,13 +203,18 @@ in your shadowed JAR, you can exclude it using the `dependencies` block instead 
 ## Filtering Dependencies
 
 Individual dependencies can be filtered from the final JAR by using the `dependencies` block of a
-[`ShadowJar`][ShadowJar] task. Dependency filtering does **not** apply to transitive dependencies.
-That is, excluding a dependency does not exclude any of its dependencies from the final JAR.
+[`ShadowJar`][ShadowJar] task. Dependency filtering does **not** apply to transitive dependencies. That is, excluding a
+dependency does not exclude any of its dependencies from the final JAR.
+
+> [!NOTE]
+> Excluding a dependency via `dependencies { exclude(...) }` removes it entirely from the shadow JAR. If you instead
+> want the dependency to be bundled into the shadow JAR but prevented from having its unused classes stripped during
+> minimization, see [`minimize { exclude(...) }`][minimizing].
 
 The `dependency` blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle's [`project.configurations`][Project.configurations] block.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -220,7 +228,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -234,7 +242,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -248,7 +256,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -262,17 +270,17 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
+> [!NOTE]
 > While not being able to filter entire transitive dependency graphs might seem like an oversight, it is necessary
 > because it would not be possible to intelligently determine the build author's intended results when there is a
 > common dependency between two 1st level dependencies when one is excluded and the other is not.
 
 ### Using Regex Patterns to Filter Dependencies
 
-Dependencies can be filtered using regex patterns.
-Coupled with the `<group>:<artifact>:<version>` notation for dependencies, this allows for excluding/including
-using any of these individual fields.
+Dependencies can be filtered using regex patterns. Coupled with the `<group>:<artifact>:<version>` notation for
+dependencies, this allows for excluding/including using any of these individual fields.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -286,7 +294,7 @@ using any of these individual fields.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -302,7 +310,7 @@ using any of these individual fields.
 
 Any of the individual fields can be safely absent and will function as though a wildcard was specified.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -316,7 +324,7 @@ Any of the individual fields can be safely absent and will function as though a 
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -341,7 +349,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
 - `.*:log4j-core:.*`
 - ...
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -355,7 +363,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -369,7 +377,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -383,7 +391,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -401,7 +409,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
 
 You can also use type-safe project accessors or version catalog accessors to filter dependencies.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -419,7 +427,7 @@ You can also use type-safe project accessors or version catalog accessors to fil
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -443,7 +451,7 @@ If more complex decisions are needed to select the dependencies to be included, 
 [`ShadowJar.dependencies`][ShadowJar.dependencies]
 block provides a method that accepts a `Closure` for selecting dependencies.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -459,7 +467,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -476,7 +484,6 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     ```
 
 
-
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar.configurations]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html
@@ -484,3 +491,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [Project.configurations]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:configurations
 [Project.zipTree]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:zipTree(java.lang.Object)
+[adding-extra-files]: ../README.md#adding-extra-files
+[pom-files]: https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/
+[so-files]: https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/
+[minimizing]: ../minimizing/README.md

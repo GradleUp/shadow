@@ -8,12 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
-import java.nio.file.Path
-import kotlin.io.path.createTempFile
-import kotlin.io.path.deleteExisting
-import kotlin.io.path.outputStream
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -24,40 +18,29 @@ import org.junit.jupiter.params.provider.MethodSource
  * [org.apache.maven.plugins.shade.resource.ServiceResourceTransformerTest.java](https://github.com/apache/maven-shade-plugin/blob/master/src/test/java/org/apache/maven/plugins/shade/resource/ServiceResourceTransformerTest.java).
  */
 class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>() {
-  private lateinit var tempJar: Path
-
-  @BeforeEach
-  override fun beforeEach() {
-    super.beforeEach()
-    tempJar = createTempFile("shade.", ".jar")
-  }
-
-  @AfterEach
-  fun afterEach() {
-    tempJar.deleteExisting()
-  }
-
   @ParameterizedTest
   @MethodSource("resourceProvider")
-  fun canTransformResource(path: String, exclude: Boolean, expected: Boolean) {
-    if (exclude) {
-      transformer.exclude(path)
+  fun canTransformResource(path: String, exclude: Boolean, expected: Boolean) =
+    with(transformer) {
+      if (exclude) {
+        exclude(path)
+      }
+      assertThat(canTransformResource(path)).isEqualTo(expected)
     }
-    assertThat(transformer.canTransformResource(path)).isEqualTo(expected)
-  }
 
   @ParameterizedTest
   @MethodSource("serviceFileProvider")
-  fun transformServiceFile(path: String, input1: String, input2: String, output: String) {
-    if (transformer.canTransformResource(path)) {
-      transformer.transform(textContext(path, input1))
-      transformer.transform(textContext(path, input2))
-    }
+  fun transformServiceFile(path: String, input1: String, input2: String, output: String) =
+    with(transformer) {
+      if (canTransformResource(path)) {
+        transform(textContext(path, input1))
+        transform(textContext(path, input2))
+      }
 
-    assertThat(transformer.hasTransformedResource()).isTrue()
-    val entry = transformer.serviceEntries.getValue(path).joinToString("\n")
-    assertThat(entry).isEqualTo(output)
-  }
+      assertThat(hasTransformedResource()).isTrue()
+      val entry = serviceEntries.getValue(path).joinToString("\n")
+      assertThat(entry).isEqualTo(output)
+    }
 
   @Test
   fun excludesGroovyExtensionModuleDescriptorFilesByDefault() {
@@ -66,87 +49,87 @@ class ServiceFileTransformerTest : BaseTransformerTest<ServiceFileTransformer>()
   }
 
   @Test
-  fun canTransformAlternateResource() {
-    transformer.path = "foo/bar"
-    assertThat(transformer.canTransformResource("foo/bar/moo/goo/Zoo")).isTrue()
-    assertThat(transformer.canTransformResource("META-INF/services/Zoo")).isFalse()
-  }
-
-  @Test
-  fun relocatedClasses() {
-    val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
-    val content = "org.foo.Service\norg.foo.exclude.OtherService\n"
-    val contentResource = "META-INF/services/org.foo.something.another"
-    val contentResourceShaded = "META-INF/services/borg.foo.something.another"
-
-    val transformer = ServiceFileTransformer()
-    transformer.transform(textContext(contentResource, content, relocator))
-
-    tempJar.outputStream().zipOutputStream().use { zos ->
-      transformer.modifyOutputStream(zos, false)
+  fun canTransformAlternateResource() =
+    with(transformer) {
+      path = "foo/bar"
+      assertThat(canTransformResource("foo/bar/moo/goo/Zoo")).isTrue()
+      assertThat(canTransformResource("META-INF/services/Zoo")).isFalse()
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
-    assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
-  }
-
   @Test
-  fun mergeRelocatedFiles() {
-    val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
-    val content = "org.foo.Service\norg.foo.exclude.OtherService\n"
-    val contentResource = "META-INF/services/org.foo.something.another"
-    val contentResourceShaded = "META-INF/services/borg.foo.something.another"
+  fun relocatedClasses() =
+    with(ServiceFileTransformer()) {
+      val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
+      val content = "org.foo.Service\norg.foo.exclude.OtherService\n"
+      val contentResource = "META-INF/services/org.foo.something.another"
+      val contentResourceShaded = "META-INF/services/borg.foo.something.another"
 
-    val transformer = ServiceFileTransformer()
-    transformer.transform(textContext(contentResource, content, relocator))
-    transformer.transform(textContext(contentResourceShaded, content, relocator))
+      transform(textContext(contentResource, content, relocator))
 
-    tempJar.outputStream().zipOutputStream().use { zos ->
-      transformer.modifyOutputStream(zos, false)
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
+
+      val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
+      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService\n")
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
-    assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService")
-  }
-
   @Test
-  fun concatenationAppliedMultipleTimes() {
-    val relocator = SimpleRelocator("org.eclipse", "org.eclipse1234")
-    val content = "org.eclipse.osgi.launch.EquinoxFactory\n"
-    val contentResource = "META-INF/services/org.osgi.framework.launch.FrameworkFactory"
+  fun mergeRelocatedFiles() =
+    with(ServiceFileTransformer()) {
+      val relocator = SimpleRelocator("org.foo", "borg.foo", excludes = listOf("org.foo.exclude.*"))
+      val content = "org.foo.Service\norg.foo.exclude.OtherService\n"
+      val contentResource = "META-INF/services/org.foo.something.another"
+      val contentResourceShaded = "META-INF/services/borg.foo.something.another"
 
-    val transformer = ServiceFileTransformer()
-    transformer.transform(textContext(contentResource, content, relocator))
+      transform(textContext(contentResource, content, relocator))
+      transform(textContext(contentResourceShaded, content, relocator))
 
-    tempJar.outputStream().zipOutputStream().use { zos ->
-      transformer.modifyOutputStream(zos, false)
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
+
+      val transformedContent = JarPath(tempJar).use { it.getContent(contentResourceShaded) }
+      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.foo.exclude.OtherService\n")
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
-    assertThat(transformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory")
-  }
-
   @Test
-  fun concatenation() {
-    val relocator = SimpleRelocator("org.foo", "borg.foo")
-    var content = "org.foo.Service\n"
-    var contentResource = "META-INF/services/org.something.another"
+  fun concatenationAppliedMultipleTimes() =
+    with(ServiceFileTransformer()) {
+      val relocator = SimpleRelocator("org.eclipse", "org.eclipse1234")
+      val content = "org.eclipse.osgi.launch.EquinoxFactory\n"
+      val contentResource = "META-INF/services/org.osgi.framework.launch.FrameworkFactory"
 
-    val transformer = ServiceFileTransformer()
-    transformer.transform(textContext(contentResource, content, relocator))
+      transform(textContext(contentResource, content, relocator))
 
-    content = "org.blah.Service\n"
-    contentResource = "META-INF/services/org.something.another"
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
 
-    transformer.transform(textContext(contentResource, content, relocator))
-
-    tempJar.outputStream().zipOutputStream().use { zos ->
-      transformer.modifyOutputStream(zos, false)
+      val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
+      assertThat(transformedContent).isEqualTo("org.eclipse1234.osgi.launch.EquinoxFactory\n")
     }
 
-    val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
-    assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service")
-  }
+  @Test
+  fun concatenation() =
+    with(ServiceFileTransformer()) {
+      val relocator = SimpleRelocator("org.foo", "borg.foo")
+      var content = "org.foo.Service\n"
+      var contentResource = "META-INF/services/org.something.another"
+      transform(textContext(contentResource, content, relocator))
+
+      content = "org.blah.Service\n"
+      contentResource = "META-INF/services/org.something.another"
+
+      transform(textContext(contentResource, content, relocator))
+
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
+
+      val transformedContent = JarPath(tempJar).use { it.getContent(contentResource) }
+      assertThat(transformedContent).isEqualTo("borg.foo.Service\norg.blah.Service\n")
+    }
 
   private companion object {
     @JvmStatic

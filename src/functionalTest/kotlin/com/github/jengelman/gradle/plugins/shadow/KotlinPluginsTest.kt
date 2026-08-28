@@ -5,10 +5,11 @@ import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
@@ -33,13 +34,13 @@ class KotlinPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-          $stdlib
-        }
+      |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |  $stdlib
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
 
@@ -47,11 +48,21 @@ class KotlinPluginsTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       val entries =
-        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *junitEntries, *manifestEntries)
+        arrayOf(
+          "my/",
+          "META-INF/my_my.kotlin_module",
+          mainClassEntry,
+          *junitEntries,
+          *manifestEntries,
+        )
       if (excludeStdlib) {
         containsOnly(*entries)
       } else {
         containsAtLeast(*entries)
+      }
+      classLoader {
+        loadClass("my.Main")
+        loadClass("junit.framework.Test")
       }
     }
   }
@@ -64,41 +75,49 @@ class KotlinPluginsTest : BasePluginTest() {
     val mainClassEntry = writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin)
     projectScript.appendText(
       """
-        kotlin {
-          jvm()
-          sourceSets {
-            commonMain {
-              dependencies {
-                implementation 'my:b:1.0'
-                $stdlib
-              }
-            }
-            jvmMain {
-              dependencies {
-                implementation 'my:a:1.0'
-              }
-            }
-          }
-        }
+      |kotlin {
+      |  jvm()
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:b:1.0'
+      |        $stdlib
+      |      }
+      |    }
+      |    jvmMain {
+      |      dependencies {
+      |        implementation 'my:a:1.0'
+      |      }
+      |    }
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       val entries =
-        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *entriesInAB, *manifestEntries)
+        arrayOf(
+          "my/",
+          "META-INF/my_my.kotlin_module",
+          mainClassEntry,
+          *entriesInAB,
+          *manifestEntries,
+        )
       if (excludeStdlib) {
         containsOnly(*entries)
       } else {
         containsAtLeast(*entries)
       }
+      classLoader {
+        loadClass("my.Main")
+      }
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1377")
-  @Test
+  @Test // #1377
   fun compatKmpForOtherNamedJvmTarget() {
     val jvmTargetName = "newJvm"
     val jvmTargetMain = "${jvmTargetName}Main"
@@ -106,45 +125,46 @@ class KotlinPluginsTest : BasePluginTest() {
     val mainClassEntry = writeClass(sourceSet = jvmTargetMain, jvmLang = JvmLang.Kotlin)
     projectScript.appendText(
       """
-        kotlin {
-          jvm('$jvmTargetName')
-          sourceSets {
-            commonMain {
-              dependencies {
-                implementation 'my:b:1.0'
-                $stdlib
-              }
-            }
-            $jvmTargetMain {
-              dependencies {
-                implementation 'my:a:1.0'
-              }
-            }
-          }
-        }
+      |kotlin {
+      |  jvm('$jvmTargetName')
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:b:1.0'
+      |        $stdlib
+      |      }
+      |    }
+      |    $jvmTargetMain {
+      |      dependencies {
+      |        implementation 'my:a:1.0'
+      |      }
+      |    }
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      val entries =
-        arrayOf("my/", "META-INF/my.kotlin_module", mainClassEntry, *entriesInAB, *manifestEntries)
+      val entries = arrayOf("my/", mainClassEntry, *entriesInAB, *manifestEntries)
       containsAtLeast(*entries)
+      classLoader {
+        loadClass("my.Main")
+      }
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1377")
-  @Test
+  @Test // #1377
   fun doNotCreateJvmTargetEagerly() {
     projectScript.appendText(
       """
-      kotlin {
-        mingwX64()
-      }
+      |kotlin {
+      |  mingwX64()
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithFailure(shadowJarPath)
@@ -164,18 +184,18 @@ class KotlinPluginsTest : BasePluginTest() {
       if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
     projectScript.appendText(
       """
-        kotlin {
-          jvm().mainRun {
-            it.mainClass.set('$mainClassName')
-          }
-        }
-        $shadowJarTask {
-          manifest {
-            $mainAttr
-          }
-        }
+      |kotlin {
+      |  jvm().mainRun {
+      |    it.mainClass.set('$mainClassName')
+      |  }
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    $mainAttr
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -195,21 +215,21 @@ class KotlinPluginsTest : BasePluginTest() {
       if (useShadowAttr) "attributes '$mainClassAttributeKey': '$main2ClassName'" else ""
     projectScript.appendText(
       """
-        kotlin {
-          jvm()
-        }
-        tasks.named('jvmJar', Jar) {
-          manifest {
-            attributes '$mainClassAttributeKey': '$mainClassName'
-          }
-        }
-        $shadowJarTask {
-          manifest {
-            $mainAttr
-          }
-        }
+      |kotlin {
+      |  jvm()
+      |}
+      |tasks.named('jvmJar', Jar) {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': '$mainClassName'
+      |  }
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    $mainAttr
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -225,29 +245,29 @@ class KotlinPluginsTest : BasePluginTest() {
     val jvmTargetName = "newJvm"
     projectScript.appendText(
       """
-        kotlin {
-          jvm() // Default JVM target.
-          jvm('$jvmTargetName')
-          sourceSets {
-            commonMain {
-              dependencies {
-                implementation 'my:a:1.0'
-              }
-            }
-            jvmMain {
-              dependencies {
-                implementation 'my:b:1.0'
-              }
-            }
-            ${jvmTargetName}Main {
-              dependencies {
-                implementation 'my:c:1.0'
-              }
-            }
-          }
-        }
+      |kotlin {
+      |  jvm() // Default JVM target.
+      |  jvm('$jvmTargetName')
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:a:1.0'
+      |      }
+      |    }
+      |    jvmMain {
+      |      dependencies {
+      |        implementation 'my:b:1.0'
+      |      }
+      |    }
+      |    ${jvmTargetName}Main {
+      |      dependencies {
+      |        implementation 'my:c:1.0'
+      |      }
+      |    }
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithFailure(shadowJarPath, infoArgument)

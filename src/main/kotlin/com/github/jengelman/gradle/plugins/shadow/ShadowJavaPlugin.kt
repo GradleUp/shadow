@@ -2,10 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHADOW
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
-import com.github.jengelman.gradle.plugins.shadow.internal.addVariantsFromConfigurationCompat
-import com.github.jengelman.gradle.plugins.shadow.internal.extendsFromCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
-import com.github.jengelman.gradle.plugins.shadow.internal.moveGradleApiIntoCompileOnly
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
@@ -14,13 +11,13 @@ import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
+import org.gradle.api.artifacts.ConsumableConfiguration
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.attributes.java.TargetJvmVersion
+import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
@@ -48,16 +45,16 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 
   protected open fun Project.configureConfigurations() {
-    val shadowConfiguration = configurations.shadow
-    configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
-      compileClasspath.extendsFromCompat(shadowConfiguration)
-    }
+    val shadowConfig = configurations.shadow
+    val compileClasspathConfig =
+      configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
+        compileClasspath.extendsFrom(shadowConfig)
+      }
     val shadowRuntimeElements =
-      configurations.register(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
-        it.extendsFromCompat(shadowConfiguration)
-        it.isCanBeConsumed = true
-        it.isCanBeResolved = false
-        it.attributes { attrs ->
+      configurations.consumable(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { shadowRuntimeElements
+        ->
+        shadowRuntimeElements.extendsFrom(shadowConfig)
+        shadowRuntimeElements.attributes { attrs ->
           attrs.attribute(
             Usage.USAGE_ATTRIBUTE,
             objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
@@ -75,49 +72,39 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
           )
         }
-        it.outgoing.artifact(tasks.shadowJar)
+        shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
       }
 
-    // Must use afterEvaluate here as we need to track the changes of addTargetJvmVersionAttribute.
+    // See more details in #2086.
     afterEvaluate {
       if (shadow.addTargetJvmVersionAttribute.get()) {
-        logger.info(
-          "Setting {} attribute for {} configuration.",
-          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name,
-          shadowRuntimeElements.name,
-        )
+        // This eager call will lock `toolchain.languageVersion`, so we must defer it by
+        // `afterEvaluate`.
+        val compileJvmVersion =
+          compileClasspathConfig.get().attributes.getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
+        val targetJvmVersion =
+          compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
+        if (targetJvmVersion != Int.MAX_VALUE) {
+          logger.info(
+            "Setting target JVM version to {} for {} configuration.",
+            targetJvmVersion,
+            shadowRuntimeElements.name,
+          )
+          shadowRuntimeElements
+            .get()
+            .attributes
+            .attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
+        } else {
+          logger.info(
+            "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
+          )
+        }
       } else {
         logger.info(
           "Skipping setting {} attribute for {} configuration.",
-          TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE.name,
+          TARGET_JVM_VERSION_ATTRIBUTE,
           shadowRuntimeElements.name,
         )
-        return@afterEvaluate
-      }
-      val targetJvmVersion =
-        configurations
-          .named(COMPILE_CLASSPATH_CONFIGURATION_NAME)
-          .map { compileClasspath ->
-            compileClasspath.attributes.getAttribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE)
-          }
-          .getOrElse(javaPluginExtension.targetCompatibility.majorVersion.toInt())
-
-      // https://github.com/gradle/gradle/blob/4198ab0670df14af9f77b9098dc892b199ac1f3f/platforms/jvm/plugins-java-base/src/main/java/org/gradle/api/plugins/jvm/internal/DefaultJvmLanguageUtilities.java#L85-L87
-      if (targetJvmVersion == Int.MAX_VALUE) {
-        logger.info(
-          "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
-        )
-      } else {
-        logger.info(
-          "Setting target JVM version to {} for {} configuration.",
-          targetJvmVersion,
-          shadowRuntimeElements.name,
-        )
-        shadowRuntimeElements.configure {
-          it.attributes { attrs ->
-            attrs.attribute(TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
-          }
-        }
       }
     }
   }
@@ -126,29 +113,23 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    shadowComponent.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
+    shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
-    // Must use afterEvaluate here as we need to track the changes of
-    // addShadowVariantIntoJavaComponent.
-    afterEvaluate {
-      if (shadow.addShadowVariantIntoJavaComponent.get()) {
-        logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
-      } else {
-        logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
-        return@afterEvaluate
-      }
-      components.named("java", AdhocComponentWithVariants::class.java) {
-        it.addVariantsFromConfigurationCompat(shadowRuntimeElements) { variant ->
-          variant.mapToOptional()
+    components.named("java", AdhocComponentWithVariants::class.java) { component ->
+      component.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
+        variant.mapToOptional()
+        if (shadow.addShadowVariantIntoJavaComponent.get()) {
+          logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
+        } else {
+          logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
+          variant.skip()
         }
       }
     }
   }
 
-  protected open fun Project.configureJavaGradlePlugin() {
-    moveGradleApiIntoCompileOnly()
-  }
+  protected open fun Project.configureJavaGradlePlugin() {}
 
   public companion object {
     public const val COMPONENT_NAME: String = SHADOW
@@ -156,7 +137,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadowRuntimeElements:
-      NamedDomainObjectProvider<Configuration>
-      get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+      NamedDomainObjectProvider<ConsumableConfiguration>
+      get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
   }
 }

@@ -20,20 +20,21 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
-import com.github.jengelman.gradle.plugins.shadow.testkit.testGradleVersion
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
+import org.gradle.api.JavaVersion
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
@@ -41,7 +42,6 @@ import org.gradle.api.plugins.JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
 import org.gradle.testkit.runner.TaskOutcome.SUCCESS
-import org.gradle.util.GradleVersion
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -50,8 +50,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 
 class JavaPluginsTest : BasePluginTest() {
-  @Issue("https://github.com/GradleUp/shadow/pull/1766")
-  @Test
+  @Test // #1766
   fun makeAssembleDependOnShadowJarEvenIfAddedLater() {
     val kFunction =
       ShadowJar.Companion::class.declaredFunctions.single { it.name == "registerShadowJarCommon" }
@@ -59,27 +58,27 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        plugins {
-          id '$shadowPluginId'
-        }
-
-        def testJar = tasks.register('testJar', Jar)
-        // Must use `@Companion` to access the companion object instance instead of the class.
-        def companion = ${ShadowJar::class.qualifiedName}.@Companion
-        companion.$jvmName(project, testJar) {
-          it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
-        }
-
-        afterEvaluate {
-          tasks.register('$ASSEMBLE_TASK_NAME') {
-          def taskDependencies = provider { dependsOn.collect { it.name }.join(', ') }
-            doFirst {
-              logger.lifecycle('task dependencies: ' + taskDependencies.get())
-            }
-          }
-        }
+      |plugins {
+      |  id '$shadowPluginId'
+      |}
+      |
+      |def testJar = tasks.register('testJar', Jar)
+      |// Must use `@Companion` to access the companion object instance instead of the class.
+      |def companion = ${ShadowJar::class.qualifiedName}.@Companion
+      |companion.$jvmName(project, testJar) {
+      |  it.archiveFile.set(project.layout.buildDirectory.file('libs/test-all.jar'))
+      |}
+      |
+      |afterEvaluate {
+      |  tasks.register('$ASSEMBLE_TASK_NAME') {
+      |  def taskDependencies = provider { dependsOn.collect { it.name }.join(', ') }
+      |    doFirst {
+      |      logger.lifecycle('task dependencies: ' + taskDependencies.get())
+      |    }
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
@@ -92,16 +91,15 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.output).contains("task dependencies: $SHADOW_JAR_TASK_NAME")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1908")
-  @Test
+  @Test // #1908
   fun shadowJarNotAddedToAssembleWhenDisabled() {
     projectScript.appendText(
       """
-      shadow {
-        addShadowJarToAssembleLifecycle = false
-      }
+      |shadow {
+      |  addShadowJarToAssembleLifecycle = false
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
@@ -192,71 +190,72 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1893")
-  @Test
+  @Test // #1893
   fun consumeShadowedProjectViaApiElementsAndRuntimeElements() {
     settingsScript.appendText(
       """
-      include 'client', 'server'
+      |include 'client', 'server'
       """
-        .trimIndent()
+        .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("client/src/main/java/client/Client.java")
       .writeText(
         """
-        package client;
-        public class Client {}
+        |package client;
+        |public class Client {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java-library")}
-      dependencies {
-        api 'junit:junit:3.8.2'
-      }
-      $shadowJarTask {
-        relocate 'junit.framework', 'client.junit.framework'
-      }
-      configurations {
-        apiElements {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact($shadowJarTask)
-        }
-        runtimeElements {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact($shadowJarTask)
-        }
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java-library")}
+        |dependencies {
+        |  api 'junit:junit:3.8.2'
+        |}
+        |$shadowJarTask {
+        |  relocate 'junit.framework', 'client.junit.framework'
+        |}
+        |configurations {
+        |  apiElements {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact($shadowJarTask)
+        |  }
+        |  runtimeElements {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact($shadowJarTask)
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Client;
-        import client.junit.framework.Test;
-        public class Server {}
+        |package server;
+        |import client.Client;
+        |import client.junit.framework.Test;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("server/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
-      dependencies {
-        // No `configuration: "shadow"` needed!
-        implementation project(':client')
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
+        |dependencies {
+        |  // No `configuration: "shadow"` needed!
+        |  implementation project(':client')
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     // Running server:jar to ensure it compiles against the shadowed client
@@ -269,52 +268,53 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1893")
-  @Test
+  @Test // #1893
   fun excludeRulesPreventBundledDepsOnConsumerClasspath() {
-    settingsScript.appendText("include 'foo', 'consumer'$lineSeparator")
-    projectScript.writeText("")
+    settingsScript.appendText("include 'foo', 'consumer'\n")
+    projectScript.deleteExisting()
 
     path("foo/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java-library")}
-      dependencies {
-        implementation 'my:a:1.0'
-      }
-      configurations {
-        named('apiElements') {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
-          exclude(group: 'my', module: 'a')
-        }
-        named('runtimeElements') {
-          outgoing.artifacts.clear()
-          outgoing.variants.clear()
-          outgoing.artifact(tasks.named('shadowJar'))
-          exclude(group: 'my', module: 'a')
-        }
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java-library")}
+        |dependencies {
+        |  implementation 'my:a:1.0'
+        |}
+        |configurations {
+        |  named('apiElements') {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact(tasks.named('shadowJar'))
+        |    exclude(group: 'my', module: 'a')
+        |  }
+        |  named('runtimeElements') {
+        |    outgoing.artifacts.clear()
+        |    outgoing.variants.clear()
+        |    outgoing.artifact(tasks.named('shadowJar'))
+        |    exclude(group: 'my', module: 'a')
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     path("consumer/build.gradle")
       .writeText(
         """
-      ${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
-      dependencies {
-        implementation project(':foo')
-      }
-      tasks.register('printClasspathFiles') {
-        def cp = configurations.runtimeClasspath
-        doLast {
-          cp.files.each { logger.lifecycle(it.name) }
-        }
-      }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java", applyShadowPlugin = false)}
+        |dependencies {
+        |  implementation project(':foo')
+        |}
+        |tasks.register('printClasspathFiles') {
+        |  def cp = configurations.runtimeClasspath
+        |  doLast {
+        |    cp.files.each { logger.lifecycle(it.name) }
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     val result = runWithSuccess(":consumer:printClasspathFiles")
@@ -324,37 +324,36 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1606")
-  @Test
+  @Test // #1606
   fun shadowExposedCustomSourceSetOutput() {
     writeClientAndServerModules()
     path("client/build.gradle")
       .appendText(
         """
-        sourceSets {
-          create('custom')
-        }
-        dependencies {
-          implementation sourceSets.custom.output
-        }
+        |sourceSets {
+        |  create('custom')
+        |}
+        |dependencies {
+        |  implementation sourceSets.custom.output
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/custom/java/client/Custom1.java")
       .writeText(
         """
-        package client;
-        public class Custom1 {}
+        |package client;
+        |public class Custom1 {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/custom/java/client/Custom2.java")
       .writeText(
         """
-        package client;
-        public class Custom2 {}
+        |package client;
+        |public class Custom2 {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/src/custom/resources/Foo.bar").writeText("Foo=Bar")
 
@@ -375,30 +374,30 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/449")
-  @ParameterizedTest
+  @ParameterizedTest // #449
   @ValueSource(booleans = [false, true])
   fun containsMultiReleaseAttrIfAnyDependencyContainsIt(addAttribute: Boolean) {
     writeClientAndServerModules()
     path("client/build.gradle")
       .appendText(
         """
-        $jarTask {
-          manifest {
-            attributes '$multiReleaseAttributeKey': 'true'
-          }
-        }
-      """
-          .trimIndent() + lineSeparator
+        |$jarTask {
+        |  manifest {
+        |    attributes '$multiReleaseAttributeKey': 'true'
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
     path("server/build.gradle")
       .appendText(
         """
-        $shadowJarTask {
-          addMultiReleaseAttribute = $addAttribute
-        }
-      """
-          .trimIndent()
+        |$shadowJarTask {
+        |  addMultiReleaseAttribute = $addAttribute
+        |}
+        """
+          .trimMargin()
       )
 
     val result = runWithSuccess(serverShadowJarPath, infoArgument)
@@ -422,13 +421,14 @@ class JavaPluginsTest : BasePluginTest() {
     path("client/build.gradle")
       .appendText(
         """
-        $jarTask {
-          manifest {
-            attributes '$multiReleaseAttributeKey': 'true'
-          }
-        }
-      """
-          .trimIndent() + lineSeparator
+        |$jarTask {
+        |  manifest {
+        |    attributes '$multiReleaseAttributeKey': 'true'
+        |  }
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     val arg = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
@@ -446,11 +446,7 @@ class JavaPluginsTest : BasePluginTest() {
       .isEqualTo(if (enable) "true" else null)
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/352",
-    "https://github.com/GradleUp/shadow/issues/729",
-  )
-  @Test
+  @Test // #352, #729
   fun excludeSomeResourcesByDefault() {
     val resJar =
       buildJar("meta-inf.jar") {
@@ -466,11 +462,11 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(resJar)}
-        }
+      |dependencies {
+      |  ${implementationFiles(resJar)}
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -482,13 +478,13 @@ class JavaPluginsTest : BasePluginTest() {
   fun includeRuntimeConfigurationByDefault() {
     projectScript.appendText(
       """
-      dependencies {
-        runtimeOnly 'my:a:1.0'
-        shadow 'my:b:1.0'
-        compileOnly 'my:b:1.0'
-      }
+      |dependencies {
+      |  runtimeOnly 'my:a:1.0'
+      |  shadow 'my:b:1.0'
+      |  compileOnly 'my:b:1.0'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -513,14 +509,14 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript("java-library")}
-        dependencies {
-          api 'my:api:1.0'
-          implementation 'my:implementation:1.0'
-          runtimeOnly 'my:runtime-only:1.0'
-        }
+      |${getDefaultProjectBuildScript("java-library")}
+      |dependencies {
+      |  api 'my:api:1.0'
+      |  implementation 'my:implementation:1.0'
+      |  runtimeOnly 'my:runtime-only:1.0'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -540,11 +536,11 @@ class JavaPluginsTest : BasePluginTest() {
   fun classPathInManifestNotAddedIfEmpty() {
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -555,22 +551,21 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/65")
-  @ParameterizedTest
+  @ParameterizedTest // #65
   @ValueSource(strings = [ShadowBasePlugin.CONFIGURATION_NAME, IMPLEMENTATION_CONFIGURATION_NAME])
   fun addShadowConfigurationToClassPathInManifest(configuration: String) {
     projectScript.appendText(
       """
-        dependencies {
-          $configuration 'junit:junit:3.8.2'
-        }
-        $jarTask {
-          manifest {
-            attributes '$classPathAttributeKey': '/libs/foo.jar'
-          }
-        }
+      |dependencies {
+      |  $configuration 'junit:junit:3.8.2'
+      |}
+      |$jarTask {
+      |  manifest {
+      |    attributes '$classPathAttributeKey': '/libs/foo.jar'
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -584,16 +579,15 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(actual).isEqualTo(expected)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/92")
-  @Test
+  @Test // #92
   fun doNotIncludeNullValueInClassPathWhenJarFileDoesNotContainClassPath() {
     projectScript.appendText(
       """
-      dependencies {
-        shadow 'junit:junit:3.8.2'
-      }
+      |dependencies {
+      |  shadow 'junit:junit:3.8.2'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -602,21 +596,20 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(value).isEqualTo("junit-3.8.2.jar")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/203")
-  @ParameterizedTest
+  @ParameterizedTest // #203
   @EnumSource(ZipEntryCompression::class)
   fun supportZipCompressions(method: ZipEntryCompression) {
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          zip64 = true
-          entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  zip64 = true
+      |  entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -624,21 +617,17 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll { containsOnly(*junitEntries, *manifestEntries) }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/459",
-    "https://github.com/GradleUp/shadow/issues/852",
-  )
-  @Test
+  @Test // #459, #852
   fun excludeGradleApiByDefault() {
     writeGradlePluginModule()
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'my:a:1.0'
-        compileOnly 'my:b:1.0'
-      }
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |  compileOnly 'my:b:1.0'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -665,26 +654,17 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1422")
-  @Test
+  @Test // #1422
   fun moveLocalGradleApiToCompileOnly() {
     projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
 
-    val outputCompileOnly = dependencies(COMPILE_ONLY_CONFIGURATION_NAME)
     val outputCompileOnlyApi = dependencies(COMPILE_ONLY_API_CONFIGURATION_NAME)
-    val outputApi = dependencies(API_CONFIGURATION_NAME)
 
     // "unspecified" is the local Gradle API.
-    if (GradleVersion.version(testGradleVersion) >= GradleVersion.version("9.4.0")) {
-      assertThat(outputCompileOnlyApi).contains("unspecified")
-    } else {
-      assertThat(outputCompileOnly).contains("unspecified")
-      assertThat(outputApi).doesNotContain("unspecified")
-    }
+    assertThat(outputCompileOnlyApi).contains("unspecified")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1422")
-  @ParameterizedTest
+  @ParameterizedTest // #1422
   @ValueSource(strings = [COMPILE_ONLY_CONFIGURATION_NAME, API_CONFIGURATION_NAME])
   fun doNotReAddSuppressedGradleApi(configuration: String) {
     projectScript.writeText(getDefaultProjectBuildScript("java-gradle-plugin"))
@@ -700,27 +680,26 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(output).doesNotContain("unspecified")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1070")
-  @Test
+  @Test // #1070
   fun registerCustomShadowJarTask() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScript.appendText(
       """
-        dependencies {
-          testImplementation 'junit:junit:3.8.2'
-        }
-        def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
-          description = 'Create a combined JAR of project and test dependencies'
-          archiveClassifier = 'test'
-          from sourceSets.named('test').map { it.output }
-          configurations.setFrom project.configurations.named('testRuntimeClasspath')
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-        }
+      |dependencies {
+      |  testImplementation 'junit:junit:3.8.2'
+      |}
+      |def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a combined JAR of project and test dependencies'
+      |  archiveClassifier = 'test'
+      |  from sourceSets.named('test').map { it.output }
+      |  configurations.setFrom project.configurations.named('testRuntimeClasspath')
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(testShadowJarTask)
@@ -736,34 +715,33 @@ class JavaPluginsTest : BasePluginTest() {
       .contains("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1784")
-  @Test
+  @Test // #1784
   fun registerShadowJarTaskWithoutShadowPluginApplied() {
     val mainClassEntry = writeClass(sourceSet = "test", withImports = true)
     val testShadowJarTask = "testShadowJar"
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript(applyShadowPlugin = false)}
-        dependencies {
-          testImplementation 'junit:junit:3.8.2'
-        }
-        def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
-          description = 'Create a combined JAR of project and test dependencies'
-          archiveClassifier = 'test'
-          from sourceSets.named('test').map { it.output }
-          configurations.setFrom project.configurations.named('testRuntimeClasspath')
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-        }
-        afterEvaluate {
-          def hasShadowPlugin = plugins.hasPlugin('${ShadowPlugin::class.qualifiedName}')
-          def hasShadowBasePlugin = plugins.hasPlugin('${ShadowBasePlugin::class.qualifiedName}')
-          logger.lifecycle("Has ShadowPlugin: " + hasShadowPlugin)
-          logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
-        }
+      |${getDefaultProjectBuildScript(applyShadowPlugin = false)}
+      |dependencies {
+      |  testImplementation 'junit:junit:3.8.2'
+      |}
+      |def $testShadowJarTask = tasks.register('$testShadowJarTask', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a combined JAR of project and test dependencies'
+      |  archiveClassifier = 'test'
+      |  from sourceSets.named('test').map { it.output }
+      |  configurations.setFrom project.configurations.named('testRuntimeClasspath')
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |}
+      |afterEvaluate {
+      |  def hasShadowPlugin = plugins.hasPlugin('${ShadowPlugin::class.qualifiedName}')
+      |  def hasShadowBasePlugin = plugins.hasPlugin('${ShadowBasePlugin::class.qualifiedName}')
+      |  logger.lifecycle("Has ShadowPlugin: " + hasShadowPlugin)
+      |  logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithSuccess(testShadowJarTask)
@@ -781,24 +759,23 @@ class JavaPluginsTest : BasePluginTest() {
       .contains("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/443")
-  @Test
+  @Test // #443
   fun registerCustomShadowJarThatContainsDependenciesOnly() {
     val mainClassEntry = writeClass()
     val dependencyShadowJar = "dependencyShadowJar"
 
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
-          description = 'Create a shadow JAR of all dependencies'
-          archiveClassifier = 'dep'
-          configurations.setFrom project.configurations.named('runtimeClasspath')
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a shadow JAR of all dependencies'
+      |  archiveClassifier = 'dep'
+      |  configurations.setFrom project.configurations.named('runtimeClasspath')
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess("jar", dependencyShadowJar)
@@ -813,18 +790,40 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1975")
   @Test
+  fun registerCustomShadowJarWithoutShadowR8Configuration() {
+    val customShadowJar = "customShadowJar"
+    projectScript.writeText(
+      """
+      |${getDefaultProjectBuildScript(applyShadowPlugin = false)}
+      |def $customShadowJar = tasks.register('$customShadowJar', ${ShadowJar::class.java.name}) {
+      |  minimize {
+      |    r8 {}
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    val result = runWithFailure(customShadowJar)
+
+    assertThat(result.output)
+      .contains(
+        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+      )
+  }
+
+  @Test // #1975
   fun skipNonExistentDependencyDirectory() {
     val nonExistentDir = projectRoot.resolve("non-existent-dir")
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(nonExistentDir)}
-        }
+      |dependencies {
+      |  ${implementationFiles(nonExistentDir)}
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithSuccess(shadowJarPath)
@@ -832,18 +831,17 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/915")
-  @Test
+  @Test // #915
   fun failBuildIfProcessingBadJar() {
     val badJarPath = path("bad.jar").apply { writeText("A bad jar.") }
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(badJarPath)}
-        }
+      |dependencies {
+      |  ${implementationFiles(badJarPath)}
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithFailure(shadowJarPath)
@@ -857,11 +855,11 @@ class JavaPluginsTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(fooAarPath)}
-        }
+      |dependencies {
+      |  ${implementationFiles(fooAarPath)}
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithFailure(shadowJarPath)
@@ -876,19 +874,19 @@ class JavaPluginsTest : BasePluginTest() {
     path("Foo").writeText("Foo")
     projectScript.appendText(
       """
-        $shadowJarTask {
-          from(file('${artifactAJar.invariantSeparatorsPathString}')) { // Without unzipping.
-            into('META-INF')
-          }
-          from(zipTree(file('${artifactBJar.invariantSeparatorsPathString}'))) { // With unzipping.
-            into('META-INF')
-          }
-          from('Foo') {
-            into('Bar')
-          }
-        }
+      |$shadowJarTask {
+      |  from(file('${artifactAJar.invariantSeparatorsPathString}')) { // Without unzipping.
+      |    into('META-INF')
+      |  }
+      |  from(zipTree(file('${artifactBJar.invariantSeparatorsPathString}'))) { // With unzipping.
+      |    into('META-INF')
+      |  }
+      |  from('Foo') {
+      |    into('Bar')
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -919,16 +917,16 @@ class JavaPluginsTest : BasePluginTest() {
   fun addDependenciesViaCustomConfigurationWithoutUnzipping() {
     projectScript.appendText(
       """
-        def nonJar = configurations.create('nonJar')
-        dependencies {
-          add('nonJar', 'my:a:1.0')
-          add('nonJar', 'my:b:1.0')
-        }
-        $shadowJarTask {
-          from(nonJar)
-        }
+      |def nonJar = configurations.create('nonJar')
+      |dependencies {
+      |  add('nonJar', 'my:a:1.0')
+      |  add('nonJar', 'my:b:1.0')
+      |}
+      |$shadowJarTask {
+      |  from(nonJar)
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -938,24 +936,23 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/520")
-  @Test
+  @Test // #520
   fun onlyKeepFilesFromProjectWhenDuplicatesStrategyIsExclude() {
     val fooJar = buildJar("foo.jar") { insert("module-info.class", "module myModuleName {}") }
     val mainClassEntry = writeClass()
     writeClass(className = "module-info") { "module myModuleName {}" }
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(fooJar)}
-        }
-        $shadowJarTask {
-          excludes.remove(
-            'module-info.class'
-          )
-        }
+      |dependencies {
+      |  ${implementationFiles(fooJar)}
+      |}
+      |$shadowJarTask {
+      |  excludes.remove(
+      |    'module-info.class'
+      |  )
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -970,36 +967,35 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1441")
-  @Test
+  @Test // #1441
   fun includeFilesInTaskOutputDirectory() {
     // Create a build that has a task with jars in the output directory
     projectScript.appendText(
       $$"""
-      def createJars = tasks.register('createJars') {
-        def artifactAJar = file('$${artifactAJar.invariantSeparatorsPathString}')
-        def artifactBJar = file('$${artifactBJar.invariantSeparatorsPathString}')
-        inputs.files(artifactAJar, artifactBJar)
-        def outputDir = file('${buildDir}/jars')
-        outputs.dir(outputDir)
-        doLast {
-          artifactAJar.withInputStream { input ->
-              new File(outputDir, 'jarA.jar').withOutputStream { output ->
-                  output << input
-              }
-          }
-          artifactBJar.withInputStream { input ->
-              new File(outputDir, 'jarB.jar').withOutputStream { output ->
-                  output << input
-              }
-          }
-        }
-      }
-      $$shadowJarTask {
-        includedDependencies.from(files(createJars).asFileTree)
-      }
+      |def createJars = tasks.register('createJars') {
+      |  def artifactAJar = file('$${artifactAJar.invariantSeparatorsPathString}')
+      |  def artifactBJar = file('$${artifactBJar.invariantSeparatorsPathString}')
+      |  inputs.files(artifactAJar, artifactBJar)
+      |  def outputDir = file('${buildDir}/jars')
+      |  outputs.dir(outputDir)
+      |  doLast {
+      |    artifactAJar.withInputStream { input ->
+      |        new File(outputDir, 'jarA.jar').withOutputStream { output ->
+      |            output << input
+      |        }
+      |    }
+      |    artifactBJar.withInputStream { input ->
+      |        new File(outputDir, 'jarB.jar').withOutputStream { output ->
+      |            output << input
+      |        }
+      |    }
+      |  }
+      |}
+      |$$shadowJarTask {
+      |  includedDependencies.from(files(createJars).asFileTree)
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -1012,11 +1008,11 @@ class JavaPluginsTest : BasePluginTest() {
     writeClientAndServerModules()
     settingsScript.prependText(
       """
-      plugins {
-        id 'com.gradle.develocity'
-      }
-      """
-        .trimIndent() + lineSeparator
+      |plugins {
+      |  id 'com.gradle.develocity'
+      |}
+      |"""
+        .trimMargin()
     )
 
     val result =
@@ -1024,8 +1020,8 @@ class JavaPluginsTest : BasePluginTest() {
         serverShadowJarPath,
         infoArgument,
         "-P${ENABLE_DEVELOCITY_INTEGRATION_PROPERTY}=true",
-        "-Dscan.dump", // Using scan.dump avoids actually publishing a Build Scan, writing it to a
-        // file instead.
+        // Using scan.dump avoids actually publishing a Build Scan, writing it to a file instead.
+        "-Dscan.dump",
       )
 
     assertThat(result.output).all {
@@ -1040,15 +1036,15 @@ class JavaPluginsTest : BasePluginTest() {
     path("src/main/resources/a.properties").writeText("invalid a")
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'my:a:1.0'
-        }
-        $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.INCLUDE
-          failOnDuplicateEntries = $enable
-        }
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |}
+      |$shadowJarTask {
+      |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |  failOnDuplicateEntries = $enable
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result =
@@ -1068,14 +1064,14 @@ class JavaPluginsTest : BasePluginTest() {
     path("src/main/resources/a.properties").writeText("project a")
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'my:a:1.0'
-        }
-        $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.INCLUDE
-        }
+      |dependencies {
+      |  implementation 'my:a:1.0'
+      |}
+      |$shadowJarTask {
+      |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result =
@@ -1094,11 +1090,11 @@ class JavaPluginsTest : BasePluginTest() {
   fun fallbackMainClassByProperty(input: String, expected: String?, message: String) {
     projectScript.appendText(
       """
-        $shadowJarTask {
-          mainClass = '$input'
-        }
+      |$shadowJarTask {
+      |  mainClass = '$input'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     val result = runWithSuccess(shadowJarPath, infoArgument)
@@ -1119,108 +1115,201 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/882")
-  @Test
+  @Test // #882
   fun compatGradleArtifactTransform() {
     settingsScript.writeText("include('app', 'lib')\n")
     path("lib/build.gradle")
       .writeText(
         """
-        plugins {
-          id 'java-library'
-        }
+        |plugins {
+        |  id 'java-library'
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("lib/src/main/java/com/company/Utils.java")
       .writeText(
         """
-        package com.company;
-
-        public class Utils {
-          public static void foo() {
-            System.out.println("bar");
-          }
-        }
+        |package com.company;
+        |
+        |public class Utils {
+        |  public static void foo() {
+        |    System.out.println("bar");
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("app/build.gradle")
       .writeText(
         """
-        import org.gradle.api.artifacts.transform.TransformParameters
-        import org.gradle.api.artifacts.transform.TransformAction
-        import org.gradle.api.artifacts.transform.TransformOutputs
-        import org.gradle.api.artifacts.transform.InputArtifact
-        import org.gradle.api.file.FileSystemLocation
-        import org.gradle.api.provider.Provider
-
-        plugins {
-          id 'application'
-          id '$shadowPluginId'
-        }
-
-        application {
-          mainClass = 'com.company.Main'
-        }
-
-        dependencies {
-          implementation project(':lib')
-        }
-
-        def transformedAttribute = Attribute.of('custom-transformed', Boolean)
-
-        dependencies {
-          attributesSchema {
-            attribute(transformedAttribute)
-          }
-          artifactTypes.maybeCreate('jar').attributes.attribute(transformedAttribute, false)
-        }
-
-        dependencies {
-          registerTransform(CustomTransformAction) {
-            from.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, false)
-            to.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, true)
-          }
-        }
-
-        $shadowJarTask {
-          configurations.setFrom project.configurations.runtimeClasspath
-        }
-
-        configurations.runtimeClasspath {
-          attributes.attribute(transformedAttribute, true)
-        }
-
-        abstract class CustomTransformAction implements TransformAction<TransformParameters.None> {
-          @InputArtifact abstract Provider<FileSystemLocation> getInputArtifact()
-
-          @Override
-          void transform(TransformOutputs outputs) {
-            outputs.file(inputArtifact.get().asFile)
-          }
-        }
-      """
-          .trimIndent()
+        |import org.gradle.api.artifacts.transform.TransformParameters
+        |import org.gradle.api.artifacts.transform.TransformAction
+        |import org.gradle.api.artifacts.transform.TransformOutputs
+        |import org.gradle.api.artifacts.transform.InputArtifact
+        |import org.gradle.api.file.FileSystemLocation
+        |import org.gradle.api.provider.Provider
+        |
+        |plugins {
+        |  id 'application'
+        |  id '$shadowPluginId'
+        |}
+        |
+        |application {
+        |  mainClass = 'com.company.Main'
+        |}
+        |
+        |dependencies {
+        |  implementation project(':lib')
+        |}
+        |
+        |def transformedAttribute = Attribute.of('custom-transformed', Boolean)
+        |
+        |dependencies {
+        |  attributesSchema {
+        |    attribute(transformedAttribute)
+        |  }
+        |  artifactTypes.maybeCreate('jar').attributes.attribute(transformedAttribute, false)
+        |}
+        |
+        |dependencies {
+        |  registerTransform(CustomTransformAction) {
+        |    from.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, false)
+        |    to.attribute(Attribute.of('artifactType', String), 'jar').attribute(transformedAttribute, true)
+        |  }
+        |}
+        |
+        |$shadowJarTask {
+        |  configurations.setFrom project.configurations.runtimeClasspath
+        |}
+        |
+        |configurations.runtimeClasspath {
+        |  attributes.attribute(transformedAttribute, true)
+        |}
+        |
+        |abstract class CustomTransformAction implements TransformAction<TransformParameters.None> {
+        |  @InputArtifact abstract Provider<FileSystemLocation> getInputArtifact()
+        |
+        |  @Override
+        |  void transform(TransformOutputs outputs) {
+        |    outputs.file(inputArtifact.get().asFile)
+        |  }
+        |}
+        """
+          .trimMargin()
       )
     path("app/src/main/java/com/company/Main.java")
       .writeText(
         """
-        package com.company;
-
-        public class Main {
-          public static void main(String[] args) {
-            Utils.foo();
-          }
-        }
+        |package com.company;
+        |
+        |public class Main {
+        |  public static void main(String[] args) {
+        |    Utils.foo();
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
       containsAtLeast("com/company/Main.class", "com/company/Utils.class", manifestEntry)
+    }
+  }
+
+  @Test // #2086
+  fun useToolchainWithoutTargetCompatibilityInKts() {
+    projectScript.deleteExisting()
+    path("build.gradle.kts")
+      .appendText(
+        """
+        |plugins {
+        |  kotlin("jvm")
+        |  id("$shadowPluginId")
+        |}
+        |java {
+        |  toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
+        |}
+        """
+          .trimMargin()
+      )
+
+    val result = runWithSuccess(shadowJarPath)
+
+    assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+  }
+
+  @Test // #2099
+  fun doNotResolveR8WhenLockingAllConfigurations() {
+    projectScript.appendText(
+      """
+      |dependencyLocking {
+      |  lockAllConfigurations()
+      |}
+      |
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |
+      |tasks.register('resolveAndLockAll') {
+      |  notCompatibleWithConfigurationCache('Filters configurations at execution time')
+      |  doFirst {
+      |    assert gradle.startParameter.writeDependencyLocks
+      |  }
+      |  doLast {
+      |    configurations.matching { it.canBeResolved }.each { it.resolve() }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess("resolveAndLockAll", "--write-locks")
+
+    assertThat(path("gradle.lockfile").toFile().readText()).all {
+      contains("junit:junit:3.8.2")
+      doesNotContain("com.android.tools:r8")
+    }
+  }
+
+  @Test
+  fun handleCaseSensitiveEntriesAcrossMultipleJars() {
+    val one =
+      buildJar("one.jar") {
+        insert("foo.txt", "lower")
+        insert("Bar.class", createEmptyClassBytes("Bar"))
+      }
+    val two =
+      buildJar("two.jar") {
+        insert("Foo.txt", "upper")
+        insert("bar.class", createEmptyClassBytes("bar"))
+      }
+
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "foo.txt",
+        "Foo.txt",
+        "bar.class",
+        "Bar.class",
+        *manifestEntries,
+      )
+      getBytes("Bar.class").isEqualTo(createEmptyClassBytes("Bar"))
+      getBytes("bar.class").isEqualTo(createEmptyClassBytes("bar"))
+      getContent("foo.txt").isEqualTo("lower")
+      getContent("Foo.txt").isEqualTo("upper")
     }
   }
 

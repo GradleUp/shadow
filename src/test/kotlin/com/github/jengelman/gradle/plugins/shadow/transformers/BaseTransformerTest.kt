@@ -7,22 +7,28 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
+import java.io.InputStream
 import java.lang.reflect.ParameterizedType
+import java.nio.file.Path
 import java.util.Locale
-import java.util.jar.JarFile.MANIFEST_NAME
 import kotlin.io.path.createTempFile
 import kotlin.io.path.outputStream
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.file.RelativePath
 import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.io.TempDir
 
 abstract class BaseTransformerTest<T : ResourceTransformer> {
   lateinit var transformer: T
     private set
 
-  val manifestTransformerContext: TransformerContext
-    get() = TransformerContext(MANIFEST_NAME, requireResourceAsStream(MANIFEST_NAME))
+  @TempDir
+  lateinit var tempDir: Path
+    private set
+
+  lateinit var tempJar: Path
+    private set
 
   @BeforeEach
   open fun beforeEach() {
@@ -31,6 +37,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
       (this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments.single()
         as Class<T>
     transformer = clazz.create(testObjectFactory)
+    tempJar = createTempFile(directory = tempDir, suffix = ".jar")
   }
 
   companion object {
@@ -44,6 +51,11 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
           override fun getRelativePath(): RelativePath = _relativePath
 
           override fun getFile(): File = requireNotNull(file) { "File must be provided." }
+
+          override fun open(): InputStream = getFile().inputStream()
+
+          // Mock Gradle's AbstractFileTreeElement.toString, which returns getDisplayName().
+          override fun toString(): String = file?.path ?: path
         }
       return canTransformResource(element)
     }
@@ -81,7 +93,7 @@ abstract class BaseTransformerTest<T : ResourceTransformer> {
      * it a prime choice to test for improper case-less string comparisons.
      */
     fun setupTurkishLocale() {
-      @Suppress("DEPRECATION") Locale.setDefault(Locale("tr"))
+      Locale.setDefault(@Suppress("DEPRECATION") Locale("tr"))
     }
   }
 }

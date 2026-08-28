@@ -84,8 +84,7 @@ class ShadowPropertiesTest {
       tasks.shadowJar.configure {
         it.manifest.attributes["shadowJar"] = "fromShadowJar"
         it.manifest.from(jar1.get().manifest)
-        @Suppress("DEPRECATION") // TODO: remove this once InheritManifest is removed.
-        it.manifest.inheritFrom(jar2.get().manifest)
+        @Suppress("DEPRECATION") it.manifest.inheritFrom(jar2.get().manifest)
       }
       // Call effectiveManifest as a way to force merging to happen like writing the jar would.
       assertThat(tasks.shadowJar.get().manifest.effectiveManifest.attributes)
@@ -149,10 +148,18 @@ class ShadowPropertiesTest {
       with(shadowJarTask) {
         assertThat(addMultiReleaseAttribute.get()).isTrue()
         assertThat(enableAutoRelocation.get()).isFalse()
-        assertThat(enableKotlinModuleRemapping.get()).isTrue()
+        assertThat(@Suppress("DEPRECATION") enableKotlinModuleRemapping.get()).isTrue()
         assertThat(failOnDuplicateEntries.get()).isFalse()
-        assertThat(minimizeJar.get()).isFalse()
+        assertThat(@Suppress("DEPRECATION") minimizeJar.get()).isFalse()
         assertThat(mainClass.orNull).isNull()
+        assertThat(javaLauncher.get().metadata.jvmVersion)
+          .isEqualTo(
+            javaToolchainService
+              .launcherFor(javaPluginExtension.toolchain)
+              .get()
+              .metadata
+              .jvmVersion
+          )
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
         assertThat(configurations.from.map { (it as Provider<*>).get() })

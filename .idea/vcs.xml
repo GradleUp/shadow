@@ -5,7 +5,7 @@
       <list>
         <IssueNavigationLink>
           <option name="issueRegexp" value="#(\d+)" />
-          <option name="linkRegexp" value="https://github.com/GradleUp/shadow/pull/$1" />
+          <option name="linkRegexp" value="https://github.com/GradleUp/shadow/issues/$1" />
         </IssueNavigationLink>
       </list>
     </option>

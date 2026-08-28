@@ -2,29 +2,24 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
-import org.gradle.api.Action
-import org.gradle.api.NamedDomainObjectProvider
+import java.io.InputStream
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ConsumableConfiguration
-import org.gradle.api.component.AdhocComponentWithVariants
-import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaApplication
 import org.gradle.api.plugins.JavaPlugin
-import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
-import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPluginExtension
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
-import org.gradle.util.GradleVersion
 
 /** Return `runtimeClasspath` or `runtime` configuration. */
 internal inline val Project.runtimeConfiguration: Configuration
@@ -47,9 +42,8 @@ internal inline val Project.javaPluginExtension: JavaPluginExtension
 internal inline val Project.javaToolchainService: JavaToolchainService
   get() = extensions.getByType(JavaToolchainService::class.java)
 
-// ExtraPropertiesExtension is IP safe and contains properties from both the root
-// `gradle.properties` and the
-// subproject's `gradle.properties`. See
+// ExtraPropertiesExtension is IP safe and contains properties from both the
+// root `gradle.properties` and the subproject's `gradle.properties`. See
 // https://github.com/gradle/gradle/issues/29600#issuecomment-3580868326.
 internal fun Project.findOptionalProperty(propertyName: String): String? {
   val extras = checkNotNull(extensions.findByType(ExtraPropertiesExtension::class.java))
@@ -67,51 +61,13 @@ internal fun Project.addBuildScanCustomValues() {
   }
 }
 
-/** TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above. */
-internal fun Configuration.extendsFromCompat(vararg superConfigs: Provider<out Configuration>) {
-  if (GradleVersion.current() >= GradleVersion.version("9.4.0")) {
-    @Suppress("UnstableApiUsage") extendsFrom(*superConfigs)
-  } else {
-    extendsFrom(*superConfigs.map { it.get() }.toTypedArray())
+internal fun FileTreeElement.inputStream(): InputStream =
+  try {
+    // Open is more performant than getFile, it doesn't extract the zip files.
+    open()
+  } catch (_: UnsupportedOperationException) {
+    file.inputStream()
   }
-}
-
-/** TODO: this could be removed after bumping the min Gradle requirement to 9.2 or above. */
-internal fun AdhocComponentWithVariants.addVariantsFromConfigurationCompat(
-  outgoingConfiguration: NamedDomainObjectProvider<Configuration>,
-  action: Action<in ConfigurationVariantDetails>,
-) {
-  if (GradleVersion.current() >= GradleVersion.version("9.2")) {
-    @Suppress("UnstableApiUsage", "UNCHECKED_CAST")
-    addVariantsFromConfiguration(outgoingConfiguration as Provider<ConsumableConfiguration>, action)
-  } else {
-    addVariantsFromConfiguration(outgoingConfiguration.get(), action)
-  }
-}
-
-/** TODO: this could be removed after bumping the min Gradle requirement to 9.4 or above. */
-internal fun Project.moveGradleApiIntoCompileOnly() {
-  // gradleApi has been added into compileOnlyApi since Gradle 9.4.0.
-  if (GradleVersion.current() >= GradleVersion.version("9.4.0")) return
-
-  // org.gradle.plugin.devel.plugins.JavaGradlePluginPlugin
-  plugins.withId("org.gradle.java-gradle-plugin") {
-    val gradleApi = dependencies.gradleApi()
-    // Remove the gradleApi so it isn't merged into the jar file.
-    // This is required because 'java-gradle-plugin' adds gradleApi() to the 'api' configuration.
-    // See
-    // https://github.com/gradle/gradle/blob/972c3e5c6ef990dd2190769c1ce31998a9402a79/subprojects/plugin-development/src/main/java/org/gradle/plugin/devel/plugins/JavaGradlePluginPlugin.java#L161.
-    configurations.named(API_CONFIGURATION_NAME) { api ->
-      // Only proceed if the removal is successful.
-      if (!api.dependencies.remove(gradleApi)) return@named
-      // Compile only gradleApi() to make sure the plugin can compile against Gradle API.
-      configurations
-        .getByName(COMPILE_ONLY_CONFIGURATION_NAME)
-        .dependencies
-        .add(dependencies.gradleApi())
-    }
-  }
-}
 
 internal inline fun <reified V : Any> ObjectFactory.property(
   defaultValue: Any? = null
@@ -122,6 +78,19 @@ internal inline fun <reified V : Any> ObjectFactory.property(
       @Suppress("UNCHECKED_CAST") convention(defaultValue as Provider<V>)
     } else {
       convention(defaultValue as V)
+    }
+  }
+
+@Suppress("UNCHECKED_CAST")
+internal inline fun <reified V : Any> ObjectFactory.listProperty(
+  defaultValue: Any? = null
+): ListProperty<V> =
+  listProperty(V::class.java).apply {
+    defaultValue ?: return@apply
+    if (defaultValue is Provider<*>) {
+      convention(defaultValue as Provider<Iterable<V>>)
+    } else {
+      convention(defaultValue as Iterable<V>)
     }
   }
 

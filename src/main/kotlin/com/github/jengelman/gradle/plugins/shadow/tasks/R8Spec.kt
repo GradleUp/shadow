@@ -1,0 +1,95 @@
+package com.github.jengelman.gradle.plugins.shadow.tasks
+
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CompileClasspath
+import org.gradle.api.tasks.Input
+import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
+
+/** Minimal R8 configuration for [ShadowJar.minimize]. */
+@ShadowDsl
+public interface R8Spec {
+  /**
+   * Whether to apply Shadow's default ProGuard rules for R8 minimization.
+   *
+   * When enabled (default), Shadow automatically generates keep rules for project classes, excluded
+   * dependencies, and service descriptors, and disables optimization unless explicitly enabled.
+   *
+   * When disabled, Shadow-generated default rules are omitted, giving full control over Shadow's
+   * rule generation and maximizing R8 optimization potential. Note that consumer rules embedded in
+   * dependency JARs may still be applied by R8, and name obfuscation remains disabled by default
+   * unless [enableObfuscation] is called or [args] is customized.
+   *
+   * Defaults to `true`.
+   */
+  @get:Input public val useDefaultRules: Property<Boolean>
+
+  /**
+   * Additional R8 command line arguments.
+   *
+   * Defaults to `--no-minification`, so R8 shrinks without renaming classes.
+   */
+  @get:Input public val args: ListProperty<String>
+
+  @Deprecated(
+    message = "Use `proguardRules` instead. This will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("proguardRules"),
+  )
+  @get:Input
+  public val keepRules: ListProperty<String>
+    get() = proguardRules
+
+  /** Additional R8/ProGuard rules. */
+  @get:Input public val proguardRules: ListProperty<String>
+
+  @Deprecated(
+    message = "Use `proguardRuleFiles` instead. This will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("proguardRuleFiles"),
+  )
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  public val keepRuleFiles: ConfigurableFileCollection
+    get() = proguardRuleFiles
+
+  /** Files containing additional R8/ProGuard rules. */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  public val proguardRuleFiles: ConfigurableFileCollection
+
+  /**
+   * Classpath files used by R8 for class hierarchy and dependency analysis, but not included in the
+   * output JAR (e.g. `compileOnly` dependencies, `gradleApi()`).
+   *
+   * Defaults to empty.
+   */
+  @get:CompileClasspath public val classpath: ConfigurableFileCollection
+
+  /**
+   * The collective ProGuard configuration output by R8.
+   *
+   * Defaults to `build/shadowJar/r8/configuration.txt`.
+   */
+  @get:OutputFile public val configurationFile: RegularFileProperty
+
+  /**
+   * Enable R8 name obfuscation while keeping Shadow's default no-optimization behavior.
+   *
+   * This removes Shadow's default `--no-minification` argument. Optimization remains disabled
+   * unless [enableOptimization] is also called.
+   */
+  public fun enableObfuscation()
+
+  /**
+   * Enable R8 optimization while keeping Shadow's default no-obfuscation behavior.
+   *
+   * This removes Shadow's generated `-dontoptimize` rule. Name obfuscation remains disabled unless
+   * [enableObfuscation] is also called.
+   */
+  public fun enableOptimization()
+}

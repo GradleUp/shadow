@@ -1,17 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isNotEmpty
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer.MergeStrategy
+import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.nio.charset.Charset
 import java.util.Properties
-import java.util.jar.JarFile.MANIFEST_NAME
+import org.gradle.api.GradleException
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -19,39 +24,14 @@ import org.junit.jupiter.params.provider.MethodSource
 
 class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransformer>() {
   @Test
-  fun hasTransformedResource() {
-    transformer.transform(manifestTransformerContext)
+  fun hasTransformedResource() =
+    with(transformer) {
+      assertThat(hasTransformedResource()).isFalse()
 
-    assertThat(transformer.hasTransformedResource()).isTrue()
-  }
+      transform(context("f.properties", mapOf("foo" to "foo")))
 
-  @Test
-  fun hasNotTransformedResource() {
-    assertThat(transformer.hasTransformedResource()).isFalse()
-  }
-
-  @Test
-  fun transformation() {
-    transformer.transform(manifestTransformerContext)
-
-    val targetLines = transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-
-    assertThat(targetLines).isNotEmpty()
-    assertThat(targetLines).contains("Manifest-Version=1.0")
-  }
-
-  @Test
-  fun transformationPropertiesAreReproducible() {
-    transformer.transform(manifestTransformerContext)
-
-    val firstRunTargetLines =
-      transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-    Thread.sleep(1000) // wait for 1sec to ensure timestamps in properties would change
-    val secondRunTargetLines =
-      transformer.transformToJar().use { it.getContent(MANIFEST_NAME).lines() }
-
-    assertThat(firstRunTargetLines).isEqualTo(secondRunTargetLines)
-  }
+      assertThat(hasTransformedResource()).isTrue()
+    }
 
   @ParameterizedTest
   @MethodSource("pathProvider")
@@ -69,18 +49,39 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
     expectedConflicts: Map<String, Map<String, Int>>,
-  ) {
-    transformer.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
-    transformer.mergeSeparator.set(mergeSeparator)
+  ) =
+    with(transformer) {
+      this.mergeStrategy.set(MergeStrategy.from(mergeStrategy))
+      this.mergeSeparator.set(mergeSeparator)
 
-    if (transformer.canTransformResource(path)) {
-      transformer.transform(context(path, input1))
-      transformer.transform(context(path, input2))
+      if (canTransformResource(path)) {
+        transform(context(path, input1))
+        transform(context(path, input2))
+      }
+
+      assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+      assertThat(conflicts).isEqualTo(expectedConflicts)
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
-    assertThat(transformer.conflicts).isEqualTo(expectedConflicts)
-  }
+  @Test
+  fun failStrategyReportsConflicts() =
+    with(transformer) {
+      val path = "f.properties"
+      mergeStrategy.set(MergeStrategy.Fail)
+      transform(context(path, mapOf("foo" to "foo")))
+      transform(context(path, mapOf("foo" to "bar")))
+
+      assertFailure { transformToJar() }
+        .isInstanceOf<GradleException>()
+        .hasMessage(
+          """
+          |The following properties files have conflicting property values and cannot be merged:
+          | * f.properties
+          |   * Property foo is duplicated 2 times with different values
+          """
+            .trimMargin()
+        )
+    }
 
   @ParameterizedTest
   @MethodSource("transformConfigWithPathsProvider")
@@ -90,17 +91,18 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input1: Map<String, String>,
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
-  ) {
-    transformer.paths.set(paths)
-    transformer.mergeStrategy.set(MergeStrategy.First)
+  ) =
+    with(transformer) {
+      this.paths.set(paths)
+      mergeStrategy.set(MergeStrategy.First)
 
-    if (transformer.canTransformResource(path)) {
-      transformer.transform(context(path, input1))
-      transformer.transform(context(path, input2))
+      if (canTransformResource(path)) {
+        transform(context(path, input1))
+        transform(context(path, input2))
+      }
+
+      assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
     }
-
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
-  }
 
   @ParameterizedTest
   @MethodSource("transformConfigWithMappingsProvider")
@@ -110,17 +112,18 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input1: Map<String, String>,
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
-  ) {
-    transformer.mappings.set(mappings)
-    transformer.mergeStrategy.set(MergeStrategy.Latest)
+  ) =
+    with(transformer) {
+      this.mappings.set(mappings)
+      mergeStrategy.set(MergeStrategy.Latest)
 
-    if (transformer.canTransformResource(path)) {
-      transformer.transform(context(path, input1))
-      transformer.transform(context(path, input2))
+      if (canTransformResource(path)) {
+        transform(context(path, input1))
+        transform(context(path, input2))
+      }
+
+      assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
     }
-
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
-  }
 
   @ParameterizedTest
   @MethodSource("keyTransformerProvider")
@@ -130,17 +133,18 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     input1: Map<String, String>,
     input2: Map<String, String>,
     expectedOutput: Map<String, String>,
-  ) {
-    transformer.mergeStrategy.set(MergeStrategy.Append)
-    transformer.keyTransformer = keyTransformer
+  ) =
+    with(transformer) {
+      mergeStrategy.set(MergeStrategy.Append)
+      this.keyTransformer = keyTransformer
 
-    if (transformer.canTransformResource(path)) {
-      transformer.transform(context(path, input1))
-      transformer.transform(context(path, input2))
+      if (canTransformResource(path)) {
+        transform(context(path, input1))
+        transform(context(path, input2))
+      }
+
+      assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
     }
-
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
-  }
 
   @ParameterizedTest
   @MethodSource("charsetProvider")
@@ -149,15 +153,40 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     charset: String,
     input: Map<String, String>,
     expectedOutput: Map<String, String>,
-  ) {
-    transformer.charsetName.set(charset)
+  ) =
+    with(transformer) {
+      charsetName.set(charset)
 
-    if (transformer.canTransformResource(path)) {
-      transformer.transform(context(path, input, Charset.forName(charset)))
+      if (canTransformResource(path)) {
+        transform(context(path, input, Charset.forName(charset)))
+      }
+
+      assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+      val content = transformToJar().use { it.getBytes(path).toString(Charset.forName(charset)) }
+      expectedOutput.forEach { (key, value) ->
+        assertThat(content).contains("$key=$value")
+      }
     }
 
-    assertThat(transformer.propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
-  }
+  @Test // #856
+  fun mergedPropertiesWithoutComments() =
+    with(transformer) {
+      val path = "META-INF/test.properties"
+      paths.set(listOf(path))
+      mergeStrategy.set(MergeStrategy.Append)
+
+      val text1 = "# A comment from jar one.\nfoo=one"
+      val text2 = "# A comment from jar two.\nfoo=two"
+
+      transform(textContext(path, text1))
+      transform(textContext(path, text2))
+
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, false)
+      }
+      val content = JarPath(tempJar).use { it.getContent(path) }
+      assertThat(content).isEqualTo("foo=one,two\n")
+    }
 
   private companion object {
     fun context(
@@ -174,6 +203,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       listOf(
         Arguments.of("foo.properties", true),
         Arguments.of("foo/bar.properties", true),
+        Arguments.of("a/b/c/ButtonLabel_en.properties", true),
+        Arguments.of("a/b/c/ButtonLabel_en_US.properties", true),
+        Arguments.of("a/b/c/ButtonLabel_fr_CA_UNIX.properties", true),
         Arguments.of("foo.props", false),
       )
 

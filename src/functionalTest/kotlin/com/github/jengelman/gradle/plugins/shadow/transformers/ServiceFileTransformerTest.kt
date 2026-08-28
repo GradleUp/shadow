@@ -1,10 +1,13 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
+import assertk.assertions.contains
 import assertk.assertions.containsMatch
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
 import kotlin.io.path.writeText
 import org.gradle.api.file.DuplicatesStrategy
@@ -17,189 +20,180 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 
 class ServiceFileTransformerTest : BaseTransformerTest() {
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun serviceResourceTransformer(shortSyntax: Boolean) {
-    val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(buildJarOne(), buildJarTwo())}
-        }
-        $shadowJarTask {
-          mergeServiceFiles {
-            exclude 'META-INF/services/com.acme.*'
-          }
-        }
-      """
-          .trimIndent()
-      } else {
-        transform<ServiceFileTransformer>(
-          dependenciesBlock = implementationFiles(buildJarOne(), buildJarTwo()),
-          transformerBlock =
-            """
-            exclude 'META-INF/services/com.acme.*'
-            """
-              .trimIndent(),
-        )
-      }
-    projectScript.appendText(config)
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("two")
-    }
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun serviceResourceTransformerAlternatePath(shortSyntax: Boolean) {
+  @Test
+  fun serviceResourceTransformerAlternatePath() {
     val one = buildJarOne { insert(ENTRY_FOO_SHADE, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_FOO_SHADE, CONTENT_TWO) }
     val config =
-      if (shortSyntax) {
-        """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles("META-INF/foo")
-        }
       """
-          .trimIndent()
-      } else {
-        transform<ServiceFileTransformer>(
-          dependenciesBlock = implementationFiles(one, two),
-          transformerBlock =
-            """
-            path = 'META-INF/foo'
-            """
-              .trimIndent(),
-        )
-      }
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles("META-INF/foo")
+      |}
+      """
+        .trimMargin()
     projectScript.appendText(config)
 
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(ENTRY_FOO_SHADE) }
-    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
+    assertThat(content).isEqualTo("$CONTENT_ONE_TWO\n")
   }
 
   @Test
   fun serviceResourceTransformerWithRelocation() {
     val one = buildJarOne {
+      insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
+      insert("foo/FooDriver.class", createEmptyClassBytes("foo/FooDriver"))
       insert(
-        "META-INF/services/java.sql.Driver",
-        """
-        oracle.jdbc.OracleDriver
-        org.apache.hive.jdbc.HiveDriver
-        """
-          .trimIndent(),
-      )
-      insert(
-        "META-INF/services/org.apache.axis.components.compiler.Compiler",
-        "org.apache.axis.components.compiler.Javac",
-      )
-      insert(
-        "META-INF/services/org.apache.commons.logging.LogFactory",
-        "org.apache.commons.logging.impl.LogFactoryImpl",
+        "META-INF/services/com.example.Driver",
+        "foo.FooDriver",
       )
     }
     val two = buildJarTwo {
+      insert("bar/BarDriver.class", createEmptyClassBytes("bar/BarDriver"))
       insert(
-        "META-INF/services/java.sql.Driver",
-        """
-        org.apache.derby.jdbc.AutoloadedDriver
-        com.mysql.jdbc.Driver
-        """
-          .trimIndent(),
+        "META-INF/services/com.example.Driver",
+        "bar.BarDriver",
       )
-      insert(
-        "META-INF/services/org.apache.axis.components.compiler.Compiler",
-        "org.apache.axis.components.compiler.Jikes",
-      )
-      insert("META-INF/services/org.apache.commons.logging.LogFactory", "org.mortbay.log.Factory")
     }
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles()
-          relocate("org.apache", "myapache") {
-            exclude 'org.apache.axis.components.compiler.Jikes'
-            exclude 'org.apache.commons.logging.LogFactory'
-          }
-        }
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |  relocate("com.example", "relocated.com.example")
+      |  relocate("foo", "relocated.foo")
+      |  relocate("bar", "relocated.bar")
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent("META-INF/services/java.sql.Driver")
+      containsOnly(
+        "relocated/",
+        "relocated/bar/",
+        "relocated/bar/BarDriver.class",
+        "relocated/com/",
+        "relocated/com/example/",
+        "relocated/com/example/Driver.class",
+        "relocated/foo/",
+        "relocated/foo/FooDriver.class",
+        "META-INF/services/",
+        "META-INF/services/relocated.com.example.Driver",
+        *manifestEntries,
+      )
+      getContent("META-INF/services/relocated.com.example.Driver")
         .isEqualTo(
           """
-          oracle.jdbc.OracleDriver
-          myapache.hive.jdbc.HiveDriver
-          myapache.derby.jdbc.AutoloadedDriver
-          com.mysql.jdbc.Driver
-          """
-            .trimIndent()
+          |relocated.foo.FooDriver
+          |relocated.bar.BarDriver
+          |"""
+            .trimMargin()
         )
-      getContent("META-INF/services/myapache.axis.components.compiler.Compiler")
-        .isEqualTo(
-          """
-          myapache.axis.components.compiler.Javac
-          org.apache.axis.components.compiler.Jikes
-          """
-            .trimIndent()
-        )
-      getContent("META-INF/services/org.apache.commons.logging.LogFactory")
-        .isEqualTo(
-          """
-          myapache.commons.logging.impl.LogFactoryImpl
-          org.mortbay.log.Factory
-          """
-            .trimIndent()
-        )
+      classLoader {
+        loadClass("relocated.com.example.Driver")
+        loadClass("relocated.foo.FooDriver")
+        loadClass("relocated.bar.BarDriver")
+      }
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/70",
-    "https://github.com/GradleUp/shadow/issues/71",
-  )
   @Test
+  fun serviceResourceTransformerWithR8Relocation() {
+    val one = buildJarOne {
+      insert("com/example/Driver.class", createEmptyClassBytes("com/example/Driver"))
+      insert("foo/FooDriver.class", createEmptyClassBytes("foo/FooDriver"))
+      insert(
+        "META-INF/services/com.example.Driver",
+        "foo.FooDriver",
+      )
+    }
+    val two = buildJarTwo {
+      insert("bar/BarDriver.class", createEmptyClassBytes("bar/BarDriver"))
+      insert(
+        "META-INF/services/com.example.Driver",
+        "bar.BarDriver",
+      )
+    }
+
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |  minimize {
+      |    r8 {
+      |      proguardRules.addAll(
+      |        "-repackageclasses 'relocated'",
+      |      )
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "relocated/bar/BarDriver.class",
+        "relocated/com/example/Driver.class",
+        "relocated/foo/FooDriver.class",
+        "META-INF/services/relocated.com.example.Driver",
+        manifestEntry,
+      )
+      getContent("META-INF/services/relocated.com.example.Driver")
+        .isEqualTo(
+          """
+          |relocated.foo.FooDriver
+          |relocated.bar.BarDriver
+          |"""
+            .trimMargin()
+        )
+      classLoader {
+        loadClass("relocated.com.example.Driver")
+        loadClass("relocated.foo.FooDriver")
+        loadClass("relocated.bar.BarDriver")
+      }
+    }
+  }
+
+  @Test // #70, #71
   fun transformProjectResources() {
     val servicesBarEntry = "META-INF/services/foo.Bar"
     val one = buildJarOne { insert(servicesBarEntry, CONTENT_ONE) }
     val two = buildJarTwo { insert(servicesBarEntry, CONTENT_TWO) }
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(one, two)}
-        }
-        $shadowJarTask {
-          mergeServiceFiles()
-        }
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  mergeServiceFiles()
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
     runWithSuccess(shadowJarPath)
 
     val content = outputShadowedJar.use { it.getContent(servicesBarEntry) }
-    assertThat(content).isEqualTo(CONTENT_THREE + "\n" + CONTENT_ONE_TWO)
+    assertThat(content).isEqualTo("$CONTENT_THREE\n$CONTENT_ONE_TWO\n")
   }
 
   @ParameterizedTest
@@ -221,11 +215,19 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
   ) {
     writeDuplicatesStrategy(strategy)
 
-    runWithSuccess(shadowJarPath)
+    val result = runWithSuccess(shadowJarPath)
+
+    if (strategy == EXCLUDE) {
+      assertThat(result.output)
+        .contains(
+          "'META-INF/services/com.acme.Foo' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.",
+          "'META-INF/services/org.apache.maven.Shade' is matched by com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer but its DuplicatesStrategy is EXCLUDE — duplicates may be silently dropped before the transformer processes them.",
+        )
+    }
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(firstValue)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo(secondValue)
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$firstValue\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("$secondValue\n")
     }
   }
 
@@ -234,20 +236,20 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(EXCLUDE)
     projectScript.appendText(
       """
-        $shadowJarTask {
-          filesMatching('$ENTRY_SERVICES_SHADE') {
-            duplicatesStrategy = DuplicatesStrategy.INCLUDE
-          }
-        }
+      |$shadowJarTask {
+      |  filesMatching('$ENTRY_SERVICES_SHADE') {
+      |    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$CONTENT_ONE_TWO\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\n")
     }
   }
 
@@ -256,20 +258,20 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(INCLUDE)
     projectScript.appendText(
       """
-        $shadowJarTask {
-          filesNotMatching('$ENTRY_SERVICES_SHADE') {
-            duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-          }
-        }
+      |$shadowJarTask {
+      |  filesNotMatching('$ENTRY_SERVICES_SHADE') {
+      |    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$CONTENT_ONE_TWO\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\n")
     }
   }
 
@@ -283,37 +285,38 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
     writeDuplicatesStrategy(default)
     projectScript.appendText(
       """
-        $shadowJarTask {
-          eachFile {
-            if (path == '$matchPath') {
-              duplicatesStrategy = DuplicatesStrategy.$override
-            }
-          }
-        }
+      |$shadowJarTask {
+      |  eachFile {
+      |    if (path == '$matchPath') {
+      |      duplicatesStrategy = DuplicatesStrategy.$override
+      |    }
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      getContent(ENTRY_SERVICES_SHADE).isEqualTo(CONTENT_ONE_TWO)
-      getContent(ENTRY_SERVICES_FOO).isEqualTo("one")
+      getContent(ENTRY_SERVICES_SHADE).isEqualTo("$CONTENT_ONE_TWO\n")
+      getContent(ENTRY_SERVICES_FOO).isEqualTo("one\n")
     }
   }
 
   private fun writeDuplicatesStrategy(strategy: DuplicatesStrategy) {
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(buildJarOne(), buildJarTwo())}
-        }
-        $shadowJarTask {
-          duplicatesStrategy = DuplicatesStrategy.$strategy
-          mergeServiceFiles()
-        }
+      |dependencies {
+      |  ${implementationFiles(buildJarOne(), buildJarTwo())}
+      |}
+      |$shadowJarTask {
+      |  duplicatesStrategy = DuplicatesStrategy.$strategy
+      |  mergeServiceFiles()
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
   }
 

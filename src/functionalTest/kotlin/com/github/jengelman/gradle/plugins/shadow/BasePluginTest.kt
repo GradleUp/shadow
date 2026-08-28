@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWarnings
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
+import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -27,6 +28,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
 import kotlin.io.path.createTempDirectory
+import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
@@ -41,6 +43,8 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.io.TempDir
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
+import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 abstract class BasePluginTest {
@@ -147,41 +151,45 @@ abstract class BasePluginTest {
     val groupInfo = if (withGroup) "group = 'my'" else ""
     val versionInfo = if (withVersion) "version = '1.0'" else ""
     return """
-      plugins {
-        id '$plugin'
-        id '$shadowPluginId' apply $applyShadowPlugin
-      }
-      $groupInfo
-      $versionInfo
-    """
-      .trimIndent() + lineSeparator
+           |plugins {
+           |  id '$plugin'
+           |  id '$shadowPluginId' apply $applyShadowPlugin
+           |}
+           |$groupInfo
+           |$versionInfo
+           |
+           """
+      .trimMargin()
   }
 
   fun getDefaultSettingsBuildScript(
     startBlock: String = "",
     // Use a test-specific build cache directory. This ensures that we'll only use cached outputs
-    // generated during
-    // this test, and we won't accidentally use cached outputs from a different test or a different
-    // build.
+    // generated during this test, and we won't accidentally use cached outputs from a different
+    // test or a different build.
     // https://docs.gradle.org/current/userguide/build_cache.html#sec:build_cache_configure_local
     buildCacheBlock: String = "local { directory = file('build-cache') }",
     endBlock: String = "rootProject.name = 'my'",
   ): String {
     return """
-      $startBlock
-      dependencyResolutionManagement {
-        repositories {
-          maven { url = '${localRepo.root.toUri()}' }
-          mavenCentral()
-        }
-      }
-      buildCache {
-        $buildCacheBlock
-      }
-      enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
-      $endBlock
-    """
-      .trimIndent() + lineSeparator
+           |$startBlock
+           |dependencyResolutionManagement {
+           |  repositories {
+           |    maven { url = '${localRepo.root.toUri()}' }
+           |    mavenCentral()
+           |    google()
+           |  }
+           |}
+           |buildCache {
+           |  $buildCacheBlock
+           |}
+           |$enableNoImplicitLookupInParentProjects
+           |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
+           |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+           |$endBlock
+           |
+           """
+      .trimMargin()
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
@@ -229,39 +237,39 @@ abstract class BasePluginTest {
           val imports = if (withImports) "import junit.framework.Test;" else ""
           val classRef = if (withImports) "\"Refs: \" + Test.class.getName()" else "\"Refs: null\""
           """
-            package $packageName;
-            $imports
-            public class $className {
-              public static void main(String[] args) {
-                if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
-                String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
-                System.out.println(content);
-                System.out.println($classRef);
-              }
-            }
+          |package $packageName;
+          |$imports
+          |public class $className {
+          |  public static void main(String[] args) {
+          |    if (args.length == 0) throw new IllegalArgumentException("No arguments provided.");
+          |    String content = String.format("Hello, World! (%s) from $className", (Object[]) args);
+          |    System.out.println(content);
+          |    System.out.println($classRef);
+          |  }
+          |}
           """
-            .trimIndent()
+            .trimMargin()
         }
         JvmLang.Kotlin -> {
           val imports = if (withImports) "import junit.framework.Test" else ""
           val classRef = if (withImports) "\"Refs: \" + Test::class.java.name" else "\"Refs: null\""
           """
-            @file:JvmName("$className")
-            package $packageName
-            $imports
-            fun main(vararg args: String) {
-              if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
-              val content ="Hello, World! (%s) from $className".format(*args)
-              println(content)
-              println($classRef)
-            }
+          |@file:JvmName("$className")
+          |package $packageName
+          |$imports
+          |fun main(vararg args: String) {
+          |  if (args.isEmpty()) throw IllegalArgumentException("No arguments provided.")
+          |  val content ="Hello, World! (%s) from $className".format(*args)
+          |  println(content)
+          |  println($classRef)
+          |}
           """
-            .trimIndent()
+            .trimMargin()
         }
       }
     },
   ): String {
-    val basePath = packageName.replace('.', '/') + "/$className"
+    val basePath = "${packageName.replace('.', '/')}/$className"
     path("src/$sourceSet/$jvmLang/$basePath.${jvmLang.suffix}").writeText(content())
     return "$basePath.class"
   }
@@ -269,73 +277,76 @@ abstract class BasePluginTest {
   fun writeClientAndServerModules(clientShadowed: Boolean = false, serverShadowBlock: String = "") {
     settingsScript.appendText(
       """
-      include 'client', 'server'
+      |include 'client', 'server'
       """
-        .trimIndent()
+        .trimMargin()
     )
-    projectScript.writeText("")
+    projectScript.deleteExisting()
 
     path("client/src/main/java/client/Client.java")
       .writeText(
         """
-        package client;
-        public class Client {}
+        |package client;
+        |public class Client {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("client/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation 'junit:junit:3.8.2'
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Client;
-        public class Server {}
+        |package server;
+        |import client.Client;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     path("server/build.gradle")
       .writeText(
         """
-        ${getDefaultProjectBuildScript("java")}
-        dependencies {
-          implementation project(':client')
-        }
-        $shadowJarTask {
-          $serverShadowBlock
-        }
-      """
-          .trimIndent() + lineSeparator
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation project(':client')
+        |}
+        |$shadowJarTask {
+        |  $serverShadowBlock
+        |}
+        |
+        """
+          .trimMargin()
       )
 
     if (!clientShadowed) return
     path("client/build.gradle")
       .appendText(
         """
-        $shadowJarTask {
-          relocate 'junit.framework', 'client.junit.framework'
-        }
-      """
-          .trimIndent() + lineSeparator
+        |$shadowJarTask {
+        |  relocate 'junit.framework', 'client.junit.framework'
+        |}
+        |
+        """
+          .trimMargin()
       )
     path("server/src/main/java/server/Server.java")
       .writeText(
         """
-        package server;
-        import client.Client;
-        import client.junit.framework.Test;
-        public class Server {}
+        |package server;
+        |import client.Client;
+        |import client.junit.framework.Test;
+        |public class Server {}
         """
-          .trimIndent()
+          .trimMargin()
       )
     val replaced =
       path("server/build.gradle")
@@ -347,32 +358,32 @@ abstract class BasePluginTest {
   fun writeGradlePluginModule() {
     projectScript.writeText(
       """
-        ${getDefaultProjectBuildScript("java-gradle-plugin")}
-        gradlePlugin {
-          plugins {
-            create('my.plugin') {
-              id = 'my.plugin'
-              implementationClass = 'my.plugin.MyPlugin'
-            }
-          }
-        }
+      |${getDefaultProjectBuildScript("java-gradle-plugin")}
+      |gradlePlugin {
+      |  plugins {
+      |    create('my.plugin') {
+      |      implementationClass = 'my.plugin.MyPlugin'
+      |    }
+      |  }
+      |}
+      |
       """
-        .trimIndent() + lineSeparator
+        .trimMargin()
     )
 
     path("src/main/java/my/plugin/MyPlugin.java")
       .writeText(
         """
-        package my.plugin;
-        import org.gradle.api.Plugin;
-        import org.gradle.api.Project;
-        public class MyPlugin implements Plugin<Project> {
-          public void apply(Project project) {
-            System.out.println("MyPlugin: Hello, World!");
-          }
-        }
+        |package my.plugin;
+        |import org.gradle.api.Plugin;
+        |import org.gradle.api.Project;
+        |public class MyPlugin implements Plugin<Project> {
+        |  public void apply(Project project) {
+        |    System.out.println("MyPlugin: Hello, World!");
+        |  }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
   }
 
@@ -386,8 +397,6 @@ abstract class BasePluginTest {
 
   @Suppress("ConstPropertyName")
   companion object {
-    val lineSeparator: String = System.lineSeparator()
-
     const val shadowPluginId = "com.gradleup.shadow"
     const val shadowJarPath = ":$SHADOW_JAR_TASK_NAME"
     const val serverShadowJarPath = ":server:$SHADOW_JAR_TASK_NAME"
@@ -420,9 +429,18 @@ abstract class BasePluginTest {
     fun String.toProperties(): Properties = Properties().apply { load(byteInputStream()) }
 
     fun implementationFiles(vararg paths: Path): String {
-      return paths.joinToString(lineSeparator) {
+      return paths.joinToString("\n") {
         "implementation files('${it.invariantSeparatorsPathString}')"
       }
+    }
+
+    fun createEmptyClassBytes(internalName: String): ByteArray {
+      return ClassWriter(0)
+        .apply {
+          visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+          visitEnd()
+        }
+        .toByteArray()
     }
 
     inline fun <reified T : ResourceTransformer> transform(
@@ -430,16 +448,16 @@ abstract class BasePluginTest {
       transformerBlock: String = "",
     ): String {
       return """
-        dependencies {
-          $dependenciesBlock
-        }
-        $shadowJarTask {
-          transform(${T::class.java.name}) {
-            $transformerBlock
-          }
-        }
-      """
-        .trimIndent()
+             |dependencies {
+             |  $dependenciesBlock
+             |}
+             |$shadowJarTask {
+             |  transform(${T::class.java.name}) {
+             |    $transformerBlock
+             |  }
+             |}
+             """
+        .trimMargin()
     }
 
     fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {

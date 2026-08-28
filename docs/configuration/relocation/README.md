@@ -1,16 +1,16 @@
 # Relocating Packages
 
-Shadow is capable of scanning a project's classes and relocating specific dependencies to a new location.
-This is often required when one of the dependencies is susceptible to breaking changes in versions or
-to classpath pollution in a downstream project.
+Shadow is capable of scanning a project's classes and relocating specific dependencies to a new location. This is often
+required when one of the dependencies is susceptible to breaking changes in versions or to classpath pollution in a
+downstream project.
 
+> [!TIP]
 > Google's Guava and the ASM library are typical cases where package relocation can come in handy.
 
-Shadow uses the ASM library to modify class byte code to replace the package name and any import
-statements for a class.
+Shadow uses the ASM library to modify class byte code to replace the package name and any import statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -18,7 +18,7 @@ Any non-class files that are stored within a package structure are also relocate
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -26,14 +26,16 @@ Any non-class files that are stored within a package structure are also relocate
     }
     ```
 
-The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`.
-For example, the class `junit.framework.TestCase` becomes `shadow.junit.TestCase`.
-In the resulting JAR, the class file is relocated from `junit/framework/TestCase.class` to
-`shadow/junit/TestCase.class`.
+The code snippet will rewrite the location for any class in the `junit.framework` to be `shadow.junit`. For example, the
+class `junit.framework.TestCase` becomes `shadow.junit.TestCase`. In the resulting JAR, the class file is relocated from
+`junit/framework/TestCase.class` to `shadow/junit/TestCase.class`.
 
+> [!WARNING]
+> **Scope of Relocation**
+>
 > Relocation operates at a package level.
 > It is not necessary to specify any patterns for matching, it will operate simply on the prefix provided.
-
+>
 > Relocation will be applied globally to all instances of the matched prefix.
 > That is, it does **not** scope to _only_ the dependencies being shadowed.
 > Be specific as possible when configuring relocation as to avoid unintended relocations.
@@ -41,10 +43,9 @@ In the resulting JAR, the class file is relocated from `junit/framework/TestCase
 ## Filtering Relocation
 
 Specific classes or files can be `included`/`excluded` from the relocation operation if necessary. Use
-[Ant Path Matcher](https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html)
-syntax to specify matching path for your files and directories.
+[Ant Path Matcher][ant-path-matcher] syntax to specify matching path for your files and directories.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -57,7 +58,7 @@ syntax to specify matching path for your files and directories.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -70,10 +71,10 @@ syntax to specify matching path for your files and directories.
     }
     ```
 
-For a more advanced path matching you might want to use [Regular Expressions](https://regexr.com/) instead. Wrap the
+For a more advanced path matching you might want to use [Regular Expressions][regular-expressions] instead. Wrap the
 expression in `%regex[]` before passing it to `include`/`exclude`.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -83,7 +84,7 @@ expression in `%regex[]` before passing it to `include`/`exclude`.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -97,7 +98,7 @@ It may be desirable to relocate all packages in a Shadow JAR except for a select
 specifying a relocation with an empty string `''` as the pattern to match on all packages. An `exclude` filter can then
 be used to prevent relocation of specific packages.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -109,7 +110,7 @@ be used to prevent relocation of specific packages.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -137,7 +138,7 @@ public class Bar {
 
 in your project, and you configure the relocation like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -145,7 +146,7 @@ in your project, and you configure the relocation like:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -156,7 +157,7 @@ in your project, and you configure the relocation like:
 the string constant `"foo.Bar"` will be relocated to `"my.foo.Bar"` by default. This may not be what you want, you can
 skip relocating string constants in the classes like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -167,7 +168,7 @@ skip relocating string constants in the classes like:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -187,7 +188,7 @@ removed for clarity reasons in version 4.0.0.
 To configure automatic dependency relocation, set `enableAutoRelocation = true` and optionally specify a custom
 `relocationPrefix` to override the default value of `"shadow"`.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
@@ -196,7 +197,7 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
@@ -205,11 +206,15 @@ To configure automatic dependency relocation, set `enableAutoRelocation = true` 
     }
     ```
 
-> Configuring package auto relocation can add significant time to the shadow process as it will process all dependencies
-> in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath` configurations.
-> Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove these
-> dependencies if you do not intend to shadow them into your library.
-
+> [!WARNING]
+> **Performance & Transitive Dependencies**
+>
+> Configuring package auto relocation can add significant time to the shadow process as it will process all
+> dependencies in the configurations declared to be shadowed. By default, this is the `runtime` or `runtimeClasspath`
+> configurations.
+>
+> Be mindful that some Gradle plugins will automatically add dependencies to your class path. You may need to remove
+> these dependencies if you do not intend to shadow them into your library.
 
 ## Relocating Kotlin Standard Library
 
@@ -222,33 +227,112 @@ runtime. See more details and discussion in [#1622][#1622].
 If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with
 relocating), you can try out the trick like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
       // Empty configurations list will exclude all dependencies.
-      configurations.unset()
-      configurations.unsetConvention()
+      configurations.setFrom()
       relocate("com.example", "shadow.com.example")
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       // Empty configurations list will exclude all dependencies.
-      configurations.unset()
-      configurations.unsetConvention()
+      configurations.setFrom()
       relocate 'com.example', 'shadow.com.example'
     }
     ```
 
-This is useful in some cases like [#759](https://github.com/GradleUp/shadow/issues/759) mentioned. See
-[Configuring Shadowed Dependencies](../dependencies/README.md) for more information about `configurations`.
+This is useful in some cases, as mentioned in [#759]. See
+[Configuring Shadowed Dependencies][configuring-shadowed-dependencies] for more information about `configurations`.
 
+## Relocating with R8
+
+As an alternative to Shadow's built-in `relocate` configuration (which uses ASM to rename package prefixes during JAR
+merging), you can use [R8][r8-minimizing] to handle package relocation (also referred to as *repackaging*).
+
+R8 performs whole-program analysis during its minimization pass to safely relocate classes while respecting Java access
+visibility constraints (such as package-private and `protected` members). For more details on R8 rules, see
+the [Global options for additional optimization][android-r8-global-options] and ProGuard manual for
+[-repackageclasses][repackageclasses], [-allowaccessmodification][allowaccessmodification]
+and [-keeppackagenames][keeppackagenames].
+
+### Configuring R8 Repackaging
+
+To use R8 for package relocation, enable R8 under `minimize` and provide ProGuard repackaging directives via
+`proguardRules` or an external rule file:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        r8 {
+          proguardRules.addAll(
+            // Repackage all relocatable classes into a single destination package
+            "-repackageclasses 'shadow.repackaged'",
+            // Optional: widen access to public to allow R8 to relocate more classes
+            "-allowaccessmodification",
+            // Optional: preserve specific package names if needed
+            "-keeppackagenames com.example.keep.**",
+          )
+        }
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        r8 {
+          proguardRules.addAll(
+            // Repackage all relocatable classes into a single destination package
+            "-repackageclasses 'shadow.repackaged'",
+            // Optional: widen access to public to allow R8 to relocate more classes
+            "-allowaccessmodification",
+            // Optional: preserve specific package names if needed
+            "-keeppackagenames com.example.keep.**",
+          )
+        }
+      }
+    }
+    ```
+
+### Comparison: Shadow `relocate` vs. R8 Repackaging
+
+| Feature                        | Shadow `relocate` (`SimpleRelocator`)                                     | R8 Repackaging (`-repackageclasses`)                |
+|:-------------------------------|:--------------------------------------------------------------------------|:----------------------------------------------------|
+| **Execution Stage**            | During JAR merging (ASM bytecode transformation)                          | Post-merge whole-program optimization               |
+| **Relocation Scope**           | Explicit per-prefix or per-class pattern matching                         | Whole-program automatic relocation                  |
+| **Visibility Handling**        | Direct string/type renaming (no visibility check)                         | Analyzes package-private & protected constraints    |
+| **Embedded R8/ProGuard Rules** | Requires [transformer][ProGuardFilesResourceTransformer] to rewrite rules | Handled natively without extra transformers         |
+| **Shrinking / Obfuscation**    | Relocation only                                                           | Combined with shrinking (optional name obfuscation) |
 
 
 [#1622]: https://github.com/GradleUp/shadow/issues/1622
+[#759]: https://github.com/GradleUp/shadow/issues/759
 [kotlin-metadata]: https://kotlinlang.org/docs/metadata-jvm.html
 [kotlin-reflection]: https://kotlinlang.org/docs/reflection.html
+[r8-minimizing]: ../minimizing/README.md#minimizing-with-r8
+[android-r8-global-options]: https://developer.android.com/topic/performance/app-optimization/global-options#global-options
+[repackageclasses]: https://www.guardsquare.com/manual/configuration/usage#repackageclasses
+[allowaccessmodification]: https://www.guardsquare.com/manual/configuration/usage#allowaccessmodification
+[keeppackagenames]: https://www.guardsquare.com/manual/configuration/usage#keeppackagenames
+[ant-path-matcher]: https://docs.spring.io/spring/docs/current/javadoc-api/org/springframework/util/AntPathMatcher.html
+[regular-expressions]: https://regexr.com/
+[configuring-shadowed-dependencies]: ../dependencies/README.md
+[ProGuardFilesResourceTransformer]: ../merging/README.md#merging-r8proguard-rule-files

@@ -10,15 +10,16 @@ import assertk.assertions.startsWith
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
-import java.net.URI
 import java.net.URL
 import java.util.Collections
 import java.util.jar.JarInputStream
 import kotlin.io.path.createTempFile
-import kotlin.io.path.outputStream
+import kotlin.io.path.writeBytes
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
@@ -34,77 +35,83 @@ import org.junit.jupiter.params.provider.MethodSource
 class Log4j2PluginsCacheFileTransformerTest :
   BaseTransformerTest<Log4j2PluginsCacheFileTransformer>() {
   @Test
-  fun canTransformResource() {
-    assertThat(transformer.canTransformResource("")).isFalse()
-    assertThat(transformer.canTransformResource(".")).isFalse()
-    assertThat(transformer.canTransformResource("tmp.dat")).isFalse()
-    assertThat(transformer.canTransformResource("$PLUGIN_CACHE_FILE.tmp")).isFalse()
-    assertThat(transformer.canTransformResource("tmp/$PLUGIN_CACHE_FILE")).isFalse()
-    assertThat(transformer.canTransformResource(PLUGIN_CACHE_FILE)).isTrue()
-  }
-
-  @Test
-  fun relocateClassesInsideDatFile() {
-    val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
-    transformer.transform(context(relocator))
-    assertThat(transformer.hasTransformedResource()).isTrue()
-
-    val tempJar = createTempFile("testable-zip-file-", ".jar")
-    tempJar.outputStream().zipOutputStream().use { zos ->
-      transformer.modifyOutputStream(zos, true)
+  fun canTransformResource() =
+    with(transformer) {
+      assertThat(canTransformResource("")).isFalse()
+      assertThat(canTransformResource(".")).isFalse()
+      assertThat(canTransformResource("tmp.dat")).isFalse()
+      assertThat(canTransformResource("$PLUGIN_CACHE_FILE.tmp")).isFalse()
+      assertThat(canTransformResource("tmp/$PLUGIN_CACHE_FILE")).isFalse()
+      assertThat(canTransformResource(PLUGIN_CACHE_FILE)).isTrue()
     }
 
-    // Pull the data back out and make sure it was transformed
-    val cache = PluginCache()
-    val url = URI("jar:" + tempJar.toUri().toURL() + "!/" + PLUGIN_CACHE_FILE).toURL()
-    cache.loadCacheFiles(Collections.enumeration(listOf(url)))
-
-    assertThat(cache.getCategory("lookup")["date"]?.className)
-      .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
-  }
-
   @Test
-  fun transformAndModifyOutputStream() {
-    assertThat(transformer.hasTransformedResource()).isFalse()
+  fun relocateClassesInsideDatFile() =
+    with(transformer) {
+      val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
+      transform(context(relocator))
+      assertThat(hasTransformedResource()).isTrue()
 
-    transformer.transform(context())
-    assertThat(transformer.hasTransformedResource()).isTrue()
-    transformer.transform(context())
-    assertThat(transformer.hasTransformedResource()).isTrue()
+      tempJar.zipOutputStream().use { zos ->
+        modifyOutputStream(zos, true)
+      }
 
-    val jarBuff = ByteArrayOutputStream()
-    ZipOutputStream(jarBuff).use { transformer.modifyOutputStream(it, false) }
-    JarInputStream(jarBuff.toByteArray().inputStream()).use { inputStream ->
-      while (true) {
-        val jarEntry = inputStream.nextJarEntry
-        if (jarEntry == null) {
-          fail("No expected resource in the output jar.")
-        } else if (jarEntry.name == PLUGIN_CACHE_FILE) {
-          assertThat(inputStream.readAllBytes().contentHashCode()).all {
-            // Hash of the original plugin cache file.
-            isNotEqualTo(-2114104185)
-            isEqualTo(1911442937)
+      // Extract the .dat file bytes to a temp file to avoid JarURLConnection locking tempJar on
+      // Windows
+      val tempDat = createTempFile(directory = tempDir, suffix = ".dat")
+      tempDat.writeBytes(JarPath(tempJar).use { it.getBytes(PLUGIN_CACHE_FILE) })
+
+      val cache = PluginCache()
+      cache.loadCacheFiles(Collections.enumeration(listOf(tempDat.toUri().toURL())))
+
+      assertThat(cache.getCategory("lookup")["date"]?.className)
+        .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
+    }
+
+  @Test // #427
+  fun transformAndModifyOutputStream() =
+    with(transformer) {
+      assertThat(hasTransformedResource()).isFalse()
+
+      transform(context())
+      assertThat(hasTransformedResource()).isTrue()
+      transform(context())
+      assertThat(hasTransformedResource()).isTrue()
+
+      val jarBuff = ByteArrayOutputStream()
+      ZipOutputStream(jarBuff).use { modifyOutputStream(it, false) }
+      JarInputStream(jarBuff.toByteArray().inputStream()).use { inputStream ->
+        while (true) {
+          val jarEntry = inputStream.nextJarEntry
+          if (jarEntry == null) {
+            fail("No expected resource in the output jar.")
+          } else if (jarEntry.name == PLUGIN_CACHE_FILE) {
+            assertThat(inputStream.readAllBytes().contentHashCode()).all {
+              // Hash of the original plugin cache file.
+              isNotEqualTo(-2114104185)
+              isEqualTo(1911442937)
+            }
+            break
           }
-          break
         }
       }
     }
-  }
 
   @ParameterizedTest
   @MethodSource("relocationProvider")
-  fun relocations(pattern: String, shadedPattern: String, expected: String) {
-    val aggregator =
-      PluginCache().apply { loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl))) }
-    transformer.transform(context(SimpleRelocator(pattern, shadedPattern)))
-    transformer.relocatePlugins(aggregator)
+  fun relocations(pattern: String, shadedPattern: String, expected: String) =
+    with(transformer) {
+      val aggregator =
+        PluginCache().apply { loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl))) }
+      transform(context(SimpleRelocator(pattern, shadedPattern)))
+      relocatePlugins(aggregator)
 
-    for (pluginEntryMap in aggregator.allCategories.values) {
-      for (entry in pluginEntryMap.values) {
-        assertThat(entry.className).startsWith(expected)
+      for (pluginEntryMap in aggregator.allCategories.values) {
+        for (entry in pluginEntryMap.values) {
+          assertThat(entry.className).startsWith(expected)
+        }
       }
     }
-  }
 
   private companion object {
     val pluginCacheUrl: URL = requireResourceAsPath(PLUGIN_CACHE_FILE).toUri().toURL()

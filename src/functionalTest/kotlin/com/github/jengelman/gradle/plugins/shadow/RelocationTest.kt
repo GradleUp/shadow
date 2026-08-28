@@ -1,35 +1,29 @@
 package com.github.jengelman.gradle.plugins.shadow
 
-import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
-import assertk.assertions.isInstanceOf
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowCopyAction.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
+import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
+import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
-import com.github.jengelman.gradle.plugins.shadow.util.Issue
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
-import java.net.URLClassLoader
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
-import kotlin.metadata.jvm.KotlinModuleMetadata
-import kotlin.metadata.jvm.UnstableMetadataApi
 import kotlin.time.Duration.Companion.seconds
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.opentest4j.AssertionFailedError
 
 class RelocationTest : BasePluginTest() {
   @ParameterizedTest
@@ -38,36 +32,40 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          enableAutoRelocation = true
-          relocationPrefix = '$relocationPrefix'
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  enableAutoRelocation = true
+      |  relocationPrefix = '$relocationPrefix'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
-    val relocatedEntries =
-      buildSet {
-          addAll(
-            junitEntries
-              .map { "$entryPrefix/$it" }
-              .filterNot { it.startsWith("$entryPrefix/META-INF/") }
-          )
-          var parent = entryPrefix
-          while (parent.isNotEmpty()) {
-            add("$parent/")
-            parent = parent.substringBeforeLast('/', "")
-          }
-        }
-        .toTypedArray()
+    val relocatedEntries = buildSet {
+      addAll(
+        junitEntries
+          .map { "$entryPrefix/$it" }
+          .filterNot { it.startsWith("$entryPrefix/META-INF/") }
+      )
+      var parent = entryPrefix
+      while (parent.isNotEmpty()) {
+        add("$parent/")
+        parent = parent.substringBeforeLast('/', "")
+      }
+    }
+      .toTypedArray()
 
     val result = runWithSuccess(shadowJarPath, infoArgument)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("my/", mainClassEntry, *relocatedEntries, *manifestEntries)
+      classLoader {
+        val pkg = relocationPrefix.replace('/', '.')
+        loadClass("my.Main")
+        loadClass("$pkg.junit.framework.Test")
+      }
     }
     // Make sure the relocator count is aligned with the number of unique packages in junit jar.
     assertThat(result.output).contains("Relocator count: 6.")
@@ -79,11 +77,11 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-      dependencies {
-        implementation 'junit:junit:3.8.2'
-      }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val relocatedEntries =
       junitEntries
@@ -112,24 +110,28 @@ class RelocationTest : BasePluginTest() {
       } else {
         containsOnly(*junitEntries, *commonEntries)
       }
+      classLoader {
+        val testClassName =
+          if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
+        loadClass(testClassName)
+      }
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/58")
-  @Test
+  @Test // #58
   fun relocateDependencyFiles() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          relocate 'junit.runner', 'a'
-          relocate 'junit.framework', 'b'
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate 'junit.runner', 'a'
+      |  relocate 'junit.framework', 'b'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val runnerFilter = { it: String -> it.startsWith("junit/runner/") }
     val frameworkFilter = { it: String -> it.startsWith("junit/framework/") }
@@ -154,6 +156,10 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
+      classLoader {
+        loadClass("a.BaseTestRunner")
+        loadClass("b.Test")
+      }
     }
   }
 
@@ -162,19 +168,19 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          relocate('junit.runner', 'a') {
-            exclude 'junit.runner.BaseTestRunner'
-          }
-          relocate('junit.framework', 'b') {
-            include 'junit.framework.Test*'
-          }
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate('junit.runner', 'a') {
+      |    exclude 'junit.runner.BaseTestRunner'
+      |  }
+      |  relocate('junit.framework', 'b') {
+      |    include 'junit.framework.Test*'
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val runnerFilter = { it: String ->
       it.startsWith("junit/runner/") && it != "junit/runner/BaseTestRunner.class"
@@ -203,25 +209,27 @@ class RelocationTest : BasePluginTest() {
         *otherJunitEntries,
         *manifestEntries,
       )
+      classLoader {
+        loadClass("junit.runner.BaseTestRunner")
+        loadClass("a.StandardTestSuiteLoader")
+        loadClass("b.Test")
+        loadClass("junit.framework.Assert")
+      }
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/53",
-    "https://github.com/GradleUp/shadow/issues/55",
-  )
-  @Test
+  @Test // #53, #55
   fun remapClassNamesForRelocatedFilesInProjectSource() {
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          relocate 'junit.framework', 'shadow.junit'
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate 'junit.framework', 'shadow.junit'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
     val relocatedEntries =
       junitEntries.map { it.replace("junit/framework/", "shadow/junit/") }.toTypedArray()
@@ -229,42 +237,30 @@ class RelocationTest : BasePluginTest() {
     path("src/main/java/my/MyTest.java")
       .writeText(
         """
-        package my;
-        import junit.framework.Test;
-        import junit.framework.TestResult;
-        public class MyTest implements Test {
-          public int countTestCases() { return 0; }
-          public void run(TestResult result) { }
-        }
+        |package my;
+        |import junit.framework.Test;
+        |import junit.framework.TestResult;
+        |public class MyTest implements Test {
+        |  public int countTestCases() { return 0; }
+        |  public void run(TestResult result) { }
+        |}
         """
-          .trimIndent()
+          .trimMargin()
       )
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
-    }
-
-    val url = outputShadowedJar.use { it.toUri().toURL() }
-    URLClassLoader(arrayOf(url), ClassLoader.getSystemClassLoader().parent).use { classLoader ->
-      assertFailure {
-          // check that the class can be loaded. If the file was not relocated properly, we should
-          // get a NoDefClassFound
-          // Isolated class loader with only the JVM system jars and the output jar from the test
-          // project
-          classLoader.loadClass("my.MyTest")
-          fail("Should not reach here.")
-        }
-        .isInstanceOf(AssertionFailedError::class)
+      classLoader {
+        val myTest = loadClass("my.MyTest")
+        val test = loadClass("shadow.junit.Test")
+        test.isAssignableFrom(myTest)
+      }
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/93",
-    "https://github.com/GradleUp/shadow/issues/114",
-  )
-  @Test
+  @Test // #93, #114
   fun relocateResourceFiles() {
     val depJar = buildJar("foo.jar") { insert("foo/dep.properties", "c") }
     writeClass(packageName = "foo", className = "Foo")
@@ -272,14 +268,14 @@ class RelocationTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(depJar)}
-        }
-        $shadowJarTask {
-          relocate 'foo', 'bar'
-        }
+      |dependencies {
+      |  ${implementationFiles(depJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate 'foo', 'bar'
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -292,6 +288,9 @@ class RelocationTest : BasePluginTest() {
         "bar/dep.properties",
         *manifestEntries,
       )
+      classLoader {
+        loadClass("bar.Foo")
+      }
     }
   }
 
@@ -307,15 +306,15 @@ class RelocationTest : BasePluginTest() {
     writeClass(withImports = true)
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          enableAutoRelocation = $enableAutoRelocation
-          preserveFileTimestamps = $preserveFileTimestamps
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  enableAutoRelocation = $enableAutoRelocation
+      |  preserveFileTimestamps = $preserveFileTimestamps
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -387,12 +386,7 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/295",
-    "https://github.com/GradleUp/shadow/issues/562",
-    "https://github.com/GradleUp/shadow/issues/884",
-  )
-  @Test
+  @Test // #295, #562, #884
   fun excludeKotlinBuiltinsFromRelocation() {
     val kotlinJar =
       buildJar("kotlin.jar") {
@@ -400,16 +394,16 @@ class RelocationTest : BasePluginTest() {
       }
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(kotlinJar)}
-        }
-        $shadowJarTask {
-          relocate('kotlin.', 'foo.kotlin.') {
-            exclude('kotlin/kotlin.kotlin_builtins')
-          }
-        }
+      |dependencies {
+      |  ${implementationFiles(kotlinJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate('kotlin.', 'foo.kotlin.') {
+      |    exclude('kotlin/kotlin.kotlin_builtins')
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -425,25 +419,25 @@ class RelocationTest : BasePluginTest() {
     val relocateConfig =
       if (exclude) {
         """
-        exclude 'junit/**'
-        exclude 'META-INF/**'
+        |exclude 'junit/**'
+        |exclude 'META-INF/**'
         """
-          .trimIndent()
+          .trimMargin()
       } else {
         ""
       }
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          relocate('', 'foo/') {
-            $relocateConfig
-          }
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  relocate('', 'foo/') {
+      |    $relocateConfig
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -462,16 +456,15 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          configurations.unset()
-          configurations.unsetConvention()
-          relocate('', 'foo/')
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  configurations.setFrom()
+      |  relocate('', 'foo/')
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -486,14 +479,14 @@ class RelocationTest : BasePluginTest() {
     writeClassWithStringRef()
     projectScript.appendText(
       """
-        $shadowJarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-          relocate('foo', 'shadow.foo')
-        }
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |  relocate('foo', 'shadow.foo')
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -502,26 +495,22 @@ class RelocationTest : BasePluginTest() {
     assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
   }
 
-  @Issue(
-    "https://github.com/GradleUp/shadow/issues/232",
-    "https://github.com/GradleUp/shadow/issues/606",
-  )
-  @ParameterizedTest
+  @ParameterizedTest // #232, #606
   @ValueSource(booleans = [false, true])
   fun disableStringConstantsRelocation(skipStringConstants: Boolean) {
     writeClassWithStringRef()
     projectScript.appendText(
       """
-        $shadowJarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-          relocate('foo', 'shadow.foo') {
-            skipStringConstants = $skipStringConstants
-          }
-        }
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |  relocate('foo', 'shadow.foo') {
+      |    skipStringConstants = $skipStringConstants
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -534,32 +523,31 @@ class RelocationTest : BasePluginTest() {
     }
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/1403")
-  @Test
+  @Test // #1403
   fun relocateMultiClassSignatureStringConstants() {
     writeClass {
       """
-      package my;
-      public class Main {
-        public static void main(String[] args) {
-          System.out.println("Lorg/package/ClassA;Lorg/package/ClassB;");
-          System.out.println("(Lorg/package/ClassC;Lorg/package/ClassD;)");
-          System.out.println("()Lorg/package/ClassE;Lorg/package/ClassF;");
-        }
-      }
+      |package my;
+      |public class Main {
+      |  public static void main(String[] args) {
+      |    System.out.println("Lorg/package/ClassA;Lorg/package/ClassB;");
+      |    System.out.println("(Lorg/package/ClassC;Lorg/package/ClassD;)");
+      |    System.out.println("()Lorg/package/ClassE;Lorg/package/ClassF;");
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     }
     projectScript.appendText(
       """
-        $shadowJarTask {
-          manifest {
-            attributes '$mainClassAttributeKey': 'my.Main'
-          }
-          relocate('org.package', 'shadow.org.package')
-        }
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |  relocate('org.package', 'shadow.org.package')
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -579,14 +567,14 @@ class RelocationTest : BasePluginTest() {
     val mainClassEntry = writeClass()
     projectScript.appendText(
       """
-        dependencies {
-          implementation 'junit:junit:3.8.2'
-        }
-        $shadowJarTask {
-          enableAutoRelocation = true
-        }
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  enableAutoRelocation = true
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(":jar", shadowJarPath)
@@ -596,9 +584,7 @@ class RelocationTest : BasePluginTest() {
     assertThat(relocatedBytes).isEqualTo(originalBytes)
   }
 
-  @Issue("https://github.com/GradleUp/shadow/issues/843")
-  @OptIn(UnstableMetadataApi::class)
-  @ParameterizedTest
+  @ParameterizedTest // #843
   @ValueSource(booleans = [false, true])
   fun relocateKotlinModuleFiles(enableKotlinModuleRemapping: Boolean) {
     val originalModuleFilePath = "META-INF/kotlin-stdlib.kotlin_module"
@@ -607,15 +593,15 @@ class RelocationTest : BasePluginTest() {
       buildJar("stdlib.jar") { insert(originalModuleFilePath, originalModuleFileBytes) }
     projectScript.appendText(
       """
-        dependencies {
-          ${implementationFiles(stdlibJar)}
-        }
-        $shadowJarTask {
-          relocate('kotlin', 'my.kotlin')
-          enableKotlinModuleRemapping = $enableKotlinModuleRemapping
-        }
+      |dependencies {
+      |  ${implementationFiles(stdlibJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate('kotlin', 'my.kotlin')
+      |  enableKotlinModuleRemapping = $enableKotlinModuleRemapping
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     )
 
     runWithSuccess(shadowJarPath)
@@ -625,62 +611,106 @@ class RelocationTest : BasePluginTest() {
     if (enableKotlinModuleRemapping) {
       assertThat(outputShadowedJar).useAll {
         containsOnly(relocatedModuleFilePath, *manifestEntries)
+        getBytes(relocatedModuleFilePath).isNotEqualTo(originalModuleFileBytes)
       }
     } else {
       assertThat(outputShadowedJar).useAll {
         containsOnly(originalModuleFilePath, *manifestEntries)
+        getBytes(originalModuleFilePath).isEqualTo(originalModuleFileBytes)
       }
-      assertThat(outputShadowedJar.use { it.getBytes(originalModuleFilePath) })
-        .isEqualTo(originalModuleFileBytes)
       return
     }
+  }
 
-    val originalModule =
-      KotlinModuleMetadata.read(requireResourceAsStream(originalModuleFilePath).readBytes())
-    val relocatedModule = outputShadowedJar.use {
-      KotlinModuleMetadata.read(it.getBytes(relocatedModuleFilePath))
+  @Test
+  fun relocateWithR8() {
+    writeClass(packageName = "my", withImports = false) {
+      """
+      |package my;
+      |import foo.Foo;
+      |public class Main {
+      |  public static void main(String[] args) {
+      |    System.out.println(Foo.class);
+      |  }
+      |}
+      """
+        .trimMargin()
     }
-
-    assertThat(relocatedModule.version.toString()).isEqualTo("2.2.0")
-    assertThat(originalModule.version.toString()).isEqualTo("2.2.0")
-
-    // No implementation for writing the optionalAnnotationClasses property yet.
-    // https://github.com/JetBrains/kotlin/blob/81502985ae0a2f5b21e121ffc180c3f4dd467e17/libraries/kotlinx-metadata/jvm/src/kotlin/metadata/jvm/KotlinModuleMetadata.kt#L71
-    assertThat(relocatedModule.kmModule.optionalAnnotationClasses).isEmpty()
-
-    val originalPkgParts = originalModule.kmModule.packageParts.entries
-    val relocatedPkgParts = relocatedModule.kmModule.packageParts.entries
-    // They are not empty and different.
-    assertThat(originalPkgParts).isNotEqualTo(relocatedPkgParts)
-    assertThat(originalPkgParts.size).isEqualTo(relocatedPkgParts.size)
-
-    relocatedPkgParts.forEachIndexed { index, (relocatedPkg, relocatedParts) ->
-      val (originalPkg, originalParts) = originalPkgParts.elementAt(index)
-      assertThat(relocatedPkg).isNotEqualTo(originalPkg)
-      assertThat(relocatedPkg).isEqualTo(originalPkg.replace("kotlin", "my.kotlin"))
-
-      if (originalParts.fileFacades.isEmpty()) {
-        assertThat(relocatedParts.fileFacades).isEmpty()
-      } else {
-        assertThat(relocatedParts.fileFacades).isNotEmpty()
-        assertThat(relocatedParts.fileFacades).isNotEqualTo(originalParts.fileFacades)
-        assertThat(relocatedParts.fileFacades)
-          .isEqualTo(originalParts.fileFacades.map { it.replace("kotlin/", "my/kotlin/") })
+    val fooJar =
+      buildJar("foo.jar") {
+        insert("foo/Foo.class", createEmptyClassBytes("foo/Foo"))
       }
 
-      if (originalParts.multiFileClassParts.isEmpty()) {
-        assertThat(relocatedParts.multiFileClassParts).isEmpty()
-      } else {
-        assertThat(relocatedParts.multiFileClassParts).isNotEmpty()
-        assertThat(relocatedParts.multiFileClassParts)
-          .isNotEqualTo(originalParts.multiFileClassParts)
-        assertThat(relocatedParts.multiFileClassParts)
-          .isEqualTo(
-            originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
-              ->
-              name.replace("kotlin/", "my/kotlin/") to facade.replace("kotlin/", "my/kotlin/")
-            }
-          )
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(fooJar)}
+      |}
+      |$shadowJarTask {
+      |  minimize {
+      |    r8 {
+      |      proguardRules.addAll(
+      |        "-repackageclasses 'relocated'",
+      |      )
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "my/Main.class",
+        "relocated/foo/Foo.class",
+        manifestEntry,
+      )
+      classLoader {
+        loadClass("my.Main")
+        loadClass("relocated.foo.Foo")
+      }
+    }
+  }
+
+  @Test // #1534
+  fun relocateCaseSensitiveAndInsensitiveClassesInJar() {
+    val fooJar =
+      buildJar("foo.jar") {
+        insert("foo/Bar.class", createEmptyClassBytes("foo/Bar"))
+        insert("foo/bar.class", createEmptyClassBytes("foo/bar"))
+      }
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(fooJar)}
+      |}
+      |$shadowJarTask {
+      |  relocate 'foo', 'shadow.foo'
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(
+        "shadow/",
+        "shadow/foo/",
+        "shadow/foo/Bar.class",
+        "shadow/foo/bar.class",
+        *manifestEntries,
+      )
+
+      val upperBytes = getBytes("shadow/foo/Bar.class")
+      val lowerBytes = getBytes("shadow/foo/bar.class")
+      assertThat(upperBytes).isNotEqualTo(lowerBytes)
+
+      classLoader {
+        loadClass("shadow.foo.Bar")
+        loadClass("shadow.foo.bar")
       }
     }
   }
@@ -688,19 +718,19 @@ class RelocationTest : BasePluginTest() {
   private fun writeClassWithStringRef() {
     writeClass {
       """
-      package my;
-      public class Main {
-        public static void main(String[] args) {
-          switch (1) {
-            default:
-              System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
-              break;
-          }
-          System.out.println("foo.Bar");
-        }
-      }
+      |package my;
+      |public class Main {
+      |  public static void main(String[] args) {
+      |    switch (1) {
+      |      default:
+      |        System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
+      |        break;
+      |    }
+      |    System.out.println("foo.Bar");
+      |  }
+      |}
       """
-        .trimIndent()
+        .trimMargin()
     }
   }
 

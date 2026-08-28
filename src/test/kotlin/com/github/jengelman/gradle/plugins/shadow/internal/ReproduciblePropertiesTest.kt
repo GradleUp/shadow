@@ -2,10 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
-import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import java.io.ByteArrayOutputStream
 import java.nio.charset.Charset
-import java.nio.charset.StandardCharsets
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 
@@ -76,18 +74,36 @@ class ReproduciblePropertiesTest {
       )
   }
 
+  @ParameterizedTest
+  @MethodSource("generalCharsetsProvider")
+  fun escapesSpecialCharacters(charset: Charset) {
+    val output =
+      ReproducibleProperties()
+        .also { properties ->
+          properties[" leading:=#!"] = "line1\nline2\t\\"
+        }
+        .writeToString(charset)
+
+    assertThat(output)
+      .isEqualTo(
+        """
+        |\ leading\:\=\#\!=line1\nline2\t\\
+        |"""
+          .trimMargin()
+      )
+  }
+
   private companion object Companion {
     @JvmStatic
     fun generalCharsetsProvider() =
-      listOf(StandardCharsets.ISO_8859_1, StandardCharsets.US_ASCII) + utfCharsetsProvider()
+      listOf(Charsets.ISO_8859_1, Charsets.US_ASCII) + utfCharsetsProvider()
 
-    @JvmStatic fun utfCharsetsProvider() = listOf(StandardCharsets.UTF_8, StandardCharsets.UTF_16)
+    @JvmStatic fun utfCharsetsProvider() = listOf(Charsets.UTF_8, Charsets.UTF_16)
 
     fun ReproducibleProperties.writeToString(charset: Charset): String {
       return ByteArrayOutputStream()
         .also { writeWithoutComments(charset, it) }
         .toString(charset.name())
-        .invariantEolString
     }
   }
 }

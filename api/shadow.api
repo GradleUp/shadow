@@ -29,6 +29,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 	public static final field CONFIGURATION_NAME Ljava/lang/String;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion;
 	public static final field EXTENSION_NAME Ljava/lang/String;
+	public static final field R8_CONFIGURATION_NAME Ljava/lang/String;
 	public static final field SHADOW Ljava/lang/String;
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
@@ -38,6 +39,12 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugi
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowBasePlugin$Companion {
 	public final synthetic fun getShadow (Lorg/gradle/api/Project;)Lcom/github/jengelman/gradle/plugins/shadow/ShadowExtension;
 	public final synthetic fun getShadow (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
+}
+
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/ShadowDsl : java/lang/annotation/Annotation {
+}
+
+public abstract interface annotation class com/github/jengelman/gradle/plugins/shadow/ShadowDslMarker : java/lang/annotation/Annotation {
 }
 
 public abstract interface class com/github/jengelman/gradle/plugins/shadow/ShadowExtension {
@@ -153,7 +160,7 @@ public class com/github/jengelman/gradle/plugins/shadow/relocation/SimpleRelocat
 	public fun toString ()Ljava/lang/String;
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter : java/io/Serializable {
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
 	public abstract fun dependency (Ljava/lang/Object;)Lorg/gradle/api/specs/Spec;
 	public abstract fun exclude (Lorg/gradle/api/specs/Spec;)V
 	public abstract fun include (Lorg/gradle/api/specs/Spec;)V
@@ -204,6 +211,32 @@ public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks
 	public abstract fun inheritFrom ([Ljava/lang/Object;Lorg/gradle/api/Action;)V
 }
 
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec : com/github/jengelman/gradle/plugins/shadow/tasks/DependencyFilter {
+	public abstract fun getTool ()Lorg/gradle/api/provider/Property;
+	public abstract fun r8 (Lorg/gradle/api/Action;)V
+}
+
+public final class com/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool : java/lang/Enum {
+	public static final field DEPENDENCY_ANALYZER Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+	public static final field R8 Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+	public static fun values ()[Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeTool;
+}
+
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/tasks/R8Spec {
+	public abstract fun enableObfuscation ()V
+	public abstract fun enableOptimization ()V
+	public abstract fun getArgs ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getClasspath ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getConfigurationFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public fun getKeepRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getKeepRules ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getProguardRuleFiles ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public abstract fun getProguardRules ()Lorg/gradle/api/provider/ListProperty;
+	public abstract fun getUseDefaultRules ()Lorg/gradle/api/provider/Property;
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction : org/gradle/api/internal/file/copy/CopyAction {
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAction$Companion;
 	public fun <init> (Ljava/io/File;Lkotlin/jvm/functions/Function1;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;ZZZLjava/lang/String;)V
@@ -215,6 +248,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowCopyAc
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar : org/gradle/api/tasks/bundling/Jar {
+	public static final field CONSTANT_TIME_FOR_ZIP_ENTRIES J
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar$Companion;
 	public static final field SHADOW_JAR_TASK_NAME Ljava/lang/String;
 	public fun <init> ()V
@@ -233,13 +267,17 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
 	public fun getEnableKotlinModuleRemapping ()Lorg/gradle/api/provider/Property;
 	public fun getExcludes ()Ljava/util/Set;
+	protected abstract fun getExecOperations ()Lorg/gradle/process/ExecOperations;
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;
+	public fun getJavaLauncher ()Lorg/gradle/api/provider/Property;
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
+	public fun getMinimizeSpec ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec;
+	public fun getR8Classpath ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
@@ -278,11 +316,13 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheLicen
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ApacheNoticeResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getAddHeader ()Lorg/gradle/api/provider/Property;
 	public fun getCharsetName ()Lorg/gradle/api/provider/Property;
 	public fun getCopyright ()Lorg/gradle/api/provider/Property;
@@ -384,6 +424,16 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/IncludeReso
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public class com/github/jengelman/gradle/plugins/shadow/transformers/KotlinModuleMetadataTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/Log4j2PluginsCacheFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
 	public fun <init> ()V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
@@ -404,9 +454,12 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestApp
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
+	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer$Companion;
+	public static final field NULL Ljava/lang/Object;
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun attributes (Ljava/util/Map;)V
 	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun getAttributesToRelocate ()Lorg/gradle/api/provider/SetProperty;
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifestEntries ()Lorg/gradle/api/provider/MapProperty;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
@@ -415,9 +468,13 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestRes
 	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
+public final class com/github/jengelman/gradle/plugins/shadow/transformers/ManifestResourceTransformer$Companion {
+}
+
 public class com/github/jengelman/gradle/plugins/shadow/transformers/MergeLicenseResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;Lorg/gradle/api/tasks/util/PatternSet;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getArtifactLicense ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getArtifactLicenseSpdxId ()Lorg/gradle/api/provider/Property;
 	public fun getFirstSeparator ()Lorg/gradle/api/provider/Property;
@@ -460,6 +517,16 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/PreserveFir
 	protected final fun getFound ()Ljava/util/Set;
 	public final fun getObjectFactory ()Lorg/gradle/api/model/ObjectFactory;
 	public fun getResources ()Lorg/gradle/api/provider/SetProperty;
+}
+
+public class com/github/jengelman/gradle/plugins/shadow/transformers/ProGuardFilesResourceTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/PatternFilterableResourceTransformer {
+	public fun <init> ()V
+	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
+	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
+	public fun hasTransformedResource ()Z
+	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V
+	public fun transform (Lcom/github/jengelman/gradle/plugins/shadow/transformers/TransformerContext;)V
 }
 
 public class com/github/jengelman/gradle/plugins/shadow/transformers/PropertiesFileTransformer : com/github/jengelman/gradle/plugins/shadow/transformers/ResourceTransformer {
@@ -517,6 +584,7 @@ public class com/github/jengelman/gradle/plugins/shadow/transformers/ServiceFile
 	public fun <init> ()V
 	public fun <init> (Lorg/gradle/api/tasks/util/PatternSet;)V
 	public synthetic fun <init> (Lorg/gradle/api/tasks/util/PatternSet;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public fun canTransformResource (Lorg/gradle/api/file/FileTreeElement;)Z
 	public fun getPath ()Ljava/lang/String;
 	public fun hasTransformedResource ()Z
 	public fun modifyOutputStream (Lorg/apache/tools/zip/ZipOutputStream;Z)V

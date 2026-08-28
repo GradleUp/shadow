@@ -1,8 +1,8 @@
 # Integrating with Kotlin Plugins
 
 Kotlin standard libraries (stdlib) are added by Kotlin plugins by default via `implementation` (`runtimeClasspath`),
-they will be bundled into the shadowed JARs automatically.
-If you don't need a standard library at all, you can add the following Gradle property to your gradle.properties file:
+they will be bundled into the shadowed JARs automatically. If you don't need a standard library at all, you can add the
+following Gradle property to your gradle.properties file:
 
 ```properties
 kotlin.stdlib.default.dependency=false
@@ -11,30 +11,29 @@ kotlin.stdlib.default.dependency=false
 Kotlin compilations may still require the standard libraries, you can add them into `compileOnly` (`compileClasspath`)
 to make sure compilations success and avoid shadowing as follows:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
-      compileOnly("org.jetbrains.kotlin:kotlin-stdlib")
+      compileOnly("org.jetbrains.kotlin:kotlin-stdlib:<version>")
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
-      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+      compileOnly 'org.jetbrains.kotlin:kotlin-stdlib:<version>'
     }
     ```
 
-See more information about
-[Dependency on the standard library](https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library).
+See more information about [Dependency on the standard library][dependency-on-the-standard-library].
 
 ## For Kotlin JVM Plugin
 
 Shadow works well for Kotlin JVM projects like Java projects. Here is an example:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -47,7 +46,7 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -60,24 +59,21 @@ Shadow works well for Kotlin JVM projects like Java projects. Here is an example
     }
     ```
 
-You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins,
-easily organize your build logic for [Publishing Libraries](../publishing/README.md),
-[Running Applications](../application-plugin/README.md), and so on.
+You can mix the Kotlin JVM plugin with `java-gradle-plugin`, `application`, and other Java plugins, easily organize your
+build logic for [Publishing Libraries][publishing-libraries], [Running Applications][running-applications], and so on.
 
 ## For Kotlin Multiplatform Plugin
 
 Shadow honors Kotlin's [`org.jetbrains.kotlin.multiplatform`][org.jetbrains.kotlin.multiplatform] plugin and will
 automatically configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
       id("org.jetbrains.kotlin.multiplatform")
       id("com.gradleup.shadow")
     }
-
-    val ktorVersion = "3.1.0"
 
     kotlin {
       @Suppress("OPT_IN_USAGE")
@@ -86,14 +82,14 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
         mainClass = "myapp.MainKt"
       }
       sourceSets {
-        val commonMain by getting {
+        commonMain {
           dependencies {
-            implementation("io.ktor:ktor-client-core:$ktorVersion")
+            implementation("io.ktor:ktor-client-core:<version>")
           }
         }
-        val jvmMain by getting {
+        jvmMain {
           dependencies {
-            implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+            implementation("io.ktor:ktor-client-okhttp:<version>")
           }
         }
       }
@@ -108,15 +104,13 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
       id 'org.jetbrains.kotlin.multiplatform'
       id 'com.gradleup.shadow'
     }
-
-    def ktorVersion = "3.1.0"
 
     kotlin {
       jvm().mainRun {
@@ -126,12 +120,12 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
       sourceSets {
         commonMain {
           dependencies {
-            implementation "io.ktor:ktor-client-core:$ktorVersion"
+            implementation "io.ktor:ktor-client-core:<version>"
           }
         }
         jvmMain {
           dependencies {
-            implementation "io.ktor:ktor-client-okhttp:$ktorVersion"
+            implementation "io.ktor:ktor-client-okhttp:<version>"
           }
         }
       }
@@ -145,6 +139,34 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     }
     ```
 
+## Kotlin Module Metadata Remapping
+
+Kotlin module metadata (`.kotlin_module`) files contain information about package parts and facades. When relocating
+classes, Shadow automatically relocates the packages and facades inside the Kotlin module metadata files. This feature
+is enabled by default via the deprecated `enableKotlinModuleRemapping` property.
+
+To explicitly apply this remapping (recommended for future compatibility), add
+[`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer] to your task configuration:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.shadowJar {
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer>()
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer)
+    }
+    ```
 
 
 [org.jetbrains.kotlin.multiplatform]: https://kotlinlang.org/docs/multiplatform-intro.html
+[KotlinModuleMetadataTransformer]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-kotlin-module-metadata-transformer/index.html
+[dependency-on-the-standard-library]: https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library
+[publishing-libraries]: ../publishing/README.md
+[running-applications]: ../application-plugin/README.md

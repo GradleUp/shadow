@@ -1,7 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.util.Properties
 import org.apache.tools.zip.ZipOutputStream
@@ -31,9 +32,12 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   private val module = Properties()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    val path = element.path
-    return path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR ||
-      path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+    return element.path
+      .let { path ->
+        path == PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR ||
+          path == PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR
+      }
+      .also { flag -> checkDupStrategy(flag, element) }
   }
 
   override fun transform(context: TransformerContext) {
@@ -62,9 +66,11 @@ public open class GroovyExtensionModuleTransformer : ResourceTransformer {
   override fun hasTransformedResource(): Boolean = module.isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, preserveFileTimestamps))
-    module.inputStream().use { it.copyTo(os) }
-    os.closeEntry()
+    os.writeEntry(PATH_GROOVY_EXTENSION_MODULE_DESCRIPTOR, preserveFileTimestamps) {
+      ReproducibleProperties()
+        .apply { putAll(module) }
+        .writeWithoutComments(Charsets.ISO_8859_1, this)
+    }
   }
 
   private fun handle(key: String, value: String, mergeValue: (String) -> Unit) {

@@ -1,15 +1,17 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -129,17 +131,15 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
     val paths = paths.get()
-
     val path = element.path
-    if (path in mappings) return true
-    for (key in mappings.keys) {
-      if (key.toRegex().containsMatchIn(path)) return true
-    }
-    if (path in paths) return true
-    for (p in paths) {
-      if (p.toRegex().containsMatchIn(path)) return true
-    }
-    return mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
+
+    return when {
+      path in mappings -> true
+      mappings.keys.any { it.toRegex().containsMatchIn(path) } -> true
+      path in paths -> true
+      paths.any { it.toRegex().containsMatchIn(path) } -> true
+      else -> mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
+    }.also { checkDupStrategy(it, element) }
   }
 
   override fun transform(context: TransformerContext) {
@@ -219,13 +219,13 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
                   .joinToString(separator = "\n   * ", prefix = "\n   * ")
             }
             .joinToString(separator = "\n * ", prefix = "\n * ")
-      error(message)
+      throw GradleException(message)
     }
 
     propertiesEntries.forEach { (path, props) ->
-      os.putNextEntry(zipEntry(path, preserveFileTimestamps))
-      props.writeWithoutComments(charset, os)
-      os.closeEntry()
+      os.writeEntry(path, preserveFileTimestamps) {
+        props.writeWithoutComments(charset, this)
+      }
     }
   }
 

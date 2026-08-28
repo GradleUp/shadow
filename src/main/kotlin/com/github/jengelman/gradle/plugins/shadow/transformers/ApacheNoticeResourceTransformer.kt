@@ -1,7 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.appendLfLine
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.nio.charset.Charset
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -9,6 +11,7 @@ import java.util.Locale
 import java.util.TreeSet
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
@@ -94,6 +97,10 @@ public open class ApacheNoticeResourceTransformer(
         .include(NOTICE_PATH, NOTICE_TXT_PATH, NOTICE_MD_PATH),
   )
 
+  override fun canTransformResource(element: FileTreeElement): Boolean {
+    return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }
+  }
+
   override fun transform(context: TransformerContext) {
     val projectName = projectName.get()
     val addHeader = addHeader.get()
@@ -142,7 +149,7 @@ public open class ApacheNoticeResourceTransformer(
               sb.setLength(0)
             }
           }
-          sb.append(line).append("\n")
+          sb.appendLfLine(line)
           lineCount++
         } else {
           val entry = sb.toString()
@@ -181,28 +188,25 @@ public open class ApacheNoticeResourceTransformer(
       count++
       if (line == copyright && count != 2) continue
       if (count == 2 && copyright != null) {
-        sb.append(copyright)
-        sb.append('\n')
+        sb.appendLfLine(copyright)
       } else {
-        sb.append(line)
-        sb.append('\n')
+        sb.appendLfLine(line)
       }
       if (count == 3) {
         // Do org stuff.
         for ((key, value) in organizationEntries) {
-          sb.append(key)
-          sb.append('\n')
+          sb.appendLfLine(key)
           for (l in value) {
             sb.append(l)
           }
-          sb.append('\n')
+          sb.appendLfLine()
         }
       }
     }
 
-    os.putNextEntry(zipEntry(outputPath.get(), preserveFileTimestamps))
-    os.write(sb.toString().trim().toByteArray(charset))
-    os.closeEntry()
+    os.writeEntry(outputPath.get(), preserveFileTimestamps) {
+      write(sb.toString().trim().toByteArray(charset))
+    }
 
     entries.clear()
   }

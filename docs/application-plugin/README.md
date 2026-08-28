@@ -3,11 +3,11 @@
 Shadow reacts to the presence of Gradle's [`application`][application] plugin and will automatically configure
 additional tasks for running the shadowed JAR and creating distributions containing the shadowed JAR.
 
-Just like the normal [`Jar`][Jar] task, when the [`application`][application] plugin is applied,
-the [`ShadowJar`][ShadowJar] manifest will be configured to contain the `Main-Class` attribute with the value specified
-in the project's `application.mainClass` attribute.
+Just like the normal [`Jar`][Jar] task, when the [`application`][application] plugin is applied, the
+[`ShadowJar`][ShadowJar] manifest will be configured to contain the `Main-Class` attribute with the value specified in
+the project's `application.mainClass` attribute.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -20,7 +20,7 @@ in the project's `application.mainClass` attribute.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -35,12 +35,11 @@ in the project's `application.mainClass` attribute.
 
 ## Running the Shadow JAR
 
-When applied along with the `application` plugin, the `runShadow` task will be created for starting
-the application from the shadowed JAR.
-The `runShadow` task is a [`JavaExec`][JavaExec] task that is configured to execute `java -jar myproject-all.jar`.
-It can be configured the same as any other [`JavaExec`][JavaExec] task.
+When applied along with the `application` plugin, the `runShadow` task will be created for starting the application from
+the shadowed JAR. The `runShadow` task is a [`JavaExec`][JavaExec] task that is configured to execute
+`java -jar myproject-all.jar`. It can be configured the same as any other [`JavaExec`][JavaExec] task.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -59,7 +58,7 @@ It can be configured the same as any other [`JavaExec`][JavaExec] task.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -81,16 +80,15 @@ It can be configured the same as any other [`JavaExec`][JavaExec] task.
 ## Distributing the Shadow JAR
 
 The Shadow plugin will also configure distribution tasks when in the presence of the [`application`][application]
-plugin. The plugin will create `shadowDistZip` and `shadowDistTar` which creates Zip and Tar distributions
-respectively. Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch
-the application.
+plugin. The plugin will create `shadowDistZip` and `shadowDistTar` which creates Zip and Tar distributions respectively.
+Each distribution will contain the shadowed JAR file along with the necessary start scripts to launch the application.
 
 Additionally, the plugin will create the `installShadowDist` and `startShadowScripts` tasks which stages the necessary
 files for a distribution to `build/install/<project name>-shadow/`.
 
 You can also add more files into the distribution like:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -128,7 +126,7 @@ You can also add more files into the distribution like:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -166,12 +164,11 @@ You can also add more files into the distribution like:
     }
     ```
 
-View [The Distribution Plugin](https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin)
-for more information about configuring distributions.
-
+View [The Distribution Plugin][distribution-plugin] for more information about configuring distributions.
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [JavaExec]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [application]: https://docs.gradle.org/current/userguide/application_plugin.html
+[distribution-plugin]: https://docs.gradle.org/current/userguide/distribution_plugin.html#distribution_plugin

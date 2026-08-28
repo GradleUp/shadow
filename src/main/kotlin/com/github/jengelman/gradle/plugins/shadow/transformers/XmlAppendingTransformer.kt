@@ -1,7 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.IOException
 import java.io.StringReader
 import javax.inject.Inject
@@ -38,7 +39,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   @get:Input public open val resource: Property<String> = objectFactory.property("")
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return resource.get().equals(element.path, ignoreCase = true)
+    return resource.get().equals(element.path, ignoreCase = true).also { flag ->
+      checkDupStrategy(flag, element)
+    }
   }
 
   override fun transform(context: TransformerContext) {
@@ -74,9 +77,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun hasTransformedResource(): Boolean = doc != null
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
-    XMLOutputter(Format.getPrettyFormat()).output(doc, os)
-    os.closeEntry()
+    os.writeEntry(resource.get(), preserveFileTimestamps) {
+      XMLOutputter(Format.getPrettyFormat().setLineSeparator("\n")).output(doc, this)
+    }
     doc = null
   }
 }

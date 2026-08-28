@@ -14,8 +14,8 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-java@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v6
         with:
           distribution: 'zulu'
           java-version-file: .github/workflows/.java-version
@@ -33,7 +33,7 @@ jobs:
       - name: Extract release notes
         uses: ffurrer2/extract-release-notes@v3
         with:
-          changelog_file: docs/changes/README.md
+          changelog_file: CHANGELOG.md
           release_notes_file: RELEASE_NOTES.md
       - name: Create release
         run: gh release create ${{ github.ref_name }} --notes-file RELEASE_NOTES.md

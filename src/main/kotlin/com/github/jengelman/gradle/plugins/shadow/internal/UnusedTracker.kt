@@ -6,12 +6,9 @@ import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
-import org.gradle.api.file.FileCollection
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.InputFiles
 import org.vafer.jdependency.Clazzpath
-import org.vafer.jdependency.ClazzpathUnit
 
 internal fun Project.getApiJars(): Provider<List<File>> {
   val apiConfiguration =
@@ -22,9 +19,7 @@ internal fun Project.getApiJars(): Provider<List<File>> {
     if (configurations.names.contains(configName)) {
       configurations.named(configName)
     } else {
-      configurations.register(configName) {
-        it.isCanBeResolved = true
-        it.isCanBeConsumed = false
+      configurations.resolvable(configName) {
         it.attributes { attrs ->
           attrs.attribute(Usage.USAGE_ATTRIBUTE, objects.named(Usage::class.java, Usage.JAVA_API))
           attrs.attribute(
@@ -47,33 +42,28 @@ internal fun Project.getApiJars(): Provider<List<File>> {
   }
 }
 
-/** Tracks unused classes in the project classpath. */
-internal class UnusedTracker(
+/** Finds unused classes in the project classpath. */
+internal fun findUnusedClasses(
   sourceSetsClassesDirs: Iterable<File>,
-  classJars: FileCollection,
-  @get:InputFiles val toMinimize: FileCollection,
-) {
-  private val projectUnits: List<ClazzpathUnit>
-  private val cp = Clazzpath()
+  classJars: Iterable<File>,
+  toMinimize: Iterable<File>,
+  dependencies: Iterable<File>,
+): Set<String> {
+  val cp = Clazzpath()
+  val projectUnits =
+    sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } +
+      classJars.map { cp.addClazzpathUnit(it) }
 
-  init {
-    projectUnits =
-      sourceSetsClassesDirs.map { cp.addClazzpathUnit(it) } +
-        classJars.map { cp.addClazzpathUnit(it) }
-  }
-
-  fun findUnused(): Set<String> {
-    val unused = cp.clazzes.toMutableSet()
-    for (cpu in projectUnits) {
-      unused.removeAll(cpu.clazzes)
-      unused.removeAll(cpu.transitiveDependencies)
-    }
-    return unused.map { it.name }.toSet()
-  }
-
-  fun addDependency(jarOrDir: File) {
+  dependencies.forEach { jarOrDir ->
     if (toMinimize.contains(jarOrDir)) {
       cp.addClazzpathUnit(jarOrDir)
     }
   }
+
+  val unused = cp.clazzes.toMutableSet()
+  for (cpu in projectUnits) {
+    unused.removeAll(cpu.clazzes)
+    unused.removeAll(cpu.transitiveDependencies)
+  }
+  return unused.map { it.name }.toSet()
 }

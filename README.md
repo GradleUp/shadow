@@ -1,28 +1,27 @@
 # Shadow
 
-Gradle plugin for creating fat/uber JARs with support for package relocation.
-
-> [!NOTE]\
-> Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the
-> ID [`com.github.johnrengelman.shadow`][johnrengelman's]
-> before maintenance was transferred to the [GradleUp organization](https://github.com/GradleUp) to ensure future
-> development, see [#908](https://github.com/GradleUp/shadow/issues/908).
->
-> If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID [
-`com.gradleup.shadow`][gradleup's]
-> and update to the latest version to receive all the latest bug fixes and improvements.
-
-## Documentation
-
-- [User Guide](https://gradleup.com/shadow/)
-- [Change Log](docs/changes/README.md)
-
-## Current Status
+A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications
+with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
 
 [![Maven Central](https://img.shields.io/maven-central/v/com.gradleup.shadow/shadow-gradle-plugin)](https://central.sonatype.com/artifact/com.gradleup.shadow/shadow-gradle-plugin)
 [![Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.gradleup.shadow)](https://plugins.gradle.org/plugin/com.gradleup.shadow)
 [![CI](https://github.com/GradleUp/shadow/actions/workflows/build.yml/badge.svg?branch=main&event=push)](https://github.com/GradleUp/shadow/actions/workflows/build.yml?query=branch:main+event:push)
 [![License](https://img.shields.io/github/license/GradleUp/shadow.svg)](LICENSE)
+
+> [!NOTE]
+> Previously this plugin was developed by [@johnrengelman](https://github.com/johnrengelman) and published under the
+> ID [`com.github.johnrengelman.shadow`][johnrengelman's] before maintenance was transferred to the
+> [GradleUp organization](https://github.com/GradleUp) to ensure future development, see
+> [#908](https://github.com/GradleUp/shadow/issues/908).
+>
+> If you are still using the old plugin ID in your build script, we recommend to switch to the new plugin ID
+> [`com.gradleup.shadow`][gradleup's] and update to the latest version to receive all the latest bug fixes and
+> improvements.
+
+## Documentation
+
+- [User Guide](https://gradleup.com/shadow/)
+- [Change Log](CHANGELOG.md)
 
 ## Compatibility Matrix
 
@@ -33,6 +32,8 @@ Gradle plugin for creating fat/uber JARs with support for package relocation.
 | 9.0.0+         | 8.11               | 11               | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.2.0+         | 8.11               | 17               | [`com.gradleup.shadow`][gradleup's]                  |
 | 9.3.0+         | 9.0                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
+| 9.5.0+         | 9.2                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
+| 9.7.0+         | 9.4                | 17               | [`com.gradleup.shadow`][gradleup's]                  |
 
 
 

@@ -3,14 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
-import assertk.assertions.isGreaterThanOrEqualTo
 import assertk.assertions.isTrue
+import com.github.jengelman.gradle.plugins.shadow.testkit.crlfEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
-import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsStream
 import java.util.jar.JarFile.MANIFEST_NAME
 import org.junit.jupiter.api.Test
 
+@Suppress("DEPRECATION")
 class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTransformer>() {
   @Test
   fun canTransformResource() =
@@ -23,16 +22,14 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
     }
 
   @Test
-  fun hasTransformedResource() {
-    transformer.append("Tag", "Something")
+  fun hasTransformedResource() =
+    with(transformer) {
+      assertThat(transformer.hasTransformedResource()).isFalse()
 
-    assertThat(transformer.hasTransformedResource()).isTrue()
-  }
+      append("Tag", "Something")
 
-  @Test
-  fun hasNotTransformedResource() {
-    assertThat(transformer.hasTransformedResource()).isFalse()
-  }
+      assertThat(hasTransformedResource()).isTrue()
+    }
 
   @Test
   fun transformation() =
@@ -42,23 +39,33 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
       append("Name", "com/example/")
       append("Sealed", false)
 
-      transform(manifestTransformerContext)
+      val source = "Manifest-Version: 1.0\r\n\r\n"
+      transform(textContext(MANIFEST_NAME, source))
 
-      val targetLines = transformToJar().use { it.getContent(MANIFEST_NAME).trim().lines() }
-      assertThat(targetLines.size).isGreaterThanOrEqualTo(4)
-      assertThat(targetLines.takeLast(4))
+      val target = transformToJar().use { it.getContent(MANIFEST_NAME) }
+      assertThat(target)
         .isEqualTo(
-          listOf("Name: org/foo/bar/", "Sealed: true", "Name: com/example/", "Sealed: false")
+          """
+          |Manifest-Version: 1.0
+          |
+          |Name: org/foo/bar/
+          |Sealed: true
+          |Name: com/example/
+          |Sealed: false
+          |
+          |"""
+            .trimMargin()
+            .crlfEolString
         )
     }
 
   @Test
-  fun noTransformation() {
-    val sourceLines = requireResourceAsStream(MANIFEST_NAME).reader().readLines()
-    transformer.transform(manifestTransformerContext)
-    val targetLines =
-      transformer.transformToJar().use { it.getStream(MANIFEST_NAME).reader().readLines() }
+  fun noTransformation() =
+    with(transformer) {
+      val source = "Manifest-Version: 1.0\r\n"
+      transform(textContext(MANIFEST_NAME, source))
+      val target = transformToJar().use { it.getContent(MANIFEST_NAME) }
 
-    assertThat(targetLines).isEqualTo(sourceLines)
-  }
+      assertThat(target).isEqualTo(source)
+    }
 }

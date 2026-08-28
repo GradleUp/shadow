@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.property
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
@@ -23,6 +23,10 @@ import org.gradle.api.tasks.PathSensitivity
  *
  * @author John Engelman
  */
+@Deprecated(
+  message = "Use `ShadowJar.from` instead. This will be removed in Shadow 10.",
+  replaceWith = ReplaceWith("from"),
+)
 @CacheableTransformer
 public open class IncludeResourceTransformer
 @Inject
@@ -37,10 +41,8 @@ constructor(final override val objectFactory: ObjectFactory) :
   override fun hasTransformedResource(): Boolean = file.get().asFile.exists()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(resource.get(), preserveFileTimestamps))
-
-    file.get().asFile.inputStream().use { inputStream -> inputStream.copyTo(os) }
-
-    os.closeEntry()
+    os.writeEntry(resource.get(), preserveFileTimestamps) {
+      file.get().asFile.inputStream().use { inputStream -> inputStream.copyTo(this) }
+    }
   }
 }

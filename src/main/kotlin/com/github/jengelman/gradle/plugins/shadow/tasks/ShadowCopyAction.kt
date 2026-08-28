@@ -4,23 +4,18 @@
 
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
-import com.github.jengelman.gradle.plugins.shadow.internal.cast
+import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
+import com.github.jengelman.gradle.plugins.shadow.internal.entries
+import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
+import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import java.util.GregorianCalendar
-import kotlin.metadata.jvm.KmModule
-import kotlin.metadata.jvm.KmPackageParts
-import kotlin.metadata.jvm.KotlinModuleMetadata
-import kotlin.metadata.jvm.UnstableMetadataApi
-import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64RequiredException
-import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
@@ -36,37 +31,51 @@ import org.gradle.api.tasks.WorkResults
  * Modified from
  * [org.gradle.api.internal.file.archive.ZipCopyAction.java](https://github.com/gradle/gradle/blob/b893c2b085046677cf858fb3d5ce00e68e556c3a/platforms/core-configuration/file-operations/src/main/java/org/gradle/api/internal/file/archive/ZipCopyAction.java).
  */
+@Deprecated("This should not be used as a public API. Will be made internal in Shadow 10.")
 public open class ShadowCopyAction
-@Deprecated("This should not be used as a public API. Will be made internal in a future release.")
-constructor(
+internal constructor(
   private val zipFile: File,
-  private val zosProvider: (File) -> ZipOutputStream,
+  private val zipOutStream: ZipOutputStream,
   private val transformers: Set<ResourceTransformer>,
   private val relocators: Set<Relocator>,
   private val unusedClasses: Set<String>,
-  private val enableKotlinModuleRemapping: Boolean,
-  private val preserveFileTimestamps: Boolean,
+  private val isPreserveFileTimestamps: Boolean,
   private val failOnDuplicateEntries: Boolean,
-  private val encoding: String?,
 ) : CopyAction {
-  private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
-
-  override fun execute(stream: CopyActionProcessingStream): WorkResult {
-    val zipOutStream =
+  @Suppress("unused") // For binary compatibility.
+  public constructor(
+    zipFile: File,
+    zosProvider: (File) -> ZipOutputStream,
+    transformers: Set<ResourceTransformer>,
+    relocators: Set<Relocator>,
+    unusedClasses: Set<String>,
+    enableKotlinModuleRemapping: Boolean,
+    preserveFileTimestamps: Boolean,
+    failOnDuplicateEntries: Boolean,
+    encoding: String?,
+  ) : this(
+    zipFile = zipFile,
+    zipOutStream =
       try {
         zosProvider(zipFile)
       } catch (e: Exception) {
         throw GradleException("Could not create ZIP '$zipFile'.", e)
-      }
+      },
+    transformers = transformers,
+    relocators = relocators,
+    unusedClasses = unusedClasses,
+    isPreserveFileTimestamps = preserveFileTimestamps,
+    failOnDuplicateEntries = failOnDuplicateEntries,
+  )
 
+  private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
+
+  override fun execute(stream: CopyActionProcessingStream): WorkResult {
     try {
       zipOutStream.use { zos ->
         stream.process(StreamAction(zos))
         processTransformers(zos)
-        addDirs(
-          zos
-        ) // This must be called after adding all file entries to avoid duplicate directories being
-        // added.
+        addDirs(zos)
         checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {
@@ -96,38 +105,34 @@ constructor(
   private fun processTransformers(zos: ZipOutputStream) {
     transformers.forEach { transformer ->
       if (transformer.hasTransformedResource()) {
-        transformer.modifyOutputStream(zos, preserveFileTimestamps)
+        transformer.modifyOutputStream(zos, isPreserveFileTimestamps)
       }
     }
   }
 
   private fun addDirs(zos: ZipOutputStream) {
-    @Suppress("UNCHECKED_CAST") val entries = zos.entries.map { it.name }
+    val entries = zos.entries.map { it.name }
     val added = entries.toMutableSet()
     val currentTimeMillis = System.currentTimeMillis()
 
-    fun addParent(name: String) {
-      val parent = name.substringBeforeLast('/', "")
-      val entryName = "$parent/"
-      if (parent.isNotEmpty() && added.add(entryName)) {
-        val details = visitedDirs[parent]
-        val (lastModified, flag) =
+    entries.forEach { name ->
+      name.parentDirectoryEntries().asReversed().forEach { entryName ->
+        if (!added.add(entryName)) return@forEach
+        val details = visitedDirs[entryName.removeSuffix("/")]
+        val (lastModified, unixMode) =
           if (details == null) {
-            currentTimeMillis to UnixStat.DEFAULT_DIR_PERM
+            currentTimeMillis to UnixMode.directory()
           } else {
-            details.lastModified to details.permissions.toUnixNumeric()
+            details.lastModified to UnixMode.directory(details.permissions.toUnixNumeric())
           }
-        val entry =
-          zipEntry(entryName, preserveFileTimestamps, lastModified) {
-            unixMode = UnixStat.DIR_FLAG or flag
-          }
-        zos.putNextEntry(entry)
-        zos.closeEntry()
-        addParent(parent)
+        zos.writeEntry(
+          name = entryName,
+          preserveLastModified = isPreserveFileTimestamps,
+          lastModified = lastModified,
+          unixMode = unixMode,
+        )
       }
     }
-
-    entries.forEach { addParent(it) }
   }
 
   private fun checkDuplicateEntries(zos: ZipOutputStream) {
@@ -149,9 +154,6 @@ constructor(
     CopyActionProcessingStreamAction {
     init {
       logger.info("Relocator count: {}.", relocators.size)
-      if (encoding != null) {
-        zipOutStr.setEncoding(encoding)
-      }
     }
 
     override fun processFile(details: FileCopyDetailsInternal) {
@@ -183,13 +185,6 @@ constructor(
             }
           }
         }
-        enableKotlinModuleRemapping && path.endsWith(".kotlin_module") -> {
-          if (relocators.isEmpty()) {
-            fileDetails.writeToZip(path)
-          } else {
-            fileDetails.remapKotlinModule()
-          }
-        }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
@@ -207,52 +202,9 @@ constructor(
       }
     }
 
-    /**
-     * Applies remapping to the given kotlin module with the specified relocation path. The remapped
-     * module is then written to the zip file.
-     */
-    @OptIn(UnstableMetadataApi::class)
-    private fun FileCopyDetails.remapKotlinModule() =
-      file.readBytes().let { bytes ->
-        val kmMetadata = KotlinModuleMetadata.read(bytes)
-        val newKmModule =
-          KmModule().apply {
-            // We don't need to relocate the nested properties in `optionalAnnotationClasses`, there
-            // is a very special use case for Kotlin Multiplatform.
-            optionalAnnotationClasses += kmMetadata.kmModule.optionalAnnotationClasses
-            packageParts +=
-              kmMetadata.kmModule.packageParts.map { (pkg, parts) ->
-                val relocatedPkg = relocators.relocateClass(pkg)
-                val relocatedParts =
-                  KmPackageParts(
-                    parts.fileFacades.mapTo(mutableListOf()) { relocators.relocatePath(it) },
-                    parts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
-                      ->
-                      relocators.relocatePath(name) to relocators.relocatePath(facade)
-                    },
-                  )
-                relocatedPkg to relocatedParts
-              }
-          }
-        val newKmMetadata = KotlinModuleMetadata(newKmModule, kmMetadata.version)
-
-        val newBytes = newKmMetadata.write()
-        val relocatedPath = relocators.relocatePath(path)
-        val entryName =
-          when {
-            relocatedPath != path -> relocatedPath
-            // Nothing changed, so keep the original path.
-            newBytes.contentEquals(bytes) -> path
-            // Content changed but path didn't, so rename to avoid name clash. The filename does not
-            // matter to the compiler.
-            else -> path.replace(".kotlin_module", ".shadow.kotlin_module")
-          }
-        writeToZip(entryName = entryName, bytes = newBytes)
-      }
-
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
-      fileDetails.file.inputStream().use { inputStream ->
+      fileDetails.inputStream().use { inputStream ->
         transformer.transform(
           TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
         )
@@ -261,35 +213,30 @@ constructor(
     }
 
     private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
-      val entry =
-        zipEntry(entryName, preserveFileTimestamps, lastModified) {
-          unixMode = UnixStat.FILE_FLAG or permissions.toUnixNumeric()
+      zipOutStr.writeEntry(
+        name = entryName,
+        preserveLastModified = isPreserveFileTimestamps,
+        lastModified = lastModified,
+        unixMode = UnixMode.file(permissions.toUnixNumeric()),
+      ) {
+        if (bytes == null) {
+          copyTo(this)
+        } else {
+          write(bytes)
         }
-      zipOutStr.putNextEntry(entry)
-      if (bytes == null) {
-        copyTo(zipOutStr)
-      } else {
-        zipOutStr.write(bytes)
       }
-      zipOutStr.closeEntry()
     }
   }
 
   public companion object {
-    private val logger = Logging.getLogger(ShadowCopyAction::class.java)
+    private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
 
-    private val ZipOutputStream.entries: List<ZipEntry>
-      get() =
-        this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this).cast()
-
-    /**
-     * A copy of
-     * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
-     *
-     * 1980-02-01 00:00:00 (318182400000).
-     */
-    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
-      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
+    @Deprecated(
+      message =
+        "Use `ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES` constant instead. This will be removed in Shadow 10.",
+      replaceWith = ReplaceWith("ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES"),
+    )
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long = ShadowJar.CONSTANT_TIME_FOR_ZIP_ENTRIES
   }
 }

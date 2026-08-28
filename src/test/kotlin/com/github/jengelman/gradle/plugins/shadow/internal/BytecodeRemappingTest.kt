@@ -1,17 +1,27 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.doesNotContain
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
+import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
 import java.io.File
+import java.io.InputStream
 import java.nio.file.Path
 import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
+import kotlin.io.path.inputStream
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.relativeTo
+import kotlin.io.path.writeBytes
+import kotlin.io.path.writeText
 import kotlin.reflect.KClass
+import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
@@ -20,9 +30,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.vafer.jdeb.shaded.objectweb.asm.AnnotationVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
 import org.vafer.jdeb.shaded.objectweb.asm.FieldVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Label
 import org.vafer.jdeb.shaded.objectweb.asm.MethodVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.ModuleVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 /**
@@ -58,6 +70,16 @@ class BytecodeRemappingTest {
     val result = details.remapClass(noMatchRelocators)
 
     assertThat(result).isEqualTo(details.file.readBytes())
+  }
+
+  @Test
+  fun asmFailureIsWrappedWithClassPath() {
+    val path = "broken/Example.class"
+    val file = tempDir.resolve(path).createParentDirectories().apply { writeText("not bytecode") }
+
+    assertFailure { file.toFileCopyDetails().remapClass(relocators) }
+      .isInstanceOf<GradleException>()
+      .hasMessage("Error in ASM processing class $path")
   }
 
   @Test
@@ -193,6 +215,48 @@ class BytecodeRemappingTest {
   }
 
   @Test
+  fun nestedClassSignatureIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val method = result.classInfo().methodData.first { it.name == "methodWithNestedGeneric" }
+    assertThat(checkNotNull(method.signature))
+      .isEqualTo(
+        $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V"
+      )
+  }
+
+  @Test
+  fun moduleMainClassIsRelocated() {
+    val originalMainClass =
+      $$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase"
+    val writer = ClassWriter(0)
+    writer.visit(Opcodes.V9, Opcodes.ACC_MODULE, "module-info", null, null, null)
+    writer.visitModule("example.module", 0, null).apply { visitMainClass(originalMainClass) }
+    writer.visitEnd()
+    val file = tempDir.resolve("module-info.class").apply { writeBytes(writer.toByteArray()) }
+    val result = file.toFileCopyDetails().remapClass(relocators)
+    var remappedMainClass: String? = null
+    ClassReader(result)
+      .accept(
+        object : ClassVisitor(Opcodes.ASM9) {
+          override fun visitModule(
+            name: String,
+            access: Int,
+            version: String?,
+          ): ModuleVisitor =
+            object : ModuleVisitor(Opcodes.ASM9) {
+              override fun visitMainClass(mainClass: String) {
+                remappedMainClass = mainClass
+              }
+            }
+        },
+        0,
+      )
+
+    assertThat(remappedMainClass).isEqualTo(relocatedFixtureBase)
+  }
+
+  @Test
   fun localVariableIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
@@ -209,20 +273,24 @@ class BytecodeRemappingTest {
     assertThat(method.invokeOwners).contains(relocatedFixtureBase)
   }
 
-  private fun KClass<*>.toFileCopyDetails() =
+  private fun Path.toFileCopyDetails() =
     object : FileCopyDetails by noOpDelegate() {
-      private val _path = java.name.replace('.', '/') + ".class"
-      private val _file =
-        tempDir
-          .resolve(_path)
-          .createParentDirectories()
-          .also { requireResourceAsPath(_path).copyTo(it) }
-          .toFile()
 
-      override fun getPath(): String = _path
+      override fun getPath(): String = relativeTo(tempDir).invariantSeparatorsPathString
 
-      override fun getFile(): File = _file
+      override fun getFile(): File = toFile()
+
+      override fun open(): InputStream = this@toFileCopyDetails.inputStream()
     }
+
+  private fun KClass<*>.toFileCopyDetails(): FileCopyDetails {
+    val path = "${java.name.replace('.', '/')}.class"
+    val file =
+      tempDir.resolve(path).createParentDirectories().also {
+        requireResourceAsPath(path).copyTo(it)
+      }
+    return file.toFileCopyDetails()
+  }
 
   // ---------------------------------------------------------------------------
   // Fixture classes – declared as nested classes so their bytecode is compiled
@@ -236,6 +304,10 @@ class BytecodeRemappingTest {
   interface FixtureInterface
 
   open class FixtureBase
+
+  class FixtureGenericOuter<T> {
+    inner class FixtureInner
+  }
 
   @Suppress("unused") // Used by parsing bytecode.
   @FixtureAnnotation
@@ -274,6 +346,8 @@ class BytecodeRemappingTest {
     }
 
     fun methodWithGeneric(list: List<FixtureBase>): FixtureBase = list[0]
+
+    fun methodWithNestedGeneric(arg: FixtureGenericOuter<FixtureBase>.FixtureInner) = Unit
   }
 }
 

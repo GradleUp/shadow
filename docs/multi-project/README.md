@@ -1,18 +1,16 @@
 # Using Shadow in Multi-Project Builds
 
-When using Shadow in a multi-project build, project dependencies will be treated the same as
-external dependencies.
-That is a project dependency will be merged into the [`ShadowJar`][ShadowJar] output of the project that
-is applying the Shadow plugin.
+When using Shadow in a multi-project build, project dependencies will be treated the same as external dependencies. That
+is a project dependency will be merged into the [`ShadowJar`][ShadowJar] output of the project that is applying the
+Shadow plugin.
 
 ## Depending on the Shadow Jar from Another Project
 
-In a multi-project build there may be one project that applies Shadow and another that
-requires the shadowed JAR as a dependency.
-In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
+In a multi-project build there may be one project that applies Shadow and another that requires the shadowed JAR as a
+dependency. In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
 configuration of the shadowed project.
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -20,7 +18,7 @@ configuration of the shadowed project.
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -42,7 +40,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
 
 **In the shadowed project (`:api`):**
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     plugins {
@@ -64,7 +62,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     plugins {
@@ -86,13 +84,13 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
     }
     ```
 
-!!! important
-
-    Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during compilation.
+> [!IMPORTANT]
+> Clearing `outgoing.variants` ensures Gradle doesn't select the unshadowed `classes` variant by default during
+> compilation.
 
 **Consuming projects can then depend on `:api` without specifying the `shadow` configuration:**
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     dependencies {
@@ -100,7 +98,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     dependencies {
@@ -113,7 +111,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
 If you want to exclude transitive dependencies that were bundled into the shadow JAR, you can add `exclude` rules to the
 configurations as well:
 
-=== "Kotlin"
+=== ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     configurations {
@@ -132,7 +130,7 @@ configurations as well:
     }
     ```
 
-=== "Groovy"
+=== ":simple-apachegroovy: build.gradle"
 
     ```groovy
     configurations {
@@ -150,6 +148,7 @@ configurations as well:
       }
     }
     ```
+
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

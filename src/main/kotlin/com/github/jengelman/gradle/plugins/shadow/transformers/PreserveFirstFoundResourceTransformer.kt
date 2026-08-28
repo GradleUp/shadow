@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.unsafeLazy
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
@@ -35,11 +36,14 @@ public open class PreserveFirstFoundResourceTransformer(
   final override val objectFactory: ObjectFactory,
   patternSet: PatternSet,
 ) : PatternFilterableResourceTransformer(patternSet) {
-  private val includeResources by unsafeLazy { @Suppress("DEPRECATION") include(resources.get()) }
+  private val includeResources by unsafeLazy { include(@Suppress("DEPRECATION") resources.get()) }
 
   @get:Internal protected val found: MutableSet<String> = mutableSetOf()
 
-  @get:Deprecated("Use `include(..)` instead")
+  @get:Deprecated(
+    message = "Use `include(..)` instead. This will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("include()"),
+  )
   @get:Input
   public open val resources: SetProperty<String> = objectFactory.setProperty()
 
@@ -48,6 +52,8 @@ public open class PreserveFirstFoundResourceTransformer(
   override fun canTransformResource(element: FileTreeElement): Boolean {
     // Init once before patternSpec is accessed.
     includeResources
-    return patternSpec.isSatisfiedBy(element) && !found.add(element.path)
+    val flag = patternSpec.isSatisfiedBy(element)
+    checkDupStrategy(flag, element)
+    return flag && !found.add(element.path)
   }
 }

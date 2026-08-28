@@ -1,7 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.util.jar.JarFile.MANIFEST_NAME
@@ -22,6 +23,10 @@ import org.gradle.api.tasks.Input
  *
  * @author Chris Rankin
  */
+@Deprecated(
+  message =
+    "Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead. This will be removed in Shadow 10."
+)
 @CacheableTransformer
 public open class ManifestAppenderTransformer
 @Inject
@@ -32,7 +37,9 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   public open val attributes: SetProperty<Pair<String, Comparable<*>>> = objectFactory.setProperty()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return MANIFEST_NAME.equals(element.path, ignoreCase = true)
+    return MANIFEST_NAME.equals(element.path, ignoreCase = true).also { flag ->
+      checkDupStrategy(flag, element)
+    }
   }
 
   override fun transform(context: TransformerContext) {
@@ -50,27 +57,26 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   override fun hasTransformedResource(): Boolean = attributes.get().isNotEmpty()
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(MANIFEST_NAME, preserveFileTimestamps))
-    os.write(manifestContents)
+    os.writeEntry(MANIFEST_NAME, preserveFileTimestamps) {
+      write(manifestContents)
 
-    if (attributes.get().isNotEmpty()) {
-      for ((key, value) in attributes.get()) {
-        os.write(key.toByteArray())
-        os.write(SEPARATOR)
-        os.write(value.toString().toByteArray())
-        os.write(EOL)
+      if (attributes.get().isNotEmpty()) {
+        for ((key, value) in attributes.get()) {
+          write(key.toByteArray())
+          write(SEPARATOR)
+          write(value.toString().toByteArray())
+          write(EOL)
+        }
+        write(EOL)
       }
-      os.write(EOL)
-      attributes.empty()
     }
-
-    os.closeEntry()
   }
 
   public open fun append(name: String, value: Comparable<*>) {
     attributes.add(name to value)
   }
 
+  @Suppress("DEPRECATION")
   private companion object {
     private val logger = Logging.getLogger(ManifestAppenderTransformer::class.java)
     private val EOL = "\r\n".toByteArray()

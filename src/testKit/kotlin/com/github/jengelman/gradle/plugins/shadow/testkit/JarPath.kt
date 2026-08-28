@@ -2,23 +2,17 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.Assert
 import assertk.assertions.containsAtLeast
-import assertk.assertions.containsExactlyInAnyOrder
+import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
+import assertk.assertions.isTrue
 import java.io.InputStream
+import java.net.URLClassLoader
 import java.nio.file.Path
+import java.util.ServiceLoader
 import java.util.jar.JarFile
-import java.util.jar.JarInputStream
 import java.util.zip.ZipFile
-import java.util.zip.ZipInputStream
-import kotlin.io.path.inputStream
 
-/**
- * A wrapper for [JarFile] that also implements [Path].
- *
- * We must declare some functions like [kotlin.io.path.deleteExisting] explicitly as they could not
- * be delegated to [JarPath] type.
- */
 @Suppress("JavaDefaultMethodsNotOverriddenByDelegation")
 class JarPath(val path: Path) : JarFile(path.toFile()), Path by path {
 
@@ -48,26 +42,9 @@ fun ZipFile.getStream(entryName: String): InputStream {
   return getInputStream(entry)
 }
 
-fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
+fun Assert<JarPath>.getBytes(entryName: String) = transform { it.getBytes(entryName) }
 
-/**
- * Scans the jar file for all entries that match the specified [entryName]. Unlike [getContent] or
- * [getStream], which return only one of the matching entries (which one is undefined), this
- * function returns all matching entries.
- */
-fun Assert<JarPath>.getContents(entryName: String) = transform { actual ->
-  JarInputStream(actual.path.inputStream()).use { jarInput ->
-    val contents = mutableListOf<String>()
-    while (true) {
-      val entry = jarInput.nextEntry ?: break
-      if (entry.name == entryName) {
-        contents.add(jarInput.readAllBytes().toString(Charsets.UTF_8))
-      }
-      jarInput.closeEntry()
-    }
-    contents
-  }
-}
+fun Assert<JarPath>.getContent(entryName: String) = transform { it.getContent(entryName) }
 
 fun Assert<JarPath>.getMainAttr(name: String) = transform { it.getMainAttr(name) }
 
@@ -89,23 +66,37 @@ fun Assert<JarPath>.containsNone(vararg entries: String) = toEntries().containsN
  */
 fun Assert<JarPath>.containsOnly(vararg entries: String) = toEntries().containsOnly(*entries)
 
-/**
- * Ensures the JAR contains exactly the specified entries, including duplicates, in any order. Used
- * alone, without [containsAtLeast] or [containsNone].
- */
-fun Assert<JarPath>.containsExactlyInAnyOrder(vararg entries: String) =
-  transform { actual ->
-      ZipInputStream(actual.path.inputStream()).use { jarInput ->
-        val allEntries = mutableListOf<String>()
-        while (true) {
-          val entry = jarInput.nextEntry ?: break
-          allEntries.add(entry.name)
-          jarInput.closeEntry()
-        }
-        allEntries
-      }
+/** Ensures the JAR contains exactly the specified entries in the exact order. */
+fun Assert<JarPath>.containsExactly(vararg entries: String) = toEntries().containsExactly(*entries)
+
+fun Assert<JarPath>.classLoader(
+  parent: ClassLoader? = null,
+  block: Assert<URLClassLoader>.() -> Unit,
+) = given { actual ->
+  URLClassLoader(arrayOf(actual.toUri().toURL()), parent).use {
+    assertThat(it).block()
+  }
+}
+
+fun Assert<URLClassLoader>.loadClass(name: String): Assert<Class<*>> = transform {
+  it.loadClass(name)
+}
+
+fun Assert<Class<*>>.isAssignableFrom(other: Assert<Class<*>>) = given { actual ->
+  other.given { otherActual ->
+    assertThat(actual.isAssignableFrom(otherActual)).isTrue()
+  }
+}
+
+fun Assert<URLClassLoader>.loadService(service: Assert<Class<*>>): Assert<List<Any>> =
+  transform { loader ->
+    lateinit var result: List<Any>
+    service.given { serviceClass ->
+      @Suppress("UNCHECKED_CAST")
+      result = ServiceLoader.load(serviceClass as Class<Any>, loader).toList()
     }
-    .containsExactlyInAnyOrder(*entries)
+    result
+  }
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }

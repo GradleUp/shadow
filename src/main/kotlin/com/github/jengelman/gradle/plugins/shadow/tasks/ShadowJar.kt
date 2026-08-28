@@ -1,38 +1,45 @@
 package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin
+import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.R8_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
-import com.github.jengelman.gradle.plugins.shadow.internal.MinimizeDependencyFilter
-import com.github.jengelman.gradle.plugins.shadow.internal.UnusedTracker
+import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
+import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
+import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.minimizeWithR8
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.internal.useZip
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
+import com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer.Companion.create
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.io.File
 import java.io.IOException
+import java.util.GregorianCalendar
 import java.util.jar.JarFile
 import java.util.zip.ZipException
-import java.util.zip.ZipFile
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
-import org.apache.tools.zip.Zip64Mode
-import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
@@ -60,11 +67,15 @@ import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.gradle.api.tasks.options.Option
+import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
+import org.gradle.process.ExecOperations
 
+@ShadowDsl
 @CacheableTask
 public abstract class ShadowJar : Jar() {
-  private val dependencyFilterForMinimize = MinimizeDependencyFilter(project)
+  private val _minimizeSpec = objectFactory.newInstance(DefaultMinimizeSpec::class.java)
+
   private val shadowDependencies = project.provider {
     // Find shadow configuration here instead of get, as the ShadowJar tasks could be registered
     // without Shadow plugin applied.
@@ -90,6 +101,10 @@ public abstract class ShadowJar : Jar() {
    *
    * Defaults to `false`.
    */
+  @Deprecated(
+    message = "Use `minimize()` instead. This property will be made non-public in Shadow 10.",
+    replaceWith = ReplaceWith("minimize()"),
+  )
   @get:Input
   @get:Option(
     option = "minimize-jar",
@@ -97,22 +112,25 @@ public abstract class ShadowJar : Jar() {
   )
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
+  /** Options for [minimize]. */
+  @get:Nested public open val minimizeSpec: MinimizeSpec = _minimizeSpec
+
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
-      if (it) (dependencyFilterForMinimize.resolve(configurations) - apiJars) else emptySet()
+    _minimizeJar.map {
+      if (it) (_minimizeSpec.resolve(configurations) - apiJars) else emptySet()
     }
   }
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
+    _minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
   }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    minimizeJar.map {
+    _minimizeJar.map {
       if (it) {
         project.sourceSets.map { sourceSet ->
           sourceSet.output.classesDirs.filter(File::isDirectory)
@@ -122,6 +140,27 @@ public abstract class ShadowJar : Jar() {
       }
     }
   }
+
+  @get:Classpath
+  public open val r8Classpath: ConfigurableFileCollection = objectFactory.fileCollection {
+    _minimizeJar.zip(minimizeSpec.tool) { enabled, tool ->
+      if (enabled && tool == MinimizeTool.R8) {
+        // Use findByName so custom ShadowJar tasks can be configured even when shadowR8 isn't
+        // registered.
+        project.configurations.findByName(R8_CONFIGURATION_NAME)?.apply {
+          // Resolve dependencies only when needed.
+          isCanBeResolved = true
+        } ?: project.files()
+      } else {
+        emptySet()
+      }
+    }
+  }
+
+  /** Java launcher used when running R8. */
+  @get:Nested
+  @get:Optional
+  public open val javaLauncher: Property<JavaLauncher> = objectFactory.property()
 
   /** [ResourceTransformer]s to be applied in the shadow steps. */
   @get:Nested
@@ -138,7 +177,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val configurations: ConfigurableFileCollection = objectFactory.fileCollection()
 
-  @get:Input
+  @get:Internal // The resolved result is tracked by includedDependencies.
   public open val dependencyFilter: Property<DependencyFilter> =
     objectFactory.property(DefaultDependencyFilter(project))
 
@@ -163,15 +202,24 @@ public abstract class ShadowJar : Jar() {
   public open val enableAutoRelocation: Property<Boolean> = objectFactory.property(false)
 
   /**
-   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files.
+   * Enables remapping of Kotlin module metadata (`.kotlin_module`) files' contents.
    *
-   * If you enable this option, the Kotlin module metadata file paths and their contents will be
-   * relocated if they are matched by any of the configured [relocators]. Someone may want to
-   * disable this feature and write their own [ResourceTransformer]s to handle Kotlin module
-   * metadata files in a custom way.
+   * If you enable this option, the Kotlin module metadata file contents will be relocated if they
+   * are matched by any of the configured [relocators]. Note that the file paths of these metadata
+   * files are relocated unconditionally regardless of this option. Someone may want to disable this
+   * feature and write their own [ResourceTransformer]s to handle Kotlin module metadata files in a
+   * custom way.
    *
    * Defaults to `true`.
    */
+  @Deprecated(
+    "Use `KotlinModuleMetadataTransformer` explicitly instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform(KotlinModuleMetadataTransformer::class.java)",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.KotlinModuleMetadataTransformer",
+      ),
+  )
   @get:Input
   @get:Option(
     option = "enable-kotlin-module-remapping",
@@ -234,11 +282,12 @@ public abstract class ShadowJar : Jar() {
   @get:Input
   @get:Option(
     option = "add-multi-release-attribute",
-    description = "Adds the multi-release attribute to the manifest if any dependencies contain it.",
+    description =
+      "Adds the multi-release attribute to the manifest if any dependencies contain it.",
   )
   public open val addMultiReleaseAttribute: Property<Boolean> = objectFactory.property(true)
 
-  @Suppress("DEPRECATION") // TODO: replace the usage of deprecated InheritManifest.
+  @Suppress("DEPRECATION")
   @Internal
   override fun getManifest(): InheritManifest = super.getManifest() as InheritManifest
 
@@ -259,9 +308,11 @@ public abstract class ShadowJar : Jar() {
    * - [FAIL]: **Fail** the build with a `DuplicateFileCopyingException` if there are duplicate
    *   `foo/bar` files.
    * - [INCLUDE]: **Duplicate** `foo/bar` entries will be included in the final JAR.
-   * - [INHERIT]: **Fail** the build with an exception like `Entry .* is a duplicate but no
-   *   duplicate handling strategy has been set`.
-   * - [WARN]: **Warn** about duplicates in the build log, this behaves exactly as [INHERIT]
+   * - [INHERIT]: **Inherit** the strategy from the parent copy specification. If explicitly set to
+   *   [INHERIT] on the root task (where no parent specification exists to inherit from),
+   *   encountering duplicates will fail the build with an exception like `Entry .* is a duplicate
+   *   but no duplicate handling strategy has been set`.
+   * - [WARN]: **Warn** about duplicates in the build log; this behaves exactly as [INCLUDE]
    *   otherwise.
    *
    * **NOTE:** The strategy takes precedence over transforming and relocating. Some
@@ -280,13 +331,15 @@ public abstract class ShadowJar : Jar() {
    */
   override fun getDuplicatesStrategy(): DuplicatesStrategy = super.getDuplicatesStrategy()
 
+  @get:Inject protected abstract val execOperations: ExecOperations
+
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
-  /** Enable [minimizeJar] and execute the [action] with the [DependencyFilter] for minimize. */
+  /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
-  public open fun minimize(action: Action<DependencyFilter> = Action {}) {
-    minimizeJar.set(true)
-    action.execute(dependencyFilterForMinimize)
+  public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
+    _minimizeJar.set(true)
+    action.execute(minimizeSpec)
   }
 
   /** Extra dependency operations to be applied in the shadow steps. */
@@ -342,6 +395,11 @@ public abstract class ShadowJar : Jar() {
    *
    * e.g. `append("resources/application.yml", "\n---\n")` for merging `resources/application.yml`
    * files.
+   *
+   * *Warning*: In most cases, this should be used with the correct [getDuplicatesStrategy] to
+   * ensure duplicate extension module files are handled properly. See more details in the
+   * [Handling Duplicates Strategy](https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy)
+   * section.
    *
    * @param resourcePath The path to the resource in the jar.
    * @param separator The separator to use between the original content and the appended content,
@@ -444,83 +502,62 @@ public abstract class ShadowJar : Jar() {
 
   @TaskAction
   override fun copy() {
-    includedDependencies.files.forEach { file ->
-      when {
-        !file.exists() -> {
-          logger.info("Skipping non-existent dependency: {}", file)
-        }
-        file.isDirectory -> {
-          from(file)
-        }
-        file.extension.equals("aar", ignoreCase = true) && file.isAar() -> {
-          val message =
-            """
-            Shadowing AAR file is not supported.
-            Please exclude dependency artifact: $file
-            or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
-          """
-              .trimIndent()
-          error(message)
-        }
-        else -> {
-          from(archiveOperations.zipTree(file))
-        }
-      }
-    }
+    addIncludedDependencies()
     injectManifestAttributes()
     super.copy()
+    runR8Minimization()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
-    val zosProvider = { destination: File ->
-      try {
-        val entryCompressionMethod =
-          when (entryCompression) {
-            ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
-            ZipEntryCompression.STORED -> ZipOutputStream.STORED
-          }
-        val stream =
-          if (entryCompressionMethod == ZipOutputStream.STORED) {
-            ZipOutputStream(destination)
-          } else {
-            // Improve performance by avoiding lots of small writes to the file system.
-            // It is not possible to do this with STORED entries as the implementation requires a
-            // RandomAccessFile to update the CRC after write.
-            ZipOutputStream(destination.outputStream().buffered())
-          }
-        stream.apply {
-          setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
-          setMethod(entryCompressionMethod)
-        }
-      } catch (e: Exception) {
-        throw IOException("Unable to create ZIP output stream for file $destination.", e)
-      }
-    }
     val unusedClasses =
-      if (minimizeJar.get()) {
-        val unusedTracker =
-          UnusedTracker(
-            sourceSetsClassesDirs = sourceSetsClassesDirs.files,
-            classJars = apiJars,
-            toMinimize = toMinimize,
-          )
-        includedDependencies.files.forEach { unusedTracker.addDependency(it) }
-        unusedTracker.findUnused()
+      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
+        findUnusedClasses(
+          sourceSetsClassesDirs = sourceSetsClassesDirs,
+          classJars = apiJars,
+          toMinimize = toMinimize,
+          dependencies = includedDependencies,
+        )
       } else {
         emptySet()
       }
+    val actualTransformers =
+      transformers.get().let { set ->
+        if (
+          @Suppress("DEPRECATION") enableKotlinModuleRemapping.get() &&
+            set.none { it is KotlinModuleMetadataTransformer }
+        ) {
+          set + KotlinModuleMetadataTransformer::class.java.create(objectFactory)
+        } else {
+          set
+        }
+      }
+    val zipFile = archiveFile.get().asFile
+    val zipOutStream =
+      try {
+        zipFile.createZipOutputStream(
+          entryCompression =
+            if (isR8Enabled) {
+              // R8 rewrites the final JAR; disabling compression makes the whole action faster.
+              ZipEntryCompression.STORED
+            } else {
+              entryCompression
+            },
+          isZip64 = isZip64,
+          encoding = metadataCharset,
+        )
+      } catch (e: Exception) {
+        throw IOException("Unable to create ZIP output stream for file $zipFile.", e)
+      }
     @Suppress("DEPRECATION")
     return ShadowCopyAction(
-      zipFile = archiveFile.get().asFile,
-      zosProvider = zosProvider,
-      transformers = transformers.get(),
+      zipFile = zipFile,
+      zipOutStream = zipOutStream,
+      transformers = actualTransformers,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      enableKotlinModuleRemapping = enableKotlinModuleRemapping.get(),
-      preserveFileTimestamps = isPreserveFileTimestamps,
+      isPreserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
-      metadataCharset,
     )
   }
 
@@ -534,6 +571,12 @@ public abstract class ShadowJar : Jar() {
     transformers.add(transformer)
   }
 
+  private val _minimizeJar
+    get() = @Suppress("DEPRECATION") minimizeJar
+
+  private val isR8Enabled: Boolean
+    get() = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
+
   private val packageRelocators: List<SimpleRelocator>
     get() {
       if (enableAutoRelocation.get()) {
@@ -546,10 +589,9 @@ public abstract class ShadowJar : Jar() {
         return emptyList()
       }
       val prefix = relocationPrefix.get()
-      return includedDependencies.files.flatMap { file ->
-        JarFile(file).use { jarFile ->
-          jarFile
-            .entries()
+      return includedDependencies.flatMap { file ->
+        file.useZip {
+          entries()
             .toList()
             .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
             .map { it.name.substringBeforeLast('/').replace('/', '.') }
@@ -558,6 +600,42 @@ public abstract class ShadowJar : Jar() {
         }
       }
     }
+
+  private fun addIncludedDependencies() {
+    val isAar: File.() -> Boolean = {
+      try {
+        extension.equals("aar", ignoreCase = true) &&
+          useZip { getEntry("AndroidManifest.xml") != null }
+      } catch (_: ZipException) {
+        // File is not a valid ZIP, so it cannot be an AAR.
+        false
+      }
+    }
+
+    includedDependencies.forEach { file ->
+      when {
+        !file.exists() -> {
+          logger.info("Skipping non-existent dependency: {}", file)
+        }
+        file.isDirectory -> {
+          from(file)
+        }
+        file.isAar() -> {
+          val message =
+            """
+            Shadowing AAR file is not supported.
+            Please exclude dependency artifact: $file
+            or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
+          """
+              .trimIndent()
+          throw GradleException(message)
+        }
+        else -> {
+          from(archiveOperations.zipTree(file))
+        }
+      }
+    }
+  }
 
   private fun injectManifestAttributes() {
     val mainClassValue = mainClass.orNull
@@ -603,26 +681,52 @@ public abstract class ShadowJar : Jar() {
       )
       return
     }
-    val includeMultiReleaseAttr =
-      includedDependencies.files.any {
-        try {
-          JarFile(it).use { jarFile ->
-            // Manifest might be null or the attribute name is invalid, or any other case.
-            runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }
-              .getOrNull()
-          } == "true"
-        } catch (_: IOException) {
-          // If the jar file is not valid, ignore it.
-          false
-        }
+    val includeMultiReleaseAttr = includedDependencies.any {
+      try {
+        JarFile(it).use { jarFile ->
+          // Manifest might be null or the attribute name is invalid, or any other case.
+          runCatching { jarFile.manifest.mainAttributes.getValue(multiReleaseAttributeKey) }
+            .getOrNull()
+        } == "true"
+      } catch (_: IOException) {
+        // If the jar file is not valid, ignore it.
+        false
       }
+    }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
     }
   }
 
+  private fun runR8Minimization() {
+    if (!isR8Enabled) return
+    minimizeWithR8(
+      inputJar = archiveFile.get().asFile,
+      temporaryDir = temporaryDir,
+      execOperations = execOperations,
+      logger = logger,
+      r8Classpath = r8Classpath,
+      r8Spec = _minimizeSpec.r8Spec,
+      javaLauncher = javaLauncher,
+      sourceSetsClassesDirs = sourceSetsClassesDirs,
+      keptDependencyFiles = includedDependencies - toMinimize,
+      relocators = relocators.get() + packageRelocators,
+    )
+  }
+
   public companion object {
     public const val SHADOW_JAR_TASK_NAME: String = "shadowJar"
+
+    /**
+     * The minimum timestamp that can be stored in a zip entry, as a UTC instant. MS-DOS date/time
+     * cannot represent dates before 1980, so smaller values are raised to this minimum.
+     *
+     * A copy of
+     * [org.gradle.api.internal.file.archive.ZipEntryConstants.CONSTANT_TIME_FOR_ZIP_ENTRIES].
+     */
+    @JvmField
+    public val CONSTANT_TIME_FOR_ZIP_ENTRIES: Long =
+      GregorianCalendar(1980, 1, 1, 0, 0, 0).timeInMillis
 
     @get:JvmSynthetic
     public inline val TaskContainer.shadowJar: TaskProvider<ShadowJar>
@@ -652,12 +756,17 @@ public abstract class ShadowJar : Jar() {
               jarTask.get().manifest,
             )
 
+          project.plugins.withId("org.gradle.java") {
+            task.javaLauncher.convention(
+              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+            )
+          }
+
           action.execute(task)
         }
         .also { task ->
-          // Can't use `named` directly as the task is optional or may not exist when the plugin is
-          // applied.
-          // Using Spec<String> applies the action to the task if it is added later.
+          // Can't use `named` directly as the task is optional or may not exist when the plugin
+          // is applied. Using Spec<String> applies the action to the task if it is added later.
           tasks.named(LifecycleBasePlugin.ASSEMBLE_TASK_NAME::equals).configureEach {
             if (shadow.addShadowJarToAssembleLifecycle.get()) {
               it.dependsOn(task)
@@ -667,11 +776,3 @@ public abstract class ShadowJar : Jar() {
     }
   }
 }
-
-private fun File.isAar(): Boolean =
-  try {
-    ZipFile(this).use { zip -> zip.getEntry("AndroidManifest.xml") != null }
-  } catch (_: ZipException) {
-    // File is not a valid ZIP, so it cannot be an AAR.
-    false
-  }

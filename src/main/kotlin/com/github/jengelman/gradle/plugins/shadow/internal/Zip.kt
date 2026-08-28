@@ -1,0 +1,115 @@
+package com.github.jengelman.gradle.plugins.shadow.internal
+
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
+import java.io.File
+import java.io.OutputStream
+import java.util.zip.ZipFile
+import org.apache.tools.zip.UnixStat
+import org.apache.tools.zip.Zip64Mode
+import org.apache.tools.zip.ZipEntry
+import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.GradleException
+import org.gradle.api.tasks.bundling.ZipEntryCompression
+
+@JvmInline
+internal value class UnixMode private constructor(internal val value: Int) {
+  companion object {
+    fun directory(permissions: Int = UnixStat.DEFAULT_DIR_PERM): UnixMode =
+      UnixMode(UnixStat.DIR_FLAG or permissions)
+
+    fun file(permissions: Int = UnixStat.DEFAULT_FILE_PERM): UnixMode =
+      UnixMode(UnixStat.FILE_FLAG or permissions)
+  }
+}
+
+/** Workaround to provide access to written [ZipOutputStream.entries]. */
+internal class TrackingZipOutputStream : ZipOutputStream {
+  constructor(out: OutputStream) : super(out)
+
+  constructor(file: File) : super(file)
+
+  private val _entries = mutableListOf<ZipEntry>()
+  val entries: List<ZipEntry> = _entries
+
+  override fun putNextEntry(archiveEntry: ZipEntry) {
+    super.putNextEntry(archiveEntry)
+    _entries.add(archiveEntry)
+  }
+}
+
+// TODO: remove this glue after ShadowCopyAction has been moved into internal.
+internal val ZipOutputStream.entries: List<ZipEntry>
+  @Suppress("UNCHECKED_CAST")
+  get() =
+    (this as? TrackingZipOutputStream)?.entries
+      ?: this::class.java.getDeclaredField("entries").apply { isAccessible = true }.get(this)
+        as List<ZipEntry>
+
+internal inline fun <R> File.useZip(block: ZipFile.() -> R): R = ZipFile(this).use(block)
+
+internal fun File.createZipOutputStream(
+  entryCompression: ZipEntryCompression,
+  isZip64: Boolean,
+  encoding: String?,
+): TrackingZipOutputStream {
+  val destination = this
+  val method =
+    when (entryCompression) {
+      ZipEntryCompression.DEFLATED -> ZipOutputStream.DEFLATED
+      ZipEntryCompression.STORED -> ZipOutputStream.STORED
+    }
+  val stream =
+    if (method == ZipOutputStream.STORED) {
+      TrackingZipOutputStream(destination)
+    } else {
+      // Improve performance by avoiding lots of small writes to the file system.
+      // STORED entries require a RandomAccessFile so their CRC can be updated after writing.
+      TrackingZipOutputStream(destination.outputStream().buffered())
+    }
+  return stream.apply {
+    setUseZip64(if (isZip64) Zip64Mode.AsNeeded else Zip64Mode.Never)
+    setMethod(method)
+    encoding?.let(::setEncoding)
+  }
+}
+
+internal inline fun ZipOutputStream.writeEntry(
+  name: String,
+  preserveLastModified: Boolean = true,
+  lastModified: Long = -1,
+  unixMode: UnixMode? = null,
+  write: ZipOutputStream.() -> Unit = {},
+) {
+  if (name.split('/', '\\').any { it == ".." }) {
+    throw GradleException("Malicious ZIP entry containing path traversal sequence: $name")
+  }
+
+  val entry =
+    ZipEntry(name).apply {
+      time =
+        if (preserveLastModified && lastModified >= 0) {
+          lastModified
+        } else {
+          CONSTANT_TIME_FOR_ZIP_ENTRIES
+        }
+      if (unixMode != null) {
+        this.unixMode = unixMode.value
+      }
+    }
+  putNextEntry(entry)
+  try {
+    write()
+  } finally {
+    closeEntry()
+  }
+}
+
+internal fun String.parentDirectoryEntries(): List<String> {
+  val parents = mutableListOf<String>()
+  var parent = substringBeforeLast('/', "")
+  while (parent.isNotEmpty()) {
+    parents += "$parent/"
+    parent = parent.substringBeforeLast('/', "")
+  }
+  return parents.asReversed()
+}

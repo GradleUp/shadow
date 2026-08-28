@@ -1,11 +1,14 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
 import java.io.BufferedInputStream
 import java.io.ByteArrayOutputStream
 import java.io.IOException
+import java.io.PrintWriter
 import org.apache.tools.zip.ZipOutputStream
+import org.codehaus.plexus.util.xml.PrettyPrintXMLWriter
 import org.codehaus.plexus.util.xml.XmlStreamReader
 import org.codehaus.plexus.util.xml.XmlStreamWriter
 import org.codehaus.plexus.util.xml.Xpp3Dom
@@ -37,13 +40,14 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
         for (component in components.values) {
           componentDom.addChild(component)
         }
-        Xpp3DomWriter.write(writer, dom)
+        val xmlWriter = PrettyPrintXMLWriter(PrintWriter(writer), "  ", "\n", null, null)
+        Xpp3DomWriter.write(xmlWriter, dom)
       }
       return os.toByteArray()
     }
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return COMPONENTS_XML_PATH == element.path
+    return (COMPONENTS_XML_PATH == element.path).also { flag -> checkDupStrategy(flag, element) }
   }
 
   override fun transform(context: TransformerContext) {
@@ -76,8 +80,7 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
 
       val key = "$role:$roleHint"
       // TODO: use the tools in Plexus to merge these properly. For now, I just need an
-      // all-or-nothing.
-      // Configuration carry over.
+      //  all-or-nothing configuration carry over.
       components[key]?.getChild("configuration")?.let { component.addChild(it) }
 
       val requirements = component.getChild("requirements")
@@ -94,10 +97,10 @@ public open class ComponentsXmlResourceTransformer : ResourceTransformer {
   }
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    os.putNextEntry(zipEntry(COMPONENTS_XML_PATH, preserveFileTimestamps))
-    os.write(transformedResource)
-    components.clear()
-    os.closeEntry()
+    os.writeEntry(COMPONENTS_XML_PATH, preserveFileTimestamps) {
+      write(transformedResource)
+      components.clear()
+    }
   }
 
   override fun hasTransformedResource(): Boolean = components.isNotEmpty()

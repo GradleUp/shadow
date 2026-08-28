@@ -1,8 +1,11 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
-import com.github.jengelman.gradle.plugins.shadow.internal.zipEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
+import java.io.FilterOutputStream
+import java.io.OutputStream
 import java.net.URL
 import java.nio.file.Path
 import java.util.Collections
@@ -10,7 +13,6 @@ import java.util.Enumeration
 import kotlin.io.path.createTempFile
 import kotlin.io.path.deleteIfExists
 import kotlin.io.path.outputStream
-import org.apache.commons.io.output.CloseShieldOutputStream
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
 import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
 import org.apache.tools.zip.ZipOutputStream
@@ -32,7 +34,7 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
   private val tempRelocators = mutableListOf<Relocator>()
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
-    return PLUGIN_CACHE_FILE == element.path
+    return (PLUGIN_CACHE_FILE == element.path).also { flag -> checkDupStrategy(flag, element) }
   }
 
   override fun transform(context: TransformerContext) {
@@ -50,12 +52,12 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
       val aggregator = PluginCache()
       aggregator.loadCacheFiles(urlEnumeration)
       relocatePlugins(aggregator)
-      os.putNextEntry(zipEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps))
-      // Prevent the aggregator to close the jar output.
-      aggregator.writeCache(CloseShieldOutputStream.wrap(os))
+      os.writeEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps) {
+        // Prevent the aggregator to close the jar output.
+        aggregator.writeCache(CloseShieldOutputStream(this))
+      }
     } finally {
       deleteTempFiles()
-      os.closeEntry()
     }
   }
 
@@ -81,4 +83,10 @@ public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
       val urls = tempFiles.map { it.toUri().toURL() }
       return Collections.enumeration(urls)
     }
+
+  private class CloseShieldOutputStream(output: OutputStream) : FilterOutputStream(output) {
+    override fun close() {
+      flush()
+    }
+  }
 }
