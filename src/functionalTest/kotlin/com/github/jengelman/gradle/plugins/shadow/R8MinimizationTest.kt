@@ -10,9 +10,8 @@ import assertk.assertions.isInstanceOf
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactly
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
@@ -519,15 +518,11 @@ class R8MinimizationTest : BasePluginTest() {
     runWithSuccess(appShadowJarPath)
 
     assertThat(outputAppShadowedJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "app/App.class",
         "lib/Used.class",
         *junitEntries.filterNot { it.endsWith('/') }.toTypedArray(),
         manifestEntry,
-      )
-      containsNone(
-        "lib/Reflective.class",
-        "lib/Unused.class",
       )
       classLoader {
         loadClass("app.App")
