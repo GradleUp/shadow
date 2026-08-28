@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHAD
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsExactly
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
@@ -426,6 +427,59 @@ class R8MinimizationTest : BasePluginTest() {
         loadClass("lib.Used")
         loadClass("lib.Unused")
         loadClass("lib.Reflective")
+      }
+    }
+    val inputConfigPath = path("app/build/tmp/shadowJar/r8/rules.pro").toRealPath()
+    val outputConfigDir = path("app/build/shadowJar/r8").toRealPath()
+    assertThat(path("app/build/shadowJar/r8/configuration.txt").readText().invariantEolString)
+      .isEqualTo(
+        """
+        |# The proguard configuration file for the following section is $inputConfigPath
+        |-basedirectory '$outputConfigDir'
+        |-dontoptimize
+        |-keep,includedescriptorclasses class app.App { *; }
+        |-keep class lib.Reflective { *; }
+        |-keep class lib.Unused { *; }
+        |-keep class lib.Used { *; }
+        |# End of content from $inputConfigPath
+        |"""
+          .trimMargin()
+      )
+  }
+
+  @Test
+  fun honorDependencyIncludes() {
+    writeR8AppAndLibModules(
+      appProjectBlock =
+        """
+        |dependencies {
+        |  implementation 'junit:junit:3.8.2'
+        |}
+        """
+          .trimMargin(),
+      appShadowBlock =
+        """
+        |minimize {
+        |  include(project(':lib'))
+        |  r8 {}
+        |}
+        """
+          .trimMargin(),
+    )
+
+    runWithSuccess(appShadowJarPath)
+
+    assertThat(outputAppShadowedJar).useAll {
+      containsOnly(
+        "app/App.class",
+        "lib/Used.class",
+        *junitEntries.filterNot { it.endsWith('/') }.toTypedArray(),
+        manifestEntry,
+      )
+      classLoader {
+        loadClass("app.App")
+        loadClass("lib.Used")
+        loadClass("junit.framework.Test")
       }
     }
   }

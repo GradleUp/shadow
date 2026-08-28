@@ -29,7 +29,7 @@ loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and 
     ```kotlin
     tasks.shadowJar {
       minimize {
-        exclude(dependency("org.scala-lang:.*:.*"))
+        exclude(dependency("org.apache.logging.log4j:.*:.*"))
       }
     }
     ```
@@ -39,7 +39,7 @@ loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       minimize {
-        exclude(dependency('org.scala-lang:.*:.*'))
+        exclude(dependency('org.apache.logging.log4j:.*:.*'))
       }
     }
     ```
@@ -414,6 +414,60 @@ To enable both:
     }
     ```
 
+### Filtering Dependencies in R8 Minimization
+
+The `include` and `exclude` filters configured on `minimize { ... }` apply to R8 minimization when default rules are
+enabled (the default):
+
+- **`exclude(...)` (Keep specific dependencies)**: Excludes matching dependencies from R8 shrinking. Shadow
+  automatically generates `-keep` rules for all classes in the excluded dependencies so they are fully preserved.
+- **`include(...)` (Shrink only specific dependencies)**: Applies R8 shrinking *only* to matching dependencies. All
+  other dependencies are automatically kept in full.
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    repositories {
+      google()
+    }
+
+    tasks.shadowJar {
+      minimize {
+        // Exclude specific dependencies from R8 shrinking (kept completely)
+        exclude(project(":api"))
+
+        // Or shrink only specific dependencies (all others are kept completely)
+        include(dependency("org.apache.logging.log4j:.*:.*"))
+
+        r8 {
+          // Optional extra configuration
+        }
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    repositories {
+      google()
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      minimize {
+        // Exclude specific dependencies from R8 shrinking (kept completely)
+        exclude(project(':api'))
+
+        // Or shrink only specific dependencies (all others are kept completely)
+        include(dependency('org.apache.logging.log4j:.*:.*'))
+
+        r8 {
+          // Optional extra configuration
+        }
+      }
+    }
+    ```
+
 ### Customizing Rules Without Defaults
 
 By default, Shadow generates fallback keep rules for project classes, excluded dependencies, and service descriptors,
@@ -457,9 +511,10 @@ or methods and running optimizations), disable `useDefaultRules`:
     ```
 
 > [!NOTE]
-> Setting `useDefaultRules = false` only disables Shadow's auto-generated rules. This does not disable consumer rules
-> embedded in dependency JARs (e.g. under `META-INF/proguard`). Furthermore, name obfuscation remains disabled by
-> default unless `enableObfuscation()` is called or `args` is customized.
+> Setting `useDefaultRules = false` disables Shadow's auto-generated rules, including `-keep` rules generated from
+> `minimize` `include` / `exclude` filters. This does not disable consumer rules embedded in dependency JARs
+> (e.g. under `META-INF/proguard`). Furthermore, name obfuscation remains disabled by default unless
+> `enableObfuscation()` is called or `args` is customized.
 
 
 
