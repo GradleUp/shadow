@@ -460,7 +460,7 @@ class RelocationTest : BasePluginTest() {
       |  implementation 'junit:junit:3.8.2'
       |}
       |$shadowJarTask {
-      |  configurations.setFrom()
+      |  mergedDependencies.setFrom()
       |  relocate('', 'foo/')
       |}
       """

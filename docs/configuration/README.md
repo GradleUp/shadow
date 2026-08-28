@@ -40,7 +40,7 @@ flowchart TD
         D4 -->|"No"| D6
     end
 
-    click A2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html" "ShadowJar.configurations"
+    click A2 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merged-dependencies.html" "ShadowJar.mergedDependencies"
     click A3 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow/-shadow-base-plugin/-companion/-c-o-n-f-i-g-u-r-a-t-i-o-n_-n-a-m-e.html" "ShadowBasePlugin.CONFIGURATION_NAME"
     click A5 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-dependencies.html" "ShadowJar.includedDependencies"
     click A4 href "../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html" "ShadowJar.dependencies"

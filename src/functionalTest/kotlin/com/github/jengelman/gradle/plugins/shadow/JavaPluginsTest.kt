@@ -693,7 +693,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  description = 'Create a combined JAR of project and test dependencies'
       |  archiveClassifier = 'test'
       |  from sourceSets.named('test').map { it.output }
-      |  configurations.setFrom project.configurations.named('testRuntimeClasspath')
+      |  mergedDependencies.from project.configurations.named('testRuntimeClasspath')
       |  manifest {
       |    attributes '$mainClassAttributeKey': 'my.Main'
       |  }
@@ -729,7 +729,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  description = 'Create a combined JAR of project and test dependencies'
       |  archiveClassifier = 'test'
       |  from sourceSets.named('test').map { it.output }
-      |  configurations.setFrom project.configurations.named('testRuntimeClasspath')
+      |  mergedDependencies.from project.configurations.named('testRuntimeClasspath')
       |  manifest {
       |    attributes '$mainClassAttributeKey': 'my.Main'
       |  }
@@ -772,7 +772,7 @@ class JavaPluginsTest : BasePluginTest() {
       |def $dependencyShadowJar = tasks.register('$dependencyShadowJar', ${ShadowJar::class.java.name}) {
       |  description = 'Create a shadow JAR of all dependencies'
       |  archiveClassifier = 'dep'
-      |  configurations.setFrom project.configurations.named('runtimeClasspath')
+      |  mergedDependencies.from project.configurations.named('runtimeClasspath')
       |}
       """
         .trimMargin()
@@ -785,6 +785,33 @@ class JavaPluginsTest : BasePluginTest() {
       transform { it.mainAttrSize }.isEqualTo(1)
     }
     assertThat(jarPath("build/libs/my-1.0-dep.jar")).useAll {
+      containsOnly(*junitEntries, *manifestEntries)
+      transform { it.mainAttrSize }.isEqualTo(1)
+    }
+  }
+
+  @Test
+  fun registerCustomShadowJarUsingDeprecatedConfigurations() {
+    val mainClassEntry = writeClass()
+    val legacyShadowJar = "legacyShadowJar"
+
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |def $legacyShadowJar = tasks.register('$legacyShadowJar', ${ShadowJar::class.java.name}) {
+      |  description = 'Create a shadow JAR of all dependencies using deprecated configurations'
+      |  archiveClassifier = 'legacy'
+      |  configurations = project.configurations.named('runtimeClasspath').map { [it] }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess("jar", legacyShadowJar)
+
+    assertThat(jarPath("build/libs/my-1.0-legacy.jar")).useAll {
       containsOnly(*junitEntries, *manifestEntries)
       transform { it.mainAttrSize }.isEqualTo(1)
     }
@@ -1180,7 +1207,7 @@ class JavaPluginsTest : BasePluginTest() {
         |}
         |
         |$shadowJarTask {
-        |  configurations.setFrom project.configurations.runtimeClasspath
+        |  mergedDependencies.from project.configurations.runtimeClasspath
         |}
         |
         |configurations.runtimeClasspath {

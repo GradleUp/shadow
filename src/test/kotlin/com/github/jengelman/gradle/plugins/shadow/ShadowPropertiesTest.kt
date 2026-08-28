@@ -33,7 +33,6 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPlugin.API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
-import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.AbstractArchiveTask
@@ -162,8 +161,9 @@ class ShadowPropertiesTest {
           )
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
-        assertThat(configurations.from.map { (it as Provider<*>).get() })
-          .containsOnly(runtimeConfiguration)
+        assertThat(mergedDependencies.files)
+          .containsOnly(*runtimeConfiguration.files.toTypedArray())
+        assertThat(@Suppress("DEPRECATION") configurations.get()).containsOnly(runtimeConfiguration)
       }
     }
 

@@ -1,15 +1,15 @@
 # Configuring Shadowed Dependencies
 
 Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all dependencies from the project's
-`runtimeClasspath` configuration into the final JAR. The configurations from which to source dependencies for the
-merging can be configured using the [`configurations`][ShadowJar.configurations] property of the
+`runtimeClasspath` configuration into the final JAR. The dependencies and files from which to source dependencies for the
+merging can be configured using the [`mergedDependencies`][ShadowJar.mergedDependencies] property of the
 [`ShadowJar`][ShadowJar] task type.
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
-      configurations.setFrom(project.configurations.compileClasspath)
+      mergedDependencies.setFrom(project.configurations.compileClasspath)
     }
     ```
 
@@ -17,24 +17,13 @@ merging can be configured using the [`configurations`][ShadowJar.configurations]
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      configurations.setFrom project.configurations.named('compileClasspath')
+      mergedDependencies.setFrom project.configurations.named('compileClasspath')
     }
     ```
 
 The above code sample would configure the [`ShadowJar`][ShadowJar] task to merge dependencies from only the
 `compileClasspath` configuration. This means any dependency declared in the `runtimeOnly` configuration would be **not**
 be included in the final JAR.
-
-> [!WARNING]
-> **Required Configuration**
->
-> Note the literal use of [`project.configurations`][Project.configurations] when setting the
-> [`configurations`][ShadowJar.configurations] attribute of a [`ShadowJar`][ShadowJar] task.
->
-> This is **required**. It may be tempting to specify `configurations.setFrom(configurations.compileClasspath)` but
-> this will not have the intended effect, as `configurations.compile` will try to delegate to the
-> [`configurations`][ShadowJar.configurations] property of the [`ShadowJar`][ShadowJar] task instead of the
-> `project`.
 
 ## Embedding Local Jar Files into Your Shadowed JAR
 
@@ -486,7 +475,7 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
-[ShadowJar.configurations]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html
+[ShadowJar.mergedDependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merged-dependencies.html
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [Project.configurations]: https://docs.gradle.org/current/dsl/org.gradle.api.Project.html#org.gradle.api.Project:configurations

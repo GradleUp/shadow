@@ -29,7 +29,7 @@ public interface DependencyFilter {
    *
    * Any [Configuration] sources within the collection are resolved individually and combined.
    */
-  public fun resolve(configurations: ConfigurableFileCollection): FileCollection
+  public fun resolve(dependencies: ConfigurableFileCollection): FileCollection
 
   /** Exclude dependencies that match the provided [spec]. */
   public fun exclude(spec: Spec<ResolvedDependency>)
@@ -81,9 +81,24 @@ public interface DependencyFilter {
         .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
     }
 
-    override fun resolve(configurations: ConfigurableFileCollection): FileCollection {
-      val extracted = configurations.from.flatMap { source -> extractConfigurations(source) }
-      return resolve(extracted)
+    override fun resolve(dependencies: ConfigurableFileCollection): FileCollection {
+      val extracted = dependencies.from.flatMap { source -> extractConfigurations(source) }
+      val excludedFiles =
+        project.files(
+          project.provider {
+            val includes = mutableSetOf<ResolvedDependency>()
+            val excludes = mutableSetOf<ResolvedDependency>()
+            extracted.forEach { config ->
+              resolve(
+                dependencies = config.resolvedConfiguration.firstLevelModuleDependencies,
+                includedDependencies = includes,
+                excludedDependencies = excludes,
+              )
+            }
+            excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
+          }
+        )
+      return dependencies - excludedFiles
     }
 
     private fun extractConfigurations(source: Any): List<Configuration> =

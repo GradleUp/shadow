@@ -156,7 +156,7 @@ The Shadow plugin provides a custom configuration (`configurations.shadow`) to s
 
 No other dependencies are automatically configured for inclusion in the POM file. For example, excluded dependencies are
 **not** automatically added to the POM file or if the configuration for merging are modified by specifying
-`shadowJar.configurations.setFrom(configurations.myConfiguration)`, there is no automatic configuration of the POM file.
+`shadowJar.mergedDependencies.setFrom(configurations.myConfiguration)`, there is no automatic configuration of the POM file.
 
 This automatic configuration occurs _only_ when using the above methods for configuring publishing. If this behavior is
 not desirable, then publishing **must** be manually configured.
@@ -392,7 +392,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
       description = "Create a combined JAR of project and test dependencies"
       archiveClassifier = "tests"
       from(sourceSets.test.map { it.output })
-      configurations.setFrom(project.configurations.testRuntimeClasspath)
+      mergedDependencies.setFrom(project.configurations.testRuntimeClasspath)
     }
 
     dependencies {
@@ -424,7 +424,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
       description = 'Create a combined JAR of project and test dependencies'
       archiveClassifier = 'tests'
       from sourceSets.named('test').map { it.output }
-      configurations.setFrom project.configurations.named('testRuntimeClasspath')
+      mergedDependencies.setFrom project.configurations.named('testRuntimeClasspath')
     }
 
     dependencies {

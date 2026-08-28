@@ -231,8 +231,8 @@ relocating), you can try out the trick like:
 
     ```kotlin
     tasks.shadowJar {
-      // Empty configurations list will exclude all dependencies.
-      configurations.setFrom()
+      // Empty mergedDependencies will exclude all dependencies.
+      mergedDependencies.setFrom()
       relocate("com.example", "shadow.com.example")
     }
     ```
@@ -241,14 +241,14 @@ relocating), you can try out the trick like:
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Empty configurations list will exclude all dependencies.
-      configurations.setFrom()
+      // Empty mergedDependencies will exclude all dependencies.
+      mergedDependencies.setFrom()
       relocate 'com.example', 'shadow.com.example'
     }
     ```
 
 This is useful in some cases, as mentioned in [#759]. See
-[Configuring Shadowed Dependencies][configuring-shadowed-dependencies] for more information about `configurations`.
+[Configuring Shadowed Dependencies][configuring-shadowed-dependencies] for more information about `mergedDependencies`.
 
 ## Relocating with R8
 

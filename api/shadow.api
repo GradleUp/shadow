@@ -261,7 +261,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getAddMultiReleaseAttribute ()Lorg/gradle/api/provider/Property;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
-	public fun getConfigurations ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getDuplicatesStrategy ()Lorg/gradle/api/file/DuplicatesStrategy;
 	public fun getEnableAutoRelocation ()Lorg/gradle/api/provider/Property;
@@ -275,6 +275,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
 	public fun getManifest ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/InheritManifest;
 	public synthetic fun getManifest ()Lorg/gradle/api/java/archives/Manifest;
+	public fun getMergedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getMinimizeJar ()Lorg/gradle/api/provider/Property;
 	public fun getMinimizeSpec ()Lcom/github/jengelman/gradle/plugins/shadow/tasks/MinimizeSpec;
 	public fun getR8Classpath ()Lorg/gradle/api/file/ConfigurableFileCollection;

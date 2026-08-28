@@ -39,7 +39,8 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val taskProvider =
       registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
         task.from(sourceSets.named("main").map { it.output })
-        task.configurations.convention(provider { runtimeConfiguration })
+        @Suppress("DEPRECATION")
+        task.configurations.convention(provider { listOf(runtimeConfiguration) })
       }
     artifacts.add(configurations.shadow.name, taskProvider)
   }

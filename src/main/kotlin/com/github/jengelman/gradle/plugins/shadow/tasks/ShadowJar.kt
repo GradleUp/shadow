@@ -41,6 +41,7 @@ import kotlin.reflect.full.hasAnnotation
 import org.gradle.api.Action
 import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.CopySpec
@@ -118,7 +119,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
     _minimizeJar.map {
-      if (it) (_minimizeSpec.resolve(configurations) - apiJars) else emptySet()
+      if (it) (_minimizeSpec.resolve(mergedDependencies) - apiJars) else emptySet()
     }
   }
 
@@ -174,8 +175,22 @@ public abstract class ShadowJar : Jar() {
    *
    * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
    */
+  @Deprecated(
+    message = "Use `mergedDependencies` instead. This property will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("mergedDependencies.from(configurations)"),
+  )
   @get:Classpath
-  public open val configurations: ConfigurableFileCollection = objectFactory.fileCollection()
+  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
+
+  /**
+   * The dependencies and files to be merged into the shadow JAR.
+   *
+   * Defaults to a file collection that contains `runtimeClasspath` or `runtime` configuration.
+   */
+  @get:Classpath
+  public open val mergedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
+    @Suppress("DEPRECATION") configurations
+  }
 
   @get:Internal // The resolved result is tracked by includedDependencies.
   public open val dependencyFilter: Property<DependencyFilter> =
@@ -184,7 +199,7 @@ public abstract class ShadowJar : Jar() {
   /** Final dependencies to be shadowed. */
   @get:Classpath
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
-    dependencyFilter.map { df -> df.resolve(configurations) }
+    dependencyFilter.map { df -> df.resolve(mergedDependencies) }
   }
 
   /**
