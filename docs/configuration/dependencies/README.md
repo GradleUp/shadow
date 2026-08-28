@@ -17,7 +17,7 @@ merging can be configured using the [`mergedDependencies`][ShadowJar.mergedDepen
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      mergedDependencies.setFrom project.configurations.named('compileClasspath')
+      mergedDependencies = project.configurations.compileClasspath
     }
     ```
 
