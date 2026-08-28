@@ -433,11 +433,10 @@ The `include` and `exclude` filters configured on `minimize { ... }` apply to R8
     tasks.shadowJar {
       minimize {
         // Exclude specific dependencies from R8 shrinking (kept completely)
-        exclude(dependency("org.apache.logging.log4j:.*:.*"))
         exclude(project(":api"))
 
         // Or shrink only specific dependencies (all others are kept completely)
-        // include(dependency("org.apache.logging.log4j:.*:.*"))
+        include(dependency("org.apache.logging.log4j:.*:.*"))
 
         r8 {
           // Optional extra configuration
@@ -456,11 +455,10 @@ The `include` and `exclude` filters configured on `minimize { ... }` apply to R8
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       minimize {
         // Exclude specific dependencies from R8 shrinking (kept completely)
-        exclude(dependency('org.apache.logging.log4j:.*:.*'))
         exclude(project(':api'))
 
         // Or shrink only specific dependencies (all others are kept completely)
-        // include(dependency('org.apache.logging.log4j:.*:.*'))
+        include(dependency('org.apache.logging.log4j:.*:.*'))
 
         r8 {
           // Optional extra configuration
