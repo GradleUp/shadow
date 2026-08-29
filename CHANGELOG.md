@@ -12,6 +12,7 @@
   - Support manifest header relocation via configurable `attributesToRelocate` property.
 - Allow disabling default ProGuard rules in R8 minimization with `R8Spec.useDefaultRules`. ([#2252](https://github.com/GradleUp/shadow/pull/2252))
 - Allow passing classpath files to R8 minimization with `R8Spec.classpath`. ([#2255](https://github.com/GradleUp/shadow/pull/2255))
+- Make `PropertiesFileTransformer` inherit `PatternFilterableResourceTransformer`. ([#2263](https://github.com/GradleUp/shadow/pull/2263))
 
 ### Changed
 
@@ -49,6 +50,8 @@
   Use `transform<GroovyExtensionModuleTransformer>()` and `transform<AppendingTransformer>()` instead.
 - Deprecate `ShadowJar.relocate(Class, Action)` and `ShadowJar.relocate<R>()`. ([#2262](https://github.com/GradleUp/shadow/pull/2262))  
   Construct a `Relocator` instance and use `ShadowJar.relocate(Relocator, Action)` instead.
+- Deprecate `PropertiesFileTransformer.paths`. ([#2263](https://github.com/GradleUp/shadow/pull/2263))  
+  Use `include(..)` instead.
 
 ### Fixed
 

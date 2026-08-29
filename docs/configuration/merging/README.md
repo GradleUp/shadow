@@ -602,6 +602,7 @@ There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provide
 - [`MergeLicenseResourceTransformer`][MergeLicenseResourceTransformer]
 - [`PreserveFirstFoundResourceTransformer`][PreserveFirstFoundResourceTransformer]
 - [`ProGuardFilesResourceTransformer`][ProGuardFilesResourceTransformer]
+- [`PropertiesFileTransformer`][PropertiesFileTransformer]
 - [`ServiceFileTransformer`][ServiceFileTransformer]
 
 You can use `include`/`exclude` and more methods to configure the patterns for those
@@ -642,7 +643,7 @@ found for duplicate property keys. You can customize the merge behavior with sev
 - `MergeStrategy.Append`: Combines duplicate property values using `mergeSeparator` (default `,`).
 - `MergeStrategy.Fail`: Fails the build if duplicate keys have conflicting values.
 
-You can also specify specific file paths or regular expressions to match using `paths`, configure per-path merge
+You can also specify specific file patterns to match using `include`/`exclude`, configure per-path merge
 strategies using `mappings`, rewrite property keys using `keyTransformer`, or change file encoding using
 `charsetName` (defaults to `ISO-8859-1`).
 
@@ -654,7 +655,7 @@ strategies using `mappings`, rewrite property keys using `keyTransformer`, or ch
 
     tasks.shadowJar {
       transform<PropertiesFileTransformer> {
-        paths.add("META-INF/test.properties")
+        include("META-INF/test.properties")
         mergeStrategy = MergeStrategy.Append
         mergeSeparator = ";"
       }
@@ -669,7 +670,7 @@ strategies using `mappings`, rewrite property keys using `keyTransformer`, or ch
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       transform(PropertiesFileTransformer) {
-        paths.add('META-INF/test.properties')
+        include 'META-INF/test.properties'
         mergeStrategy = MergeStrategy.Append
         mergeSeparator = ';'
       }

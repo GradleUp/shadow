@@ -82,6 +82,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
         )
     }
 
+  @Suppress("DEPRECATION")
   @ParameterizedTest
   @MethodSource("transformConfigWithPathsProvider")
   fun exerciseAllTransformConfigurationsWithPaths(
@@ -101,6 +102,29 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
       }
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
+    }
+
+  @Test
+  fun patternFilteringWithIncludeAndExclude() =
+    with(transformer) {
+      include("a.properties", "sub/dir/*.properties")
+      exclude("sub/dir/excluded.properties")
+
+      assertThat(canTransformResource("a.properties")).isTrue()
+      assertThat(canTransformResource("sub/dir/b.properties")).isTrue()
+      assertThat(canTransformResource("sub/dir/excluded.properties")).isFalse()
+      assertThat(canTransformResource("other.properties")).isFalse()
+    }
+
+  @Test
+  fun patternFilteringWithOnlyExclude() =
+    with(transformer) {
+      exclude("sub/dir/excluded.properties")
+
+      assertThat(canTransformResource("a.properties")).isTrue()
+      assertThat(canTransformResource("sub/dir/b.properties")).isTrue()
+      assertThat(canTransformResource("sub/dir/excluded.properties")).isFalse()
+      assertThat(canTransformResource("other.txt")).isFalse()
     }
 
   @ParameterizedTest
@@ -171,7 +195,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
   fun mergedPropertiesWithoutComments() =
     with(transformer) {
       val path = "META-INF/test.properties"
-      paths.set(listOf(path))
+      include(path)
       mergeStrategy.set(MergeStrategy.Append)
 
       val text1 = "# A comment from jar one.\nfoo=one"

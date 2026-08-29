@@ -19,6 +19,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
+import org.gradle.api.tasks.util.PatternSet
 
 /**
  * Resources transformer that merges Properties files.
@@ -65,13 +66,11 @@ import org.gradle.api.tasks.Internal
  * With `mergeStrategy = MergeStrategy.Fail` the transformation will fail if there are conflicting
  * values.
  *
- * There are three additional properties that can be set: [paths], [mappings], and [keyTransformer].
- * The first contains a list of strings or regexes that will be used to determine if a path should
- * be transformed or not. The merge strategy and merge separator are taken from the global settings.
+ * Use the [include] or [exclude] functions inherited from [PatternSet] to configure which property
+ * files are transformed. The merge strategy and merge separator are taken from the global settings.
  *
- * The [mappings] property allows you to define merge strategy and separator per path. If either
- * [paths] or [mappings] is defined then no other path entries will be merged. [mappings] has
- * precedence over [paths] if both are defined.
+ * The [mappings] property allows you to define merge strategy and separator per path. If [mappings]
+ * is defined then no other path entries will be merged.
  *
  * If you need to transform keys in properties files, e.g. because they contain class names about to
  * be relocated, you can set the [keyTransformer] property to a closure that receives the original
@@ -82,9 +81,7 @@ import org.gradle.api.tasks.Internal
  * import org.codehaus.griffon.gradle.shadow.transformers.*
  * tasks.named('shadowJar', ShadowJar) {
  *   transform(PropertiesFileTransformer) {
- *     paths = [
- *       'META-INF/editors/java.beans.PropertyEditor'
- *     ]
+ *     include 'META-INF/editors/java.beans.PropertyEditor'
  *     keyTransformer = { key ->
  *       key.replaceAll('^(orig\.package\..*)$', 'new.prefix.$1')
  *     }
@@ -99,9 +96,10 @@ import org.gradle.api.tasks.Internal
  * @author Marc Philipp
  */
 @CacheableTransformer
-public open class PropertiesFileTransformer
-@Inject
-constructor(final override val objectFactory: ObjectFactory) : ResourceTransformer {
+public open class PropertiesFileTransformer(
+  final override val objectFactory: ObjectFactory,
+  patternSet: PatternSet,
+) : PatternFilterableResourceTransformer(patternSet) {
   private inline val charset
     get() = Charset.forName(charsetName.get())
 
@@ -109,7 +107,12 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
 
   @get:Internal internal val propertiesEntries = mutableMapOf<String, ReproducibleProperties>()
 
-  @get:Input public open val paths: SetProperty<String> = objectFactory.setProperty()
+  @get:Deprecated(
+    message = "Use `include(..)` instead. This will be removed in Shadow 10.",
+    replaceWith = ReplaceWith("include()"),
+  )
+  @get:Input
+  public open val paths: SetProperty<String> = objectFactory.setProperty()
 
   @get:Input
   public open val mappings: MapProperty<String, Map<String, String>> = objectFactory.mapProperty()
@@ -128,18 +131,34 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
   // https://github.com/GradleUp/shadow/pull/1208.
   public open var keyTransformer: (String) -> String = IDENTITY
 
+  @Inject
+  public constructor(
+    objectFactory: ObjectFactory
+  ) : this(
+    objectFactory,
+    PatternSet(),
+  )
+
   override fun canTransformResource(element: FileTreeElement): Boolean {
     val mappings = mappings.get()
-    val paths = paths.get()
+    val paths = @Suppress("DEPRECATION") paths.get()
     val path = element.path
 
-    return when {
-      path in mappings -> true
-      mappings.keys.any { it.toRegex().containsMatchIn(path) } -> true
-      path in paths -> true
-      paths.any { it.toRegex().containsMatchIn(path) } -> true
-      else -> mappings.isEmpty() && paths.isEmpty() && path.endsWith(PROPERTIES_SUFFIX)
-    }.also { checkDupStrategy(it, element) }
+    val flag =
+      when {
+        path in mappings -> true
+        mappings.keys.any { it.toRegex().containsMatchIn(path) } -> true
+        path in paths -> true
+        paths.any { it.toRegex().containsMatchIn(path) } -> true
+        includes.isNotEmpty() -> patternSpec.isSatisfiedBy(element)
+        else ->
+          mappings.isEmpty() &&
+            paths.isEmpty() &&
+            path.endsWith(PROPERTIES_SUFFIX) &&
+            patternSpec.isSatisfiedBy(element)
+      }
+
+    return flag.also { checkDupStrategy(it, element) }
   }
 
   override fun transform(context: TransformerContext) {
