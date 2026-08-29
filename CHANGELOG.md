@@ -45,7 +45,7 @@
   Use `ShadowJar.exclude` or `MergeLicenseResourceTransformer` instead.
 - Deprecate `ManifestAppenderTransformer`. ([#2221](https://github.com/GradleUp/shadow/pull/2221))  
   Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead.
-- Deprecate `mergeGroovyExtensionModules` and `append` in `ShadowJar`.  
+- Deprecate `mergeGroovyExtensionModules` and `append` in `ShadowJar`. ([#2261](https://github.com/GradleUp/shadow/pull/2261))  
   Use `transform<GroovyExtensionModuleTransformer>()` and `transform<AppendingTransformer>()` instead.
 
 ### Fixed
