@@ -223,8 +223,11 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val method = result.classInfo().methodData.single { it.name == "<init>" }
-    assertThat(method.stringConstants[0])
-      .isEqualTo($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
+    assertThat(method.stringConstants)
+      .containsExactly(
+        $$"com.example.relocated.BytecodeRemappingTest$FixtureBase",
+        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;",
+      )
   }
 
   @Test
@@ -240,9 +243,10 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(skipRelocators)
 
     val method = result.classInfo().methodData.single { it.name == "<init>" }
-    assertThat(method.stringConstants[0])
-      .isEqualTo(
-        $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
+    assertThat(method.stringConstants)
+      .containsExactly(
+        $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase",
+        $$"()Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;",
       )
   }
 
@@ -253,9 +257,10 @@ class BytecodeRemappingTest {
     // Verify that two adjacent class references in a single string constant are both relocated
     // (regression test for the issue-1403 pattern).
     val method = result.classInfo().methodData.single { it.name == "<init>" }
-    assertThat(method.stringConstants[1])
-      .isEqualTo(
-        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
+    assertThat(method.stringConstants)
+      .containsExactly(
+        $$"com.example.relocated.BytecodeRemappingTest$FixtureBase",
+        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;",
       )
   }
 
