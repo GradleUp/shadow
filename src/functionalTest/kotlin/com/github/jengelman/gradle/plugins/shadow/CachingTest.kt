@@ -8,6 +8,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import kotlin.io.path.appendText
@@ -491,9 +492,7 @@ class CachingTest : BasePluginTest() {
 
     projectScript.appendText(
       """
-      |$shadowJarTask {
-      |  mergeGroovyExtensionModules()
-      |}
+      |${transform<GroovyExtensionModuleTransformer>()}
       |
       """
         .trimMargin()
