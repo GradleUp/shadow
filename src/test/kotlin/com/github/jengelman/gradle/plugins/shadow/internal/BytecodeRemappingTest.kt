@@ -2,8 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.contains
-import assertk.assertions.doesNotContain
+import assertk.assertions.containsExactly
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
@@ -96,7 +95,10 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     assertThat(result.classInfo().annotationDescriptors)
-      .contains($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;")
+      .containsExactly(
+        $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;",
+        "Lkotlin/Metadata;",
+      )
   }
 
   @Test
@@ -105,7 +107,7 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val annotation =
-      result.classInfo().annotations.first {
+      result.classInfo().annotations.single {
         it.descriptor == $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;"
       }
     val stringValue =
@@ -115,7 +117,7 @@ class BytecodeRemappingTest {
         ?: error("stringArrayValue must be Array<String>")
     assertThat(stringValue).isEqualTo($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
     assertThat(stringArrayValue)
-      .isEqualTo(arrayOf($$"com/example/relocated/BytecodeRemappingTest$FixtureBase"))
+      .containsExactly($$"com/example/relocated/BytecodeRemappingTest$FixtureBase")
   }
 
   @Test
@@ -168,37 +170,41 @@ class BytecodeRemappingTest {
   fun fieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().fieldDescriptors).contains("L$relocatedFixtureBase;")
+    val field = result.classInfo().fieldData.single { it.name == "field" }
+    assertThat(field.descriptor).isEqualTo("L$relocatedFixtureBase;")
   }
 
   @Test
   fun arrayFieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().fieldDescriptors).contains("[L$relocatedFixtureBase;")
+    val field = result.classInfo().fieldData.single { it.name == "arrayField" }
+    assertThat(field.descriptor).isEqualTo("[L$relocatedFixtureBase;")
   }
 
   @Test
   fun array2dFieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().fieldDescriptors).contains("[[L$relocatedFixtureBase;")
+    val field = result.classInfo().fieldData.single { it.name == "array2dField" }
+    assertThat(field.descriptor).isEqualTo("[[L$relocatedFixtureBase;")
   }
 
   @Test
   fun methodDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().methodDescriptors)
-      .contains("(L$relocatedFixtureBase;)L$relocatedFixtureBase;")
+    val method = result.classInfo().methodData.single { it.name == "method" }
+    assertThat(method.descriptor).isEqualTo("(L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
   @Test
   fun methodMultipleArgsIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().methodDescriptors)
-      .contains("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
+    val method = result.classInfo().methodData.single { it.name == "methodMultiArgs" }
+    assertThat(method.descriptor)
+      .isEqualTo("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
   @ParameterizedTest
@@ -206,20 +212,28 @@ class BytecodeRemappingTest {
   fun primitivePlusClassMethodIsRelocated(primitiveDescriptor: Char) {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().methodDescriptors)
-      .contains("(${primitiveDescriptor}L$relocatedFixtureBase;)L$relocatedFixtureBase;")
+    val method =
+      result.classInfo().methodData.single { it.descriptor.startsWith("($primitiveDescriptor") }
+    assertThat(method.descriptor)
+      .isEqualTo("(${primitiveDescriptor}L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
   @Test
-  fun stringConstantIsRelocated() {
+  fun stringConstantsAreRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(result.classInfo().stringConstants)
-      .contains($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
+    // Verify that single class references as well as two adjacent class references in a single
+    // string constant are both relocated (regression test for the issue-1403 pattern).
+    val method = result.classInfo().methodData.single { it.name == "<init>" }
+    assertThat(method.stringConstants)
+      .containsExactly(
+        $$"com.example.relocated.BytecodeRemappingTest$FixtureBase",
+        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;",
+      )
   }
 
   @Test
-  fun stringConstantNotRelocatedWhenSkipEnabled() {
+  fun stringConstantsNotRelocatedWhenSkipEnabled() {
     val skipRelocators =
       setOf(
         SimpleRelocator(
@@ -230,19 +244,11 @@ class BytecodeRemappingTest {
       )
     val result = fixtureSubjectDetails.remapClass(skipRelocators)
 
-    assertThat(result.classInfo().stringConstants)
-      .doesNotContain($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
-  }
-
-  @Test
-  fun multiClassDescriptorStringConstantIsRelocated() {
-    val result = fixtureSubjectDetails.remapClass(relocators)
-
-    // Verify that two adjacent class references in a single string constant are both relocated
-    // (regression test for the issue-1403 pattern).
-    assertThat(result.classInfo().stringConstants)
-      .contains(
-        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
+    val method = result.classInfo().methodData.single { it.name == "<init>" }
+    assertThat(method.stringConstants)
+      .containsExactly(
+        $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase",
+        $$"()Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;",
       )
   }
 
@@ -250,23 +256,26 @@ class BytecodeRemappingTest {
   fun interfaceIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(ClassReader(result).interfaces.toList())
-      .contains($$"com/example/relocated/BytecodeRemappingTest$FixtureInterface")
+    assertThat(ClassReader(result).interfaces)
+      .containsExactly($$"com/example/relocated/BytecodeRemappingTest$FixtureInterface")
   }
 
   @Test
   fun signatureIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodWithGeneric" }
-    assertThat(checkNotNull(method.signature)).contains("L$relocatedFixtureBase;")
+    val method = result.classInfo().methodData.single { it.name == "methodWithGeneric" }
+    assertThat(checkNotNull(method.signature))
+      .isEqualTo(
+        $$"(Ljava/util/List<+Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>;)Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
+      )
   }
 
   @Test
   fun nestedClassSignatureIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodWithNestedGeneric" }
+    val method = result.classInfo().methodData.single { it.name == "methodWithNestedGeneric" }
     assertThat(checkNotNull(method.signature))
       .isEqualTo(
         $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V"
@@ -308,17 +317,22 @@ class BytecodeRemappingTest {
   fun localVariableIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "method" }
-    assertThat(method.localVarDescriptors).contains("L$relocatedFixtureBase;")
+    val method = result.classInfo().methodData.single { it.name == "method" }
+    assertThat(method.localVarDescriptors)
+      .containsExactly(
+        $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;",
+        "L$relocatedFixtureBase;",
+      )
   }
 
   @Test
   fun instructionIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodWithCheckCast" }
-    assertThat(method.checkcastTargets).contains(relocatedFixtureBase)
-    assertThat(method.invokeOwners).contains(relocatedFixtureBase)
+    val method = result.classInfo().methodData.single { it.name == "methodWithCheckCast" }
+    assertThat(method.checkcastTargets).containsExactly(relocatedFixtureBase, relocatedFixtureBase)
+    assertThat(method.invokeOwners)
+      .containsExactly("kotlin/jvm/internal/Intrinsics", relocatedFixtureBase)
   }
 
   private fun Path.toFileCopyDetails() =
@@ -409,36 +423,11 @@ class BytecodeRemappingTest {
   }
 }
 
-private data class ClassBytecodeInfo(
-  val annotationDescriptors: List<String>,
-  val annotations: List<AnnotationBytecodeInfo>,
-  val fieldDescriptors: List<String>,
-  val methodData: List<MethodBytecodeInfo>,
-) {
-  val methodDescriptors = methodData.map { it.descriptor }
-  val stringConstants = methodData.flatMap { it.stringConstants }
-
-  data class AnnotationBytecodeInfo(
-    val descriptor: String,
-    val values: Map<String, Any?>,
-  )
-
-  data class MethodBytecodeInfo(
-    val name: String,
-    val descriptor: String,
-    val signature: String?,
-    val localVarDescriptors: List<String>,
-    @Suppress("SpellCheckingInspection") val checkcastTargets: List<String>,
-    val invokeOwners: List<String>,
-    val stringConstants: List<String>,
-  )
-}
-
 @Suppress("SpellCheckingInspection")
 private fun ByteArray.classInfo(): ClassBytecodeInfo {
   val annotationDescs = mutableListOf<String>()
   val annotations = mutableListOf<ClassBytecodeInfo.AnnotationBytecodeInfo>()
-  val fieldDescs = mutableListOf<String>()
+  val fields = mutableListOf<ClassBytecodeInfo.FieldBytecodeInfo>()
   val methods = mutableListOf<ClassBytecodeInfo.MethodBytecodeInfo>()
 
   ClassReader(this)
@@ -482,7 +471,7 @@ private fun ByteArray.classInfo(): ClassBytecodeInfo {
           signature: String?,
           value: Any?,
         ): FieldVisitor? {
-          fieldDescs.add(descriptor)
+          fields.add(ClassBytecodeInfo.FieldBytecodeInfo(name, descriptor))
           return null
         }
 
@@ -547,5 +536,32 @@ private fun ByteArray.classInfo(): ClassBytecodeInfo {
       0,
     )
 
-  return ClassBytecodeInfo(annotationDescs, annotations, fieldDescs, methods)
+  return ClassBytecodeInfo(annotationDescs, annotations, fields, methods)
+}
+
+private data class ClassBytecodeInfo(
+  val annotationDescriptors: List<String>,
+  val annotations: List<AnnotationBytecodeInfo>,
+  val fieldData: List<FieldBytecodeInfo>,
+  val methodData: List<MethodBytecodeInfo>,
+) {
+  data class AnnotationBytecodeInfo(
+    val descriptor: String,
+    val values: Map<String, Any?>,
+  )
+
+  data class FieldBytecodeInfo(
+    val name: String,
+    val descriptor: String,
+  )
+
+  data class MethodBytecodeInfo(
+    val name: String,
+    val descriptor: String,
+    val signature: String?,
+    val localVarDescriptors: List<String>,
+    @Suppress("SpellCheckingInspection") val checkcastTargets: List<String>,
+    val invokeOwners: List<String>,
+    val stringConstants: List<String>,
+  )
 }
