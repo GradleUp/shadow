@@ -4,6 +4,7 @@ import assertk.Assert
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
@@ -528,7 +529,7 @@ class PublishingTest : BasePluginTest() {
 
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
     gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
-      assertThat(gmm.variantNames).containsOnly(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+      assertThat(gmm.variantNames).containsExactly(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
       assertShadowVariantCommon(gmm)
     }
   }
@@ -586,7 +587,7 @@ class PublishingTest : BasePluginTest() {
             Bundling.BUNDLING_ATTRIBUTE.name to Bundling.EXTERNAL,
             Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
           )
-        transform { it.coordinates }.containsOnly("my:a:1.0")
+        transform { it.coordinates }.containsExactly("my:a:1.0")
       }
     }
     val entriesCommon =
