@@ -13,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.Path
@@ -112,8 +113,14 @@ class ApplicationPluginTest : BasePluginTest() {
       } else {
         runProcess(unixScript.toString(), "bar")
       }
-    assertThat(runningOutput)
-      .contains("Hello, World! (bar) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.invariantEolString)
+      .isEqualTo(
+        """
+        |Hello, World! (bar) from Main
+        |Refs: junit.framework.Test
+        |"""
+          .trimMargin()
+      )
   }
 
   @Test

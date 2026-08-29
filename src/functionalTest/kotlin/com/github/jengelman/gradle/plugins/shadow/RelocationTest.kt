@@ -6,7 +6,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
-import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
@@ -14,7 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
-import com.github.jengelman.gradle.plugins.shadow.util.runProcess
+import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -480,9 +479,6 @@ class RelocationTest : BasePluginTest() {
     projectScript.appendText(
       """
       |$shadowJarTask {
-      |  manifest {
-      |    attributes '$mainClassAttributeKey': 'my.Main'
-      |  }
       |  relocate('foo', 'shadow.foo')
       |}
       """
@@ -490,9 +486,19 @@ class RelocationTest : BasePluginTest() {
     )
 
     runWithSuccess(shadowJarPath)
-    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
+    assertThat(outputShadowedJar).useAll {
+      classLoader {
+        runMain("my.Main")
+          .isEqualTo(
+            """
+            |shadow.foo.Foo
+            |shadow.foo.Bar
+            |"""
+              .trimMargin()
+          )
+      }
+    }
   }
 
   @ParameterizedTest // #232, #606
@@ -502,9 +508,6 @@ class RelocationTest : BasePluginTest() {
     projectScript.appendText(
       """
       |$shadowJarTask {
-      |  manifest {
-      |    attributes '$mainClassAttributeKey': 'my.Main'
-      |  }
       |  relocate('foo', 'shadow.foo') {
       |    skipStringConstants = $skipStringConstants
       |  }
@@ -512,14 +515,26 @@ class RelocationTest : BasePluginTest() {
       """
         .trimMargin()
     )
+    val expected =
+      if (skipStringConstants) {
+          """
+        |foo.Foo
+        |foo.Bar
+        |"""
+        } else {
+          """
+        |shadow.foo.Foo
+        |shadow.foo.Bar
+        |"""
+        }
+        .trimMargin()
 
     runWithSuccess(shadowJarPath)
-    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    if (skipStringConstants) {
-      assertThat(result).contains("foo.Foo", "foo.Bar")
-    } else {
-      assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
+    assertThat(outputShadowedJar).useAll {
+      classLoader {
+        runMain("my.Main").isEqualTo(expected)
+      }
     }
   }
 
@@ -541,9 +556,6 @@ class RelocationTest : BasePluginTest() {
     projectScript.appendText(
       """
       |$shadowJarTask {
-      |  manifest {
-      |    attributes '$mainClassAttributeKey': 'my.Main'
-      |  }
       |  relocate('org.package', 'shadow.org.package')
       |}
       """
@@ -551,15 +563,20 @@ class RelocationTest : BasePluginTest() {
     )
 
     runWithSuccess(shadowJarPath)
-    val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    // Just check that the jar can be executed without NoClassDefFoundError.
-    assertThat(result)
-      .contains(
-        "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB",
-        "Lshadow/org/package/ClassC;Lshadow/org/package/ClassD",
-        "Lshadow/org/package/ClassE;Lshadow/org/package/ClassF",
-      )
+    assertThat(outputShadowedJar).useAll {
+      classLoader {
+        runMain("my.Main")
+          .isEqualTo(
+            """
+            |Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;
+            |(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)
+            |()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;
+            |"""
+              .trimMargin()
+          )
+      }
+    }
   }
 
   @Test
@@ -721,11 +738,13 @@ class RelocationTest : BasePluginTest() {
       |package my;
       |public class Main {
       |  public static void main(String[] args) {
+      |    String s1;
       |    switch (1) {
       |      default:
-      |        System.out.println("foo.Foo"); // Test case for string constants used in switch statements.
+      |        s1 = "foo.Foo"; // Test case for string constants used in switch statements.
       |        break;
       |    }
+      |    System.out.println(s1);
       |    System.out.println("foo.Bar");
       |  }
       |}

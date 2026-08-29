@@ -491,7 +491,7 @@ class PublishingTest : BasePluginTest() {
         "maven-all-1.0.pom.sha512",
       )
 
-    assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll { containsNone(*entriesInAB) }
+    assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll { containsOnly(*manifestEntries) }
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-all.jar")).useAll {
       containsOnly(*entriesInAB, *manifestEntries)
     }

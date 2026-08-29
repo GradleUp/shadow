@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
