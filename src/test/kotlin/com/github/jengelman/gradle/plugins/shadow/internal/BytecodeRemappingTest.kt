@@ -129,8 +129,8 @@ class BytecodeRemappingTest {
     val d2 = metadataAnnotation.values["d2"] as? Array<String> ?: error("d2 must be Array<String>")
     val mv = metadataAnnotation.values["mv"] as? IntArray ?: error("mv must be IntArray")
 
-    assertThat(d2).contains($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;")
-    assertThat(d2).contains("L$relocatedFixtureBase;")
+    assertThat(d2[0]).isEqualTo($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;")
+    assertThat(d2[1]).isEqualTo("L$relocatedFixtureBase;")
 
     val metadata =
       Metadata(
