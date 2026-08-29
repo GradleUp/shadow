@@ -442,7 +442,7 @@ public abstract class ShadowJar : Jar() {
     action: Action<SimpleRelocator> = Action {},
   ) {
     val relocator = SimpleRelocator(pattern, destination)
-    addRelocator(relocator, action)
+    relocate(relocator = relocator, action = action)
   }
 
   @Deprecated(
@@ -522,7 +522,7 @@ public abstract class ShadowJar : Jar() {
    */
   @JvmSynthetic
   public inline fun <reified T : ResourceTransformer> transform(action: Action<T> = Action {}) {
-    transform(T::class.java, action)
+    transform(clazz = T::class.java, action = action)
   }
 
   @TaskAction
