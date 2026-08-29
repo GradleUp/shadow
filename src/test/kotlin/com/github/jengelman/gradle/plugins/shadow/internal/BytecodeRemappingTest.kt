@@ -442,33 +442,6 @@ class BytecodeRemappingTest {
   }
 }
 
-private data class ClassBytecodeInfo(
-  val annotationDescriptors: List<String>,
-  val annotations: List<AnnotationBytecodeInfo>,
-  val fieldData: List<FieldBytecodeInfo>,
-  val methodData: List<MethodBytecodeInfo>,
-) {
-  data class AnnotationBytecodeInfo(
-    val descriptor: String,
-    val values: Map<String, Any?>,
-  )
-
-  data class FieldBytecodeInfo(
-    val name: String,
-    val descriptor: String,
-  )
-
-  data class MethodBytecodeInfo(
-    val name: String,
-    val descriptor: String,
-    val signature: String?,
-    val localVarDescriptors: List<String>,
-    @Suppress("SpellCheckingInspection") val checkcastTargets: List<String>,
-    val invokeOwners: List<String>,
-    val stringConstants: List<String>,
-  )
-}
-
 @Suppress("SpellCheckingInspection")
 private fun ByteArray.classInfo(): ClassBytecodeInfo {
   val annotationDescs = mutableListOf<String>()
@@ -583,4 +556,31 @@ private fun ByteArray.classInfo(): ClassBytecodeInfo {
     )
 
   return ClassBytecodeInfo(annotationDescs, annotations, fields, methods)
+}
+
+private data class ClassBytecodeInfo(
+  val annotationDescriptors: List<String>,
+  val annotations: List<AnnotationBytecodeInfo>,
+  val fieldData: List<FieldBytecodeInfo>,
+  val methodData: List<MethodBytecodeInfo>,
+) {
+  data class AnnotationBytecodeInfo(
+    val descriptor: String,
+    val values: Map<String, Any?>,
+  )
+
+  data class FieldBytecodeInfo(
+    val name: String,
+    val descriptor: String,
+  )
+
+  data class MethodBytecodeInfo(
+    val name: String,
+    val descriptor: String,
+    val signature: String?,
+    val localVarDescriptors: List<String>,
+    @Suppress("SpellCheckingInspection") val checkcastTargets: List<String>,
+    val invokeOwners: List<String>,
+    val stringConstants: List<String>,
+  )
 }
