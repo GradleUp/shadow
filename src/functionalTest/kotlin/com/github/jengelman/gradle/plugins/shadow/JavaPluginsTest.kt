@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsExactly
 import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
@@ -25,6 +24,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
@@ -712,8 +712,14 @@ class JavaPluginsTest : BasePluginTest() {
 
     val pathString = path("build/libs/my-1.0-test.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
-    assertThat(runningOutput.trim().lines())
-      .containsExactly("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.invariantEolString)
+      .isEqualTo(
+        """
+        |Hello, World! (foo) from Main
+        |Refs: junit.framework.Test
+        |"""
+          .trimMargin()
+      )
   }
 
   @Test // #1784
@@ -756,8 +762,14 @@ class JavaPluginsTest : BasePluginTest() {
 
     val pathString = path("build/libs/my-1.0-test.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
-    assertThat(runningOutput.trim().lines())
-      .containsExactly("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.invariantEolString)
+      .isEqualTo(
+        """
+        |Hello, World! (foo) from Main
+        |Refs: junit.framework.Test
+        |"""
+          .trimMargin()
+      )
   }
 
   @Test // #443

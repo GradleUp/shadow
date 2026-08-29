@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -12,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONS
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
@@ -493,7 +493,14 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    assertThat(result.trim().lines()).containsExactly("shadow.foo.Foo", "shadow.foo.Bar")
+    assertThat(result.invariantEolString)
+      .isEqualTo(
+        """
+        |shadow.foo.Foo
+        |shadow.foo.Bar
+        |"""
+          .trimMargin()
+      )
   }
 
   @ParameterizedTest // #232, #606
@@ -517,11 +524,20 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    if (skipStringConstants) {
-      assertThat(result.trim().lines()).containsExactly("foo.Foo", "foo.Bar")
-    } else {
-      assertThat(result.trim().lines()).containsExactly("shadow.foo.Foo", "shadow.foo.Bar")
-    }
+    val expected =
+      if (skipStringConstants) {
+          """
+        |foo.Foo
+        |foo.Bar
+        |"""
+        } else {
+          """
+        |shadow.foo.Foo
+        |shadow.foo.Bar
+        |"""
+        }
+        .trimMargin()
+    assertThat(result.invariantEolString).isEqualTo(expected)
   }
 
   @Test // #1403
@@ -555,11 +571,14 @@ class RelocationTest : BasePluginTest() {
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     // Just check that the jar can be executed without NoClassDefFoundError.
-    assertThat(result.trim().lines())
-      .containsExactly(
-        "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;",
-        "(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)",
-        "()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;",
+    assertThat(result.invariantEolString)
+      .isEqualTo(
+        """
+        |Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;
+        |(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)
+        |()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;
+        |"""
+          .trimMargin()
       )
   }
 

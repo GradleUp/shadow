@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
@@ -14,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.isWindows
 import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import java.nio.file.Path
@@ -113,8 +113,14 @@ class ApplicationPluginTest : BasePluginTest() {
       } else {
         runProcess(unixScript.toString(), "bar")
       }
-    assertThat(runningOutput.trim().lines())
-      .containsExactly("Hello, World! (bar) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.invariantEolString)
+      .isEqualTo(
+        """
+        |Hello, World! (bar) from Main
+        |Refs: junit.framework.Test
+        |"""
+          .trimMargin()
+      )
   }
 
   @Test
