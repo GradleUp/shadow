@@ -20,6 +20,7 @@ import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
+import kotlin.metadata.jvm.KotlinClassMetadata
 import kotlin.reflect.KClass
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
@@ -96,6 +97,53 @@ class BytecodeRemappingTest {
 
     assertThat(result.classInfo().annotationDescriptors)
       .contains($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;")
+  }
+
+  @Test
+  @Suppress("UNCHECKED_CAST")
+  fun annotationStringValueIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val annotation =
+      result.classInfo().annotations.first {
+        it.descriptor == $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;"
+      }
+    val stringValue =
+      annotation.values["stringValue"] as? String ?: error("stringValue must be String")
+    val stringArrayValue =
+      annotation.values["stringArrayValue"] as? Array<String>
+        ?: error("stringArrayValue must be Array<String>")
+    assertThat(stringValue).isEqualTo($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
+    assertThat(stringArrayValue)
+      .isEqualTo(arrayOf($$"com/example/relocated/BytecodeRemappingTest$FixtureBase"))
+  }
+
+  @Test
+  @Suppress("UNCHECKED_CAST")
+  fun kotlinMetadataIsRelocated() {
+    val result = fixtureSubjectDetails.remapClass(relocators)
+
+    val metadataAnnotation =
+      result.classInfo().annotations.single { it.descriptor == "Lkotlin/Metadata;" }
+    val d1 = metadataAnnotation.values["d1"] as? Array<String> ?: error("d1 must be Array<String>")
+    val d2 = metadataAnnotation.values["d2"] as? Array<String> ?: error("d2 must be Array<String>")
+    val mv = metadataAnnotation.values["mv"] as? IntArray ?: error("mv must be IntArray")
+
+    assertThat(d2[0]).isEqualTo($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;")
+    assertThat(d2[1]).isEqualTo("L$relocatedFixtureBase;")
+
+    val metadata =
+      Metadata(
+        kind = metadataAnnotation.values["k"] as? Int ?: 1,
+        metadataVersion = mv,
+        data1 = d1,
+        data2 = d2,
+        extraString = metadataAnnotation.values["xs"] as? String ?: "",
+        packageName = metadataAnnotation.values["pn"] as? String ?: "",
+        extraInt = metadataAnnotation.values["xi"] as? Int ?: 0,
+      )
+    val kmClass = (KotlinClassMetadata.readStrict(metadata) as KotlinClassMetadata.Class).kmClass
+    assertThat(kmClass.name).isEqualTo("com/example/relocated/BytecodeRemappingTest.FixtureSubject")
   }
 
   @Test
@@ -299,18 +347,28 @@ class BytecodeRemappingTest {
 
   @Retention(AnnotationRetention.RUNTIME)
   @Target(AnnotationTarget.CLASS)
-  annotation class FixtureAnnotation
+  @Suppress("unused")
+  annotation class FixtureAnnotation(
+    val stringValue: String = "",
+    val stringArrayValue: Array<String> = [],
+  )
 
   interface FixtureInterface
 
   open class FixtureBase
 
+  @Suppress("unused")
   class FixtureGenericOuter<T> {
-    inner class FixtureInner
+    @Suppress("RedundantInnerClassModifier") inner class FixtureInner
   }
 
   @Suppress("unused") // Used by parsing bytecode.
-  @FixtureAnnotation
+  @FixtureAnnotation(
+    stringValue =
+      $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase",
+    stringArrayValue =
+      [$$"com/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase"],
+  )
   class FixtureSubject : FixtureBase(), FixtureInterface {
     val field: FixtureBase = FixtureBase()
     val arrayField: Array<FixtureBase> = emptyArray()
@@ -353,11 +411,17 @@ class BytecodeRemappingTest {
 
 private data class ClassBytecodeInfo(
   val annotationDescriptors: List<String>,
+  val annotations: List<AnnotationBytecodeInfo>,
   val fieldDescriptors: List<String>,
   val methodData: List<MethodBytecodeInfo>,
 ) {
   val methodDescriptors = methodData.map { it.descriptor }
   val stringConstants = methodData.flatMap { it.stringConstants }
+
+  data class AnnotationBytecodeInfo(
+    val descriptor: String,
+    val values: Map<String, Any?>,
+  )
 
   data class MethodBytecodeInfo(
     val name: String,
@@ -373,15 +437,42 @@ private data class ClassBytecodeInfo(
 @Suppress("SpellCheckingInspection")
 private fun ByteArray.classInfo(): ClassBytecodeInfo {
   val annotationDescs = mutableListOf<String>()
+  val annotations = mutableListOf<ClassBytecodeInfo.AnnotationBytecodeInfo>()
   val fieldDescs = mutableListOf<String>()
   val methods = mutableListOf<ClassBytecodeInfo.MethodBytecodeInfo>()
 
   ClassReader(this)
     .accept(
       object : ClassVisitor(Opcodes.ASM9) {
-        override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor? {
+        override fun visitAnnotation(descriptor: String, visible: Boolean): AnnotationVisitor {
           annotationDescs.add(descriptor)
-          return null
+          val values = mutableMapOf<String, Any?>()
+          annotations.add(ClassBytecodeInfo.AnnotationBytecodeInfo(descriptor, values))
+          return object : AnnotationVisitor(Opcodes.ASM9) {
+            override fun visit(name: String?, value: Any?) {
+              if (name != null) values[name] = value
+            }
+
+            override fun visitArray(name: String?): AnnotationVisitor {
+              val arrayElements = mutableListOf<Any?>()
+              return object : AnnotationVisitor(Opcodes.ASM9) {
+                override fun visit(name: String?, value: Any?) {
+                  arrayElements.add(value)
+                }
+
+                override fun visitEnd() {
+                  if (name != null) {
+                    values[name] =
+                      if (arrayElements.all { it is String }) {
+                        arrayElements.filterIsInstance<String>().toTypedArray()
+                      } else {
+                        arrayElements.toTypedArray()
+                      }
+                  }
+                }
+              }
+            }
+          }
         }
 
         override fun visitField(
@@ -456,5 +547,5 @@ private fun ByteArray.classInfo(): ClassBytecodeInfo {
       0,
     )
 
-  return ClassBytecodeInfo(annotationDescs, fieldDescs, methods)
+  return ClassBytecodeInfo(annotationDescs, annotations, fieldDescs, methods)
 }
