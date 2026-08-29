@@ -8,7 +8,6 @@ import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
-import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
@@ -19,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -84,11 +82,8 @@ class JavaPluginsTest : BasePluginTest() {
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
 
-    assertThat(result.task(":$ASSEMBLE_TASK_NAME"))
-      .isNotNull()
-      .transform { it.outcome }
-      .isEqualTo(SUCCESS)
-    assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result).taskOutcomeEquals(":$ASSEMBLE_TASK_NAME", SUCCESS)
+    assertThat(result).taskOutcomeEquals(shadowJarPath, SUCCESS)
     assertThat(result.output).contains("task dependencies: $SHADOW_JAR_TASK_NAME")
   }
 
@@ -105,10 +100,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
 
-    assertThat(result.task(":$ASSEMBLE_TASK_NAME"))
-      .isNotNull()
-      .transform { it.outcome }
-      .isEqualTo(SUCCESS)
+    assertThat(result).taskOutcomeEquals(":$ASSEMBLE_TASK_NAME", SUCCESS)
     assertThat(result.task(shadowJarPath)).isNull()
   }
 
@@ -154,6 +146,8 @@ class JavaPluginsTest : BasePluginTest() {
   @Test
   fun dependOnProjectShadowJar() {
     writeClientAndServerModules(clientShadowed = true)
+    val relocatedEntries =
+      junitEntries.map { it.replace("junit/framework/", "client/junit/framework/") }.toTypedArray()
 
     runWithSuccess(":server:jar")
 
@@ -161,8 +155,13 @@ class JavaPluginsTest : BasePluginTest() {
       containsOnly("server/", "server/Server.class", *manifestEntries)
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
-      containsAtLeast("client/", "client/Client.class", "client/junit/framework/Test.class")
-      containsNone("server/Server.class")
+      containsOnly(
+        "client/",
+        "client/junit/",
+        "client/Client.class",
+        *relocatedEntries,
+        *manifestEntries,
+      )
     }
   }
 
@@ -186,8 +185,13 @@ class JavaPluginsTest : BasePluginTest() {
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
-      containsAtLeast("client/Client.class", "client/junit/framework/Test.class")
-      containsNone("server/Server.class")
+      containsOnly(
+        "client/",
+        "client/junit/",
+        "client/Client.class",
+        *relocatedEntries,
+        *manifestEntries,
+      )
     }
   }
 
@@ -707,7 +711,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
-      getMainAttr(mainClassAttributeKey).isNotNull()
+      getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
       classLoader {
         loadClass("my.Main")
         loadClass("junit.framework.Test")
@@ -750,7 +754,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
-      getMainAttr(mainClassAttributeKey).isNotNull()
+      getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
       classLoader {
         loadClass("my.Main")
         loadClass("junit.framework.Test")
@@ -826,8 +830,7 @@ class JavaPluginsTest : BasePluginTest() {
     )
 
     val result = runWithSuccess(shadowJarPath)
-
-    assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result).taskOutcomeEquals(shadowJarPath, SUCCESS)
   }
 
   @Test // #915
@@ -1236,8 +1239,7 @@ class JavaPluginsTest : BasePluginTest() {
       )
 
     val result = runWithSuccess(shadowJarPath)
-
-    assertThat(result.task(shadowJarPath)).isNotNull().transform { it.outcome }.isEqualTo(SUCCESS)
+    assertThat(result).taskOutcomeEquals(shadowJarPath, SUCCESS)
   }
 
   @Test // #2099
