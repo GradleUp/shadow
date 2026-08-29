@@ -358,17 +358,8 @@ public abstract class ShadowJar : Jar() {
    *
    * @see [getDuplicatesStrategy]
    */
-  @Deprecated(
-    message =
-      "Use `transform<ServiceFileTransformer>()` instead. This will be removed in Shadow 10.",
-    replaceWith =
-      ReplaceWith(
-        "transform<ServiceFileTransformer> { it.path = rootPath }",
-        "com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer",
-      ),
-  )
   public open fun mergeServiceFiles(rootPath: String) {
-    transform(ServiceFileTransformer::class.java) { it.path = rootPath }
+    mergeServiceFiles { it.path = rootPath }
   }
 
   /**
@@ -381,15 +372,6 @@ public abstract class ShadowJar : Jar() {
    *
    * @see [getDuplicatesStrategy]
    */
-  @Deprecated(
-    message =
-      "Use `transform<ServiceFileTransformer>()` instead. This will be removed in Shadow 10.",
-    replaceWith =
-      ReplaceWith(
-        "transform<ServiceFileTransformer>(action)",
-        "com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer",
-      ),
-  )
   @JvmOverloads
   public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
     transform(ServiceFileTransformer::class.java, action)
