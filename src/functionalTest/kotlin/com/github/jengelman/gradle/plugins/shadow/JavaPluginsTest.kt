@@ -16,15 +16,15 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
-import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
-import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
+import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
+import com.github.jengelman.gradle.plugins.shadow.util.runProcess
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.invariantSeparatorsPathString
@@ -712,11 +712,18 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
       getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
-      classLoader {
-        loadClass("my.Main")
-        loadClass("junit.framework.Test")
-      }
     }
+
+    val pathString = path("build/libs/my-1.0-test.jar").toString()
+    val runningOutput = runProcess("java", "-jar", pathString, "foo")
+    assertThat(runningOutput.invariantEolString)
+      .isEqualTo(
+        """
+        |Hello, World! (foo) from Main
+        |Refs: junit.framework.Test
+        |"""
+          .trimMargin()
+      )
   }
 
   @Test // #1784
@@ -755,11 +762,18 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
       containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
       getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
-      classLoader {
-        loadClass("my.Main")
-        loadClass("junit.framework.Test")
-      }
     }
+
+    val pathString = path("build/libs/my-1.0-test.jar").toString()
+    val runningOutput = runProcess("java", "-jar", pathString, "foo")
+    assertThat(runningOutput.invariantEolString)
+      .isEqualTo(
+        """
+        |Hello, World! (foo) from Main
+        |Refs: junit.framework.Test
+        |"""
+          .trimMargin()
+      )
   }
 
   @Test // #443
