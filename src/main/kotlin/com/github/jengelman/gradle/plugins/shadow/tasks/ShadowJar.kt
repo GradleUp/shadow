@@ -419,7 +419,7 @@ public abstract class ShadowJar : Jar() {
     message = "Use `transform<AppendingTransformer>()` instead. This will be removed in Shadow 10.",
     replaceWith =
       ReplaceWith(
-        "transform<AppendingTransformer> { it.resource.set(resourcePath); it.separator.set(separator) }",
+        "transform<AppendingTransformer> { resource.set(resourcePath); separator.set(separator) }",
         "com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer",
       ),
   )
