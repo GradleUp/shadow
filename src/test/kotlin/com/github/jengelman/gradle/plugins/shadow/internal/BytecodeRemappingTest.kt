@@ -107,7 +107,7 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val annotation =
-      result.classInfo().annotations.first {
+      result.classInfo().annotations.single {
         it.descriptor == $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;"
       }
     val stringValue =
@@ -170,7 +170,7 @@ class BytecodeRemappingTest {
   fun fieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val field = result.classInfo().fieldData.first { it.name == "field" }
+    val field = result.classInfo().fieldData.single { it.name == "field" }
     assertThat(field.descriptor).isEqualTo("L$relocatedFixtureBase;")
   }
 
@@ -178,7 +178,7 @@ class BytecodeRemappingTest {
   fun arrayFieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val field = result.classInfo().fieldData.first { it.name == "arrayField" }
+    val field = result.classInfo().fieldData.single { it.name == "arrayField" }
     assertThat(field.descriptor).isEqualTo("[L$relocatedFixtureBase;")
   }
 
@@ -186,7 +186,7 @@ class BytecodeRemappingTest {
   fun array2dFieldDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val field = result.classInfo().fieldData.first { it.name == "array2dField" }
+    val field = result.classInfo().fieldData.single { it.name == "array2dField" }
     assertThat(field.descriptor).isEqualTo("[[L$relocatedFixtureBase;")
   }
 
@@ -194,7 +194,7 @@ class BytecodeRemappingTest {
   fun methodDescriptorIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "method" }
+    val method = result.classInfo().methodData.single { it.name == "method" }
     assertThat(method.descriptor).isEqualTo("(L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
 
@@ -202,7 +202,7 @@ class BytecodeRemappingTest {
   fun methodMultipleArgsIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodMultiArgs" }
+    val method = result.classInfo().methodData.single { it.name == "methodMultiArgs" }
     assertThat(method.descriptor)
       .isEqualTo("(L$relocatedFixtureBase;L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
@@ -213,7 +213,7 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val method =
-      result.classInfo().methodData.first { it.descriptor.startsWith("($primitiveDescriptor") }
+      result.classInfo().methodData.single { it.descriptor.startsWith("($primitiveDescriptor") }
     assertThat(method.descriptor)
       .isEqualTo("(${primitiveDescriptor}L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
@@ -222,7 +222,7 @@ class BytecodeRemappingTest {
   fun stringConstantIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "<init>" }
+    val method = result.classInfo().methodData.single { it.name == "<init>" }
     assertThat(method.stringConstants[0])
       .isEqualTo($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
   }
@@ -239,7 +239,7 @@ class BytecodeRemappingTest {
       )
     val result = fixtureSubjectDetails.remapClass(skipRelocators)
 
-    val method = result.classInfo().methodData.first { it.name == "<init>" }
+    val method = result.classInfo().methodData.single { it.name == "<init>" }
     assertThat(method.stringConstants[0])
       .isEqualTo(
         $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase"
@@ -252,7 +252,7 @@ class BytecodeRemappingTest {
 
     // Verify that two adjacent class references in a single string constant are both relocated
     // (regression test for the issue-1403 pattern).
-    val method = result.classInfo().methodData.first { it.name == "<init>" }
+    val method = result.classInfo().methodData.single { it.name == "<init>" }
     assertThat(method.stringConstants[1])
       .isEqualTo(
         $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
@@ -271,7 +271,7 @@ class BytecodeRemappingTest {
   fun signatureIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodWithGeneric" }
+    val method = result.classInfo().methodData.single { it.name == "methodWithGeneric" }
     assertThat(checkNotNull(method.signature))
       .isEqualTo(
         $$"(Ljava/util/List<+Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>;)Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
@@ -282,7 +282,7 @@ class BytecodeRemappingTest {
   fun nestedClassSignatureIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodWithNestedGeneric" }
+    val method = result.classInfo().methodData.single { it.name == "methodWithNestedGeneric" }
     assertThat(checkNotNull(method.signature))
       .isEqualTo(
         $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V"
@@ -324,7 +324,7 @@ class BytecodeRemappingTest {
   fun localVariableIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "method" }
+    val method = result.classInfo().methodData.single { it.name == "method" }
     assertThat(method.localVarDescriptors)
       .containsExactly(
         $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;",
@@ -336,7 +336,7 @@ class BytecodeRemappingTest {
   fun instructionIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == "methodWithCheckCast" }
+    val method = result.classInfo().methodData.single { it.name == "methodWithCheckCast" }
     assertThat(method.checkcastTargets).containsExactly(relocatedFixtureBase, relocatedFixtureBase)
     assertThat(method.invokeOwners)
       .containsExactly("kotlin/jvm/internal/Intrinsics", relocatedFixtureBase)
