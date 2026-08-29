@@ -124,12 +124,12 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val metadataAnnotation =
-      result.classInfo().annotations.first { it.descriptor == "Lkotlin/Metadata;" }
+      result.classInfo().annotations.single { it.descriptor == "Lkotlin/Metadata;" }
     val d1 = metadataAnnotation.values["d1"] as? Array<String> ?: error("d1 must be Array<String>")
     val d2 = metadataAnnotation.values["d2"] as? Array<String> ?: error("d2 must be Array<String>")
     val mv = metadataAnnotation.values["mv"] as? IntArray ?: error("mv must be IntArray")
 
-    assertThat(d2).contains("Lcom/example/relocated/BytecodeRemappingTest\$FixtureSubject;")
+    assertThat(d2).contains($$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;")
     assertThat(d2).contains("L$relocatedFixtureBase;")
 
     val metadata =
@@ -347,6 +347,7 @@ class BytecodeRemappingTest {
 
   @Retention(AnnotationRetention.RUNTIME)
   @Target(AnnotationTarget.CLASS)
+  @Suppress("unused")
   annotation class FixtureAnnotation(
     val stringValue: String = "",
     val stringArrayValue: Array<String> = [],
@@ -356,8 +357,9 @@ class BytecodeRemappingTest {
 
   open class FixtureBase
 
+  @Suppress("unused")
   class FixtureGenericOuter<T> {
-    inner class FixtureInner
+    @Suppress("RedundantInnerClassModifier") inner class FixtureInner
   }
 
   @Suppress("unused") // Used by parsing bytecode.
