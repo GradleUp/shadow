@@ -12,15 +12,10 @@ class AppendingTransformerTest : BaseTransformerTest() {
     val one = buildJarOne { insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE) }
     val two = buildJarTwo { insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO) }
     projectScript.appendText(
-      """
-      |dependencies {
-      |  ${implementationFiles(one, two)}
-      |}
-      |$shadowJarTask {
-      |  append('$ENTRY_TEST_PROPERTIES')
-      |}
-      """
-        .trimMargin()
+      transform<AppendingTransformer>(
+        dependenciesBlock = implementationFiles(one, two),
+        transformerBlock = "resource = '$ENTRY_TEST_PROPERTIES'",
+      )
     )
 
     runWithSuccess(shadowJarPath)

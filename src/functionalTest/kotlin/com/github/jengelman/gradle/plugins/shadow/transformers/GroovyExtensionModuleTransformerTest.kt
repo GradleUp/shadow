@@ -19,15 +19,9 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   @Test
   fun groovyExtensionModuleTransformer() {
     projectScript.appendText(
-      """
-      |dependencies {
-      |  ${implementationFiles(buildJarFoo(), buildJarBar())}
-      |}
-      |$shadowJarTask {
-      |  mergeGroovyExtensionModules()
-      |}
-      """
-        .trimMargin()
+      transform<GroovyExtensionModuleTransformer>(
+        dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar())
+      )
     )
 
     runWithSuccess(shadowJarPath)

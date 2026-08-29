@@ -387,6 +387,15 @@ public abstract class ShadowJar : Jar() {
    *
    * @see [getDuplicatesStrategy]
    */
+  @Deprecated(
+    message =
+      "Use `transform<GroovyExtensionModuleTransformer>()` instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform<GroovyExtensionModuleTransformer>()",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer",
+      ),
+  )
   public open fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
   }
@@ -406,6 +415,14 @@ public abstract class ShadowJar : Jar() {
    * @param separator The separator to use between the original content and the appended content,
    *   defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
    */
+  @Deprecated(
+    message = "Use `transform<AppendingTransformer>()` instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform<AppendingTransformer> { resource.set(resourcePath); separator.set(separator) }",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer",
+      ),
+  )
   @JvmOverloads
   public open fun append(
     resourcePath: String,

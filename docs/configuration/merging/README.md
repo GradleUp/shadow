@@ -368,7 +368,7 @@ the [`ServiceFileTransformer`][ServiceFileTransformer]:
 > `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`) are ignored by the
 > [`ServiceFileTransformer`][ServiceFileTransformer].
 > This is due to these files having a different syntax than standard service descriptor files.
-> Use the [`mergeGroovyExtensionModules()`][mergeGroovyExtensionModules] method to merge these files if your
+> Use the [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] to merge these files if your
 > dependencies contain them.
 
 ### Configuring the Location of Service Descriptor Files
@@ -449,17 +449,12 @@ from merging.
 
 Shadow provides a specific transformer for dealing with Groovy extension module files. This is due to their special
 syntax and how they need to be merged together. The
-[`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files. The
-[`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
+[`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files.
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
-      // Short syntax.
-      mergeGroovyExtensionModules()
-
-      // Full syntax.
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer>()
     }
     ```
@@ -468,10 +463,6 @@ syntax and how they need to be merged together. The
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Short syntax.
-      mergeGroovyExtensionModules()
-
-      // Full syntax.
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer)
     }
     ```
@@ -503,14 +494,15 @@ Log4j 2.x Core components. It's a Gradle equivalent of
 ## Appending Text Files
 
 Generic text files can be appended together using the [`AppendingTransformer`][AppendingTransformer]. Each file is
-appended using separators (defaults to `\n`) to separate content. The [`ShadowJar`][ShadowJar] task provides a short
-syntax method of [`append(String)`][ShadowJar.append] to configure this transformer.
+appended using separators (defaults to `\n`) to separate content.
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
-      append("test.properties")
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer> {
+        resource = "test.properties"
+      }
     }
     ```
 
@@ -518,7 +510,9 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      append 'test.properties'
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+        resource = 'test.properties'
+      }
     }
     ```
 
@@ -526,9 +520,6 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
     ```kotlin
     tasks.shadowJar {
-      // short syntax
-      append("resources/application.yml", "\n---\n")
-      // full syntax
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer> {
         resource = "resources/custom-config/application.yml"
         separator = "\n---\n"
@@ -540,9 +531,6 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // short syntax
-      append('resources/application.yml', '\n---\n')
-      // full syntax
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
         resource = 'resources/custom-config/application.yml'
         separator = '\n---\n'
@@ -966,7 +954,6 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
 [PatternFilterable]: https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.tasks.util/-pattern-filterable/index.html
 [PatternFilterableResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pattern-filterable-resource-transformer/index.html
-[ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
 [ShadowJar.exclude]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html#org.gradle.api.tasks.AbstractCopyTask:exclude(java.lang.Iterable)
 [ShadowJar.failOnDuplicateEntries]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
 [ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
@@ -974,7 +961,6 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
-[mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
 [CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
 [shadowjar-execution-flow]: ../README.md#shadowjar-execution-flow
 [Diffuse]: https://github.com/JakeWharton/diffuse
