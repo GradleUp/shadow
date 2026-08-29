@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -14,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -489,12 +489,14 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       classLoader {
-        loadClass("my.Main")
-          .transform {
-            @Suppress("UNCHECKED_CAST")
-            it.getMethod("getStrings").invoke(null) as Array<String>
-          }
-          .containsExactly("shadow.foo.Foo", "shadow.foo.Bar")
+        runMain("my.Main")
+          .isEqualTo(
+            """
+            |shadow.foo.Foo
+            |shadow.foo.Bar
+            |"""
+              .trimMargin()
+          )
       }
     }
   }
@@ -515,21 +517,23 @@ class RelocationTest : BasePluginTest() {
     )
     val expected =
       if (skipStringConstants) {
-        arrayOf("foo.Foo", "foo.Bar")
-      } else {
-        arrayOf("shadow.foo.Foo", "shadow.foo.Bar")
-      }
+          """
+        |foo.Foo
+        |foo.Bar
+        |"""
+        } else {
+          """
+        |shadow.foo.Foo
+        |shadow.foo.Bar
+        |"""
+        }
+        .trimMargin()
 
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
       classLoader {
-        loadClass("my.Main")
-          .transform {
-            @Suppress("UNCHECKED_CAST")
-            it.getMethod("getStrings").invoke(null) as Array<String>
-          }
-          .containsExactly(*expected)
+        runMain("my.Main").isEqualTo(expected)
       }
     }
   }
@@ -540,12 +544,10 @@ class RelocationTest : BasePluginTest() {
       """
       |package my;
       |public class Main {
-      |  public static String[] getSignatures() {
-      |    return new String[] {
-      |      "Lorg/package/ClassA;Lorg/package/ClassB;",
-      |      "(Lorg/package/ClassC;Lorg/package/ClassD;)",
-      |      "()Lorg/package/ClassE;Lorg/package/ClassF;",
-      |    };
+      |  public static void main(String[] args) {
+      |    System.out.println("Lorg/package/ClassA;Lorg/package/ClassB;");
+      |    System.out.println("(Lorg/package/ClassC;Lorg/package/ClassD;)");
+      |    System.out.println("()Lorg/package/ClassE;Lorg/package/ClassF;");
       |  }
       |}
       """
@@ -564,15 +566,14 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       classLoader {
-        loadClass("my.Main")
-          .transform {
-            @Suppress("UNCHECKED_CAST")
-            it.getMethod("getSignatures").invoke(null) as Array<String>
-          }
-          .containsExactly(
-            "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;",
-            "(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)",
-            "()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;",
+        runMain("my.Main")
+          .isEqualTo(
+            """
+            |Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;
+            |(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)
+            |()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;
+            |"""
+              .trimMargin()
           )
       }
     }
@@ -736,14 +737,15 @@ class RelocationTest : BasePluginTest() {
       """
       |package my;
       |public class Main {
-      |  public static String[] getStrings() {
+      |  public static void main(String[] args) {
       |    String s1;
       |    switch (1) {
       |      default:
       |        s1 = "foo.Foo"; // Test case for string constants used in switch statements.
       |        break;
       |    }
-      |    return new String[] { s1, "foo.Bar" };
+      |    System.out.println(s1);
+      |    System.out.println("foo.Bar");
       |  }
       |}
       """
