@@ -445,7 +445,10 @@ public abstract class ShadowJar : Jar() {
     addRelocator(relocator, action)
   }
 
-  /** Relocate classes and resources using a [Relocator]. */
+  @Deprecated(
+    message =
+      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10."
+  )
   @JvmOverloads
   public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
     val relocator = clazz.getDeclaredConstructor().newInstance()
@@ -458,10 +461,14 @@ public abstract class ShadowJar : Jar() {
     addRelocator(relocator, action)
   }
 
-  /** Relocate classes and resources using a [Relocator]. */
+  @Suppress("DeprecatedCallableAddReplaceWith")
+  @Deprecated(
+    message =
+      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10."
+  )
   @JvmSynthetic
   public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
-    relocate(R::class.java, action)
+    @Suppress("DEPRECATION") relocate(R::class.java, action)
   }
 
   /**
