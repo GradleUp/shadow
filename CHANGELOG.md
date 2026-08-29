@@ -47,6 +47,8 @@
   Use `ManifestResourceTransformer` or `ShadowJar.manifest` instead.
 - Deprecate `mergeGroovyExtensionModules` and `append` in `ShadowJar`. ([#2261](https://github.com/GradleUp/shadow/pull/2261))  
   Use `transform<GroovyExtensionModuleTransformer>()` and `transform<AppendingTransformer>()` instead.
+- Deprecate `ShadowJar.relocate(Class, Action)` and `ShadowJar.relocate<R>()`. ([#2262](https://github.com/GradleUp/shadow/pull/2262))  
+  Construct a `Relocator` instance and use `ShadowJar.relocate(Relocator, Action)` instead.
 
 ### Fixed
 
