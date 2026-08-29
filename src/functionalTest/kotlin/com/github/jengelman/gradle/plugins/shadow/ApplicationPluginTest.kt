@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
@@ -112,8 +113,8 @@ class ApplicationPluginTest : BasePluginTest() {
       } else {
         runProcess(unixScript.toString(), "bar")
       }
-    assertThat(runningOutput)
-      .contains("Hello, World! (bar) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.trim().lines())
+      .containsExactly("Hello, World! (bar) from Main", "Refs: junit.framework.Test")
   }
 
   @Test

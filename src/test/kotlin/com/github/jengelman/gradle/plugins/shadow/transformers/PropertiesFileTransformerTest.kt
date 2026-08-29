@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.contains
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -163,9 +162,9 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
 
       assertThat(propertiesEntries[path].orEmpty()).isEqualTo(expectedOutput)
       val content = transformToJar().use { it.getBytes(path).toString(Charset.forName(charset)) }
-      expectedOutput.forEach { (key, value) ->
-        assertThat(content).contains("$key=$value")
-      }
+      val expectedContent =
+        expectedOutput.entries.joinToString(separator = "") { "${it.key}=${it.value}\n" }
+      assertThat(content).isEqualTo(expectedContent)
     }
 
   @Test // #856

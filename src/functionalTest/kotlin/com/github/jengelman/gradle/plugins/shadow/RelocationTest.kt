@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsExactly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -492,7 +493,7 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
-    assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
+    assertThat(result.trim().lines()).containsExactly("shadow.foo.Foo", "shadow.foo.Bar")
   }
 
   @ParameterizedTest // #232, #606
@@ -517,9 +518,9 @@ class RelocationTest : BasePluginTest() {
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     if (skipStringConstants) {
-      assertThat(result).contains("foo.Foo", "foo.Bar")
+      assertThat(result.trim().lines()).containsExactly("foo.Foo", "foo.Bar")
     } else {
-      assertThat(result).contains("shadow.foo.Foo", "shadow.foo.Bar")
+      assertThat(result.trim().lines()).containsExactly("shadow.foo.Foo", "shadow.foo.Bar")
     }
   }
 
@@ -554,11 +555,11 @@ class RelocationTest : BasePluginTest() {
     val result = runProcess("java", "-jar", outputShadowedJar.use { it.toString() })
 
     // Just check that the jar can be executed without NoClassDefFoundError.
-    assertThat(result)
-      .contains(
-        "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB",
-        "Lshadow/org/package/ClassC;Lshadow/org/package/ClassD",
-        "Lshadow/org/package/ClassE;Lshadow/org/package/ClassF",
+    assertThat(result.trim().lines())
+      .containsExactly(
+        "Lshadow/org/package/ClassA;Lshadow/org/package/ClassB;",
+        "(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)",
+        "()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;",
       )
   }
 

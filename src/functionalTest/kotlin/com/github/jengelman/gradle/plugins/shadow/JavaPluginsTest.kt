@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsExactly
 import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
@@ -711,8 +712,8 @@ class JavaPluginsTest : BasePluginTest() {
 
     val pathString = path("build/libs/my-1.0-test.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
-    assertThat(runningOutput)
-      .contains("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.trim().lines())
+      .containsExactly("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
   }
 
   @Test // #1784
@@ -755,8 +756,8 @@ class JavaPluginsTest : BasePluginTest() {
 
     val pathString = path("build/libs/my-1.0-test.jar").toString()
     val runningOutput = runProcess("java", "-jar", pathString, "foo")
-    assertThat(runningOutput)
-      .contains("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
+    assertThat(runningOutput.trim().lines())
+      .containsExactly("Hello, World! (foo) from Main", "Refs: junit.framework.Test")
   }
 
   @Test // #443
