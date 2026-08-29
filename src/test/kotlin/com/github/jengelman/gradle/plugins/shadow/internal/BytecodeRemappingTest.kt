@@ -26,7 +26,7 @@ import org.gradle.api.file.FileCopyDetails
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.CsvSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.vafer.jdeb.shaded.objectweb.asm.AnnotationVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
@@ -208,20 +208,12 @@ class BytecodeRemappingTest {
   }
 
   @ParameterizedTest
-  @CsvSource(
-    "methodWithPrimitivePlusClass, B",
-    "methodWithCharPlusClass, C",
-    "methodWithDoublePlusClass, D",
-    "methodWithFloatPlusClass, F",
-    "methodWithIntPlusClass, I",
-    "methodWithLongPlusClass, J",
-    "methodWithShortPlusClass, S",
-    "methodWithBooleanPlusClass, Z",
-  )
-  fun primitivePlusClassMethodIsRelocated(methodName: String, primitiveDescriptor: Char) {
+  @ValueSource(chars = ['B', 'C', 'D', 'F', 'I', 'J', 'S', 'Z'])
+  fun primitivePlusClassMethodIsRelocated(primitiveDescriptor: Char) {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    val method = result.classInfo().methodData.first { it.name == methodName }
+    val method =
+      result.classInfo().methodData.first { it.descriptor.startsWith("($primitiveDescriptor") }
     assertThat(method.descriptor)
       .isEqualTo("(${primitiveDescriptor}L$relocatedFixtureBase;)L$relocatedFixtureBase;")
   }
