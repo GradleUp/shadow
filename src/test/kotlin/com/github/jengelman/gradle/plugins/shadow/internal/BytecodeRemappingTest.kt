@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
@@ -94,11 +95,9 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     assertThat(result.classInfo().annotationDescriptors)
-      .isEqualTo(
-        listOf(
-          $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;",
-          "Lkotlin/Metadata;",
-        )
+      .containsExactly(
+        $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureAnnotation;",
+        "Lkotlin/Metadata;",
       )
   }
 
@@ -118,7 +117,7 @@ class BytecodeRemappingTest {
         ?: error("stringArrayValue must be Array<String>")
     assertThat(stringValue).isEqualTo($$"com.example.relocated.BytecodeRemappingTest$FixtureBase")
     assertThat(stringArrayValue)
-      .isEqualTo(arrayOf($$"com/example/relocated/BytecodeRemappingTest$FixtureBase"))
+      .containsExactly($$"com/example/relocated/BytecodeRemappingTest$FixtureBase")
   }
 
   @Test
@@ -272,8 +271,8 @@ class BytecodeRemappingTest {
   fun interfaceIsRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
-    assertThat(ClassReader(result).interfaces.toList())
-      .isEqualTo(listOf($$"com/example/relocated/BytecodeRemappingTest$FixtureInterface"))
+    assertThat(ClassReader(result).interfaces)
+      .containsExactly($$"com/example/relocated/BytecodeRemappingTest$FixtureInterface")
   }
 
   @Test
@@ -335,11 +334,9 @@ class BytecodeRemappingTest {
 
     val method = result.classInfo().methodData.first { it.name == "method" }
     assertThat(method.localVarDescriptors)
-      .isEqualTo(
-        listOf(
-          $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;",
-          "L$relocatedFixtureBase;",
-        )
+      .containsExactly(
+        $$"Lcom/example/relocated/BytecodeRemappingTest$FixtureSubject;",
+        "L$relocatedFixtureBase;",
       )
   }
 
@@ -348,10 +345,9 @@ class BytecodeRemappingTest {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
     val method = result.classInfo().methodData.first { it.name == "methodWithCheckCast" }
-    assertThat(method.checkcastTargets)
-      .isEqualTo(listOf(relocatedFixtureBase, relocatedFixtureBase))
+    assertThat(method.checkcastTargets).containsExactly(relocatedFixtureBase, relocatedFixtureBase)
     assertThat(method.invokeOwners)
-      .isEqualTo(listOf("kotlin/jvm/internal/Intrinsics", relocatedFixtureBase))
+      .containsExactly("kotlin/jvm/internal/Intrinsics", relocatedFixtureBase)
   }
 
   private fun Path.toFileCopyDetails() =
