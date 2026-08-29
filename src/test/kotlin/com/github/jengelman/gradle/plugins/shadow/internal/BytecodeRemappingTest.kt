@@ -219,9 +219,11 @@ class BytecodeRemappingTest {
   }
 
   @Test
-  fun stringConstantIsRelocated() {
+  fun stringConstantsAreRelocated() {
     val result = fixtureSubjectDetails.remapClass(relocators)
 
+    // Verify that single class references as well as two adjacent class references in a single
+    // string constant are both relocated (regression test for the issue-1403 pattern).
     val method = result.classInfo().methodData.single { it.name == "<init>" }
     assertThat(method.stringConstants)
       .containsExactly(
@@ -231,7 +233,7 @@ class BytecodeRemappingTest {
   }
 
   @Test
-  fun stringConstantNotRelocatedWhenSkipEnabled() {
+  fun stringConstantsNotRelocatedWhenSkipEnabled() {
     val skipRelocators =
       setOf(
         SimpleRelocator(
@@ -247,20 +249,6 @@ class BytecodeRemappingTest {
       .containsExactly(
         $$"com.github.jengelman.gradle.plugins.shadow.internal.BytecodeRemappingTest$FixtureBase",
         $$"()Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;Lcom/github/jengelman/gradle/plugins/shadow/internal/BytecodeRemappingTest$FixtureBase;",
-      )
-  }
-
-  @Test
-  fun multiClassDescriptorStringConstantIsRelocated() {
-    val result = fixtureSubjectDetails.remapClass(relocators)
-
-    // Verify that two adjacent class references in a single string constant are both relocated
-    // (regression test for the issue-1403 pattern).
-    val method = result.classInfo().methodData.single { it.name == "<init>" }
-    assertThat(method.stringConstants)
-      .containsExactly(
-        $$"com.example.relocated.BytecodeRemappingTest$FixtureBase",
-        $$"()Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;",
       )
   }
 
