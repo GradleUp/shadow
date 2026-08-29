@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.all
 import assertk.assertThat
-import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
@@ -118,7 +117,7 @@ class ShadowPropertiesTest {
       val assembleTask = tasks.getByName(ASSEMBLE_TASK_NAME)
 
       assertThat(shadowConfig.artifacts.files).containsOnly(shadowJarTask.archiveFile.get().asFile)
-      assertThat(assembleTask.dependsOnTaskNames).containsExactly(shadowJarTask.name)
+      assertThat(assembleTask.dependsOnTaskNames).containsOnly(shadowJarTask.name)
 
       // Check inherited properties.
       with(shadowJarTask as Jar) {
