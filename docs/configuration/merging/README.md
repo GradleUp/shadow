@@ -77,7 +77,7 @@ If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
     ```kotlin
     tasks.shadowJar {
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE // The default strategy.
-      mergeServiceFiles()
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>()
     }
     ```
 
@@ -86,7 +86,7 @@ If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE // The default strategy.
-      mergeServiceFiles()
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
     }
     ```
 
@@ -143,7 +143,7 @@ Here are some examples:
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
       // Step 2.
-      mergeServiceFiles()
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>()
       // Step 3. Using `filesNotMatching`:
       filesNotMatching("META-INF/services/**") {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
@@ -158,7 +158,7 @@ Here are some examples:
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       // Step 2.
-      mergeServiceFiles()
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>()
       // Step 3. Using `filesMatching`:
       filesMatching("META-INF/services/**") {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
@@ -184,7 +184,7 @@ Here are some examples:
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
       // Step 2.
-      mergeServiceFiles()
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
       // Step 3. Using `filesNotMatching`:
       filesNotMatching('META-INF/services/**') {
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
@@ -199,7 +199,7 @@ Here are some examples:
       // Step 1.
       duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Or FAIL.
       // Step 2.
-      mergeServiceFiles()
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
       // Step 3. Using `filesMatching`:
       filesMatching('META-INF/services/**') {
         duplicatesStrategy = DuplicatesStrategy.INCLUDE // Or WARN.
@@ -333,18 +333,12 @@ runtime, this file is read and used to configure library or application behavior
 Multiple dependencies may use the same service descriptor file name. In this case, it is generally desired to merge the
 content of each instance of the file into a single output file. The [`ServiceFileTransformer`][ServiceFileTransformer]
 class is used to perform this merging. By default, it will merge each copy of a file under `META-INF/services` into a
-single file in the output JAR. You can use either the short syntax method
-[`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to add
-the [`ServiceFileTransformer`][ServiceFileTransformer]:
+single file in the output JAR:
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
-      // Short syntax.
-      mergeServiceFiles()
-
-      // Full syntax.
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer>()
     }
     ```
@@ -353,10 +347,6 @@ the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Short syntax.
-      mergeServiceFiles()
-
-      // Full syntax.
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer)
     }
     ```
@@ -368,7 +358,7 @@ the [`ServiceFileTransformer`][ServiceFileTransformer]:
 > `META-INF/services/org.codehaus.groovy.runtime.ExtensionModule`) are ignored by the
 > [`ServiceFileTransformer`][ServiceFileTransformer].
 > This is due to these files having a different syntax than standard service descriptor files.
-> Use the [`mergeGroovyExtensionModules()`][mergeGroovyExtensionModules] method to merge these files if your
+> Use the [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] to merge these files if your
 > dependencies contain them.
 
 ### Configuring the Location of Service Descriptor Files
@@ -380,12 +370,6 @@ This directory can be overridden to merge descriptor files in a different locati
 
     ```kotlin
     tasks.shadowJar {
-      // Short syntax.
-      mergeServiceFiles {
-        path = "META-INF/custom"
-      }
-
-      // Full syntax.
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
         path = "META-INF/custom"
       }
@@ -396,12 +380,6 @@ This directory can be overridden to merge descriptor files in a different locati
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Short syntax.      
-      mergeServiceFiles {
-        path = 'META-INF/custom'
-      }
-
-      // Full syntax.
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
         path = 'META-INF/custom'
       }
@@ -417,12 +395,6 @@ from merging.
 
     ```kotlin
     tasks.shadowJar {
-      // Short syntax.
-      mergeServiceFiles {
-        exclude("META-INF/services/com.acme.*")
-      }
-
-      // Full syntax.
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer> {
         exclude("META-INF/services/com.acme.*")
       }
@@ -433,12 +405,6 @@ from merging.
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Short syntax.
-      mergeServiceFiles {
-        exclude 'META-INF/services/com.acme.*'
-      }
-
-      // Full syntax.
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer) {
         exclude 'META-INF/services/com.acme.*'
       }
@@ -449,17 +415,12 @@ from merging.
 
 Shadow provides a specific transformer for dealing with Groovy extension module files. This is due to their special
 syntax and how they need to be merged together. The
-[`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files. The
-[`ShadowJar`][ShadowJar] task also provides a short syntax method to add this transformer.
+[`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files.
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
-      // Short syntax.
-      mergeGroovyExtensionModules()
-
-      // Full syntax.
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer>()
     }
     ```
@@ -468,10 +429,6 @@ syntax and how they need to be merged together. The
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // Short syntax.
-      mergeGroovyExtensionModules()
-
-      // Full syntax.
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer)
     }
     ```
@@ -503,14 +460,15 @@ Log4j 2.x Core components. It's a Gradle equivalent of
 ## Appending Text Files
 
 Generic text files can be appended together using the [`AppendingTransformer`][AppendingTransformer]. Each file is
-appended using separators (defaults to `\n`) to separate content. The [`ShadowJar`][ShadowJar] task provides a short
-syntax method of [`append(String)`][ShadowJar.append] to configure this transformer.
+appended using separators (defaults to `\n`) to separate content.
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.shadowJar {
-      append("test.properties")
+      transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer> {
+        resource = "test.properties"
+      }
     }
     ```
 
@@ -518,7 +476,9 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      append 'test.properties'
+      transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
+        resource = 'test.properties'
+      }
     }
     ```
 
@@ -526,9 +486,6 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
     ```kotlin
     tasks.shadowJar {
-      // short syntax
-      append("resources/application.yml", "\n---\n")
-      // full syntax
       transform<com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer> {
         resource = "resources/custom-config/application.yml"
         separator = "\n---\n"
@@ -540,9 +497,6 @@ syntax method of [`append(String)`][ShadowJar.append] to configure this transfor
 
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      // short syntax
-      append('resources/application.yml', '\n---\n')
-      // full syntax
       transform(com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer) {
         resource = 'resources/custom-config/application.yml'
         separator = '\n---\n'
@@ -966,15 +920,12 @@ You can then run the task to scan each entry on the classpath and print any matc
 [ServiceFileTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-service-file-transformer/index.html
 [PatternFilterable]: https://docs.gradle.org/current/kotlin-dsl/gradle/org.gradle.api.tasks.util/-pattern-filterable/index.html
 [PatternFilterableResourceTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-pattern-filterable-resource-transformer/index.html
-[ShadowJar.append]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/append.html
 [ShadowJar.exclude]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.AbstractCopyTask.html#org.gradle.api.tasks.AbstractCopyTask:exclude(java.lang.Iterable)
 [ShadowJar.failOnDuplicateEntries]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/fail-on-duplicate-entries.html
 [ShadowJar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
-[ShadowJar.mergeServiceFiles]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-service-files.html
 [ShadowJar.transform]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/transform.html
 [ShadowJar]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [XmlAppendingTransformer]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-xml-appending-transformer/index.html
-[mergeGroovyExtensionModules]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merge-groovy-extension-modules.html
 [CopySpec]: https://docs.gradle.org/current/javadoc/org/gradle/api/file/CopySpec.html
 [shadowjar-execution-flow]: ../README.md#shadowjar-execution-flow
 [Diffuse]: https://github.com/JakeWharton/diffuse

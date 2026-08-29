@@ -358,8 +358,17 @@ public abstract class ShadowJar : Jar() {
    *
    * @see [getDuplicatesStrategy]
    */
+  @Deprecated(
+    message =
+      "Use `transform<ServiceFileTransformer>()` instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform<ServiceFileTransformer> { it.path = rootPath }",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer",
+      ),
+  )
   public open fun mergeServiceFiles(rootPath: String) {
-    mergeServiceFiles { it.path = rootPath }
+    transform(ServiceFileTransformer::class.java) { it.path = rootPath }
   }
 
   /**
@@ -372,6 +381,15 @@ public abstract class ShadowJar : Jar() {
    *
    * @see [getDuplicatesStrategy]
    */
+  @Deprecated(
+    message =
+      "Use `transform<ServiceFileTransformer>()` instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform<ServiceFileTransformer>(action)",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer",
+      ),
+  )
   @JvmOverloads
   public open fun mergeServiceFiles(action: Action<ServiceFileTransformer> = Action {}) {
     transform(ServiceFileTransformer::class.java, action)
@@ -387,6 +405,15 @@ public abstract class ShadowJar : Jar() {
    *
    * @see [getDuplicatesStrategy]
    */
+  @Deprecated(
+    message =
+      "Use `transform<GroovyExtensionModuleTransformer>()` instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform<GroovyExtensionModuleTransformer>()",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer",
+      ),
+  )
   public open fun mergeGroovyExtensionModules() {
     transform(GroovyExtensionModuleTransformer::class.java, action = {})
   }
@@ -406,6 +433,14 @@ public abstract class ShadowJar : Jar() {
    * @param separator The separator to use between the original content and the appended content,
    *   defaults to [AppendingTransformer.DEFAULT_SEPARATOR] (`\n`).
    */
+  @Deprecated(
+    message = "Use `transform<AppendingTransformer>()` instead. This will be removed in Shadow 10.",
+    replaceWith =
+      ReplaceWith(
+        "transform<AppendingTransformer> { it.resource.set(resourcePath); it.separator.set(separator) }",
+        "com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer",
+      ),
+  )
   @JvmOverloads
   public open fun append(
     resourcePath: String,
