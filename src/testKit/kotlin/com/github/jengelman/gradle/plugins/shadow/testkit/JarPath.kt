@@ -6,7 +6,9 @@ import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
 import assertk.assertions.isTrue
+import java.io.ByteArrayOutputStream
 import java.io.InputStream
+import java.io.PrintStream
 import java.net.URLClassLoader
 import java.nio.file.Path
 import java.util.ServiceLoader
@@ -97,6 +99,28 @@ fun Assert<URLClassLoader>.loadService(service: Assert<Class<*>>): Assert<List<A
     }
     result
   }
+
+private val systemOutLock = Any()
+
+fun Assert<URLClassLoader>.runMain(
+  className: String,
+  vararg args: String,
+): Assert<String> = transform { loader ->
+  val mainClass = loader.loadClass(className)
+  val mainMethod = mainClass.getMethod("main", Array<String>::class.java)
+
+  val os = ByteArrayOutputStream()
+  synchronized(systemOutLock) {
+    val originalOut = System.out
+    try {
+      System.setOut(PrintStream(os))
+      mainMethod(null, args)
+    } finally {
+      System.setOut(originalOut)
+    }
+  }
+  os.toString().invariantEolString
+}
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }
