@@ -7,7 +7,7 @@ import java.nio.charset.Charset
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 
 internal fun generateShadowedSourcesJar(
-  archiveFile: File,
+  sourcesJarFile: File,
   sourceSetsSourceDirs: Iterable<File>,
   includedSourcesJars: Iterable<File>,
   relocators: Iterable<Relocator>,
@@ -17,15 +17,7 @@ internal fun generateShadowedSourcesJar(
   preserveFileTimestamps: Boolean,
 ) {
   val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }
-  val hasProjectSources = sourceSetsSourceDirs.any {
-    it.exists() && it.walkTopDown().any(File::isFile)
-  }
-  if (!hasProjectSources && sourcesJars.isEmpty()) return
-
-  val sourcesJarFile =
-    archiveFile.parentFile.resolve(
-      "${archiveFile.nameWithoutExtension}-sources.${archiveFile.extension}"
-    )
+  if (sourceSetsSourceDirs.none() && sourcesJars.isEmpty()) return
 
   val visitedFiles = mutableSetOf<String>()
   val charset = metadataCharset?.let(Charset::forName) ?: Charsets.UTF_8

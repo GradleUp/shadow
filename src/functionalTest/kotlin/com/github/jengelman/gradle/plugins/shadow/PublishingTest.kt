@@ -9,6 +9,7 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
@@ -35,6 +36,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader
 import org.gradle.api.JavaVersion
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion
@@ -279,10 +281,17 @@ class PublishingTest : BasePluginTest() {
         "maven-1.0.jar.sha512",
         "maven-1.0.module.sha512",
         "maven-1.0.pom.sha512",
+        "maven-1.0-sources.jar",
+        "maven-1.0-sources.jar.md5",
+        "maven-1.0-sources.jar.sha1",
+        "maven-1.0-sources.jar.sha256",
+        "maven-1.0-sources.jar.sha512",
       )
     assertShadowJarCommon(repoJarPath("$artifactRoot/maven-1.0.jar"))
     assertPomCommon(repoPath("$artifactRoot/maven-1.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module")))
+    val gmm = gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module"))
+    assertShadowVariantCommon(gmm)
+    assertShadowSourcesVariantCommon(gmm)
   }
 
   @Test
@@ -413,11 +422,18 @@ class PublishingTest : BasePluginTest() {
         "my-artifact-2.0-my-classifier.my-ext.md5",
         "my-artifact-2.0.pom.md5",
         "my-artifact-2.0.pom.sha1",
+        "my-artifact-2.0-sources.my-ext",
+        "my-artifact-2.0-sources.my-ext.md5",
+        "my-artifact-2.0-sources.my-ext.sha1",
+        "my-artifact-2.0-sources.my-ext.sha256",
+        "my-artifact-2.0-sources.my-ext.sha512",
       )
 
     assertShadowJarCommon(repoJarPath("$artifactRoot/my-artifact-2.0-my-classifier.my-ext"))
     assertPomCommon(repoPath("$artifactRoot/my-artifact-2.0.pom"))
-    assertShadowVariantCommon(gmmAdapter.fromJson(repoPath("$artifactRoot/my-artifact-2.0.module")))
+    val gmm = gmmAdapter.fromJson(repoPath("$artifactRoot/my-artifact-2.0.module"))
+    assertShadowVariantCommon(gmm)
+    assertShadowSourcesVariantCommon(gmm)
   }
 
   @Test
@@ -471,6 +487,12 @@ class PublishingTest : BasePluginTest() {
         "maven-1.0-all.jar.sha1",
         "maven-1.0-all.jar.sha256",
         "maven-1.0-all.jar.sha512",
+        // Entries of maven-1.0-sources.jar
+        "maven-1.0-sources.jar",
+        "maven-1.0-sources.jar.md5",
+        "maven-1.0-sources.jar.sha1",
+        "maven-1.0-sources.jar.sha256",
+        "maven-1.0-sources.jar.sha512",
       )
     assertThat(repoPath("my/maven-all/1.0").entries)
       .containsOnly(
@@ -489,6 +511,12 @@ class PublishingTest : BasePluginTest() {
         "maven-all-1.0-all.jar.sha512",
         "maven-all-1.0.module.sha512",
         "maven-all-1.0.pom.sha512",
+        // Entries of maven-all-1.0-sources.jar
+        "maven-all-1.0-sources.jar",
+        "maven-all-1.0-sources.jar.md5",
+        "maven-all-1.0-sources.jar.sha1",
+        "maven-all-1.0-sources.jar.sha256",
+        "maven-all-1.0-sources.jar.sha512",
       )
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll { containsOnly(*manifestEntries) }
@@ -498,12 +526,13 @@ class PublishingTest : BasePluginTest() {
 
     assertPomCommon(repoPath("my/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))
     gmmAdapter.fromJson(repoPath("my/maven/1.0/maven-1.0.module")).let { gmm ->
-      // apiElements, runtimeElements, shadowRuntimeElements
+      // apiElements, runtimeElements, shadowRuntimeElements, shadowSourcesElements
       assertThat(gmm.variantNames)
         .containsOnly(
           API_ELEMENTS_CONFIGURATION_NAME,
           RUNTIME_ELEMENTS_CONFIGURATION_NAME,
           SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+          SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME,
         )
       assertThat(gmm.apiElementsVariant).all {
         transform { it.attributes }
@@ -524,12 +553,18 @@ class PublishingTest : BasePluginTest() {
         transform { it.coordinates }.containsOnly("my:a:1.0", "my:b:1.0")
       }
       assertShadowVariantCommon(gmm)
+      assertShadowSourcesVariantCommon(gmm)
     }
 
     assertPomCommon(repoPath("my/maven-all/1.0/maven-all-1.0.pom"))
     gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")).let { gmm ->
-      assertThat(gmm.variantNames).containsOnly(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+      assertThat(gmm.variantNames)
+        .containsOnly(
+          SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+          SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME,
+        )
       assertShadowVariantCommon(gmm)
+      assertShadowSourcesVariantCommon(gmm)
     }
   }
 
@@ -622,6 +657,11 @@ class PublishingTest : BasePluginTest() {
           "maven-1.0-all.jar.sha1",
           "maven-1.0-all.jar.sha256",
           "maven-1.0-all.jar.sha512",
+          "maven-1.0-sources.jar",
+          "maven-1.0-sources.jar.md5",
+          "maven-1.0-sources.jar.sha1",
+          "maven-1.0-sources.jar.sha256",
+          "maven-1.0-sources.jar.sha512",
           *entriesCommon,
         )
       assertThat(gmm.variantNames)
@@ -629,9 +669,11 @@ class PublishingTest : BasePluginTest() {
           API_ELEMENTS_CONFIGURATION_NAME,
           RUNTIME_ELEMENTS_CONFIGURATION_NAME,
           SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+          SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME,
         )
       assertVariantsCommon(gmm)
       assertShadowVariantCommon(gmm)
+      assertShadowSourcesVariantCommon(gmm)
       assertThat(pomDependencies).containsOnly("my:a:1.0" to "runtime", "my:b:1.0" to "compile")
     } else {
       assertThat(artifactEntries).containsOnly(*entriesCommon)
@@ -722,6 +764,17 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
+  private fun assertShadowSourcesVariantCommon(
+    gmm: GradleModuleMetadata,
+    variantAttrs: Array<Pair<String, String>> = shadowSourcesVariantAttrs,
+    body: Assert<GradleModuleMetadata.Variant>.() -> Unit = {},
+  ) {
+    assertThat(gmm.shadowSourcesElementsVariant).all {
+      transform { it.attributes }.containsOnly(*variantAttrs)
+      body()
+    }
+  }
+
   private fun assertShadowJarCommon(jarPath: JarPath) {
     assertThat(jarPath).useAll {
       containsAtLeast(*entriesInA)
@@ -751,6 +804,14 @@ class PublishingTest : BasePluginTest() {
           Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
           Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
         )
+
+    val shadowSourcesVariantAttrs =
+      arrayOf(
+        Category.CATEGORY_ATTRIBUTE.name to Category.DOCUMENTATION,
+        Bundling.BUNDLING_ATTRIBUTE.name to Bundling.SHADOWED,
+        DocsType.DOCS_TYPE_ATTRIBUTE.name to DocsType.SOURCES,
+        Usage.USAGE_ATTRIBUTE.name to Usage.JAVA_RUNTIME,
+      )
 
     fun MavenXpp3Reader.read(path: Path): Model = path.inputStream().use { read(it) }
 

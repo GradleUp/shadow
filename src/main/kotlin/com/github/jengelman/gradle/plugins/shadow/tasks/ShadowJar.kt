@@ -52,7 +52,7 @@ import org.gradle.api.file.DuplicatesStrategy.EXCLUDE
 import org.gradle.api.file.DuplicatesStrategy.FAIL
 import org.gradle.api.file.DuplicatesStrategy.INCLUDE
 import org.gradle.api.file.DuplicatesStrategy.INHERIT
-import org.gradle.api.file.DuplicatesStrategy.WARN
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -62,6 +62,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -197,6 +198,24 @@ public abstract class ShadowJar : Jar() {
       df.resolveSourcesJars(cs)
     }
   }
+
+  @get:Optional
+  @get:OutputFile
+  public val archiveSourcesFile: RegularFileProperty =
+    objectFactory
+      .fileProperty()
+      .convention(
+        destinationDirectory.file(
+          archiveFileName.map { name ->
+            val idx = name.lastIndexOf('.')
+            if (idx != -1) {
+              "${name.substring(0, idx)}-sources${name.substring(idx)}"
+            } else {
+              "$name-sources"
+            }
+          }
+        )
+      )
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
@@ -755,8 +774,9 @@ public abstract class ShadowJar : Jar() {
   }
 
   private fun generateShadowedSourcesJar() {
+    if (!archiveSourcesFile.isPresent) return
     generateShadowedSourcesJar(
-      archiveFile = archiveFile.get().asFile,
+      sourcesJarFile = archiveSourcesFile.get().asFile,
       sourceSetsSourceDirs = sourceSetsSourceDirs.files,
       includedSourcesJars = includedSourcesJars.files,
       relocators = relocators.get() + packageRelocators,

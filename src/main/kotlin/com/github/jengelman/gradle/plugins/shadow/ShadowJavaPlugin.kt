@@ -15,6 +15,7 @@ import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
@@ -77,6 +78,35 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
       }
 
+    val shadowSourcesElements =
+      configurations.consumable(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME) { shadowSourcesElements
+        ->
+        shadowSourcesElements.attributes { attrs ->
+          attrs.attribute(
+            Usage.USAGE_ATTRIBUTE,
+            objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
+          )
+          attrs.attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            objects.named(Category::class.java, Category.DOCUMENTATION),
+          )
+          attrs.attribute(
+            Bundling.BUNDLING_ATTRIBUTE,
+            objects.named(Bundling::class.java, Bundling.SHADOWED),
+          )
+          attrs.attribute(
+            DocsType.DOCS_TYPE_ATTRIBUTE,
+            objects.named(DocsType::class.java, DocsType.SOURCES),
+          )
+        }
+        val sourcesJarFile = tasks.shadowJar.flatMap { it.archiveSourcesFile }
+        shadowSourcesElements.outgoing.artifact(sourcesJarFile) { artifact ->
+          artifact.builtBy(tasks.shadowJar)
+          artifact.classifier = "sources"
+          artifact.type = "jar"
+        }
+      }
+
     // See more details in #2086.
     afterEvaluate {
       if (shadow.addTargetJvmVersionAttribute.get()) {
@@ -113,11 +143,13 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
 
   protected open fun Project.configureComponents() {
     val shadowRuntimeElements = configurations.shadowRuntimeElements
+    val shadowSourcesElements = configurations.shadowSourcesElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
     shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
+    shadowComponent.addVariantsFromConfiguration(shadowSourcesElements) {}
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
       component.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
         variant.mapToOptional()
@@ -125,6 +157,15 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
         } else {
           logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
+          variant.skip()
+        }
+      }
+      component.addVariantsFromConfiguration(shadowSourcesElements) { variant ->
+        variant.mapToOptional()
+        if (shadow.addShadowVariantIntoJavaComponent.get()) {
+          logger.info("Adding {} variant to Java component.", shadowSourcesElements.name)
+        } else {
+          logger.info("Skipping adding {} variant to Java component.", shadowSourcesElements.name)
           variant.skip()
         }
       }
@@ -137,10 +178,16 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   public companion object {
     public const val COMPONENT_NAME: String = SHADOW
     public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
+    public const val SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME: String = "shadowSourcesElements"
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadowRuntimeElements:
       NamedDomainObjectProvider<ConsumableConfiguration>
       get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
+
+    @get:JvmSynthetic
+    public inline val ConfigurationContainer.shadowSourcesElements:
+      NamedDomainObjectProvider<ConsumableConfiguration>
+      get() = named(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
   }
 }

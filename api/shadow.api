@@ -58,6 +58,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 	public static final field COMPONENT_NAME Ljava/lang/String;
 	public static final field Companion Lcom/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion;
 	public static final field SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME Ljava/lang/String;
+	public static final field SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME Ljava/lang/String;
 	public fun <init> (Lorg/gradle/api/component/SoftwareComponentFactory;)V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
@@ -69,6 +70,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugi
 
 public final class com/github/jengelman/gradle/plugins/shadow/ShadowJavaPlugin$Companion {
 	public final synthetic fun getShadowRuntimeElements (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
+	public final synthetic fun getShadowSourcesElements (Lorg/gradle/api/artifacts/ConfigurationContainer;)Lorg/gradle/api/NamedDomainObjectProvider;
 }
 
 public abstract class com/github/jengelman/gradle/plugins/shadow/ShadowKmpPlugin : org/gradle/api/Plugin {
@@ -259,6 +261,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getAddMultiReleaseAttribute ()Lorg/gradle/api/provider/Property;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
+	public final fun getArchiveSourcesFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getDuplicatesStrategy ()Lorg/gradle/api/file/DuplicatesStrategy;
