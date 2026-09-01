@@ -73,6 +73,9 @@ abstract class BasePluginTest {
   open val outputShadowedJar: JarPath
     get() = jarPath("build/libs/my-1.0-all.jar")
 
+  val outputShadowedSourcesJar: JarPath
+    get() = jarPath("build/libs/my-1.0-all-sources.jar")
+
   val outputServerShadowedJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
 
@@ -89,6 +92,10 @@ abstract class BasePluginTest {
               buildJar {
                 insert("a.properties", "a")
                 insert("a2.properties", "a2")
+              }
+              buildSourcesJar {
+                insert("a/A.java", "package a;\npublic class A {}")
+                insert("a.properties", "a")
               }
             }
           val b = jarModule("my", "b", "1.0") { buildJar { insert("b.properties", "b") } }

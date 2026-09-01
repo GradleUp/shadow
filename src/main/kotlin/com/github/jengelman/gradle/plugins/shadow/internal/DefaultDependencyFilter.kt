@@ -11,7 +11,7 @@ import org.gradle.api.file.FileCollection
 import org.gradle.jvm.JvmLibrary
 import org.gradle.language.base.artifact.SourcesArtifact
 
-internal class DefaultDependencyFilter(private val project: Project) :
+internal class DefaultDependencyFilter(@Transient private val project: Project) :
   DependencyFilter.AbstractDependencyFilter(project) {
   override fun resolve(
     dependencies: Set<ResolvedDependency>,

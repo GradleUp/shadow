@@ -97,9 +97,16 @@ class AppendableMavenRepository(val root: Path) {
             """
               .trimMargin()
           }
+        val sourcesArtifactLine =
+          if (module.sourcesArtifactPath != null) {
+            "artifact('${module.sourcesArtifactPath}') { classifier = 'sources' }"
+          } else {
+            ""
+          }
         module.createMavenPublication(
           """
           |artifact '${module.artifactPath}'
+          |$sourcesArtifactLine
           |pom.withXml { xml ->
           |  def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
           |  $nodes
@@ -199,6 +206,7 @@ class AppendableMavenRepository(val root: Path) {
   inner class JarModule(groupId: String, artifactId: String, version: String) :
     Module(groupId, artifactId, version) {
     private var existingJar: Path? = null
+    private var existingSourcesJar: Path? = null
 
     val artifactPath: String
       get() =
@@ -210,6 +218,16 @@ class AppendableMavenRepository(val root: Path) {
           }
           ?.invariantSeparatorsPathString ?: error("No jar file provided for $coordinate")
 
+    val sourcesArtifactPath: String?
+      get() =
+        existingSourcesJar
+          ?.also {
+            check(it.exists() && it.isRegularFile()) {
+              "Sources jar file does not exist or is not a regular file: $it"
+            }
+          }
+          ?.invariantSeparatorsPathString
+
     fun useJar(existingJar: Path) {
       this.existingJar = existingJar
     }
@@ -217,6 +235,11 @@ class AppendableMavenRepository(val root: Path) {
     fun buildJar(builder: JarBuilder.() -> Unit) {
       val jarPath = jarsDir.resolve("${coordinate.replace(':', '-')}.jar")
       existingJar = JarBuilder(jarPath).apply(builder).write()
+    }
+
+    fun buildSourcesJar(builder: JarBuilder.() -> Unit) {
+      val jarPath = jarsDir.resolve("${coordinate.replace(':', '-')}-sources.jar")
+      existingSourcesJar = JarBuilder(jarPath).apply(builder).write()
     }
   }
 

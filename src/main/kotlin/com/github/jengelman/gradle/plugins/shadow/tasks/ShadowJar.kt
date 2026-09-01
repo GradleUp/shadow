@@ -7,8 +7,10 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
+import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
+import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
@@ -17,13 +19,16 @@ import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.minimizeWithR8
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.internal.useZip
+import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.AppendingTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.CacheableTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
@@ -33,6 +38,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
 import java.util.GregorianCalendar
 import java.util.jar.JarFile
 import java.util.zip.ZipException
@@ -62,6 +68,7 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
+import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -193,6 +200,17 @@ public abstract class ShadowJar : Jar() {
     dependencyFilter.zip(configurations) { df, cs ->
       df as DefaultDependencyFilter
       df.resolveSourcesJars(cs)
+    }
+  }
+
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  internal val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection {
+    val sourceSets = project.extensions.findByType(SourceSetContainer::class.java)
+    if (sourceSets != null) {
+      sourceSets.named("main").map { it.allSource.srcDirs }
+    } else {
+      emptySet<File>()
     }
   }
 
@@ -539,6 +557,7 @@ public abstract class ShadowJar : Jar() {
     injectManifestAttributes()
     super.copy()
     runR8Minimization()
+    generateShadowedSourcesJar()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
@@ -745,6 +764,124 @@ public abstract class ShadowJar : Jar() {
       keptDependencyFiles = includedDependencies - toMinimize,
       relocators = relocators.get() + packageRelocators,
     )
+  }
+
+  private fun generateShadowedSourcesJar() {
+    val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }
+    if (sourcesJars.isEmpty) return
+
+    val archive = archiveFile.get().asFile
+    val sourcesJarFile =
+      archive.parentFile.resolve("${archive.nameWithoutExtension}-sources.${archive.extension}")
+
+    val actualRelocators = relocators.get() + packageRelocators
+    val visitedFiles = mutableSetOf<String>()
+    val charset = metadataCharset?.let(Charset::forName) ?: Charsets.UTF_8
+
+    try {
+      sourcesJarFile
+        .createZipOutputStream(
+          entryCompression = entryCompression,
+          isZip64 = isZip64,
+          encoding = metadataCharset,
+        )
+        .use { zos ->
+          for (srcDir in sourceSetsSourceDirs.files) {
+            if (!srcDir.exists()) continue
+            srcDir
+              .walkTopDown()
+              .filter { it.isFile }
+              .forEach { file ->
+                val relPath = file.relativeTo(srcDir).invariantSeparatorsPath
+                if (visitedFiles.add(relPath)) {
+                  val relocatedPath = actualRelocators.relocatePath(relPath)
+                  val bytes =
+                    if (isSourceFile(relPath)) {
+                      var text = file.readText(charset)
+                      for (relocator in actualRelocators) {
+                        text = relocator.applyToSourceContent(text)
+                      }
+                      text.toByteArray(charset)
+                    } else {
+                      file.readBytes()
+                    }
+                  zos.writeEntry(
+                    name = relocatedPath,
+                    preserveLastModified = isPreserveFileTimestamps,
+                    lastModified = file.lastModified(),
+                    unixMode = UnixMode.file(),
+                  ) {
+                    write(bytes)
+                  }
+                }
+              }
+          }
+
+          sourcesJars.forEach { jarFile ->
+            jarFile.useZip {
+              entries().toList().forEach { entry ->
+                if (entry.isDirectory) return@forEach
+                val name = entry.name
+                if (
+                  name == "META-INF/MANIFEST.MF" ||
+                    name.endsWith(".class") ||
+                    name.startsWith("META-INF/INDEX.LIST") ||
+                    (name.startsWith("META-INF/") &&
+                      (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
+                ) {
+                  return@forEach
+                }
+                val relocatedPath = actualRelocators.relocatePath(name)
+                if (visitedFiles.add(relocatedPath)) {
+                  val bytes =
+                    if (isSourceFile(name)) {
+                      var text = getInputStream(entry).bufferedReader(charset).readText()
+                      for (relocator in actualRelocators) {
+                        text = relocator.applyToSourceContent(text)
+                      }
+                      text.toByteArray(charset)
+                    } else {
+                      getInputStream(entry).readBytes()
+                    }
+                  zos.writeEntry(
+                    name = relocatedPath,
+                    preserveLastModified = isPreserveFileTimestamps,
+                    lastModified = entry.time,
+                    unixMode = UnixMode.file(),
+                  ) {
+                    write(bytes)
+                  }
+                }
+              }
+            }
+          }
+
+          val entries = zos.entries.map { it.name }
+          val added = entries.toMutableSet()
+          val currentTimeMillis = System.currentTimeMillis()
+          entries.forEach { name ->
+            name.parentDirectoryEntries().asReversed().forEach { entryName ->
+              if (!added.add(entryName)) return@forEach
+              zos.writeEntry(
+                name = entryName,
+                preserveLastModified = isPreserveFileTimestamps,
+                lastModified = currentTimeMillis,
+                unixMode = UnixMode.directory(),
+              )
+            }
+          }
+        }
+    } catch (e: Exception) {
+      sourcesJarFile.delete()
+      throw e
+    }
+  }
+
+  private fun isSourceFile(path: String): Boolean {
+    return path.endsWith(".java") ||
+      path.endsWith(".kt") ||
+      path.endsWith(".groovy") ||
+      path.endsWith(".scala")
   }
 
   public companion object {
