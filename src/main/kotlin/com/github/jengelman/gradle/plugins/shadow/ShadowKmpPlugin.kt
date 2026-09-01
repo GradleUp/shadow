@@ -36,6 +36,9 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
     val kotlinJvmMain = target.compilations.named("main")
     registerShadowJarCommon(tasks.named(target.artifactsTaskName, Jar::class.java)) { task ->
       task.from(kotlinJvmMain.map { it.output.allOutputs })
+      task.sourceSetsSourceDirs.convention(
+        kotlinJvmMain.map { it.allKotlinSourceSets.flatMap { ss -> ss.kotlin.srcDirs } }
+      )
       task.configurations.convention(
         kotlinJvmMain
           .flatMap { configurations.named(it.runtimeDependencyConfigurationName) }

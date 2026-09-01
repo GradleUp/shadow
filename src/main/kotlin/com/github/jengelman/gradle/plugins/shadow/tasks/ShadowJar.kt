@@ -64,7 +64,6 @@ import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
-import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
@@ -201,14 +200,7 @@ public abstract class ShadowJar : Jar() {
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
-  internal val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    val sourceSets = project.extensions.findByType(SourceSetContainer::class.java)
-    if (sourceSets != null) {
-      sourceSets.named("main").map { it.allSource.srcDirs }
-    } else {
-      emptySet<File>()
-    }
-  }
+  internal val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
 
   /**
    * Enables auto relocation of packages in the dependencies.
