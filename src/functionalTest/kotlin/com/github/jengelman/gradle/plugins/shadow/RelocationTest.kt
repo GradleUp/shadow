@@ -762,8 +762,9 @@ class RelocationTest : BasePluginTest() {
       .writeText(
         """
         |package my;
+        |import g.G;
         |public class Main {
-        |  String a = "a.A";
+        |  G g;
         |}
         """
           .trimMargin()
@@ -771,10 +772,10 @@ class RelocationTest : BasePluginTest() {
     projectScript.appendText(
       """
       |dependencies {
-      |  implementation 'my:a:1.0'
+      |  implementation 'my:g:1.0'
       |}
       |$shadowJarTask {
-      |  relocate('a', 'shadow.a')
+      |  relocate('g', 'shadow.g')
       |}
       """
         .trimMargin()
@@ -787,25 +788,25 @@ class RelocationTest : BasePluginTest() {
         "my/",
         "my/Main.java",
         "shadow/",
-        "shadow/a/",
-        "shadow/a/A.java",
-        "shadow/a.properties",
+        "shadow/g/",
+        "shadow/g/G.java",
       )
       getContent("my/Main.java")
         .isEqualTo(
           """
           |package my;
+          |import shadow.g.G;
           |public class Main {
-          |  String a = "shadow.a.A";
+          |  G g;
           |}
           """
             .trimMargin()
         )
-      getContent("shadow/a/A.java")
+      getContent("shadow/g/G.java")
         .isEqualTo(
           """
-          |package shadow.a;
-          |public class A {}
+          |package shadow.g;
+          |public class G {}
           """
             .trimMargin()
         )

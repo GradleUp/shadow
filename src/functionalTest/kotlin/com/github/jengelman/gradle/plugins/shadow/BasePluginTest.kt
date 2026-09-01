@@ -61,6 +61,9 @@ abstract class BasePluginTest {
   lateinit var artifactBJar: Path
     private set
 
+  lateinit var artifactGJar: Path
+    private set
+
   val projectScript: Path
     get() = path("build.gradle")
 
@@ -93,10 +96,6 @@ abstract class BasePluginTest {
                 insert("a.properties", "a")
                 insert("a2.properties", "a2")
               }
-              buildSourcesJar {
-                insert("a/A.java", "package a;\npublic class A {}")
-                insert("a.properties", "a")
-              }
             }
           val b = jarModule("my", "b", "1.0") { buildJar { insert("b.properties", "b") } }
           val c = jarModule("my", "c", "1.0") { buildJar { insert("c.properties", "c") } }
@@ -118,6 +117,20 @@ abstract class BasePluginTest {
               // Circular dependency with e.
               addDependency(e)
             }
+          val g =
+            jarModule("my", "g", "1.0") {
+              buildJar { insert("g/G.class", createEmptyClassBytes("g/G")) }
+              buildSourcesJar {
+                insert(
+                  "g/G.java",
+                  """
+                  |package g;
+                  |public class G {}
+                  """
+                    .trimMargin(),
+                )
+              }
+            }
           bomModule("my", "bom", "1.0") {
             addDependency(a)
             addDependency(b)
@@ -125,12 +138,14 @@ abstract class BasePluginTest {
             addDependency(d)
             addDependency(e)
             addDependency(f)
+            addDependency(g)
           }
         }
     localRepo.publish()
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactGJar = path("my/g/1.0/g-1.0.jar", parent = localRepo.root)
   }
 
   @BeforeEach
