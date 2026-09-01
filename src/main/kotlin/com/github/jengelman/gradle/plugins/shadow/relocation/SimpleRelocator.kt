@@ -127,10 +127,6 @@ constructor(
     return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }
 
-  /**
-   * We don't call this function now, so we don't have to expose [sourcePackageExcludes] and
-   * [sourcePathExcludes] as inputs.
-   */
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString) return sourceContent
     val content =
