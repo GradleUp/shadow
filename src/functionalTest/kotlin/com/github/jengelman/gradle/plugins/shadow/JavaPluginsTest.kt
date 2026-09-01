@@ -9,6 +9,7 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNull
+import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
@@ -27,6 +28,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
+import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
@@ -1324,6 +1326,46 @@ class JavaPluginsTest : BasePluginTest() {
       getContent("foo.txt").isEqualTo("lower")
       getContent("Foo.txt").isEqualTo("upper")
     }
+  }
+
+  @Test
+  fun generateJavadocFromShadowedSourcesJar() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |/** Main class doc */
+        |public class Main {
+        |  /** Main method doc */
+        |  public static void main(String[] args) {}
+        |}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |  shadow 'my:g:1.0'
+      |}
+      |
+      |tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      |  relocate 'g', 'shadow.g'
+      |}
+      |
+      |tasks.named('javadoc', Javadoc) {
+      |  source = zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
+      |  classpath = files(tasks.named('shadowJar').flatMap { it.archiveFile })
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess("javadoc")
+
+    val javadocDir = projectRoot.resolve("build/docs/javadoc")
+    assertThat(javadocDir.resolve("my/Main.html").exists()).isTrue()
+    assertThat(javadocDir.resolve("shadow/g/G.html").exists()).isTrue()
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {

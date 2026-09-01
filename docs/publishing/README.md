@@ -515,6 +515,79 @@ customizable properties listed in [Configuring Output Name][configuring-output-n
 We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will
 be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
+## Generating Javadoc or Dokka from Shadowed Sources
+
+When creating fat / shadowed libraries, you may want to generate a complete Javadoc or Dokka JAR covering both your
+project sources and shadowed dependency sources with relocated packages.
+
+Because `shadowJar` outputs the shadowed sources archive at `archiveSourcesFile` (where relocated packages and
+source contents have already been transformed), you can configure the `javadoc` task (or Dokka task) to consume the
+shadowed sources and classes directly from `shadowJar`. The generated documentation will reflect the relocated package
+names (e.g. `shadow.g.G` instead of `g.G`).
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.javadoc {
+      source = zipTree(tasks.shadowJar.flatMap { it.archiveSourcesFile })
+      classpath = files(tasks.shadowJar.flatMap { it.archiveFile })
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('javadoc', Javadoc) {
+      source = zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
+      classpath = files(tasks.named('shadowJar').flatMap { it.archiveFile })
+    }
+    ```
+
+If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed sources and configure `sourceRoots`:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      kotlin("jvm")
+      id("com.gradleup.shadow")
+      id("org.jetbrains.dokka")
+    }
+
+    val extractShadowedSources = tasks.register<Sync>("extractShadowedSources") {
+      from(zipTree(tasks.shadowJar.flatMap { it.archiveSourcesFile }))
+      into(layout.buildDirectory.dir("extracted-shadowed-sources"))
+    }
+
+    dokka {
+      dokkaSourceSets.configureEach {
+        sourceRoots.setFrom(extractShadowedSources.map { it.destinationDir })
+        classpath.setFrom(tasks.shadowJar.flatMap { it.archiveFile })
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'org.jetbrains.kotlin.jvm'
+      id 'com.gradleup.shadow'
+      id 'org.jetbrains.dokka'
+    }
+
+    tasks.register('extractShadowedSources', Sync) {
+      from zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
+      into layout.buildDirectory.dir('extracted-shadowed-sources')
+    }
+
+    dokka {
+      dokkaSourceSets.configureEach {
+        sourceRoots.from(extractShadowedSources.map { it.destinationDir })
+        classpath.from(tasks.named('shadowJar').flatMap { it.archiveFile })
+      }
+    }
+    ```
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
@@ -522,3 +595,4 @@ be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
 [configuring-output-name]: ../configuration/README.md#configuring-output-name
+[dokka]: https://kotlinlang.org/docs/dokka-introduction.html

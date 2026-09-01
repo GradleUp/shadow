@@ -12,6 +12,9 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -277,6 +280,55 @@ class KotlinPluginsTest : BasePluginTest() {
         "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
         "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
       )
+  }
+
+  @Test
+  fun generateDokkaFromShadowedSourcesJar() {
+    projectScript.writeText(
+      """
+      |plugins {
+      |  id 'org.jetbrains.kotlin.jvm'
+      |  id 'com.gradleup.shadow'
+      |  id 'org.jetbrains.dokka'
+      |}
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |  shadow 'my:g:1.0'
+      |}
+      |tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      |  relocate 'g', 'shadow.g'
+      |}
+      |def extractShadowedSources = tasks.register('extractShadowedSources', Sync) {
+      |  from zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
+      |  into layout.buildDirectory.dir('extracted-shadowed-sources')
+      |}
+      |dokka {
+      |  dokkaSourceSets.configureEach {
+      |    sourceRoots.from(extractShadowedSources.map { it.destinationDir })
+      |    classpath.from(tasks.named('shadowJar').flatMap { it.archiveFile })
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+    path("src/main/kotlin/my/Main.kt")
+      .writeText(
+        """
+        |package my
+        |/** Main class doc */
+        |class Main
+        """
+          .trimMargin()
+      )
+
+    runWithSuccess("dokkaGenerateHtml")
+
+    val dokkaDir = projectRoot.resolve("build/dokka/html")
+    val dokkaFiles =
+      dokkaDir.walk().map { it.relativeTo(dokkaDir).invariantSeparatorsPathString }.toList()
+    assertThat(dokkaFiles).contains("index.html")
+    assertThat(dokkaFiles).contains("my/my/-main/index.html")
+    assertThat(dokkaFiles).contains("my/shadow.g/-g/index.html")
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {
