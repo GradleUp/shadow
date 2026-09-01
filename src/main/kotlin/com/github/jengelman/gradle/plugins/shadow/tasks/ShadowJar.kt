@@ -188,6 +188,14 @@ public abstract class ShadowJar : Jar() {
     dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
   }
 
+  @get:Classpath
+  internal val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
+    dependencyFilter.zip(configurations) { df, cs ->
+      df as DefaultDependencyFilter
+      df.resolveSourcesJars(cs)
+    }
+  }
+
   /**
    * Enables auto relocation of packages in the dependencies.
    *

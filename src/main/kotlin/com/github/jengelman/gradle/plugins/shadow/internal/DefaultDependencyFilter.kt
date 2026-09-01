@@ -2,9 +2,16 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.artifacts.result.ResolvedArtifactResult
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.file.FileCollection
+import org.gradle.jvm.JvmLibrary
+import org.gradle.language.base.artifact.SourcesArtifact
 
-internal class DefaultDependencyFilter(project: Project) :
+internal class DefaultDependencyFilter(private val project: Project) :
   DependencyFilter.AbstractDependencyFilter(project) {
   override fun resolve(
     dependencies: Set<ResolvedDependency>,
@@ -18,5 +25,31 @@ internal class DefaultDependencyFilter(project: Project) :
         resolve(dep.children, includedDependencies, excludedDependencies)
       }
     }
+  }
+
+  fun resolveSourcesJars(configurations: Collection<Configuration>): FileCollection {
+    return configurations
+      .map { resolveSourcesJars(it) }
+      .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
+  }
+
+  private fun resolveSourcesJars(configuration: Configuration): FileCollection {
+    val componentIds =
+      configuration.incoming.resolutionResult.allDependencies
+        .filterIsInstance<ResolvedDependencyResult>()
+        .map { it.selected.id }
+        .filterIsInstance<ModuleComponentIdentifier>()
+        .toSet()
+    val files =
+      project.dependencies
+        .createArtifactResolutionQuery()
+        .forComponents(componentIds)
+        .withArtifacts(JvmLibrary::class.java, SourcesArtifact::class.java)
+        .execute()
+        .resolvedComponents
+        .flatMap { it.getArtifacts(SourcesArtifact::class.java) }
+        .filterIsInstance<ResolvedArtifactResult>()
+        .map { it.file }
+    return project.files(files)
   }
 }
