@@ -12,6 +12,7 @@
   - Support manifest header relocation via configurable `attributesToRelocate` property.
 - Allow disabling default ProGuard rules in R8 minimization with `R8Spec.useDefaultRules`. ([#2252](https://github.com/GradleUp/shadow/pull/2252))
 - Allow passing classpath files to R8 minimization with `R8Spec.classpath`. ([#2255](https://github.com/GradleUp/shadow/pull/2255))
+- Support shadowed sources JAR. ([#2265](https://github.com/GradleUp/shadow/pull/2265))
 
 ### Changed
 
