@@ -814,7 +814,7 @@ class RelocationTest : BasePluginTest() {
   }
 
   @Test
-  fun skipShadowedSourcesJarWhenNoIncludedSourcesJars() {
+  fun generateShadowedSourcesJarWhenNoIncludedSourcesJars() {
     writeClass()
     projectScript.appendText(
       """
@@ -825,7 +825,28 @@ class RelocationTest : BasePluginTest() {
         .trimMargin()
     )
 
-    runWithSuccess("clean", shadowJarPath)
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+      )
+    }
+  }
+
+  @Test
+  fun skipShadowedSourcesJarWhenNoSources() {
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:b:1.0'
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
 
     assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar").exists()).isFalse()
   }

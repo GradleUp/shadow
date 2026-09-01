@@ -17,7 +17,10 @@ internal fun generateShadowedSourcesJar(
   preserveFileTimestamps: Boolean,
 ) {
   val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }
-  if (sourcesJars.isEmpty()) return
+  val hasProjectSources = sourceSetsSourceDirs.any {
+    it.exists() && it.walkTopDown().any(File::isFile)
+  }
+  if (!hasProjectSources && sourcesJars.isEmpty()) return
 
   val sourcesJarFile =
     archiveFile.parentFile.resolve(
