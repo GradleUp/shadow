@@ -10,6 +10,7 @@ pluginManagement {
     }
     gradlePluginPortal()
   }
+  includeBuild("gradle/build-logic")
 }
 
 plugins { id("com.gradle.develocity") version "4.5.0" }
