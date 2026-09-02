@@ -3,13 +3,13 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsAtLeast
 import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNull
-import assertk.assertions.isTrue
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowPlugin.Companion.ENABLE_DEVELOCITY_INTEGRATION_PROPERTY
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
@@ -28,10 +28,11 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
-import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
@@ -1336,7 +1337,6 @@ class JavaPluginsTest : BasePluginTest() {
         |package my;
         |/** Main class doc */
         |public class Main {
-        |  /** Main method doc */
         |  public static void main(String[] args) {}
         |}
         """
@@ -1346,16 +1346,13 @@ class JavaPluginsTest : BasePluginTest() {
       """
       |dependencies {
       |  implementation 'my:g:1.0'
-      |  shadow 'my:g:1.0'
       |}
-      |
-      |tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      |$shadowJarTask {
       |  relocate 'g', 'shadow.g'
       |}
-      |
       |tasks.named('javadoc', Javadoc) {
-      |  source = zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
-      |  classpath = files(tasks.named('shadowJar').flatMap { it.archiveFile })
+      |  classpath = files($shadowJarTask.flatMap { it.archiveFile })
+      |  source = zipTree($shadowJarTask.flatMap { it.archiveSourcesFile })
       |}
       """
         .trimMargin()
@@ -1364,8 +1361,14 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess("javadoc")
 
     val javadocDir = projectRoot.resolve("build/docs/javadoc")
-    assertThat(javadocDir.resolve("my/Main.html").exists()).isTrue()
-    assertThat(javadocDir.resolve("shadow/g/G.html").exists()).isTrue()
+    val javadocFiles =
+      javadocDir.walk().map { it.relativeTo(javadocDir).invariantSeparatorsPathString }
+    assertThat(javadocFiles)
+      .containsAtLeast(
+        "index.html",
+        "my/Main.html",
+        "shadow/g/G.html",
+      )
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {

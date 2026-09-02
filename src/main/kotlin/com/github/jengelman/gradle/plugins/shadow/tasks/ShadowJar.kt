@@ -9,7 +9,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifes
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
-import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.generateShadowedSourcesJar

@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsAtLeast
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
@@ -284,33 +285,6 @@ class KotlinPluginsTest : BasePluginTest() {
 
   @Test
   fun generateDokkaFromShadowedSourcesJar() {
-    projectScript.writeText(
-      """
-      |plugins {
-      |  id 'org.jetbrains.kotlin.jvm'
-      |  id 'com.gradleup.shadow'
-      |  id 'org.jetbrains.dokka'
-      |}
-      |dependencies {
-      |  implementation 'my:g:1.0'
-      |  shadow 'my:g:1.0'
-      |}
-      |tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      |  relocate 'g', 'shadow.g'
-      |}
-      |def extractShadowedSources = tasks.register('extractShadowedSources', Sync) {
-      |  from zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
-      |  into layout.buildDirectory.dir('extracted-shadowed-sources')
-      |}
-      |dokka {
-      |  dokkaSourceSets.configureEach {
-      |    sourceRoots.from(extractShadowedSources.map { it.destinationDir })
-      |    classpath.from(tasks.named('shadowJar').flatMap { it.archiveFile })
-      |  }
-      |}
-      """
-        .trimMargin()
-    )
     path("src/main/kotlin/my/Main.kt")
       .writeText(
         """
@@ -320,15 +294,43 @@ class KotlinPluginsTest : BasePluginTest() {
         """
           .trimMargin()
       )
+    projectScript.writeText(
+      """
+      |plugins {
+      |  id 'org.jetbrains.kotlin.jvm'
+      |  id 'com.gradleup.shadow'
+      |  id 'org.jetbrains.dokka'
+      |}
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |}
+      |$shadowJarTask {
+      |  relocate 'g', 'shadow.g'
+      |}
+      |def extractShadowedSources = tasks.register('extractShadowedSources', Sync) {
+      |  from zipTree($shadowJarTask.flatMap { it.archiveSourcesFile })
+      |  into layout.buildDirectory.dir('extracted-shadowed-sources')
+      |}
+      |dokka {
+      |  dokkaSourceSets.configureEach {
+      |    classpath.from($shadowJarTask.flatMap { it.archiveFile })
+      |    sourceRoots.from(extractShadowedSources.map { it.destinationDir })
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
 
     runWithSuccess("dokkaGenerateHtml")
 
     val dokkaDir = projectRoot.resolve("build/dokka/html")
-    val dokkaFiles =
-      dokkaDir.walk().map { it.relativeTo(dokkaDir).invariantSeparatorsPathString }.toList()
-    assertThat(dokkaFiles).contains("index.html")
-    assertThat(dokkaFiles).contains("my/my/-main/index.html")
-    assertThat(dokkaFiles).contains("my/shadow.g/-g/index.html")
+    val dokkaFiles = dokkaDir.walk().map { it.relativeTo(dokkaDir).invariantSeparatorsPathString }
+    assertThat(dokkaFiles)
+      .containsAtLeast(
+        "index.html",
+        "my/my/-main/index.html",
+        "my/shadow.g/-g/index.html",
+      )
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {
