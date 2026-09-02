@@ -21,7 +21,9 @@ import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
+import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -54,14 +56,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         compileClasspath.extendsFrom(shadowConfig)
       }
     val shadowRuntimeElements =
-      configurations.consumable(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { shadowRuntimeElements
-        ->
-        shadowRuntimeElements.extendsFrom(shadowConfig)
-        shadowRuntimeElements.attributes { attrs ->
-          attrs.attribute(
-            Usage.USAGE_ATTRIBUTE,
-            objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
-          )
+      registerConsumableConfiguration(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+        extendsFrom(shadowConfig)
+        attributes { attrs ->
           attrs.attribute(
             Category.CATEGORY_ATTRIBUTE,
             objects.named(Category::class.java, Category.LIBRARY),
@@ -70,42 +67,26 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
             objects.named(LibraryElements::class.java, LibraryElements.JAR),
           )
-          attrs.attributeProvider(
-            Bundling.BUNDLING_ATTRIBUTE,
-            shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
-          )
         }
-        shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
+        outgoing.artifact(tasks.shadowJar)
       }
-
-    val shadowSourcesElements =
-      configurations.consumable(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME) { shadowSourcesElements
-        ->
-        shadowSourcesElements.attributes { attrs ->
-          attrs.attribute(
-            Usage.USAGE_ATTRIBUTE,
-            objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
-          )
-          attrs.attribute(
-            Category.CATEGORY_ATTRIBUTE,
-            objects.named(Category::class.java, Category.DOCUMENTATION),
-          )
-          attrs.attribute(
-            Bundling.BUNDLING_ATTRIBUTE,
-            objects.named(Bundling::class.java, Bundling.SHADOWED),
-          )
-          attrs.attribute(
-            DocsType.DOCS_TYPE_ATTRIBUTE,
-            objects.named(DocsType::class.java, DocsType.SOURCES),
-          )
-        }
-        val sourcesJarFile = tasks.shadowJar.flatMap { it.archiveSourcesFile }
-        shadowSourcesElements.outgoing.artifact(sourcesJarFile) { artifact ->
-          artifact.builtBy(tasks.shadowJar)
-          artifact.classifier = "sources"
-          artifact.type = "jar"
-        }
+    registerConsumableConfiguration(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME) {
+      attributes { attrs ->
+        attrs.attribute(
+          Category.CATEGORY_ATTRIBUTE,
+          objects.named(Category::class.java, Category.DOCUMENTATION),
+        )
+        attrs.attribute(
+          DocsType.DOCS_TYPE_ATTRIBUTE,
+          objects.named(DocsType::class.java, DocsType.SOURCES),
+        )
       }
+      outgoing.artifact(tasks.shadowJar.flatMap { it.archiveSourcesFile }) { artifact ->
+        artifact.builtBy(tasks.shadowJar)
+        artifact.classifier = "sources"
+        artifact.type = "jar"
+      }
+    }
 
     // See more details in #2086.
     afterEvaluate {
@@ -151,26 +132,53 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     }
     shadowComponent.addVariantsFromConfiguration(shadowSourcesElements) {}
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
-      component.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
-        variant.mapToOptional()
-        if (shadow.addShadowVariantIntoJavaComponent.get()) {
-          logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
-        } else {
-          logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
-          variant.skip()
-        }
-      }
-      component.addVariantsFromConfiguration(shadowSourcesElements) { variant ->
-        variant.mapToOptional()
-        if (shadow.addShadowVariantIntoJavaComponent.get()) {
-          logger.info("Adding {} variant to Java component.", shadowSourcesElements.name)
-        } else {
-          logger.info("Skipping adding {} variant to Java component.", shadowSourcesElements.name)
-          variant.skip()
-        }
+      val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
+      component.addVariants(
+        addIntoJavaComponent = addIntoJavaComponent,
+        outgoingConfiguration = shadowRuntimeElements,
+        logger = logger,
+      )
+      component.addVariants(
+        addIntoJavaComponent = addIntoJavaComponent,
+        outgoingConfiguration = shadowSourcesElements,
+        logger = logger,
+      )
+    }
+  }
+
+  private fun AdhocComponentWithVariants.addVariants(
+    addIntoJavaComponent: Provider<Boolean>,
+    outgoingConfiguration: NamedDomainObjectProvider<ConsumableConfiguration>,
+    logger: Logger,
+  ) {
+    addVariantsFromConfiguration(outgoingConfiguration) { variant ->
+      variant.mapToOptional()
+      if (addIntoJavaComponent.get()) {
+        logger.info("Adding {} variant to Java component.", outgoingConfiguration.name)
+      } else {
+        logger.info("Skipping adding {} variant to Java component.", outgoingConfiguration.name)
+        variant.skip()
       }
     }
   }
+
+  private fun Project.registerConsumableConfiguration(
+    name: String,
+    action: ConsumableConfiguration.() -> Unit,
+  ) =
+    configurations.consumable(name) { configuration ->
+      configuration.attributes { attrs ->
+        attrs.attribute(
+          Usage.USAGE_ATTRIBUTE,
+          objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
+        )
+        attrs.attributeProvider(
+          Bundling.BUNDLING_ATTRIBUTE,
+          shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
+        )
+      }
+      configuration.action()
+    }
 
   @Deprecated("This method will be removed in Shadow 10.")
   protected open fun Project.configureJavaGradlePlugin() {}
