@@ -128,7 +128,7 @@ public final class com/github/jengelman/gradle/plugins/shadow/relocation/Relocat
 	public static final fun relocatePath (Ljava/lang/Iterable;Ljava/lang/String;)Ljava/lang/String;
 }
 
-public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator {
+public abstract interface class com/github/jengelman/gradle/plugins/shadow/relocation/Relocator : java/io/Serializable {
 	public abstract fun applyToSourceContent (Ljava/lang/String;)Ljava/lang/String;
 	public abstract fun canRelocateClass (Ljava/lang/String;)Z
 	public abstract fun canRelocatePath (Ljava/lang/String;)Z
@@ -284,6 +284,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
+	protected abstract fun getWorkerExecutor ()Lorg/gradle/workers/WorkerExecutor;
 	public fun mergeGroovyExtensionModules ()V
 	public final fun mergeServiceFiles ()V
 	public fun mergeServiceFiles (Ljava/lang/String;)V

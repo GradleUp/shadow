@@ -7,11 +7,11 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
+import com.github.jengelman.gradle.plugins.shadow.internal.GenerateShadowedSourcesJarWorkAction
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
-import com.github.jengelman.gradle.plugins.shadow.internal.generateShadowedSourcesJar
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
@@ -73,6 +73,7 @@ import org.gradle.api.tasks.options.Option
 import org.gradle.jvm.toolchain.JavaLauncher
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.process.ExecOperations
+import org.gradle.workers.WorkerExecutor
 
 @ShadowDsl
 @CacheableTask
@@ -84,6 +85,29 @@ public abstract class ShadowJar : Jar() {
     // without Shadow plugin applied.
     project.configurations.findByName(ShadowBasePlugin.CONFIGURATION_NAME) ?: project.files()
   }
+
+  @Transient private var _unusedClasses: Set<String>? = null
+
+  private val unusedClasses: Set<String>
+    get() =
+      _unusedClasses
+        ?: (if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
+            findUnusedClasses(
+              sourceSetsClassesDirs = sourceSetsClassesDirs,
+              classJars = apiJars,
+              toMinimize = toMinimize,
+              dependencies = includedDependencies,
+            )
+          } else {
+            emptySet()
+          })
+          .also { _unusedClasses = it }
+
+  @Transient private var _actualRelocators: Set<Relocator>? = null
+
+  private val actualRelocators: Set<Relocator>
+    get() =
+      _actualRelocators ?: (relocators.get() + packageRelocators).also { _actualRelocators = it }
 
   init {
     group = LifecycleBasePlugin.BUILD_GROUP
@@ -368,6 +392,8 @@ public abstract class ShadowJar : Jar() {
 
   @get:Inject protected abstract val archiveOperations: ArchiveOperations
 
+  @get:Inject protected abstract val workerExecutor: WorkerExecutor
+
   /** Enable minimization and execute the [action] with the [MinimizeSpec] for minimize. */
   @JvmOverloads
   public open fun minimize(action: Action<in MinimizeSpec> = Action {}) {
@@ -561,25 +587,14 @@ public abstract class ShadowJar : Jar() {
   override fun copy() {
     addIncludedDependencies()
     injectManifestAttributes()
-    super.copy()
-    runR8Minimization()
     generateShadowedSourcesJar()
+    super.copy()
+    workerExecutor.await()
+    runR8Minimization()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
-    val unusedClasses =
-      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
-          findUnusedClasses(
-            sourceSetsClassesDirs = sourceSetsClassesDirs,
-            classJars = apiJars,
-            toMinimize = toMinimize,
-            dependencies = includedDependencies,
-          )
-        } else {
-          emptySet()
-        }
-        .also { this.unusedClasses = it }
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -613,7 +628,7 @@ public abstract class ShadowJar : Jar() {
       zipFile = zipFile,
       zipOutStream = zipOutStream,
       transformers = actualTransformers,
-      relocators = relocators.get() + packageRelocators,
+      relocators = actualRelocators,
       unusedClasses = unusedClasses,
       isPreserveFileTimestamps = isPreserveFileTimestamps,
       failOnDuplicateEntries = failOnDuplicateEntries.get(),
@@ -769,25 +784,24 @@ public abstract class ShadowJar : Jar() {
       javaLauncher = javaLauncher,
       sourceSetsClassesDirs = sourceSetsClassesDirs,
       keptDependencyFiles = includedDependencies - toMinimize,
-      relocators = relocators.get() + packageRelocators,
+      relocators = actualRelocators,
     )
   }
 
-  private var unusedClasses: Set<String> = emptySet()
-
   private fun generateShadowedSourcesJar() {
     if (!archiveSourcesFile.isPresent) return
-    generateShadowedSourcesJar(
-      sourcesJarFile = archiveSourcesFile.get().asFile,
-      sourceSetsSourceDirs = sourceSetsSourceDirs.files,
-      includedSourcesJars = includedSourcesJars.files,
-      relocators = relocators.get() + packageRelocators,
-      unusedClasses = unusedClasses,
-      entryCompression = entryCompression,
-      isZip64 = isZip64,
-      metadataCharset = metadataCharset,
-      preserveFileTimestamps = isPreserveFileTimestamps,
-    )
+    workerExecutor.noIsolation().submit(GenerateShadowedSourcesJarWorkAction::class.java) { params
+      ->
+      params.sourcesJarFile.set(archiveSourcesFile)
+      params.sourceSetsSourceDirs.from(sourceSetsSourceDirs)
+      params.includedSourcesJars.from(includedSourcesJars)
+      params.relocators.set(actualRelocators)
+      params.unusedClasses.set(unusedClasses)
+      params.entryCompression.set(entryCompression)
+      params.zip64.set(isZip64)
+      params.metadataCharset.set(metadataCharset)
+      params.preserveFileTimestamps.set(isPreserveFileTimestamps)
+    }
   }
 
   public companion object {

@@ -4,7 +4,43 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
 import java.nio.charset.Charset
+import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.Property
+import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.gradle.workers.WorkAction
+import org.gradle.workers.WorkParameters
+
+internal abstract class GenerateShadowedSourcesJarWorkAction :
+  WorkAction<GenerateShadowedSourcesJarWorkAction.Params> {
+  interface Params : WorkParameters {
+    val sourcesJarFile: RegularFileProperty
+    val sourceSetsSourceDirs: ConfigurableFileCollection
+    val includedSourcesJars: ConfigurableFileCollection
+    val relocators: SetProperty<Relocator>
+    val unusedClasses: SetProperty<String>
+    val entryCompression: Property<ZipEntryCompression>
+    val zip64: Property<Boolean>
+    val metadataCharset: Property<String>
+    val preserveFileTimestamps: Property<Boolean>
+  }
+
+  override fun execute() {
+    val params = parameters
+    generateShadowedSourcesJar(
+      sourcesJarFile = params.sourcesJarFile.get().asFile,
+      sourceSetsSourceDirs = params.sourceSetsSourceDirs.files,
+      includedSourcesJars = params.includedSourcesJars.files,
+      relocators = params.relocators.get(),
+      unusedClasses = params.unusedClasses.get(),
+      entryCompression = params.entryCompression.get(),
+      isZip64 = params.zip64.get(),
+      metadataCharset = params.metadataCharset.orNull,
+      preserveFileTimestamps = params.preserveFileTimestamps.get(),
+    )
+  }
+}
 
 internal fun generateShadowedSourcesJar(
   sourcesJarFile: File,
