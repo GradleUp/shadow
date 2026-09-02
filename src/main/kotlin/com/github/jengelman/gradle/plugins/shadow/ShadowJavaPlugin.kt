@@ -32,7 +32,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       configureShadowJar()
       configureConfigurations()
       configureComponents()
-      configureJavaGradlePlugin()
+      @Suppress("DEPRECATION") configureJavaGradlePlugin()
     }
 
   protected open fun Project.configureShadowJar() {
@@ -129,6 +129,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     }
   }
 
+  @Deprecated("This method will be removed in Shadow 10.")
   protected open fun Project.configureJavaGradlePlugin() {}
 
   public companion object {

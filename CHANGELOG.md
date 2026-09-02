@@ -49,6 +49,7 @@
   Use `transform<GroovyExtensionModuleTransformer>()` and `transform<AppendingTransformer>()` instead.
 - Deprecate `ShadowJar.relocate(Class, Action)` and `ShadowJar.relocate<R>()`. ([#2262](https://github.com/GradleUp/shadow/pull/2262))  
   Construct a `Relocator` instance and use `ShadowJar.relocate(Relocator, Action)` instead.
+- Deprecate `ShadowJavaPlugin.configureJavaGradlePlugin()`. ([#2267](https://github.com/GradleUp/shadow/pull/2267))
 
 ### Fixed
 
