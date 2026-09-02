@@ -34,11 +34,25 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
   }
 
   private fun resolveSourcesJars(configuration: Configuration): FileCollection {
+    val includes = mutableSetOf<ResolvedDependency>()
+    val excludes = mutableSetOf<ResolvedDependency>()
+    resolve(
+      dependencies = configuration.resolvedConfiguration.firstLevelModuleDependencies,
+      includedDependencies = includes,
+      excludedDependencies = excludes,
+    )
     val componentIds =
       configuration.incoming.resolutionResult.allDependencies
         .filterIsInstance<ResolvedDependencyResult>()
         .map { it.selected.id }
         .filterIsInstance<ModuleComponentIdentifier>()
+        .filter { id ->
+          includes.any {
+            it.moduleGroup == id.group &&
+              it.moduleName == id.module &&
+              it.moduleVersion == id.version
+          }
+        }
         .toSet()
     val files =
       project.dependencies

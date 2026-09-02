@@ -2,6 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
@@ -225,6 +227,35 @@ class FilteringTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("f.properties", *entriesInAB, *manifestEntries)
+    }
+  }
+
+  @Test
+  fun excludeDependencyFromSourcesJar() {
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |  implementation 'my:h:1.0'
+      |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency('my:h:1.0'))
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsAtLeast("g/G.class")
+      containsNone("h/H.class", "h/UnusedH.class")
+    }
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsAtLeast("g/G.java")
+      containsNone("h/H.java", "h/UnusedH.java")
     }
   }
 
