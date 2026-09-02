@@ -31,6 +31,17 @@ internal fun generateShadowedSourcesJar(
         encoding = metadataCharset,
       )
       .use { zos ->
+        val manifestEntry = "META-INF/MANIFEST.MF"
+        visitedFiles.add(manifestEntry)
+        zos.writeEntry(
+          name = manifestEntry,
+          preserveLastModified = preserveFileTimestamps,
+          lastModified = if (preserveFileTimestamps) System.currentTimeMillis() else -1,
+          unixMode = UnixMode.file(),
+        ) {
+          write("Manifest-Version: 1.0\n\n".toByteArray(charset))
+        }
+
         for (srcDir in sourceSetsSourceDirs) {
           if (!srcDir.exists()) continue
           srcDir

@@ -562,8 +562,8 @@ public abstract class ShadowJar : Jar() {
     addIncludedDependencies()
     injectManifestAttributes()
     super.copy()
-    runR8Minimization()
     generateShadowedSourcesJar()
+    runR8Minimization()
   }
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.

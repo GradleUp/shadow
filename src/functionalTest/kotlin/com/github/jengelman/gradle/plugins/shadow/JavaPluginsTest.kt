@@ -150,6 +150,7 @@ class JavaPluginsTest : BasePluginTest() {
         "server/",
         "client/Client.java",
         "server/Server.java",
+        *manifestEntries,
       )
     }
   }
@@ -1360,7 +1361,7 @@ class JavaPluginsTest : BasePluginTest() {
       |}
       |tasks.named('javadoc', Javadoc) {
       |  classpath = files($shadowJarTask.flatMap { it.archiveFile })
-      |  source = zipTree($shadowJarTask.flatMap { it.archiveSourcesFile })
+      |  source = zipTree($shadowJarTask.flatMap { it.archiveSourcesFile }).matching { include('**/*.java') }
       |}
       """
         .trimMargin()

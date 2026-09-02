@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -16,7 +15,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
-import com.github.jengelman.gradle.plugins.shadow.testkit.toEntries
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -790,6 +788,7 @@ class RelocationTest : BasePluginTest() {
         "shadow/",
         "shadow/g/",
         "shadow/g/G.java",
+        *manifestEntries,
       )
       getContent("my/Main.java")
         .isEqualTo(
@@ -831,6 +830,7 @@ class RelocationTest : BasePluginTest() {
       containsOnly(
         "my/",
         "my/Main.java",
+        *manifestEntries,
       )
     }
   }
@@ -848,7 +848,7 @@ class RelocationTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedSourcesJar).useAll { toEntries().isEmpty() }
+    assertThat(outputShadowedSourcesJar).useAll { containsOnly(*manifestEntries) }
   }
 
   private companion object {

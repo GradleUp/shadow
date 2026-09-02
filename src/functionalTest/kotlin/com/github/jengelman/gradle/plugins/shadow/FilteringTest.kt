@@ -190,6 +190,7 @@ class FilteringTest : BasePluginTest() {
         "server/",
         "client/Client.java",
         "server/Server.java",
+        *manifestEntries,
       )
     }
   }
@@ -282,7 +283,7 @@ class FilteringTest : BasePluginTest() {
       }
     }
     assertThat(outputServerShadowedSourcesJar).useAll {
-      containsOnly("server/", "server/Server.java")
+      containsOnly("server/", "server/Server.java", *manifestEntries)
     }
   }
 }
