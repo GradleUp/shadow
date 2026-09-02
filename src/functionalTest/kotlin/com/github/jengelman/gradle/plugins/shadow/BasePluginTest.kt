@@ -82,6 +82,9 @@ abstract class BasePluginTest {
   val outputServerShadowedJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
 
+  val outputServerShadowedSourcesJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all-sources.jar")
+
   @BeforeAll
   fun beforeAll() {
     localRepo = createDefaultLocalMavenRepository(junitJar).apply { publish() }
@@ -260,6 +263,9 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |java {
+        |  withSourcesJar()
+        |}
         |dependencies {
         |  implementation 'junit:junit:3.8.2'
         |}

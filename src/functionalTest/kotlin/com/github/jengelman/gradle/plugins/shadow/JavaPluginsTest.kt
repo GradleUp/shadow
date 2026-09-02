@@ -144,6 +144,14 @@ class JavaPluginsTest : BasePluginTest() {
         *manifestEntries,
       )
     }
+    assertThat(outputServerShadowedSourcesJar).useAll {
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.java",
+        "server/Server.java",
+      )
+    }
   }
 
   @Test

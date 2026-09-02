@@ -184,6 +184,14 @@ class FilteringTest : BasePluginTest() {
         loadClass("server.Server")
       }
     }
+    assertThat(outputServerShadowedSourcesJar).useAll {
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.java",
+        "server/Server.java",
+      )
+    }
   }
 
   @Test
@@ -272,6 +280,9 @@ class FilteringTest : BasePluginTest() {
         loadClass("server.Server")
         loadClass("junit.framework.Test")
       }
+    }
+    assertThat(outputServerShadowedSourcesJar).useAll {
+      containsOnly("server/", "server/Server.java")
     }
   }
 }
