@@ -145,20 +145,17 @@ class ShadowSourcesJarTest {
     )
 
     val outputJar = tempDir.resolve("output-sources.jar")
-    outputJar
-      .createZipOutputStream(
-        entryCompression = ZipEntryCompression.DEFLATED,
-        isZip64 = false,
-        encoding = null,
-      )
-      .use { zos ->
-        generateShadowedSourcesJar(
-          zos = zos,
-          sourceSetsSourceDirs = listOf(srcDir),
-          includedSourcesJars = emptyList(),
-          relocators = listOf(SimpleRelocator("com.example", "shadow.example")),
-        )
-      }
+    generateShadowedSourcesJar(
+      sourcesJarFile = outputJar,
+      sourceSetsSourceDirs = listOf(srcDir),
+      includedSourcesJars = emptyList(),
+      relocators = listOf(SimpleRelocator("com.example", "shadow.example")),
+      unusedClasses = emptySet(),
+      entryCompression = ZipEntryCompression.DEFLATED,
+      isZip64 = false,
+      metadataCharset = null,
+      preserveFileTimestamps = true,
+    )
 
     assertThat(outputJar.exists()).isTrue()
     val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
