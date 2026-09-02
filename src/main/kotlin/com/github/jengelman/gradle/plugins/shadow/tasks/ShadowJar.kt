@@ -34,6 +34,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import java.io.File
 import java.io.IOException
+import java.nio.charset.Charset
 import java.util.GregorianCalendar
 import java.util.jar.JarFile
 import java.util.zip.ZipException
@@ -777,17 +778,29 @@ public abstract class ShadowJar : Jar() {
 
   private fun generateShadowedSourcesJar() {
     if (!archiveSourcesFile.isPresent) return
-    generateShadowedSourcesJar(
-      sourcesJarFile = archiveSourcesFile.get().asFile,
-      sourceSetsSourceDirs = sourceSetsSourceDirs.files,
-      includedSourcesJars = includedSourcesJars.files,
-      relocators = relocators.get() + packageRelocators,
-      unusedClasses = unusedClasses,
-      entryCompression = entryCompression,
-      isZip64 = isZip64,
-      metadataCharset = metadataCharset,
-      preserveFileTimestamps = isPreserveFileTimestamps,
-    )
+    val sourcesJarFile = archiveSourcesFile.get().asFile
+    try {
+      sourcesJarFile
+        .createZipOutputStream(
+          entryCompression = entryCompression,
+          isZip64 = isZip64,
+          encoding = metadataCharset,
+        )
+        .use { zos ->
+          generateShadowedSourcesJar(
+            zos = zos,
+            sourceSetsSourceDirs = sourceSetsSourceDirs.files,
+            includedSourcesJars = includedSourcesJars.files,
+            relocators = relocators.get() + packageRelocators,
+            unusedClasses = unusedClasses,
+            charset = metadataCharset?.let(Charset::forName) ?: Charsets.UTF_8,
+            preserveFileTimestamps = isPreserveFileTimestamps,
+          )
+        }
+    } catch (e: Exception) {
+      sourcesJarFile.delete()
+      throw e
+    }
   }
 
   public companion object {
