@@ -70,12 +70,13 @@ spotless {
   }
 }
 
-@Suppress("UNCHECKED_CAST") // TODO: https://github.com/gradle/gradle/issues/38970
+val testPluginRuntimeOnly = configurations.dependencyScope("testPluginRuntimeOnly")
+
 val testPluginClasspath =
   configurations.resolvable("testPluginClasspath") {
     description = "Plugins used in integration tests could be resolved in classpath."
-    extendsFrom(configurations.compileOnly)
-  } as NamedDomainObjectProvider<Configuration>
+    extendsFrom(configurations.compileOnly, testPluginRuntimeOnly)
+  }
 
 val testKit = sourceSets.register("testKit")
 val testKitImplementation = configurations.named("testKitImplementation")
@@ -138,8 +139,8 @@ dependencies {
   testKitImplementation(gradleTestKit())
   testKitImplementation(libs.assertk)
 
-  testPluginClasspath(libs.foojayResolver)
-  testPluginClasspath(libs.pluginPublish)
+  testPluginRuntimeOnly(libs.foojayResolver)
+  testPluginRuntimeOnly(libs.pluginPublish)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }
