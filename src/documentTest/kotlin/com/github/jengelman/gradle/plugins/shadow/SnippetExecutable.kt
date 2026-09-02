@@ -15,8 +15,6 @@ sealed interface SnippetExecutable {
   val buildScriptName: String
   val assembleDependsOn: String
   val snippet: String
-  /** Unique name for the test, formatted as `publishing/README.md:10`. */
-  val displayName: String
   val sourceLocation: String
 
   fun execute(projectRoot: Path) {
@@ -153,12 +151,12 @@ sealed interface SnippetExecutable {
 }
 
 fun SnippetExecutable(
-  lang: DslLang,
+  lang: String,
   snippet: String,
-  testName: String,
   sourceLocation: String,
 ): SnippetExecutable =
-  when (lang) {
-    DslLang.Groovy -> GroovyBuildExecutable(snippet, testName, sourceLocation)
-    DslLang.Kotlin -> KotlinBuildExecutable(snippet, testName, sourceLocation)
+  when (lang.lowercase()) {
+    "groovy" -> GroovyBuildExecutable(snippet, sourceLocation)
+    "kotlin" -> KotlinBuildExecutable(snippet, sourceLocation)
+    else -> error("Unsupported language: $lang")
   }
