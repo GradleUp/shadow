@@ -38,26 +38,42 @@ internal fun generateShadowedSourcesJar(
             .filter { it.isFile }
             .forEach { file ->
               val relPath = file.relativeTo(srcDir).invariantSeparatorsPath
-              if (isUnused(relPath, { file.readText(charset) }, unusedClasses)) return@forEach
-              if (visitedFiles.add(relPath)) {
-                val relocatedPath = relocators.relocatePath(relPath)
-                val bytes =
-                  if (isSourceFile(relPath)) {
-                    var text = file.readText(charset)
-                    for (relocator in relocators) {
-                      text = relocator.applyToSourceContent(text)
-                    }
-                    text.toByteArray(charset)
-                  } else {
-                    file.readBytes()
+              val isSource = isSourceFile(relPath)
+              if (isSource) {
+                val text = file.readText(charset)
+                val pkg = extractPackage(text)
+                val simpleName = file.name
+                if (isUnused(simpleName, pkg, text, unusedClasses)) return@forEach
+                val canonicalPath =
+                  if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
+                val relocatedPath = relocators.relocatePath(canonicalPath)
+                if (visitedFiles.add(relocatedPath)) {
+                  var transformedText = text
+                  for (relocator in relocators) {
+                    transformedText = relocator.applyToSourceContent(transformedText)
                   }
-                zos.writeEntry(
-                  name = relocatedPath,
-                  preserveLastModified = preserveFileTimestamps,
-                  lastModified = file.lastModified(),
-                  unixMode = UnixMode.file(),
-                ) {
-                  write(bytes)
+                  val bytes = transformedText.toByteArray(charset)
+                  zos.writeEntry(
+                    name = relocatedPath,
+                    preserveLastModified = preserveFileTimestamps,
+                    lastModified = file.lastModified(),
+                    unixMode = UnixMode.file(),
+                  ) {
+                    write(bytes)
+                  }
+                }
+              } else {
+                val relocatedPath = relocators.relocatePath(relPath)
+                if (visitedFiles.add(relocatedPath)) {
+                  val bytes = file.readBytes()
+                  zos.writeEntry(
+                    name = relocatedPath,
+                    preserveLastModified = preserveFileTimestamps,
+                    lastModified = file.lastModified(),
+                    unixMode = UnixMode.file(),
+                  ) {
+                    write(bytes)
+                  }
                 }
               }
             }
@@ -77,34 +93,42 @@ internal fun generateShadowedSourcesJar(
               ) {
                 return@forEach
               }
-              if (
-                isUnused(
-                  name,
-                  { getInputStream(entry).bufferedReader(charset).readText() },
-                  unusedClasses,
-                )
-              ) {
-                return@forEach
-              }
-              val relocatedPath = relocators.relocatePath(name)
-              if (visitedFiles.add(relocatedPath)) {
-                val bytes =
-                  if (isSourceFile(name)) {
-                    var text = getInputStream(entry).bufferedReader(charset).readText()
-                    for (relocator in relocators) {
-                      text = relocator.applyToSourceContent(text)
-                    }
-                    text.toByteArray(charset)
-                  } else {
-                    getInputStream(entry).readBytes()
+              val isSource = isSourceFile(name)
+              if (isSource) {
+                val text = getInputStream(entry).bufferedReader(charset).readText()
+                val pkg = extractPackage(text)
+                val simpleName = name.substringAfterLast('/')
+                if (isUnused(simpleName, pkg, text, unusedClasses)) return@forEach
+                val canonicalPath =
+                  if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
+                val relocatedPath = relocators.relocatePath(canonicalPath)
+                if (visitedFiles.add(relocatedPath)) {
+                  var transformedText = text
+                  for (relocator in relocators) {
+                    transformedText = relocator.applyToSourceContent(transformedText)
                   }
-                zos.writeEntry(
-                  name = relocatedPath,
-                  preserveLastModified = preserveFileTimestamps,
-                  lastModified = entry.time,
-                  unixMode = UnixMode.file(),
-                ) {
-                  write(bytes)
+                  val bytes = transformedText.toByteArray(charset)
+                  zos.writeEntry(
+                    name = relocatedPath,
+                    preserveLastModified = preserveFileTimestamps,
+                    lastModified = entry.time,
+                    unixMode = UnixMode.file(),
+                  ) {
+                    write(bytes)
+                  }
+                }
+              } else {
+                val relocatedPath = relocators.relocatePath(name)
+                if (visitedFiles.add(relocatedPath)) {
+                  val bytes = getInputStream(entry).readBytes()
+                  zos.writeEntry(
+                    name = relocatedPath,
+                    preserveLastModified = preserveFileTimestamps,
+                    lastModified = entry.time,
+                    unixMode = UnixMode.file(),
+                  ) {
+                    write(bytes)
+                  }
                 }
               }
             }
@@ -132,24 +156,30 @@ internal fun generateShadowedSourcesJar(
   }
 }
 
+private val packageRegex = Regex("""(?:^|\n)\s*package\s+([a-zA-Z0-9_.]+)""")
+
 private val jvmNameRegex =
   Regex(
     """@file\s*:\s*(?:\[[^\]]*\b)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
   )
 
-private fun isUnused(
-  path: String,
-  sourceContentProvider: () -> String,
+internal fun extractPackage(text: String): String {
+  val matches = packageRegex.findAll(text).map { it.groupValues[1] }.toList()
+  return if (matches.isEmpty()) "" else matches.joinToString(".")
+}
+
+internal fun isUnused(
+  fileName: String,
+  pkg: String,
+  text: String,
   unusedClasses: Set<String>,
 ): Boolean {
-  if (unusedClasses.isEmpty() || !isSourceFile(path)) return false
-  val simpleName = path.substringAfterLast('/').substringBeforeLast('.')
-  val pkg = path.substringBeforeLast('/', "").replace('/', '.')
+  if (unusedClasses.isEmpty()) return false
+  val simpleName = fileName.substringBeforeLast('.')
   val className = if (pkg.isEmpty()) simpleName else "$pkg.$simpleName"
   if (unusedClasses.contains(className)) return true
 
-  if (path.endsWith(".kt")) {
-    val text = sourceContentProvider()
+  if (fileName.endsWith(".kt")) {
     val customJvmName = jvmNameRegex.find(text)?.groupValues?.get(1)
     val facadeName = customJvmName ?: "${simpleName}Kt"
     val facadeClassName = if (pkg.isEmpty()) facadeName else "$pkg.$facadeName"
