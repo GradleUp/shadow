@@ -18,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.util.GradleModuleMetadata
+import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.coordinate
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
 import com.squareup.moshi.JsonAdapter
@@ -30,6 +31,7 @@ import kotlin.io.path.inputStream
 import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.readText
+import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
 import org.apache.maven.model.Model
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader
@@ -684,6 +686,87 @@ class PublishingTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun publishKmpWithShadowedSources() {
+    path("gradle.properties").writeText("kotlin.stdlib.default.dependency=false")
+    projectScript.writeText(
+      """
+      |plugins {
+      |  id 'org.jetbrains.kotlin.multiplatform'
+      |  id 'com.gradleup.shadow'
+      |  id 'maven-publish'
+      |}
+      |group = 'my'
+      |version = '1.0'
+      |kotlin {
+      |  jvm()
+      |  sourceSets {
+      |    commonMain {
+      |      dependencies {
+      |        implementation 'my:g:1.0'
+      |        compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'
+      |      }
+      |    }
+      |    jvmMain {
+      |      dependencies {
+      |        implementation 'my:h:1.0'
+      |      }
+      |    }
+      |  }
+      |}
+      |$shadowJarTask {
+      |  archiveClassifier = ''
+      |}
+      |publishing {
+      |  repositories {
+      |    maven { url = '${remoteRepoPath.toUri()}' }
+      |  }
+      |  publications {
+      |    shadow(MavenPublication) {
+      |      artifactId = 'my-all'
+      |      artifact($shadowJarTask)
+      |      artifact($shadowJarTask.flatMap { it.archiveSourcesFile })
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+    writeClass(sourceSet = "commonMain", jvmLang = JvmLang.Kotlin, className = "CommonMain")
+    writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "JvmMain")
+
+    publish()
+
+    val artifactRoot = "my/my-all/1.0"
+    assertThat(repoPath(artifactRoot).entries.filter { it.endsWith(".jar") })
+      .containsOnly(
+        "my-all-1.0.jar",
+        "my-all-1.0-sources.jar",
+      )
+
+    assertThat(repoJarPath("$artifactRoot/my-all-1.0.jar")).useAll {
+      containsAtLeast(
+        "my/CommonMain.class",
+        "my/JvmMain.class",
+        "g/G.class",
+        "h/H.class",
+        *manifestEntries,
+      )
+    }
+
+    assertThat(repoJarPath("$artifactRoot/my-all-1.0-sources.jar")).useAll {
+      containsAtLeast(
+        "my/CommonMain.kt",
+        "my/JvmMain.kt",
+        "g/G.java",
+        "h/H.java",
+      )
+    }
+
+    assertPomCommon(repoPath("$artifactRoot/my-all-1.0.pom"), emptyArray())
+    assertThat(repoPath(artifactRoot).entries.filter { it.endsWith(".module") }).isEmpty()
+  }
+
   private fun repoPath(relative: String): Path {
     return remoteRepoPath.resolve(relative).also { check(it.exists()) { "Path not found: $it" } }
   }
@@ -744,10 +827,12 @@ class PublishingTest : BasePluginTest() {
   private fun assertPomCommon(pomPath: Path, coordinates: Array<String> = arrayOf("my:b:1.0")) {
     assertThat(pomReader.read(pomPath)).all {
       transform { it.dependencies.map(Dependency::coordinate) }.containsOnly(*coordinates)
-      // All scopes should be runtime.
-      transform { it.dependencies.map(Dependency::getScope).distinct() }
-        .single()
-        .isEqualTo("runtime")
+      if (coordinates.isNotEmpty()) {
+        // All scopes should be runtime.
+        transform { it.dependencies.map(Dependency::getScope).distinct() }
+          .single()
+          .isEqualTo("runtime")
+      }
     }
   }
 

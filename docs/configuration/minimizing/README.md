@@ -107,6 +107,16 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
 > Alternatively, if you use [R8 Repackaging][r8-repackaging] (e.g. `-repackageclasses`), R8 applies embedded rules
 > natively without needing rule rewriting.
 
+> [!NOTE]
+> **Shadowed Sources JAR and R8**
+>
+> R8 operates directly on compiled JVM bytecode rather than source code. When minimizing with R8 (`minimize { r8 { ... } }`),
+> Shadow cannot determine which source files correspond to classes removed by R8. Therefore, the shadowed sources JAR will
+> contain all relocated source files without responding to R8 shrinking results.
+>
+> If you need unused source files to be filtered out of the shadowed sources JAR, use the default dependency analyzer
+> minimization (`minimize()`) instead.
+
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

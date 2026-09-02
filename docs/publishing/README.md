@@ -515,6 +515,155 @@ customizable properties listed in [Configuring Output Name][configuring-output-n
 We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will
 be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
+## Shadowed Sources JAR
+
+When publishing a shadowed library, consumers and IDEs need a corresponding sources JAR to navigate source code and
+inspect implementations. A standard sources JAR only contains your project's original un-relocated sources, which
+causes broken navigation when consumers reference relocated packages.
+
+Shadow automatically generates a **Shadowed Sources JAR** containing:
+
+- Source files from your project's source sets (`Java`, `Kotlin`, `Groovy`, `Scala`).
+- Source files resolved and merged from all bundled dependencies' `-sources.jar` archives.
+- Relocated package declarations, imports, and symbol references that match your [`relocate`][ShadowJar.relocate] rules.
+- Normalized package directory layout matching the declared `package` in each source file.
+- Automatic filtering: dependencies excluded in `dependencies { exclude(...) }` or unused classes removed via
+  `minimize()` are automatically excluded from the shadowed sources JAR as well.
+
+### Publishing with `withSourcesJar()`
+
+When Gradle's standard `java.withSourcesJar()` is enabled, the Shadow plugin automatically registers the
+`shadowSourcesElements` variant and publishes the shadowed sources JAR alongside the shadowed binary JAR:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+        }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
+The published Maven publication will include both `<artifactId>-<version>-all.jar` and
+`<artifactId>-<version>-all-sources.jar`.
+
+### Customizing the Sources Archive File
+
+The shadowed sources JAR output location is configured via [`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
+which defaults to the same destination and base name as `archiveFile` with `-sources.jar` suffix:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.shadowJar {
+      archiveSourcesFile = layout.buildDirectory.file("custom-libs/my-sources.jar")
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveSourcesFile = layout.buildDirectory.file('custom-libs/my-sources.jar')
+    }
+    ```
+
+### Publishing with Kotlin Multiplatform (KMP)
+
+In Kotlin Multiplatform (KMP) projects, publications are managed by the Kotlin Gradle Plugin (KGP) per target (such as
+the `jvm` publication). You can attach the shadowed sources JAR artifact to the `jvm` Maven publication:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      id("org.jetbrains.kotlin.multiplatform")
+      id("com.gradleup.shadow")
+      `maven-publish`
+    }
+
+    kotlin {
+      jvm()
+    }
+
+    publishing {
+      publications {
+        named<MavenPublication>("jvm") {
+          artifact(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveSourcesFile })
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'org.jetbrains.kotlin.multiplatform'
+      id 'com.gradleup.shadow'
+      id 'maven-publish'
+    }
+
+    kotlin {
+      jvm()
+    }
+
+    publishing {
+      publications {
+        named('jvm', MavenPublication) {
+          artifact tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).flatMap { it.archiveSourcesFile }
+        }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
 ## Generating Javadoc or Dokka from Shadowed Sources
 
 When creating fat / shadowed libraries, you may want to generate a complete Javadoc or Dokka JAR covering both your
@@ -592,6 +741,8 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[ShadowJar.archiveSourcesFile]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/archive-sources-file.html
+[ShadowJar.relocate]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocate.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
 [configuring-output-name]: ../configuration/README.md#configuring-output-name
