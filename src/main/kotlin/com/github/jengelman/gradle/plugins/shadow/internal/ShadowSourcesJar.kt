@@ -11,6 +11,7 @@ internal fun generateShadowedSourcesJar(
   sourceSetsSourceDirs: Iterable<File>,
   includedSourcesJars: Iterable<File>,
   relocators: Iterable<Relocator>,
+  unusedClasses: Set<String> = emptySet(),
   entryCompression: ZipEntryCompression,
   isZip64: Boolean,
   metadataCharset: String?,
@@ -37,6 +38,7 @@ internal fun generateShadowedSourcesJar(
             .filter { it.isFile }
             .forEach { file ->
               val relPath = file.relativeTo(srcDir).invariantSeparatorsPath
+              if (isUnused(relPath, { file.readText(charset) }, unusedClasses)) return@forEach
               if (visitedFiles.add(relPath)) {
                 val relocatedPath = relocators.relocatePath(relPath)
                 val bytes =
@@ -72,6 +74,15 @@ internal fun generateShadowedSourcesJar(
                   name.startsWith("META-INF/INDEX.LIST") ||
                   (name.startsWith("META-INF/") &&
                     (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
+              ) {
+                return@forEach
+              }
+              if (
+                isUnused(
+                  name,
+                  { getInputStream(entry).bufferedReader(charset).readText() },
+                  unusedClasses,
+                )
               ) {
                 return@forEach
               }
@@ -119,6 +130,33 @@ internal fun generateShadowedSourcesJar(
     sourcesJarFile.delete()
     throw e
   }
+}
+
+private val jvmNameRegex =
+  Regex(
+    """@file\s*:\s*(?:\[[^\]]*\b)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
+  )
+
+private fun isUnused(
+  path: String,
+  sourceContentProvider: () -> String,
+  unusedClasses: Set<String>,
+): Boolean {
+  if (unusedClasses.isEmpty() || !isSourceFile(path)) return false
+  val simpleName = path.substringAfterLast('/').substringBeforeLast('.')
+  val pkg = path.substringBeforeLast('/', "").replace('/', '.')
+  val className = if (pkg.isEmpty()) simpleName else "$pkg.$simpleName"
+  if (unusedClasses.contains(className)) return true
+
+  if (path.endsWith(".kt")) {
+    val text = sourceContentProvider()
+    val customJvmName = jvmNameRegex.find(text)?.groupValues?.get(1)
+    val facadeName = customJvmName ?: "${simpleName}Kt"
+    val facadeClassName = if (pkg.isEmpty()) facadeName else "$pkg.$facadeName"
+    if (unusedClasses.contains(facadeClassName)) return true
+  }
+
+  return false
 }
 
 private fun isSourceFile(path: String): Boolean {

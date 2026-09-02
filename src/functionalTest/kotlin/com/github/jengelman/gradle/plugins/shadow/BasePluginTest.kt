@@ -131,6 +131,58 @@ abstract class BasePluginTest {
                 )
               }
             }
+          val h =
+            jarModule("my", "h", "1.0") {
+              buildJar {
+                insert("h/H.class", createEmptyClassBytes("h/H"))
+                insert("h/UnusedH.class", createEmptyClassBytes("h/UnusedH"))
+              }
+              buildSourcesJar {
+                insert(
+                  "h/H.java",
+                  """
+                  |package h;
+                  |public class H {}
+                  """
+                    .trimMargin(),
+                )
+                insert(
+                  "h/UnusedH.java",
+                  """
+                  |package h;
+                  |public class UnusedH {}
+                  """
+                    .trimMargin(),
+                )
+              }
+            }
+          val k =
+            jarModule("my", "k", "1.0") {
+              buildJar {
+                insert("k/CustomUtils.class", createEmptyClassBytes("k/CustomUtils"))
+                insert("k/CustomUnusedUtils.class", createEmptyClassBytes("k/CustomUnusedUtils"))
+              }
+              buildSourcesJar {
+                insert(
+                  "k/Utils.kt",
+                  """
+                  |@file:JvmName("CustomUtils")
+                  |package k
+                  |fun util() {}
+                  """
+                    .trimMargin(),
+                )
+                insert(
+                  "k/UnusedUtils.kt",
+                  """
+                  |@file:JvmName("CustomUnusedUtils")
+                  |package k
+                  |fun unusedUtil() {}
+                  """
+                    .trimMargin(),
+                )
+              }
+            }
           bomModule("my", "bom", "1.0") {
             addDependency(a)
             addDependency(b)
@@ -139,6 +191,8 @@ abstract class BasePluginTest {
             addDependency(e)
             addDependency(f)
             addDependency(g)
+            addDependency(h)
+            addDependency(k)
           }
         }
     localRepo.publish()

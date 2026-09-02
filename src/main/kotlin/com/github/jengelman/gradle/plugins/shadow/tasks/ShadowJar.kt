@@ -570,15 +570,16 @@ public abstract class ShadowJar : Jar() {
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
-        findUnusedClasses(
-          sourceSetsClassesDirs = sourceSetsClassesDirs,
-          classJars = apiJars,
-          toMinimize = toMinimize,
-          dependencies = includedDependencies,
-        )
-      } else {
-        emptySet()
-      }
+          findUnusedClasses(
+            sourceSetsClassesDirs = sourceSetsClassesDirs,
+            classJars = apiJars,
+            toMinimize = toMinimize,
+            dependencies = includedDependencies,
+          )
+        } else {
+          emptySet()
+        }
+        .also { this.unusedClasses = it }
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -772,6 +773,8 @@ public abstract class ShadowJar : Jar() {
     )
   }
 
+  private var unusedClasses: Set<String> = emptySet()
+
   private fun generateShadowedSourcesJar() {
     if (!archiveSourcesFile.isPresent) return
     generateShadowedSourcesJar(
@@ -779,6 +782,7 @@ public abstract class ShadowJar : Jar() {
       sourceSetsSourceDirs = sourceSetsSourceDirs.files,
       includedSourcesJars = includedSourcesJars.files,
       relocators = relocators.get() + packageRelocators,
+      unusedClasses = unusedClasses,
       entryCompression = entryCompression,
       isZip64 = isZip64,
       metadataCharset = metadataCharset,

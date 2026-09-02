@@ -126,6 +126,46 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun minimizeSourcesJar() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |import h.H;
+        |import k.CustomUtils;
+        |public class Main {
+        |  H h;
+        |  CustomUtils u;
+        |}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:h:1.0'
+      |  implementation 'my:k:1.0'
+      |}
+      |$shadowJarTask {
+      |  minimize()
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsAtLeast("my/Main.class", "h/H.class", "k/CustomUtils.class")
+      containsNone("h/UnusedH.class", "k/CustomUnusedUtils.class")
+    }
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsAtLeast("my/Main.java", "h/H.java", "k/Utils.kt")
+      containsNone("h/UnusedH.java", "k/UnusedUtils.kt")
+    }
+  }
+
   /**
    * 'Client', 'Server' and 'junit' are independent. 'junit' is excluded from the minimize step. The
    * minimize step shall remove 'Client' but not 'junit'.
