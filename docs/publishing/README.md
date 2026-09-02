@@ -520,17 +520,17 @@ be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 When creating fat / shadowed libraries, you may want to generate a complete Javadoc or Dokka JAR covering both your
 project sources and shadowed dependency sources with relocated packages.
 
-Because `shadowJar` outputs the shadowed sources archive at `archiveSourcesFile` (where relocated packages and
-source contents have already been transformed), you can configure the `javadoc` task (or Dokka task) to consume the
-shadowed sources and classes directly from `shadowJar`. The generated documentation will reflect the relocated package
-names (e.g. `shadow.g.G` instead of `g.G`).
+Because `shadowJar` outputs the shadowed sources archive at `archiveSourcesFile` (where relocated packages and source
+contents have already been transformed), you can configure the `javadoc` task (or Dokka task) to consume the shadowed
+sources and classes directly from `shadowJar`. The generated documentation will reflect the relocated package names
+(e.g. `shadow.com.Example` instead of `com.Example`).
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.javadoc {
-      source = zipTree(tasks.shadowJar.flatMap { it.archiveSourcesFile })
       classpath = files(tasks.shadowJar.flatMap { it.archiveFile })
+      source = zipTree(tasks.shadowJar.flatMap { it.archiveSourcesFile })
     }
     ```
 
@@ -538,8 +538,8 @@ names (e.g. `shadow.g.G` instead of `g.G`).
 
     ```groovy
     tasks.named('javadoc', Javadoc) {
-      source = zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
       classpath = files(tasks.named('shadowJar').flatMap { it.archiveFile })
+      source = zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
     }
     ```
 
@@ -550,8 +550,8 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
     ```kotlin
     plugins {
       kotlin("jvm")
-      id("com.gradleup.shadow")
       id("org.jetbrains.dokka")
+      id("com.gradleup.shadow")
     }
 
     val extractShadowedSources = tasks.register<Sync>("extractShadowedSources") {
@@ -561,8 +561,8 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 
     dokka {
       dokkaSourceSets.configureEach {
-        sourceRoots.setFrom(extractShadowedSources.map { it.destinationDir })
         classpath.setFrom(tasks.shadowJar.flatMap { it.archiveFile })
+        sourceRoots.setFrom(extractShadowedSources.map { it.destinationDir })
       }
     }
     ```
@@ -572,8 +572,8 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
     ```groovy
     plugins {
       id 'org.jetbrains.kotlin.jvm'
-      id 'com.gradleup.shadow'
       id 'org.jetbrains.dokka'
+      id 'com.gradleup.shadow'
     }
 
     tasks.register('extractShadowedSources', Sync) {
@@ -583,8 +583,8 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 
     dokka {
       dokkaSourceSets.configureEach {
-        sourceRoots.from(extractShadowedSources.map { it.destinationDir })
         classpath.from(tasks.named('shadowJar').flatMap { it.archiveFile })
+        sourceRoots.from(extractShadowedSources.map { it.destinationDir })
       }
     }
     ```
