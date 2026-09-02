@@ -9,6 +9,10 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
+/**
+ * TODO: blocked by https://github.com/gradle/test-retry-gradle-plugin/issues/540 or
+ *   https://github.com/gradle/test-retry-gradle-plugin/issues/152
+ */
 abstract class GenerateDocTests : DefaultTask() {
   @get:InputDirectory
   @get:PathSensitive(PathSensitivity.RELATIVE)
