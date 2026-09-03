@@ -19,7 +19,9 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
 import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.component.SoftwareComponentFactory
+import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 
@@ -113,18 +115,36 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
-      variant.mapToMavenScope("runtime")
+    shadowComponent.addVariants(
+      outgoingConfiguration = shadowRuntimeElements,
+      logger = logger,
+    ) {
+      mapToMavenScope("runtime")
     }
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
-      component.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
-        variant.mapToOptional()
-        if (shadow.addShadowVariantIntoJavaComponent.get()) {
-          logger.info("Adding {} variant to Java component.", shadowRuntimeElements.name)
-        } else {
-          logger.info("Skipping adding {} variant to Java component.", shadowRuntimeElements.name)
-          variant.skip()
-        }
+      component.addVariants(
+        outgoingConfiguration = shadowRuntimeElements,
+        logger = logger,
+        shouldAdd = shadow.addShadowVariantIntoJavaComponent::get,
+      ) {
+        mapToOptional()
+      }
+    }
+  }
+
+  private fun AdhocComponentWithVariants.addVariants(
+    outgoingConfiguration: NamedDomainObjectProvider<ConsumableConfiguration>,
+    logger: Logger,
+    shouldAdd: () -> Boolean = { true },
+    action: ConfigurationVariantDetails.() -> Unit,
+  ) {
+    addVariantsFromConfiguration(outgoingConfiguration) { variant ->
+      if (shouldAdd()) {
+        logger.info("Adding {} variant to {} component.", outgoingConfiguration.name, name)
+        variant.action()
+      } else {
+        logger.info("Skipping adding {} variant to {} component.", outgoingConfiguration.name, name)
+        variant.skip()
       }
     }
   }
