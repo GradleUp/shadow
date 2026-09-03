@@ -110,6 +110,7 @@ class JavaPluginsTest : BasePluginTest() {
 
     assertThat(result.output.substringAfter("Options\n").substringBefore("\n\nDescription"))
       .isEqualTo(
+        // If the expected options are modified, also update docs/getting-started/README.md.
         """
         |     --add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.
         |
