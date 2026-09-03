@@ -20,7 +20,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.minimizeWithR8
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
-import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.internal.sourceSetsOrNull
 import com.github.jengelman.gradle.plugins.shadow.internal.useZip
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -139,14 +139,10 @@ public abstract class ShadowJar : Jar() {
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    _minimizeJar.map {
-      if (it) {
-        project.sourceSets.map { sourceSet ->
-          sourceSet.output.classesDirs.filter(File::isDirectory)
-        }
-      } else {
-        emptySet()
-      }
+    project.provider {
+      project.sourceSetsOrNull?.map { sourceSet ->
+        sourceSet.output.classesDirs.filter(File::isDirectory)
+      } ?: emptySet<File>()
     }
   }
 
