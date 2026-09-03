@@ -2,7 +2,7 @@
 
 The built in [`ShadowJar`][ShadowJar] task only provides an output for the `main` source set of the project. It is
 possible to add arbitrary [`ShadowJar`][ShadowJar] tasks to a project. When doing so, ensure that the
-[`configurations`][ShadowJar.configurations] property is specified to inform Shadow which dependencies to merge into the
+[`mergedDependencies`][ShadowJar.mergedDependencies] property is specified to inform Shadow which dependencies to merge into the
 output.
 
 === ":material-language-kotlin: build.gradle.kts"
@@ -13,7 +13,7 @@ output.
 
       archiveClassifier = "test"
       from(sourceSets.test.map { it.output })
-      configurations = project.configurations.testRuntimeClasspath.map { listOf(it) }
+      mergedDependencies.setFrom(project.configurations.testRuntimeClasspath)
 
       manifest {
         // Optionally, set the main class for the JAR.
@@ -36,7 +36,7 @@ output.
 
       archiveClassifier = 'test'
       from sourceSets.named('test').map { it.output }
-      configurations = project.configurations.named('testRuntimeClasspath').map { [it] }
+      mergedDependencies.setFrom project.configurations.named('testRuntimeClasspath')
 
       manifest {
         // Optionally, set the main class for the JAR.
@@ -59,7 +59,7 @@ The code snippet above will generate a shadowed JAR containing both the `main` a
 
 It is also possible to create a shadow JAR that contains *only* the dependencies and none of the project's own source
 code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task and configuring the
-[`configurations`][ShadowJar.configurations] property, but **not** adding any project sources with `from(...)`.
+[`mergedDependencies`][ShadowJar.mergedDependencies] property, but **not** adding any project sources with `from(...)`.
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -67,7 +67,7 @@ code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task an
     val dependencyShadowJar = tasks.register<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("dependencyShadowJar") {
       description = "Create a shadow JAR of all dependencies"
       archiveClassifier = "dep"
-      configurations = project.configurations.runtimeClasspath.map { listOf(it) }
+      mergedDependencies.setFrom(project.configurations.runtimeClasspath)
     }
     ```
 
@@ -77,7 +77,7 @@ code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task an
     tasks.register('dependencyShadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       description = 'Create a shadow JAR of all dependencies'
       archiveClassifier = 'dep'
-      configurations = project.configurations.named('runtimeClasspath').map { [it] }
+      mergedDependencies.setFrom project.configurations.named('runtimeClasspath')
     }
     ```
 
@@ -86,5 +86,5 @@ configuration. The standard `jar` task will still produce a JAR with only the pr
 
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
-[ShadowJar.configurations]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/configurations.html
+[ShadowJar.mergedDependencies]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/merged-dependencies.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html

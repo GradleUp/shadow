@@ -7,6 +7,7 @@ import org.gradle.api.artifacts.Dependency
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.artifacts.ResolvedArtifact
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.Provider
 import org.gradle.api.specs.Spec
@@ -22,6 +23,13 @@ public interface DependencyFilter {
    * the results.
    */
   public fun resolve(configurations: Collection<Configuration>): FileCollection
+
+  /**
+   * Resolve a [ConfigurableFileCollection] against the [include]/[exclude] rules in the filter.
+   *
+   * Any [Configuration] sources within the collection are resolved individually and combined.
+   */
+  public fun resolve(dependencies: ConfigurableFileCollection): FileCollection
 
   /** Exclude dependencies that match the provided [spec]. */
   public fun exclude(spec: Spec<ResolvedDependency>)
@@ -72,6 +80,39 @@ public interface DependencyFilter {
         .map { resolve(it) }
         .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
     }
+
+    override fun resolve(dependencies: ConfigurableFileCollection): FileCollection {
+      val extracted = dependencies.from.flatMap { source -> extractConfigurations(source) }
+      val excludedFiles =
+        project.files(
+          project.provider {
+            val includes = mutableSetOf<ResolvedDependency>()
+            val excludes = mutableSetOf<ResolvedDependency>()
+            extracted.forEach { config ->
+              resolve(
+                dependencies = config.resolvedConfiguration.firstLevelModuleDependencies,
+                includedDependencies = includes,
+                excludedDependencies = excludes,
+              )
+            }
+            excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
+          }
+        )
+      return dependencies - excludedFiles
+    }
+
+    private fun extractConfigurations(source: Any): List<Configuration> =
+      when (source) {
+        is Configuration -> listOf(source)
+        is Provider<*> ->
+          when (val value = source.orNull) {
+            is Configuration -> listOf(value)
+            is Iterable<*> -> value.filterIsInstance<Configuration>()
+            else -> emptyList()
+          }
+        is Iterable<*> -> source.filterIsInstance<Configuration>()
+        else -> emptyList()
+      }
 
     override fun exclude(spec: Spec<ResolvedDependency>) {
       excludeSpecs.add(spec)
