@@ -8,7 +8,6 @@ import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.GradleException
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 
 @JvmInline
@@ -81,7 +80,7 @@ internal inline fun ZipOutputStream.writeEntry(
   write: ZipOutputStream.() -> Unit = {},
 ) {
   if (name.split('/', '\\').any { it == ".." }) {
-    throw GradleException("Malicious ZIP entry containing path traversal sequence: $name")
+    gradleError("Malicious ZIP entry containing path traversal sequence: $name")
   }
 
   val entry =

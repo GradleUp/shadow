@@ -6,6 +6,7 @@ package com.github.jengelman.gradle.plugins.shadow.tasks
 
 import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.entries
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
@@ -17,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContex
 import java.io.File
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.internal.file.CopyActionProcessingStreamAction
 import org.gradle.api.internal.file.copy.CopyAction
@@ -59,7 +59,7 @@ internal constructor(
       try {
         zosProvider(zipFile)
       } catch (e: Exception) {
-        throw GradleException("Could not create ZIP '$zipFile'.", e)
+        gradleError("Could not create ZIP '$zipFile'.", e)
       },
     transformers = transformers,
     relocators = relocators,
@@ -143,7 +143,7 @@ internal constructor(
         duplicates.entries.joinToString(separator = "\n") { "${it.key} (${it.value} times)" }
       val message = "Duplicate entries found in the shadowed JAR: \n$dupEntries"
       if (failOnDuplicateEntries) {
-        throw GradleException(message)
+        gradleError(message)
       } else {
         logger.warn(message)
       }
@@ -164,7 +164,7 @@ internal constructor(
           visitFile(details)
         }
       } catch (e: Exception) {
-        throw GradleException("Could not add $details to ZIP '$zipFile'.", e)
+        gradleError("Could not add $details to ZIP '$zipFile'.", e)
       }
     }
 
@@ -204,6 +204,7 @@ internal constructor(
 
     private fun transform(fileDetails: FileCopyDetails, path: String): Boolean {
       val transformer = transformers.find { it.canTransformResource(fileDetails) } ?: return false
+      logger.debug("Transforming resource '{}' using {}.", path, transformer::class.simpleName)
       fileDetails.inputStream().use { inputStream ->
         transformer.transform(
           TransformerContext(path = path, inputStream = inputStream, relocators = relocators)

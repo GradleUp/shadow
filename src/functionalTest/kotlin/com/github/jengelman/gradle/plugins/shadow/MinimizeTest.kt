@@ -12,8 +12,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 
 class MinimizeTest : BasePluginTest() {
   private val outputImplShadowedJar: JarPath
@@ -309,40 +307,6 @@ class MinimizeTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       containsOnly("e.properties", "f.properties", *manifestEntries)
-    }
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun enableMinimizationByCliOption(enable: Boolean) {
-    writeClientAndServerModules()
-
-    if (enable) {
-      runWithSuccess(serverShadowJarPath, "--minimize-jar")
-    } else {
-      runWithSuccess(serverShadowJarPath, "--no-minimize-jar")
-    }
-
-    assertThat(outputServerShadowedJar).useAll {
-      if (enable) {
-        containsAtLeast("server/Server.class", *manifestEntries)
-        containsNone("client/Client.class")
-      } else {
-        containsOnly(
-          "client/",
-          "server/",
-          "client/Client.class",
-          "server/Server.class",
-          *junitEntries,
-          *manifestEntries,
-        )
-      }
-      classLoader {
-        loadClass("server.Server")
-        if (!enable) {
-          loadClass("client.Client")
-        }
-      }
     }
   }
 

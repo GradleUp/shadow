@@ -3,8 +3,8 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.KOTLIN_MULTIPLATFORM_PLUGIN_ID
 import com.github.jengelman.gradle.plugins.shadow.internal.addBuildScanCustomValues
 import com.github.jengelman.gradle.plugins.shadow.internal.findOptionalProperty
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.legacy.LegacyShadowPlugin
-import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -19,7 +19,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
       withId("org.gradle.application") { apply(ShadowApplicationPlugin::class.java) }
       withId(KOTLIN_MULTIPLATFORM_PLUGIN_ID) { apply(ShadowKmpPlugin::class.java) }
       withId("com.android.base") {
-        throw GradleException(
+        gradleError(
           "Shadow does not support being used with AGP. You may need the Android Fused Library plugin instead. " +
             "See https://developer.android.com/build/publish-library/fused-library"
         )
@@ -37,12 +37,8 @@ public abstract class ShadowPlugin : Plugin<Project> {
   private fun Project.configureBuildScan() {
     val enableDevelocityIntegration =
       findOptionalProperty(ENABLE_DEVELOCITY_INTEGRATION_PROPERTY)?.toBoolean() ?: false
-    if (enableDevelocityIntegration) {
-      logger.info("Enabling Develocity integration for Shadow plugin.")
-    } else {
-      logger.info("Skipping Develocity integration for Shadow plugin.")
-      return
-    }
+    if (!enableDevelocityIntegration) return
+    logger.info("Enabling Develocity integration for Shadow plugin.")
     addBuildScanCustomValues()
   }
 

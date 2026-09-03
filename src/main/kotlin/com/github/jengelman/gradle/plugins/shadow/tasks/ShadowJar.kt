@@ -13,6 +13,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.generateShadowedSourcesJar
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
@@ -40,7 +41,6 @@ import java.util.zip.ZipException
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
 import org.gradle.api.Action
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
@@ -603,16 +603,19 @@ public abstract class ShadowJar : Jar() {
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
     val unusedClasses =
       if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
-          findUnusedClasses(
-            sourceSetsClassesDirs = sourceSetsClassesDirs,
-            classJars = apiJars,
-            toMinimize = toMinimize,
-            dependencies = includedDependencies,
-          )
-        } else {
-          emptySet()
-        }
-        .also { this.unusedClasses = it }
+        findUnusedClasses(
+          sourceSetsClassesDirs = sourceSetsClassesDirs,
+          classJars = apiJars,
+          toMinimize = toMinimize,
+          dependencies = includedDependencies,
+        )
+      } else {
+        emptySet()
+      }
+    if (unusedClasses.isNotEmpty()) {
+      logger.info("Found {} unused classes to drop for minimization.", unusedClasses.size)
+    }
+    this.unusedClasses = unusedClasses
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -671,15 +674,7 @@ public abstract class ShadowJar : Jar() {
 
   private val packageRelocators: List<SimpleRelocator>
     get() {
-      if (enableAutoRelocation.get()) {
-        logger.info(
-          "Adding auto relocation packages in the dependencies with prefix '{}'.",
-          relocationPrefix.get(),
-        )
-      } else {
-        logger.info("Skipping package relocators as auto relocation is disabled.")
-        return emptyList()
-      }
+      if (!enableAutoRelocation.get()) return emptyList()
       val prefix = relocationPrefix.get()
       return includedDependencies.flatMap { file ->
         file.useZip {
@@ -710,6 +705,7 @@ public abstract class ShadowJar : Jar() {
           logger.info("Skipping non-existent dependency: {}", file)
         }
         file.isDirectory -> {
+          logger.debug("Including dependency: {}", file)
           from(file)
         }
         file.isAar() -> {
@@ -720,9 +716,10 @@ public abstract class ShadowJar : Jar() {
             or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
           """
               .trimIndent()
-          throw GradleException(message)
+          gradleError(message)
         }
         else -> {
+          logger.debug("Including dependency: {}", file)
           from(archiveOperations.zipTree(file))
         }
       }
@@ -758,21 +755,16 @@ public abstract class ShadowJar : Jar() {
     val shadowFiles = shadowDependencies.get()
     if (!shadowFiles.isEmpty) {
       val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
-      manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
+      val classPathValue = attrs.joinToString(" ").trim()
+      manifest.attributes[classPathAttributeKey] = classPathValue
+      logger.info(
+        "Adding {} attribute to the manifest with value '{}'.",
+        classPathAttributeKey,
+        classPathValue,
+      )
     }
 
-    if (addMultiReleaseAttribute.get()) {
-      logger.info(
-        "Adding {} attribute to the manifest if any dependencies contain it.",
-        multiReleaseAttributeKey,
-      )
-    } else {
-      logger.info(
-        "Skipping adding {} attribute to the manifest as it is disabled.",
-        multiReleaseAttributeKey,
-      )
-      return
-    }
+    if (!addMultiReleaseAttribute.get()) return
     val includeMultiReleaseAttr = includedDependencies.any {
       try {
         JarFile(it).use { jarFile ->
@@ -787,6 +779,7 @@ public abstract class ShadowJar : Jar() {
     }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
+      logger.info("Adding {} attribute to the manifest.", multiReleaseAttributeKey)
     }
   }
 
