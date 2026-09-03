@@ -164,12 +164,11 @@ internal fun generateShadowedSourcesJar(
   }
 }
 
-private val packageRegex = Regex("""(?:^|\n)\s*package\s+([a-zA-Z0-9_.]+)""")
+private val packageRegex = """(?:^|\n)\s*package\s+([a-zA-Z0-9_.]+)""".toRegex()
 
 private val jvmNameRegex =
-  Regex(
-    """@file\s*:\s*(?:\[[^\]]*\b)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
-  )
+  """@file\s*:\s*(?:\[[^]]*\b)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
+    .toRegex()
 
 internal fun extractPackage(text: String): String {
   val matches = packageRegex.findAll(text).map { it.groupValues[1] }.toList()
