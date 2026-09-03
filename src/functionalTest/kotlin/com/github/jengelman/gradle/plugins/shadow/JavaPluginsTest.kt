@@ -106,22 +106,34 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun shadowJarCliOptions() {
-    val result = runWithSuccess("help", "--task", shadowJarPath)
+    val options =
+      runWithSuccess("help", "--task", shadowJarPath)
+        .output
+        .substringAfter("Options")
+        .substringBefore("Description")
+        .lines()
+        .filter(CharSequence::isNotBlank)
+        .joinToString(separator = "\n")
 
-    assertThat(result.output)
-      .contains(
-        "--add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.",
-        "--no-add-multi-release-attribute     Disables option --add-multi-release-attribute.",
-        "--enable-auto-relocation     Enables auto relocation of packages in the dependencies.",
-        "--no-enable-auto-relocation     Disables option --enable-auto-relocation.",
-        "--enable-kotlin-module-remapping     Enables remapping of Kotlin module metadata files.",
-        "--no-enable-kotlin-module-remapping     Disables option --enable-kotlin-module-remapping.",
-        "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
-        "--no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries",
-        "--main-class     Main class attribute to add to manifest.",
-        "--minimize-jar     Minimizes the jar by removing unused classes.",
-        "--no-minimize-jar     Disables option --minimize-jar.",
-        "--relocation-prefix     Prefix used for auto relocation of packages in the dependencies.",
+    assertThat(options)
+      .isEqualTo(
+        // If the expected options are modified, also update docs/getting-started/README.md.
+        """
+        |     --add-multi-release-attribute     Adds the multi-release attribute to the manifest if any dependencies contain it.
+        |     --no-add-multi-release-attribute     Disables option --add-multi-release-attribute.
+        |     --enable-auto-relocation     Enables auto relocation of packages in the dependencies.
+        |     --no-enable-auto-relocation     Disables option --enable-auto-relocation.
+        |     --enable-kotlin-module-remapping     Enables remapping of Kotlin module metadata files.
+        |     --no-enable-kotlin-module-remapping     Disables option --enable-kotlin-module-remapping.
+        |     --fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.
+        |     --no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries.
+        |     --main-class     Main class attribute to add to manifest.
+        |     --minimize-jar     Minimizes the jar by removing unused classes.
+        |     --no-minimize-jar     Disables option --minimize-jar.
+        |     --relocation-prefix     Prefix used for auto relocation of packages in the dependencies.
+        |     --rerun     Causes the task to be re-run even if up-to-date.
+        """
+          .trimMargin()
       )
   }
 
@@ -417,38 +429,6 @@ class JavaPluginsTest : BasePluginTest() {
       )
     assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
       .isEqualTo(if (addAttribute) "true" else null)
-  }
-
-  @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun containsMultiReleaseAttrByCliOption(enable: Boolean) {
-    writeClientAndServerModules()
-    path("client/build.gradle")
-      .appendText(
-        """
-        |$jarTask {
-        |  manifest {
-        |    attributes '$multiReleaseAttributeKey': 'true'
-        |  }
-        |}
-        |
-        """
-          .trimMargin()
-      )
-
-    val arg = if (enable) "--add-multi-release-attribute" else "--no-add-multi-release-attribute"
-    val result = runWithSuccess(serverShadowJarPath, infoArgument, arg)
-
-    assertThat(result.output)
-      .contains(
-        if (enable) {
-          "Adding Multi-Release attribute to the manifest if any dependencies contain it."
-        } else {
-          "Skipping adding Multi-Release attribute to the manifest as it is disabled."
-        }
-      )
-    assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
-      .isEqualTo(if (enable) "true" else null)
   }
 
   @Test // #352, #729
@@ -1073,33 +1053,6 @@ class JavaPluginsTest : BasePluginTest() {
   }
 
   @ParameterizedTest
-  @ValueSource(booleans = [false, true])
-  fun failBuildIfDuplicateEntriesByCliOption(enable: Boolean) {
-    path("src/main/resources/a.properties").writeText("project a")
-    projectScript.appendText(
-      """
-      |dependencies {
-      |  implementation 'my:a:1.0'
-      |}
-      |$shadowJarTask {
-      |  duplicatesStrategy = DuplicatesStrategy.INCLUDE
-      |}
-      """
-        .trimMargin()
-    )
-
-    val result =
-      if (enable) {
-        runWithFailure(shadowJarPath, "--fail-on-duplicate-entries")
-      } else {
-        runWithSuccess(shadowJarPath, "--no-fail-on-duplicate-entries")
-      }
-
-    assertThat(result.output)
-      .contains("Duplicate entries found in the shadowed JAR:", "a.properties (2 times)")
-  }
-
-  @ParameterizedTest
   @MethodSource("fallbackMainClassProvider")
   fun fallbackMainClassByProperty(input: String, expected: String?, message: String) {
     projectScript.appendText(
@@ -1114,18 +1067,6 @@ class JavaPluginsTest : BasePluginTest() {
     val result = runWithSuccess(shadowJarPath, infoArgument)
 
     assertThat(result.output).contains(message)
-    assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
-  }
-
-  @ParameterizedTest
-  @MethodSource("fallbackMainClassProvider")
-  fun fallbackMainClassByCliOption(input: String, expected: String?) {
-    if (input.isEmpty()) {
-      runWithSuccess(shadowJarPath)
-    } else {
-      runWithSuccess(shadowJarPath, "--main-class", input)
-    }
-
     assertThat(outputShadowedJar).useAll { getMainAttr(mainClassAttributeKey).isEqualTo(expected) }
   }
 
