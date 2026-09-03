@@ -546,6 +546,7 @@ public abstract class ShadowJar : Jar() {
           classJars = apiJars,
           toMinimize = toMinimize,
           dependencies = includedDependencies,
+          resourcesDirs = sourceSetsResourcesDirs,
         )
       } else {
         emptySet()
@@ -605,6 +606,16 @@ public abstract class ShadowJar : Jar() {
 
   private val _minimizeJar
     get() = @Suppress("DEPRECATION") minimizeJar
+
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  private val sourceSetsResourcesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
+    project.provider {
+      project.sourceSetsOrNull?.map { sourceSet ->
+        sourceSet.output.resourcesDir?.takeIf(File::isDirectory)
+      } ?: emptySet<File>()
+    }
+  }
 
   private val isR8Enabled: Boolean
     get() = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8

@@ -298,6 +298,178 @@ class MinimizeTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun keepServiceImplementationsWhenServiceInterfaceIsUsed() {
+    settingsScript.appendText(
+      """
+      |include 'used-service', 'unused-service', 'dependency-service', 'app'
+      |"""
+        .trimMargin()
+    )
+    projectScript.deleteExisting()
+
+    path("unused-service/src/main/java/unused/UnusedServiceInterface.java")
+      .writeText(
+        """
+        |package unused;
+        |public interface UnusedServiceInterface {}
+        |"""
+          .trimMargin()
+      )
+    path("unused-service/src/main/java/unused/UnusedServiceClass.java")
+      .writeText(
+        """
+        |package unused;
+        |public class UnusedServiceClass implements UnusedServiceInterface {}
+        |"""
+          .trimMargin()
+      )
+    path("unused-service/src/main/resources/META-INF/services/unused.UnusedServiceInterface")
+      .writeText("unused.UnusedServiceClass\n")
+    path("unused-service/build.gradle")
+      .writeText(
+        """
+        |plugins {
+        |  id 'java'
+        |}
+        |"""
+          .trimMargin()
+      )
+
+    path("dependency-service/src/main/java/dep/DependencyServiceInterface.java")
+      .writeText(
+        """
+        |package dep;
+        |public interface DependencyServiceInterface {}
+        |"""
+          .trimMargin()
+      )
+    path("dependency-service/src/main/java/dep/DependencyServiceClass.java")
+      .writeText(
+        """
+        |package dep;
+        |public class DependencyServiceClass implements DependencyServiceInterface {}
+        |"""
+          .trimMargin()
+      )
+    path("dependency-service/src/main/java/dep/DependencyUnreferencedClass.java")
+      .writeText(
+        """
+        |package dep;
+        |public class DependencyUnreferencedClass {}
+        |"""
+          .trimMargin()
+      )
+    path("dependency-service/src/main/resources/META-INF/services/dep.DependencyServiceInterface")
+      .writeText("dep.DependencyServiceClass\n")
+    path("dependency-service/build.gradle")
+      .writeText(
+        """
+        |plugins {
+        |  id 'java'
+        |}
+        |"""
+          .trimMargin()
+      )
+
+    path("used-service/src/main/java/used/SomeServiceInterface.java")
+      .writeText(
+        """
+        |package used;
+        |public interface SomeServiceInterface {}
+        |"""
+          .trimMargin()
+      )
+    path("used-service/src/main/java/used/SomeServiceClass.java")
+      .writeText(
+        """
+        |package used;
+        |import dep.DependencyServiceInterface;
+        |public class SomeServiceClass implements SomeServiceInterface {
+        |  private final Class<?> dep = DependencyServiceInterface.class;
+        |}
+        |"""
+          .trimMargin()
+      )
+    path("used-service/src/main/java/used/SomeUnreferencedClass.java")
+      .writeText(
+        """
+        |package used;
+        |public class SomeUnreferencedClass {}
+        |"""
+          .trimMargin()
+      )
+    path("used-service/src/main/resources/META-INF/services/used.SomeServiceInterface")
+      .writeText("used.SomeServiceClass\n")
+    path("used-service/build.gradle")
+      .writeText(
+        """
+        |plugins {
+        |  id 'java'
+        |}
+        |dependencies {
+        |  implementation project(':dependency-service')
+        |}
+        |"""
+          .trimMargin()
+      )
+
+    path("app/src/main/java/app/Main.java")
+      .writeText(
+        """
+        |package app;
+        |import used.SomeServiceInterface;
+        |public class Main {
+        |  private final Class<?> service = SomeServiceInterface.class;
+        |}
+        |"""
+          .trimMargin()
+      )
+    path("app/build.gradle")
+      .writeText(
+        """
+        |${getDefaultProjectBuildScript("java")}
+        |dependencies {
+        |  implementation project(':used-service')
+        |  implementation project(':unused-service')
+        |}
+        |$shadowJarTask {
+        |  minimize()
+        |}
+        |"""
+          .trimMargin()
+      )
+
+    runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
+
+    val outputAppShadowedJar = jarPath("app/build/libs/app-1.0-all.jar")
+    assertThat(outputAppShadowedJar).useAll {
+      containsAtLeast(
+        "app/Main.class",
+        "used/SomeServiceInterface.class",
+        "used/SomeServiceClass.class",
+        "dep/DependencyServiceInterface.class",
+        "dep/DependencyServiceClass.class",
+        "META-INF/services/used.SomeServiceInterface",
+        "META-INF/services/dep.DependencyServiceInterface",
+        *manifestEntries,
+      )
+      containsNone(
+        "used/SomeUnreferencedClass.class",
+        "dep/DependencyUnreferencedClass.class",
+        "unused/UnusedServiceInterface.class",
+        "unused/UnusedServiceClass.class",
+      )
+      classLoader {
+        loadClass("app.Main")
+        loadClass("used.SomeServiceInterface")
+        loadClass("used.SomeServiceClass")
+        loadClass("dep.DependencyServiceInterface")
+        loadClass("dep.DependencyServiceClass")
+      }
+    }
+  }
+
   private fun writeApiLibAndImplModules() {
     settingsScript.appendText(
       """
