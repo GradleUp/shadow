@@ -568,18 +568,6 @@ public abstract class ShadowJar : Jar() {
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
-    val unusedClasses =
-      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
-          findUnusedClasses(
-            sourceSetsClassesDirs = sourceSetsClassesDirs,
-            classJars = apiJars,
-            toMinimize = toMinimize,
-            dependencies = includedDependencies,
-          )
-        } else {
-          emptySet()
-        }
-        .also { this.unusedClasses = it }
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -636,29 +624,41 @@ public abstract class ShadowJar : Jar() {
   private val isR8Enabled: Boolean
     get() = _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.R8
 
-  private val packageRelocators: List<SimpleRelocator>
-    get() {
-      if (enableAutoRelocation.get()) {
-        logger.info(
-          "Adding auto relocation packages in the dependencies with prefix '{}'.",
-          relocationPrefix.get(),
-        )
-      } else {
-        logger.info("Skipping package relocators as auto relocation is disabled.")
-        return emptyList()
-      }
-      val prefix = relocationPrefix.get()
-      return includedDependencies.flatMap { file ->
-        file.useZip {
-          entries()
-            .toList()
-            .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
-            .map { it.name.substringBeforeLast('/').replace('/', '.') }
-            .toSet()
-            .map { SimpleRelocator(it, "$prefix.$it") }
-        }
+  private val unusedClasses by lazy {
+    if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
+      findUnusedClasses(
+        sourceSetsClassesDirs = sourceSetsClassesDirs,
+        classJars = apiJars,
+        toMinimize = toMinimize,
+        dependencies = includedDependencies,
+      )
+    } else {
+      emptySet()
+    }
+  }
+
+  private val packageRelocators by lazy {
+    if (enableAutoRelocation.get()) {
+      logger.info(
+        "Adding auto relocation packages in the dependencies with prefix '{}'.",
+        relocationPrefix.get(),
+      )
+    } else {
+      logger.info("Skipping package relocators as auto relocation is disabled.")
+      return@lazy emptyList()
+    }
+    val prefix = relocationPrefix.get()
+    return@lazy includedDependencies.flatMap { file ->
+      file.useZip {
+        entries()
+          .toList()
+          .filter { it.name.endsWith(".class") && it.name != "module-info.class" }
+          .map { it.name.substringBeforeLast('/').replace('/', '.') }
+          .toSet()
+          .map { SimpleRelocator(it, "$prefix.$it") }
       }
     }
+  }
 
   private fun addIncludedDependencies() {
     val isAar: File.() -> Boolean = {
@@ -772,8 +772,6 @@ public abstract class ShadowJar : Jar() {
       relocators = relocators.get() + packageRelocators,
     )
   }
-
-  private var unusedClasses: Set<String> = emptySet()
 
   private fun generateShadowedSourcesJar() {
     if (!archiveSourcesFile.isPresent) return
