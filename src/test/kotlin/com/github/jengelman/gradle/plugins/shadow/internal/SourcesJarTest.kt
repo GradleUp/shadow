@@ -1,18 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import assertk.assertFailure
 import assertk.assertThat
 import assertk.assertions.containsAtLeast
+import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
+import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import java.io.File
 import java.util.zip.ZipFile
+import org.gradle.api.GradleException
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
-class ShadowSourcesJarTest {
+class SourcesJarTest {
 
   @Test
   fun extractPackageStatements() {
@@ -248,5 +252,31 @@ class ShadowSourcesJarTest {
           "z/sub/",
         )
       )
+  }
+
+  @Test
+  fun throwsGradleExceptionOnFailure(@TempDir tempDir: File) {
+    val invalidFile = tempDir.resolve("not-a-file").apply { mkdirs() }
+    val srcDir =
+      tempDir.resolve("src").apply {
+        mkdirs()
+        resolve("Main.java").writeText("public class Main {}")
+      }
+
+    assertFailure {
+        generateShadowedSourcesJar(
+          sourcesJarFile = invalidFile,
+          sourceSetsSourceDirs = listOf(srcDir),
+          includedSourcesJars = emptyList(),
+          relocators = emptyList(),
+          unusedClasses = emptySet(),
+          entryCompression = ZipEntryCompression.DEFLATED,
+          isZip64 = false,
+          metadataCharset = null,
+          preserveFileTimestamps = true,
+        )
+      }
+      .isInstanceOf<GradleException>()
+      .hasMessage("Could not create shadowed sources JAR '$invalidFile'.")
   }
 }

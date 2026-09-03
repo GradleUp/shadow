@@ -165,7 +165,7 @@ internal fun generateShadowedSourcesJar(
       }
   } catch (e: Exception) {
     sourcesJarFile.delete()
-    throw e
+    gradleError("Could not create shadowed sources JAR '$sourcesJarFile'.", e)
   }
 }
 
