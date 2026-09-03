@@ -148,6 +148,7 @@ class MinimizeTest : BasePluginTest() {
       |  implementation 'my:k:1.0'
       |}
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  minimize()
       |}
       """

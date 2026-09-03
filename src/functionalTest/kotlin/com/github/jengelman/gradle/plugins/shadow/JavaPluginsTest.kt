@@ -121,6 +121,8 @@ class JavaPluginsTest : BasePluginTest() {
         "--no-enable-kotlin-module-remapping     Disables option --enable-kotlin-module-remapping.",
         "--fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.",
         "--no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries",
+        "--generate-sources-jar     Generates a companion shadowed sources JAR containing project and dependency sources.",
+        "--no-generate-sources-jar     Disables option --generate-sources-jar.",
         "--main-class     Main class attribute to add to manifest.",
         "--minimize-jar     Minimizes the jar by removing unused classes.",
         "--no-minimize-jar     Disables option --minimize-jar.",
@@ -1357,6 +1359,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  implementation 'my:g:1.0'
       |}
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  relocate 'g', 'shadow.g'
       |}
       |tasks.named('javadoc', Javadoc) {

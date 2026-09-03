@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
@@ -162,7 +163,26 @@ class ShadowPropertiesTest {
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
         assertThat(configurations.get()).containsOnly(runtimeConfiguration)
+        assertThat(generateSourcesJar.get()).isFalse()
+        assertThat(archiveSourcesFile.get().asFile).all {
+          isEqualTo(destinationDirectory.file("my-project-1.0.0-all-sources.jar").get().asFile)
+          isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
+        }
+        assertThat(sourceSetsSourceDirs.files)
+          .containsOnly(
+            *javaPluginExtension.sourceSets.getByName("main").allSource.srcDirs.toTypedArray()
+          )
+        assertThat(includedSourcesJars.files).isEmpty()
       }
+    }
+
+  @Test
+  fun applyJavaPluginWithSourcesJar() =
+    with(project) {
+      plugins.apply(JavaPlugin::class.java)
+      javaPluginExtension.withSourcesJar()
+      val shadowJarTask = tasks.shadowJar.get()
+      assertThat(shadowJarTask.generateSourcesJar.get()).isTrue()
     }
 
   @Test

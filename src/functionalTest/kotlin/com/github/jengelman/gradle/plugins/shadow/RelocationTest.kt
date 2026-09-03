@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
@@ -17,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import kotlin.io.path.appendText
+import kotlin.io.path.exists
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
@@ -756,6 +758,23 @@ class RelocationTest : BasePluginTest() {
   }
 
   @Test
+  fun generateNoShadowedSourcesJarByDefault() {
+    writeClass()
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar").exists()).isFalse()
+  }
+
+  @Test
   fun generateShadowedSourcesJarWithRelocation() {
     path("src/main/java/my/Main.java")
       .writeText(
@@ -774,6 +793,7 @@ class RelocationTest : BasePluginTest() {
       |  implementation 'my:g:1.0'
       |}
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  relocate('g', 'shadow.g')
       |}
       """
@@ -821,6 +841,9 @@ class RelocationTest : BasePluginTest() {
       |dependencies {
       |  implementation 'my:b:1.0'
       |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
       """
         .trimMargin()
     )
@@ -842,6 +865,9 @@ class RelocationTest : BasePluginTest() {
       """
       |dependencies {
       |  implementation 'my:b:1.0'
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
       |}
       """
         .trimMargin()
@@ -873,6 +899,7 @@ class RelocationTest : BasePluginTest() {
     projectScript.appendText(
       """
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  sourceSetsSourceDirs.from('src/extra/java')
       |  relocate('extra', 'shadow.extra')
       |}
@@ -921,6 +948,7 @@ class RelocationTest : BasePluginTest() {
     projectScript.appendText(
       """
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  includedSourcesJars.from('libs/external-sources.jar')
       |  relocate('ext', 'shadow.ext')
       |}

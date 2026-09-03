@@ -45,6 +45,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
         task.from(mainSourceSet.map { it.output })
         task.sourceSetsSourceDirs.convention(mainSourceSet.map { it.allSource.srcDirs })
+        task.generateSourcesJar.convention(
+          provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null }
+        )
         task.configurations.convention(provider { listOf(runtimeConfiguration) })
       }
     artifacts.add(configurations.shadow.name, taskProvider)

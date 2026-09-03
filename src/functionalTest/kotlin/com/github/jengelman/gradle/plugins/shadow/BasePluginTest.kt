@@ -287,6 +287,9 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |java {
+        |  withSourcesJar()
+        |}
         |dependencies {
         |  implementation project(':client')
         |}

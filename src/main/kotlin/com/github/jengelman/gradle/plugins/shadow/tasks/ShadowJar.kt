@@ -215,6 +215,21 @@ public abstract class ShadowJar : Jar() {
   public open val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
 
   /**
+   * If `true`, generates a companion shadowed sources JAR containing project and dependency
+   * sources.
+   *
+   * In projects applying the `shadow` plugin for Java, this convention defaults to `true` when
+   * `java.withSourcesJar()` is enabled, and `false` otherwise.
+   */
+  @get:Input
+  @get:Option(
+    option = "generate-sources-jar",
+    description =
+      "Generates a companion shadowed sources JAR containing project and dependency sources.",
+  )
+  public open val generateSourcesJar: Property<Boolean> = objectFactory.property(false)
+
+  /**
    * The destination location of the companion shadowed sources JAR.
    *
    * Defaults to
@@ -794,7 +809,7 @@ public abstract class ShadowJar : Jar() {
   private var unusedClasses: Set<String> = emptySet()
 
   private fun generateShadowedSourcesJar() {
-    if (!archiveSourcesFile.isPresent) return
+    if (!generateSourcesJar.get() || !archiveSourcesFile.isPresent) return
     generateShadowedSourcesJar(
       sourcesJarFile = archiveSourcesFile.get().asFile,
       sourceSetsSourceDirs = sourceSetsSourceDirs.files,

@@ -306,6 +306,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  implementation 'my:g:1.0'
       |}
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  relocate 'g', 'shadow.g'
       |}
       |def extractShadowedSources = tasks.register('extractShadowedSources', Sync) {
@@ -349,6 +350,7 @@ class KotlinPluginsTest : BasePluginTest() {
       """
       |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  relocate 'my.custom', 'shadow.custom'
       |}
       """

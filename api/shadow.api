@@ -270,6 +270,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getExcludes ()Ljava/util/Set;
 	protected abstract fun getExecOperations ()Lorg/gradle/process/ExecOperations;
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
+	public fun getGenerateSourcesJar ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludedSourcesJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;

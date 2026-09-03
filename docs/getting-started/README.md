@@ -138,7 +138,8 @@ in their build logic), Shadow will automatically configure the following behavio
   - `META-INF/versions/**/module-info.class`
   - `module-info.class`
 - Configures the [`ShadowJar`][ShadowJar] task to generate a companion **Shadowed Sources JAR** containing both
-  project sources and shadowed dependency sources with relocated packages.
+  project sources and shadowed dependency sources with relocated packages when `java.withSourcesJar()` is enabled
+  (or when [`generateSourcesJar`][ShadowJar.generateSourcesJar] is set to `true`).
 - Creates and registers the `shadow` component in the project (used for integrating with
   [`maven-publish`][maven-publish]), including the `shadowSourcesElements` variant when `java.withSourcesJar()` is enabled.
 
@@ -157,6 +158,8 @@ Here are the options that can be passed to the `shadowJar`:
 --no-enable-kotlin-module-remapping   Disables option --enable-kotlin-module-remapping.
 --fail-on-duplicate-entries           Fails build if the ZIP entries in the shadowed JAR are duplicate.
 --no-fail-on-duplicate-entries        Disables option --fail-on-duplicate-entries.
+--generate-sources-jar                Generates a companion shadowed sources JAR containing project and dependency sources.
+--no-generate-sources-jar             Disables option --generate-sources-jar.
 --main-class                          Main class attribute to add to manifest.
 --minimize-jar                        Minimizes the jar by removing unused classes.
 --no-minimize-jar                     Disables option --minimize-jar.
@@ -177,5 +180,6 @@ Refer to [listing command line options][listing-command-line-options].
 [JavaPlugin]: https://docs.gradle.org/current/userguide/java_plugin.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[ShadowJar.generateSourcesJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/generate-sources-jar.html
 [gradle-plugin-portal]: https://plugins.gradle.org/plugin/com.gradleup.shadow
 [listing-command-line-options]: https://docs.gradle.org/current/userguide/custom_tasks.html#sec:listing_task_options

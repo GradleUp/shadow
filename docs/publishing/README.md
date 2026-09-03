@@ -589,10 +589,11 @@ The published Maven publication will include both `<artifactId>-<version>-all.ja
 `<artifactId>-<version>-all-sources.jar`.
 
 > [!NOTE]
-> The companion shadowed sources JAR is generated automatically whenever the `shadowJar` task runs (as long as project
-> or dependency sources are present). However, **it is only published to Maven repositories when `java.withSourcesJar()`
-> is enabled**. If `withSourcesJar()` is omitted, publishing from `components["shadow"]` will only publish the shadowed
-> binary JAR, preserving backward compatibility for existing builds.
+> Generating the companion shadowed sources JAR is controlled by [`generateSourcesJar`][ShadowJar.generateSourcesJar].
+> In Java projects, it defaults to `true` when `java.withSourcesJar()` is enabled, and `false` otherwise to avoid
+> unnecessary build overhead for application builds. If `withSourcesJar()` is omitted, publishing from
+> `components["shadow"]` will only publish the shadowed binary JAR, preserving backward compatibility for existing builds.
+> You can also explicitly toggle generation via `generateSourcesJar = true` (or `--generate-sources-jar`).
 
 ### Customizing the Sources Archive File
 
@@ -675,6 +676,10 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
         maven("https://repo.myorg.com")
       }
     }
+
+    tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+      generateSourcesJar = true
+    }
     ```
 
 === ":simple-apachegroovy: build.gradle"
@@ -703,6 +708,10 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
       repositories {
         maven { url = 'https://repo.myorg.com' }
       }
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      generateSourcesJar = true
     }
     ```
 
@@ -784,6 +793,7 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [ShadowJar.archiveSourcesFile]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/archive-sources-file.html
+[ShadowJar.generateSourcesJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/generate-sources-jar.html
 [ShadowJar.includedSourcesJars]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-sources-jars.html
 [ShadowJar.relocate]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocate.html
 [ShadowJar.sourceSetsSourceDirs]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/source-sets-source-dirs.html

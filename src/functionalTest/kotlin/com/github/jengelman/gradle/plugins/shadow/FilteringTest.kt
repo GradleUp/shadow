@@ -248,6 +248,7 @@ class FilteringTest : BasePluginTest() {
       |  implementation 'my:h:1.0'
       |}
       |$shadowJarTask {
+      |  generateSourcesJar = true
       |  dependencies {
       |    exclude(dependency('my:h:1.0'))
       |  }
