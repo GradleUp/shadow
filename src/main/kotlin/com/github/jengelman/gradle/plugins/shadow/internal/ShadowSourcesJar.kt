@@ -17,7 +17,7 @@ internal fun generateShadowedSourcesJar(
   metadataCharset: String?,
   preserveFileTimestamps: Boolean,
 ) {
-  val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }
+  val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }.sortedBy { it.path }
   if (sourceSetsSourceDirs.none() && sourcesJars.isEmpty()) return
 
   val visitedFiles = mutableSetOf<String>()
@@ -41,11 +41,13 @@ internal fun generateShadowedSourcesJar(
           write("Manifest-Version: 1.0\n\n".toByteArray(charset))
         }
 
-        for (srcDir in sourceSetsSourceDirs) {
-          if (!srcDir.exists()) continue
+        val sortedSourceDirs = sourceSetsSourceDirs.filter { it.exists() }.sortedBy { it.path }
+        for (srcDir in sortedSourceDirs) {
           srcDir
             .walkTopDown()
             .filter { it.isFile }
+            .toList()
+            .sortedBy { it.relativeTo(srcDir).invariantSeparatorsPath }
             .forEach { file ->
               val relPath = file.relativeTo(srcDir).invariantSeparatorsPath
               val isSource = isSourceFile(relPath)
@@ -91,64 +93,67 @@ internal fun generateShadowedSourcesJar(
 
         sourcesJars.forEach { jarFile ->
           jarFile.useZip {
-            entries().toList().forEach { entry ->
-              if (entry.isDirectory) return@forEach
-              val name = entry.name
-              if (
-                name == "META-INF/MANIFEST.MF" ||
-                  name.endsWith(".class") ||
-                  name.startsWith("META-INF/INDEX.LIST") ||
-                  (name.startsWith("META-INF/") &&
-                    (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
-              ) {
-                return@forEach
-              }
-              val isSource = isSourceFile(name)
-              if (isSource) {
-                val text = getInputStream(entry).bufferedReader(charset).readText()
-                val pkg = extractPackage(text)
-                val simpleName = name.substringAfterLast('/')
-                if (isUnused(simpleName, pkg, text, unusedClasses)) return@forEach
-                val canonicalPath =
-                  if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
-                val relocatedPath = relocators.relocatePath(canonicalPath)
-                if (visitedFiles.add(relocatedPath)) {
-                  var transformedText = text
-                  for (relocator in relocators) {
-                    transformedText = relocator.applyToSourceContent(transformedText)
+            entries()
+              .toList()
+              .filterNot { it.isDirectory }
+              .sortedBy { it.name }
+              .forEach { entry ->
+                val name = entry.name
+                if (
+                  name == "META-INF/MANIFEST.MF" ||
+                    name.endsWith(".class") ||
+                    name.startsWith("META-INF/INDEX.LIST") ||
+                    (name.startsWith("META-INF/") &&
+                      (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
+                ) {
+                  return@forEach
+                }
+                val isSource = isSourceFile(name)
+                if (isSource) {
+                  val text = getInputStream(entry).bufferedReader(charset).readText()
+                  val pkg = extractPackage(text)
+                  val simpleName = name.substringAfterLast('/')
+                  if (isUnused(simpleName, pkg, text, unusedClasses)) return@forEach
+                  val canonicalPath =
+                    if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
+                  val relocatedPath = relocators.relocatePath(canonicalPath)
+                  if (visitedFiles.add(relocatedPath)) {
+                    var transformedText = text
+                    for (relocator in relocators) {
+                      transformedText = relocator.applyToSourceContent(transformedText)
+                    }
+                    val bytes = transformedText.toByteArray(charset)
+                    zos.writeEntry(
+                      name = relocatedPath,
+                      preserveLastModified = preserveFileTimestamps,
+                      lastModified = entry.time,
+                      unixMode = UnixMode.file(),
+                    ) {
+                      write(bytes)
+                    }
                   }
-                  val bytes = transformedText.toByteArray(charset)
-                  zos.writeEntry(
-                    name = relocatedPath,
-                    preserveLastModified = preserveFileTimestamps,
-                    lastModified = entry.time,
-                    unixMode = UnixMode.file(),
-                  ) {
-                    write(bytes)
+                } else {
+                  val relocatedPath = relocators.relocatePath(name)
+                  if (visitedFiles.add(relocatedPath)) {
+                    val bytes = getInputStream(entry).readBytes()
+                    zos.writeEntry(
+                      name = relocatedPath,
+                      preserveLastModified = preserveFileTimestamps,
+                      lastModified = entry.time,
+                      unixMode = UnixMode.file(),
+                    ) {
+                      write(bytes)
+                    }
                   }
                 }
-              } else {
-                val relocatedPath = relocators.relocatePath(name)
-                if (visitedFiles.add(relocatedPath)) {
-                  val bytes = getInputStream(entry).readBytes()
-                  zos.writeEntry(
-                    name = relocatedPath,
-                    preserveLastModified = preserveFileTimestamps,
-                    lastModified = entry.time,
-                    unixMode = UnixMode.file(),
-                  ) {
-                    write(bytes)
-                  }
-                }
               }
-            }
           }
         }
 
         val entries = zos.entries.map { it.name }
         val added = entries.toMutableSet()
         entries.forEach { name ->
-          name.parentDirectoryEntries().asReversed().forEach { entryName ->
+          name.parentDirectoryEntries().forEach { entryName ->
             if (!added.add(entryName)) return@forEach
             zos.writeEntry(
               name = entryName,
@@ -167,7 +172,7 @@ internal fun generateShadowedSourcesJar(
 private val packageRegex = """(?:^|\n)\s*package\s+([a-zA-Z0-9_.]+)""".toRegex()
 
 private val jvmNameRegex =
-  """@file\s*:\s*(?:\[[^]]*\b)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
+  """@file\s*:\s*(?:\[[^]]*?)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
     .toRegex()
 
 internal fun extractPackage(text: String): String {

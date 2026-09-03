@@ -127,7 +127,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowSourcesElements = configurations.shadowSourcesElements
-    // If `withSourcesJar` presents.
+    // If `withSourcesJar` is present.
     val sourcesElements = { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) }
 
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)

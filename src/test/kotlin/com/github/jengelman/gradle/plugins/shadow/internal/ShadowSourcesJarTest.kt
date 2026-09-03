@@ -125,6 +125,48 @@ class ShadowSourcesJarTest {
         )
       )
       .isFalse()
+    assertThat(
+        isUnused(
+          "BracketedUtils.kt",
+          "com.example",
+          """
+          @file:[JvmName("CustomFacade")]
+          package com.example
+          fun util() {}
+          """
+            .trimIndent(),
+          unusedSet,
+        )
+      )
+      .isTrue()
+    assertThat(
+        isUnused(
+          "BracketedMultiUtils.kt",
+          "com.example",
+          """
+          @file:[Suppress("unused") JvmName("CustomFacade")]
+          package com.example
+          fun util() {}
+          """
+            .trimIndent(),
+          unusedSet,
+        )
+      )
+      .isTrue()
+    assertThat(
+        isUnused(
+          "BracketedMultiUtilsReversed.kt",
+          "com.example",
+          """
+          @file:[JvmName("CustomFacade") Suppress("unused")]
+          package com.example
+          fun util() {}
+          """
+            .trimIndent(),
+          unusedSet,
+        )
+      )
+      .isTrue()
 
     assertThat(isUnused("UnusedJava.java", "com.example", "class UnusedJava {}", emptySet()))
       .isFalse()
@@ -160,5 +202,51 @@ class ShadowSourcesJarTest {
     assertThat(outputJar.exists()).isTrue()
     val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
     assertThat(entries).containsAtLeast("shadow/example/nested/Mismatched.kt")
+  }
+
+  @Test
+  fun generateShadowedSourcesJarDeterministicOrdering(@TempDir tempDir: File) {
+    val srcDir = tempDir.resolve("src").apply { mkdirs() }
+    srcDir.resolve("z/sub/Z.java").apply {
+      parentFile.mkdirs()
+      writeText("package z.sub;\nclass Z {}")
+    }
+    srcDir.resolve("a/A.java").apply {
+      parentFile.mkdirs()
+      writeText("package a;\nclass A {}")
+    }
+    srcDir.resolve("m/M.java").apply {
+      parentFile.mkdirs()
+      writeText("package m;\nclass M {}")
+    }
+
+    val outputJar = tempDir.resolve("output-sources.jar")
+    generateShadowedSourcesJar(
+      sourcesJarFile = outputJar,
+      sourceSetsSourceDirs = listOf(srcDir),
+      includedSourcesJars = emptyList(),
+      relocators = emptyList(),
+      unusedClasses = emptySet(),
+      entryCompression = ZipEntryCompression.DEFLATED,
+      isZip64 = false,
+      metadataCharset = null,
+      preserveFileTimestamps = true,
+    )
+
+    val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
+    assertThat(entries)
+      .isEqualTo(
+        listOf(
+          "META-INF/MANIFEST.MF",
+          "a/A.java",
+          "m/M.java",
+          "z/sub/Z.java",
+          "META-INF/",
+          "a/",
+          "m/",
+          "z/",
+          "z/sub/",
+        )
+      )
   }
 }
