@@ -139,6 +139,8 @@ public abstract class ShadowJar : Jar() {
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
+    // Avoid snapshotting source sets classes dirs during task input snapshotting when minimization
+    // is disabled.
     _minimizeJar.map {
       if (it) {
         project.sourceSets.map { sourceSet ->
