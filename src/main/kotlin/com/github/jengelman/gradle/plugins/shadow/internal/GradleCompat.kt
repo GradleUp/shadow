@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.gradle.develocity.agent.gradle.DevelocityConfiguration
 import java.io.InputStream
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.distribution.DistributionContainer
@@ -20,6 +21,10 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun gradleError(message: String, cause: Throwable? = null): Nothing =
+  throw GradleException(message, cause)
 
 /** Return `runtimeClasspath` or `runtime` configuration. */
 internal inline val Project.runtimeConfiguration: Configuration

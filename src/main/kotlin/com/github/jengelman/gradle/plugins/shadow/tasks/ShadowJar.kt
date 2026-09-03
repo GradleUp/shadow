@@ -12,6 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
@@ -39,7 +40,6 @@ import java.util.zip.ZipException
 import javax.inject.Inject
 import kotlin.reflect.full.hasAnnotation
 import org.gradle.api.Action
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.file.ArchiveOperations
@@ -649,7 +649,7 @@ public abstract class ShadowJar : Jar() {
             or use Android Fused Library plugin instead. See https://developer.android.com/build/publish-library/fused-library.
           """
               .trimIndent()
-          throw GradleException(message)
+          gradleError(message)
         }
         else -> {
           logger.debug("Including dependency: {}", file)

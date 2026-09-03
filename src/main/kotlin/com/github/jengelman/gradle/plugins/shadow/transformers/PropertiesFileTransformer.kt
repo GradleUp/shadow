@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.ReproducibleProperties
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.mapProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
@@ -11,7 +12,6 @@ import java.nio.charset.Charset
 import java.util.Properties
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
@@ -219,7 +219,7 @@ constructor(final override val objectFactory: ObjectFactory) : ResourceTransform
                   .joinToString(separator = "\n   * ", prefix = "\n   * ")
             }
             .joinToString(separator = "\n * ", prefix = "\n * ")
-      throw GradleException(message)
+      gradleError(message)
     }
 
     propertiesEntries.forEach { (path, props) ->

@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.tasks.FindResourceInClasspath
 import java.io.File
@@ -9,7 +10,6 @@ import java.security.MessageDigest
 import java.util.HexFormat
 import javax.inject.Inject
 import org.apache.tools.zip.ZipOutputStream
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileTreeElement
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.tasks.Internal
@@ -99,7 +99,7 @@ public open class DeduplicatingResourceTransformer(
           }
         }
       }
-      throw GradleException(message)
+      gradleError(message)
     }
   }
 

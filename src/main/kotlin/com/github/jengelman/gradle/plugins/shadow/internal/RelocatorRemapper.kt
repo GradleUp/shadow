@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassWriter
@@ -33,7 +32,7 @@ internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
         // If we didn't need to change anything, keep the original bytes as-is.
         if (modified) cw.toByteArray() else bytes
       } catch (t: Throwable) {
-        throw GradleException("Error in ASM processing class $path", t)
+        gradleError("Error in ASM processing class $path", t)
       }
     }
 
