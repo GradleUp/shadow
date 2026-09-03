@@ -588,6 +588,12 @@ When Gradle's standard `java.withSourcesJar()` is enabled, the Shadow plugin aut
 The published Maven publication will include both `<artifactId>-<version>-all.jar` and
 `<artifactId>-<version>-all-sources.jar`.
 
+> [!NOTE]
+> The companion shadowed sources JAR is generated automatically whenever the `shadowJar` task runs (as long as project
+> or dependency sources are present). However, **it is only published to Maven repositories when `java.withSourcesJar()`
+> is enabled**. If `withSourcesJar()` is omitted, publishing from `components["shadow"]` will only publish the shadowed
+> binary JAR, preserving backward compatibility for existing builds.
+
 ### Customizing the Sources Archive File
 
 The shadowed sources JAR output location is configured via [`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
