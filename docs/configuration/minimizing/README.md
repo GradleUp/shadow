@@ -1,7 +1,31 @@
 # Minimizing
 
-Shadow can automatically remove all JARs and classes of dependencies that are not used by the project, thereby
-minimizing the resulting shadowed JAR.
+Shadow can automatically remove unused JARs, classes, and code of dependencies, thereby minimizing the resulting
+shadowed JAR.
+
+## Overview & Choosing a Minimization Tool
+
+Shadow provides two minimization backends:
+
+1. **`DEPENDENCY_ANALYZER` (Default)**: A lightweight, class-level analyzer powered by [jdependency][jdependency] based
+   on bytecode constant pool references.
+2. **`R8` (Recommended for advanced shrinking)**: A whole-program optimizer and shrinker powered by [R8][R8] that
+   operates at the method/field level.
+
+| Feature / Capability             | `DEPENDENCY_ANALYZER` (Default)                         | `R8` (Advanced)                                                          |
+|:---------------------------------|:--------------------------------------------------------|:-------------------------------------------------------------------------|
+| **Analysis Granularity**         | **Class-level** (keeps or drops entire class files)     | **Method/Field-level** (fine-grained Tree Shaking)                       |
+| **Reflection & Dynamic Loading** | Manual exclusion required (`minimize { exclude(...) }`) | Supported via ProGuard keep rules and embedded consumer rules            |
+| **Java SPI (`ServiceLoader`)**   | ❌ **Not detected automatically**                       | **Automatically preserved** (parses `META-INF/services`)                 |
+| **Bytecode Optimizations**       | None (simple file filtering)                            | Dead code elimination, method inlining, constant folding, etc.           |
+| **Build Overhead**               | Minimal / fast                                          | Requires running R8 compiler                                             |
+| **Best For**                     | Simple projects with direct bytecode references         | Modern applications with SPI, reflection, or requiring smallest JAR size |
+
+---
+
+## Minimizing with the Dependency Analyzer
+
+By default, calling `minimize()` enables Shadow's built-in dependency analyzer:
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -21,8 +45,8 @@ minimizing the resulting shadowed JAR.
 
 A dependency can be excluded from the minimization process, thereby forcing its inclusion in the shadow JAR. This is
 useful when the dependency analyzer cannot find the usage of a class programmatically, for example if the class is
-loaded dynamically via `Class.forName(String)`. Each of the `group`, `name` and `version` fields separated by `:` of a
-`dependency` is interpreted as a regular expression.
+loaded dynamically via `Class.forName(String)` or loaded via Java SPI (`ServiceLoader`). Each of the `group`, `name` and
+`version` fields separated by `:` of a `dependency` is interpreted as a regular expression.
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -524,6 +548,7 @@ or methods and running optimizations), disable `useDefaultRules`:
 [-keepdirectories]: https://www.guardsquare.com/manual/configuration/usage#keepdirectories
 [library-optimization-guidance]: https://developer.android.com/topic/performance/app-optimization/library-optimization
 [R8]: https://r8.googlesource.com/r8
+[jdependency]: https://github.com/tcurdt/jdependency
 [ProguardConfigurationParser]: https://r8.googlesource.com/r8/+/refs/tags/9.1.31/src/main/java/com/android/tools/r8/shaking/ProguardConfigurationParser.java
 [ShadowJar.dependencies]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/dependencies.html
 [DependencyFilter]: ../../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-dependency-filter/index.html
