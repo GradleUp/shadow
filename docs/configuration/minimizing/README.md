@@ -16,7 +16,7 @@ Shadow provides two minimization backends:
 |:---------------------------------|:--------------------------------------------------------|:-------------------------------------------------------------------------|
 | **Analysis Granularity**         | **Class-level** (keeps or drops entire class files)     | **Method/Field-level** (fine-grained Tree Shaking)                       |
 | **Reflection & Dynamic Loading** | Manual exclusion required (`minimize { exclude(...) }`) | Supported via ProGuard keep rules and embedded consumer rules            |
-| **Java SPI (`ServiceLoader`)**   | ❌ **Not detected automatically**                       | **Automatically preserved** (parses `META-INF/services`)                 |
+| **Java SPI (`ServiceLoader`)**   | ❌ **Not detected automatically**                       | **Preserved by default rules** (parses `META-INF/services`)              |
 | **Bytecode Optimizations**       | None (simple file filtering)                            | Dead code elimination, method inlining, constant folding, etc.           |
 | **Build Overhead**               | Minimal / fast                                          | Requires running R8 compiler                                             |
 | **Best For**                     | Simple projects with direct bytecode references         | Modern applications with SPI, reflection, or requiring smallest JAR size |
