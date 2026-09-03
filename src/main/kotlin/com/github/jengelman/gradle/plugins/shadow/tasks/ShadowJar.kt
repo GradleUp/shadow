@@ -118,14 +118,22 @@ public abstract class ShadowJar : Jar() {
 
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    _minimizeJar.map {
-      if (it) (_minimizeSpec.resolve(configurations.get()) - apiJars) else emptySet()
+    // Avoid resolving classpath files during task input snapshotting when minimization is disabled.
+    _minimizeJar.flatMap {
+      if (it) {
+        configurations.map { configs -> _minimizeSpec.resolve(configs) - apiJars }
+      } else {
+        project.provider { emptySet() }
+      }
     }
   }
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    _minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
+    // Avoid resolving classpath files during task input snapshotting when minimization is disabled.
+    _minimizeJar.flatMap {
+      if (it) project.getApiJars() else project.provider { emptyList() }
+    }
   }
 
   @get:InputFiles
