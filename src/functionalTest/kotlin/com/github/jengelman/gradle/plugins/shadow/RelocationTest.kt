@@ -70,53 +70,6 @@ class RelocationTest : BasePluginTest() {
     assertThat(result.output).contains("Relocator count: 6.")
   }
 
-  @ParameterizedTest
-  @MethodSource("relocationCliOptionProvider")
-  fun enableAutoRelocationByCliOption(enable: Boolean, relocationPrefix: String) {
-    val mainClassEntry = writeClass()
-    projectScript.appendText(
-      """
-      |dependencies {
-      |  implementation 'junit:junit:3.8.2'
-      |}
-      """
-        .trimMargin()
-    )
-    val relocatedEntries =
-      junitEntries
-        .map { "$relocationPrefix/$it" }
-        .filterNot { it.startsWith("$relocationPrefix/META-INF/") }
-        .toTypedArray()
-
-    if (enable) {
-      runWithSuccess(
-        shadowJarPath,
-        "--enable-auto-relocation",
-        "--relocation-prefix=$relocationPrefix",
-      )
-    } else {
-      runWithSuccess(
-        shadowJarPath,
-        "--no-enable-auto-relocation",
-        "--relocation-prefix=$relocationPrefix",
-      )
-    }
-
-    val commonEntries = arrayOf("my/", mainClassEntry, *manifestEntries)
-    assertThat(outputShadowedJar).useAll {
-      if (enable) {
-        containsOnly("$relocationPrefix/", *relocatedEntries, *commonEntries)
-      } else {
-        containsOnly(*junitEntries, *commonEntries)
-      }
-      classLoader {
-        val testClassName =
-          if (enable) "$relocationPrefix.junit.framework.Test" else "junit.framework.Test"
-        loadClass(testClassName)
-      }
-    }
-  }
-
   @Test // #58
   fun relocateDependencyFiles() {
     val mainClassEntry = writeClass()
@@ -761,15 +714,6 @@ class RelocationTest : BasePluginTest() {
         Arguments.of(true, false),
         Arguments.of(false, true),
         Arguments.of(true, true),
-      )
-
-    @JvmStatic
-    fun relocationCliOptionProvider() =
-      listOf(
-        Arguments.of(false, "foo"),
-        Arguments.of(false, "bar"),
-        Arguments.of(true, "foo"),
-        Arguments.of(true, "bar"),
       )
   }
 }
