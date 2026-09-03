@@ -546,6 +546,9 @@ public abstract class ShadowJar : Jar() {
       } else {
         emptySet()
       }
+    if (unusedClasses.isNotEmpty()) {
+      logger.info("Found {} unused classes to drop for minimization.", unusedClasses.size)
+    }
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -635,6 +638,7 @@ public abstract class ShadowJar : Jar() {
           logger.info("Skipping non-existent dependency: {}", file)
         }
         file.isDirectory -> {
+          logger.debug("Including dependency: {}", file)
           from(file)
         }
         file.isAar() -> {
@@ -648,6 +652,7 @@ public abstract class ShadowJar : Jar() {
           throw GradleException(message)
         }
         else -> {
+          logger.debug("Including dependency: {}", file)
           from(archiveOperations.zipTree(file))
         }
       }
@@ -683,7 +688,13 @@ public abstract class ShadowJar : Jar() {
     val shadowFiles = shadowDependencies.get()
     if (!shadowFiles.isEmpty) {
       val attrs = listOf(classPathAttr) + shadowFiles.map { it.name }
-      manifest.attributes[classPathAttributeKey] = attrs.joinToString(" ").trim()
+      val classPathValue = attrs.joinToString(" ").trim()
+      manifest.attributes[classPathAttributeKey] = classPathValue
+      logger.info(
+        "Adding {} attribute to the manifest with value '{}'.",
+        classPathAttributeKey,
+        classPathValue,
+      )
     }
 
     if (!addMultiReleaseAttribute.get()) return
@@ -701,6 +712,7 @@ public abstract class ShadowJar : Jar() {
     }
     if (includeMultiReleaseAttr) {
       manifest.attributes[multiReleaseAttributeKey] = true
+      logger.info("Adding {} attribute to the manifest.", multiReleaseAttributeKey)
     }
   }
 
