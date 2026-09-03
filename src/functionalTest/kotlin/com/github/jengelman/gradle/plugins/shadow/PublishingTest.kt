@@ -564,9 +564,9 @@ class PublishingTest : BasePluginTest() {
     assertThat(result.output)
       .contains(
         if (addShadowVariant) {
-          "Adding shadowRuntimeElements variant to Java component."
+          "Adding shadowRuntimeElements variant to java component."
         } else {
-          "Skipping adding shadowRuntimeElements variant to Java component."
+          "Skipping adding shadowRuntimeElements variant to java component."
         }
       )
     val assertVariantsCommon = { gmm: GradleModuleMetadata ->
