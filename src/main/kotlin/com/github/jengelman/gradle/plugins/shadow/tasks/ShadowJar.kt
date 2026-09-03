@@ -132,7 +132,7 @@ public abstract class ShadowJar : Jar() {
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
     // Avoid resolving classpath files during task input snapshotting when minimization is disabled.
     _minimizeJar.flatMap {
-      if (it) project.getApiJars() else project.provider { emptyList() }
+      if (it) project.getApiJars() else project.provider { emptySet() }
     }
   }
 
