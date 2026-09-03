@@ -725,7 +725,9 @@ class PublishingTest : BasePluginTest() {
       |    shadow(MavenPublication) {
       |      artifactId = 'my-all'
       |      artifact($shadowJarTask)
-      |      artifact($shadowJarTask.flatMap { it.archiveSourcesFile })
+      |      artifact($shadowJarTask.flatMap { it.archiveSourcesFile }) {
+      |        classifier = 'sources'
+      |      }
       |    }
       |  }
       |}

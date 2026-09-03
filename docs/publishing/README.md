@@ -631,7 +631,9 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
       publications {
         withType<MavenPublication>().configureEach {
           if (name == "jvm") {
-            artifact(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveSourcesFile })
+            artifact(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveSourcesFile }) {
+              classifier = "sources"
+            }
           }
         }
       }
@@ -658,7 +660,9 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
       publications {
         withType(MavenPublication).configureEach {
           if (name == 'jvm') {
-            artifact tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).flatMap { it.archiveSourcesFile }
+            artifact(tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).flatMap { it.archiveSourcesFile }) {
+              classifier = 'sources'
+            }
           }
         }
       }
