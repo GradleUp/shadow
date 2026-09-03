@@ -20,7 +20,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.minimizeWithR8
 import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.property
 import com.github.jengelman.gradle.plugins.shadow.internal.setProperty
-import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.internal.sourceSetsOrNull
 import com.github.jengelman.gradle.plugins.shadow.internal.useZip
 import com.github.jengelman.gradle.plugins.shadow.relocation.CacheableRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -113,32 +113,34 @@ public abstract class ShadowJar : Jar() {
   )
   public open val minimizeJar: Property<Boolean> = objectFactory.property(false)
 
+  /**
+   * The configurations to include dependencies from.
+   *
+   * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
+   */
+  @get:Classpath
+  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
+
   /** Options for [minimize]. */
   @get:Nested public open val minimizeSpec: MinimizeSpec = _minimizeSpec
 
   @get:Classpath
   public open val toMinimize: ConfigurableFileCollection = objectFactory.fileCollection {
-    _minimizeJar.map {
-      if (it) (_minimizeSpec.resolve(configurations.get()) - apiJars) else emptySet()
-    }
+    configurations.map { _minimizeSpec.resolve(it) - apiJars }
   }
 
   @get:Classpath
   public open val apiJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    _minimizeJar.map { if (it) project.getApiJars() else emptySet<File>() }
+    project.getApiJars()
   }
 
   @get:InputFiles
   @get:PathSensitive(PathSensitivity.RELATIVE)
   public open val sourceSetsClassesDirs: ConfigurableFileCollection = objectFactory.fileCollection {
-    _minimizeJar.map {
-      if (it) {
-        project.sourceSets.map { sourceSet ->
-          sourceSet.output.classesDirs.filter(File::isDirectory)
-        }
-      } else {
-        emptySet()
-      }
+    project.provider {
+      project.sourceSetsOrNull?.map {
+        it.output.classesDirs.filter(File::isDirectory)
+      } ?: emptySet<File>()
     }
   }
 
@@ -169,14 +171,6 @@ public abstract class ShadowJar : Jar() {
 
   /** [Relocator]s to be applied in the shadow steps. */
   @get:Nested public open val relocators: SetProperty<Relocator> = objectFactory.setProperty()
-
-  /**
-   * The configurations to include dependencies from.
-   *
-   * Defaults to a set that contains `runtimeClasspath` or `runtime` configuration.
-   */
-  @get:Classpath
-  public open val configurations: SetProperty<Configuration> = objectFactory.setProperty()
 
   @get:Internal // The resolved result is tracked by includedDependencies.
   public open val dependencyFilter: Property<DependencyFilter> =
