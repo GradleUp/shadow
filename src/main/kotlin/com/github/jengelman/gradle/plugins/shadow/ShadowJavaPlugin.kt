@@ -20,6 +20,7 @@ import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
 import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
@@ -123,32 +124,40 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 
   protected open fun Project.configureComponents() {
+    val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowSourcesElements = configurations.shadowSourcesElements
     // If `withSourcesJar` presents.
     val sourcesElements = { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) }
+
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
-    shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
-      variant.mapToMavenScope("runtime")
+    shadowComponent.addVariants(
+      outgoingConfiguration = shadowRuntimeElements,
+      logger = logger,
+    ) {
+      mapToMavenScope("runtime")
     }
-    shadowComponent.addVariantsFromConfiguration(shadowSourcesElements) { variant ->
-      if (sourcesElements() == null) {
-        variant.skip()
-      }
-    }
+    shadowComponent.addVariants(
+      outgoingConfiguration = shadowSourcesElements,
+      logger = logger,
+      shouldAdd = { sourcesElements() != null },
+    )
+
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
-      val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
       component.addVariants(
         outgoingConfiguration = shadowRuntimeElements,
         logger = logger,
         shouldAdd = addIntoJavaComponent::get,
-      )
+      ) {
+        mapToOptional()
+      }
       component.addVariants(
         outgoingConfiguration = shadowSourcesElements,
         logger = logger,
+        shouldAdd = { addIntoJavaComponent.get() && sourcesElements() != null },
       ) {
-        addIntoJavaComponent.get() && sourcesElements() != null
+        mapToOptional()
       }
     }
   }
@@ -156,14 +165,15 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   private fun AdhocComponentWithVariants.addVariants(
     outgoingConfiguration: NamedDomainObjectProvider<ConsumableConfiguration>,
     logger: Logger,
-    shouldAdd: () -> Boolean,
+    shouldAdd: () -> Boolean = { true },
+    action: ConfigurationVariantDetails.() -> Unit = {},
   ) {
     addVariantsFromConfiguration(outgoingConfiguration) { variant ->
-      variant.mapToOptional()
       if (shouldAdd()) {
-        logger.info("Adding {} variant to Java component.", outgoingConfiguration.name)
+        logger.info("Adding {} variant to {} component.", outgoingConfiguration.name, name)
+        variant.action()
       } else {
-        logger.info("Skipping adding {} variant to Java component.", outgoingConfiguration.name)
+        logger.info("Skipping adding {} variant to {} component.", outgoingConfiguration.name, name)
         variant.skip()
       }
     }

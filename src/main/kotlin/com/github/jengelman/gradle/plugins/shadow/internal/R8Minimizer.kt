@@ -240,4 +240,4 @@ private fun String.isJavaTypeName(): Boolean = javaTypeNameRegex.matches(this)
 private const val SERVICES_PATH = "META-INF/services/"
 // Keep only ordinary dot-separated Java type names in generated rules. This filters out blank
 // service lines, comments, malformed providers, and JVM-only names R8 would reject.
-private val javaTypeNameRegex = Regex("[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*")
+private val javaTypeNameRegex = "[A-Za-z_$][A-Za-z0-9_$]*(\\.[A-Za-z_$][A-Za-z0-9_$]*)*".toRegex()
