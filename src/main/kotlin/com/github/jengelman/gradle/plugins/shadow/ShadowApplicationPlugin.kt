@@ -4,11 +4,11 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.SHA
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.distributions
+import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
 import java.io.IOException
-import org.gradle.api.GradleException
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -95,7 +95,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
             !destinationDir.resolve("bin").isDirectory ||
             !destinationDir.resolve(executableDir.get()).isDirectory
         ) {
-          throw GradleException(
+          gradleError(
             "The specified installation directory '$destinationDir' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
               "If you really want to install to this directory, delete it and run the install task again.\n" +
               "Alternatively, choose a different installation directory."

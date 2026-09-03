@@ -6,7 +6,6 @@ import java.io.File
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.zip.ZipEntry
 import kotlin.io.path.moveTo
-import org.gradle.api.GradleException
 import org.gradle.api.file.FileCollection
 import org.gradle.api.logging.Logger
 import org.gradle.api.provider.Provider
@@ -41,7 +40,7 @@ internal fun minimizeWithR8(
   relocators: Iterable<Relocator>,
 ) {
   if (r8Classpath.isEmpty) {
-    throw GradleException(
+    gradleError(
       "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
     )
   }
@@ -54,7 +53,7 @@ internal fun minimizeWithR8(
   val javaHome =
     launcher?.metadata?.installationPath?.asFile?.absolutePath ?: System.getProperty("java.home")
   if (javaHome.isNullOrBlank()) {
-    throw GradleException("R8 minimization requires the java.home system property.")
+    gradleError("R8 minimization requires the java.home system property.")
   }
 
   val r8Args = r8Spec.args.get()
