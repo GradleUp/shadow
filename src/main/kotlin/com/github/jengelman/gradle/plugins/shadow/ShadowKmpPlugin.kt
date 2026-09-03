@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import com.github.jengelman.gradle.plugins.shadow.internal.isAtLeastKgp
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
+import java.io.File
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.tasks.bundling.Jar
@@ -40,6 +41,13 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         kotlinJvmMain
           .flatMap { configurations.named(it.runtimeDependencyConfigurationName) }
           .map { listOf(it) }
+      )
+      // Include all compilations (including test) so that test code's transitive dependency
+      // references are also considered "used" during minimization.
+      task.sourceSetsClassesDirs.convention(
+        target.compilations.map { compilation ->
+          compilation.output.classesDirs.filter(File::isDirectory)
+        }
       )
 
       if (!isAtLeastKgp("1.9.0")) return@registerShadowJarCommon

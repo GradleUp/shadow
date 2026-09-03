@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.io.File
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
@@ -42,6 +43,11 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
         task.from(sourceSets.named("main").map { it.output })
         task.configurations.convention(provider { listOf(runtimeConfiguration) })
+        // Include all source sets (including test) so that test code's transitive dependency
+        // references are also considered "used" during minimization.
+        task.sourceSetsClassesDirs.convention(
+          sourceSets.map { it.output.classesDirs.filter(File::isDirectory) }
+        )
       }
     artifacts.add(configurations.shadow.name, taskProvider)
   }
