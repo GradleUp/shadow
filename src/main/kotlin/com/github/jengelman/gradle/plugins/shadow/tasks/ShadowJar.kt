@@ -193,8 +193,7 @@ public abstract class ShadowJar : Jar() {
   @get:Classpath
   internal val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
     dependencyFilter.zip(configurations) { df, cs ->
-      df as DefaultDependencyFilter
-      df.resolveSourcesJars(cs)
+      (df as? DefaultDependencyFilter)?.resolveSourcesJars(cs) ?: project.files()
     }
   }
 
