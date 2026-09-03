@@ -15,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
+import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -849,6 +850,104 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedSourcesJar).useAll { containsOnly(*manifestEntries) }
+  }
+
+  @Test
+  fun generateShadowedSourcesJarWithCustomSourceSetsSourceDirs() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |public class Main {}
+        """
+          .trimMargin()
+      )
+    path("src/extra/java/extra/Extra.java")
+      .writeText(
+        """
+        |package extra;
+        |public class Extra {}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |$shadowJarTask {
+      |  sourceSetsSourceDirs.from('src/extra/java')
+      |  relocate('extra', 'shadow.extra')
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        "shadow/",
+        "shadow/extra/",
+        "shadow/extra/Extra.java",
+        *manifestEntries,
+      )
+      getContent("shadow/extra/Extra.java")
+        .isEqualTo(
+          """
+          |package shadow.extra;
+          |public class Extra {}
+          """
+            .trimMargin()
+        )
+    }
+  }
+
+  @Test
+  fun generateShadowedSourcesJarWithCustomIncludedSourcesJars() {
+    writeClass()
+    val customSourcesJar = path("libs/external-sources.jar")
+    customSourcesJar.parent.toFile().mkdirs()
+    JarBuilder(customSourcesJar)
+      .insert(
+        "ext/Ext.java",
+        """
+        package ext;
+        public class Ext {}
+        """
+          .trimIndent(),
+      )
+      .write()
+
+    projectScript.appendText(
+      """
+      |$shadowJarTask {
+      |  includedSourcesJars.from('libs/external-sources.jar')
+      |  relocate('ext', 'shadow.ext')
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        "shadow/",
+        "shadow/ext/",
+        "shadow/ext/Ext.java",
+        *manifestEntries,
+      )
+      getContent("shadow/ext/Ext.java")
+        .isEqualTo(
+          """
+          |package shadow.ext;
+          |public class Ext {}
+          """
+            .trimMargin()
+        )
+    }
   }
 
   private companion object {

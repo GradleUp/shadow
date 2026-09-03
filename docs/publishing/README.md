@@ -596,7 +596,7 @@ The published Maven publication will include both `<artifactId>-<version>-all.ja
 
 ### Customizing the Sources Archive File
 
-The shadowed sources JAR output location is configured via [`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
+The companion shadowed sources JAR output location is configured via [`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
 which defaults to the same destination and base name as `archiveFile` with `-sources.jar` suffix:
 
 === ":material-language-kotlin: build.gradle.kts"
@@ -612,6 +612,34 @@ which defaults to the same destination and base name as `archiveFile` with `-sou
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       archiveSourcesFile = layout.buildDirectory.file('custom-libs/my-sources.jar')
+    }
+    ```
+
+You can also customize the source inputs included in the companion sources JAR using
+[`sourceSetsSourceDirs`][ShadowJar.sourceSetsSourceDirs] and
+[`includedSourcesJars`][ShadowJar.includedSourcesJars]:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.shadowJar {
+      // Add custom source directories
+      sourceSetsSourceDirs.from("src/extra/java")
+
+      // Add additional dependency sources JARs
+      includedSourcesJars.from("libs/external-lib-sources.jar")
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Add custom source directories
+      sourceSetsSourceDirs.from('src/extra/java')
+
+      // Add additional dependency sources JARs
+      includedSourcesJars.from('libs/external-lib-sources.jar')
     }
     ```
 
@@ -756,7 +784,9 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
 [ShadowJar.archiveSourcesFile]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/archive-sources-file.html
+[ShadowJar.includedSourcesJars]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-sources-jars.html
 [ShadowJar.relocate]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocate.html
+[ShadowJar.sourceSetsSourceDirs]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/source-sets-source-dirs.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
 [configuring-output-name]: ../configuration/README.md#configuring-output-name

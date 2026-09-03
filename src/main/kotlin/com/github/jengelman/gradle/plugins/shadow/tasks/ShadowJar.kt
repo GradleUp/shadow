@@ -191,16 +191,37 @@ public abstract class ShadowJar : Jar() {
     dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
   }
 
+  /**
+   * Source JARs resolved from bundled dependencies to be merged into the companion shadowed sources
+   * JAR.
+   */
   @get:Classpath
-  internal val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
+  public open val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
     dependencyFilter.zip(configurations) { df, cs ->
       (df as? DefaultDependencyFilter)?.resolveSourcesJars(cs) ?: project.files()
     }
   }
 
+  /**
+   * Source directories from project source sets to be included in the companion shadowed sources
+   * JAR.
+   *
+   * In projects applying the `shadow` plugin for Java or Kotlin Multiplatform, this defaults to the
+   * relevant source sets' source directories.
+   */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  public open val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
+
+  /**
+   * The destination location of the companion shadowed sources JAR.
+   *
+   * Defaults to
+   * `<destinationDirectory>/<archiveBaseName>-<archiveClassifier>-sources.<archiveExtension>`.
+   */
   @get:Optional
   @get:OutputFile
-  public val archiveSourcesFile: RegularFileProperty =
+  public open val archiveSourcesFile: RegularFileProperty =
     objectFactory
       .fileProperty()
       .convention(
@@ -215,10 +236,6 @@ public abstract class ShadowJar : Jar() {
           }
         )
       )
-
-  @get:InputFiles
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  internal val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
 
   /**
    * Enables auto relocation of packages in the dependencies.

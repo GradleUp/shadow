@@ -261,7 +261,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getAddMultiReleaseAttribute ()Lorg/gradle/api/provider/Property;
 	public fun getApiJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	protected abstract fun getArchiveOperations ()Lorg/gradle/api/file/ArchiveOperations;
-	public final fun getArchiveSourcesFile ()Lorg/gradle/api/file/RegularFileProperty;
+	public fun getArchiveSourcesFile ()Lorg/gradle/api/file/RegularFileProperty;
 	public fun getConfigurations ()Lorg/gradle/api/provider/SetProperty;
 	public fun getDependencyFilter ()Lorg/gradle/api/provider/Property;
 	public fun getDuplicatesStrategy ()Lorg/gradle/api/file/DuplicatesStrategy;
@@ -271,6 +271,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	protected abstract fun getExecOperations ()Lorg/gradle/process/ExecOperations;
 	public fun getFailOnDuplicateEntries ()Lorg/gradle/api/provider/Property;
 	public fun getIncludedDependencies ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getIncludedSourcesJars ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getIncludes ()Ljava/util/Set;
 	public fun getJavaLauncher ()Lorg/gradle/api/provider/Property;
 	public fun getMainClass ()Lorg/gradle/api/provider/Property;
@@ -282,6 +283,7 @@ public abstract class com/github/jengelman/gradle/plugins/shadow/tasks/ShadowJar
 	public fun getRelocationPrefix ()Lorg/gradle/api/provider/Property;
 	public fun getRelocators ()Lorg/gradle/api/provider/SetProperty;
 	public fun getSourceSetsClassesDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
+	public fun getSourceSetsSourceDirs ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getToMinimize ()Lorg/gradle/api/file/ConfigurableFileCollection;
 	public fun getTransformers ()Lorg/gradle/api/provider/SetProperty;
 	public fun mergeGroovyExtensionModules ()V
