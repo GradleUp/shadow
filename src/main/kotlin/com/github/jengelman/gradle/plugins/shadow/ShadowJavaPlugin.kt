@@ -23,7 +23,7 @@ import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
-import org.gradle.api.provider.Provider
+import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -125,35 +125,42 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   protected open fun Project.configureComponents() {
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowSourcesElements = configurations.shadowSourcesElements
+    // If `withSourcesJar` presents.
+    val sourcesElements = { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) }
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
     shadowComponent.addVariantsFromConfiguration(shadowRuntimeElements) { variant ->
       variant.mapToMavenScope("runtime")
     }
-    shadowComponent.addVariantsFromConfiguration(shadowSourcesElements) {}
+    shadowComponent.addVariantsFromConfiguration(shadowSourcesElements) { variant ->
+      if (sourcesElements() == null) {
+        variant.skip()
+      }
+    }
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
       val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
       component.addVariants(
-        addIntoJavaComponent = addIntoJavaComponent,
         outgoingConfiguration = shadowRuntimeElements,
         logger = logger,
+        shouldAdd = addIntoJavaComponent::get,
       )
       component.addVariants(
-        addIntoJavaComponent = addIntoJavaComponent,
         outgoingConfiguration = shadowSourcesElements,
         logger = logger,
-      )
+      ) {
+        addIntoJavaComponent.get() && sourcesElements() != null
+      }
     }
   }
 
   private fun AdhocComponentWithVariants.addVariants(
-    addIntoJavaComponent: Provider<Boolean>,
     outgoingConfiguration: NamedDomainObjectProvider<ConsumableConfiguration>,
     logger: Logger,
+    shouldAdd: () -> Boolean,
   ) {
     addVariantsFromConfiguration(outgoingConfiguration) { variant ->
       variant.mapToOptional()
-      if (addIntoJavaComponent.get()) {
+      if (shouldAdd()) {
         logger.info("Adding {} variant to Java component.", outgoingConfiguration.name)
       } else {
         logger.info("Skipping adding {} variant to Java component.", outgoingConfiguration.name)
