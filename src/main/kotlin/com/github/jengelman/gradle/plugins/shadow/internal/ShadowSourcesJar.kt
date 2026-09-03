@@ -36,7 +36,6 @@ internal fun generateShadowedSourcesJar(
         zos.writeEntry(
           name = manifestEntry,
           preserveLastModified = preserveFileTimestamps,
-          lastModified = if (preserveFileTimestamps) System.currentTimeMillis() else -1,
           unixMode = UnixMode.file(),
         ) {
           write("Manifest-Version: 1.0\n\n".toByteArray(charset))
@@ -148,14 +147,12 @@ internal fun generateShadowedSourcesJar(
 
         val entries = zos.entries.map { it.name }
         val added = entries.toMutableSet()
-        val currentTimeMillis = System.currentTimeMillis()
         entries.forEach { name ->
           name.parentDirectoryEntries().asReversed().forEach { entryName ->
             if (!added.add(entryName)) return@forEach
             zos.writeEntry(
               name = entryName,
               preserveLastModified = preserveFileTimestamps,
-              lastModified = currentTimeMillis,
               unixMode = UnixMode.directory(),
             )
           }
