@@ -37,12 +37,8 @@ public abstract class ShadowPlugin : Plugin<Project> {
   private fun Project.configureBuildScan() {
     val enableDevelocityIntegration =
       findOptionalProperty(ENABLE_DEVELOCITY_INTEGRATION_PROPERTY)?.toBoolean() ?: false
-    if (enableDevelocityIntegration) {
-      logger.info("Enabling Develocity integration for Shadow plugin.")
-    } else {
-      logger.info("Skipping Develocity integration for Shadow plugin.")
-      return
-    }
+    if (!enableDevelocityIntegration) return
+    logger.info("Enabling Develocity integration for Shadow plugin.")
     addBuildScanCustomValues()
   }
 

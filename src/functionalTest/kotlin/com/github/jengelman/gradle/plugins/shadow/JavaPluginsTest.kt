@@ -417,16 +417,8 @@ class JavaPluginsTest : BasePluginTest() {
           .trimMargin()
       )
 
-    val result = runWithSuccess(serverShadowJarPath, infoArgument)
+    runWithSuccess(serverShadowJarPath)
 
-    assertThat(result.output)
-      .contains(
-        if (addAttribute) {
-          "Adding Multi-Release attribute to the manifest if any dependencies contain it."
-        } else {
-          "Skipping adding Multi-Release attribute to the manifest as it is disabled."
-        }
-      )
     assertThat(outputServerShadowedJar.use { it.getMainAttr(multiReleaseAttributeKey) })
       .isEqualTo(if (addAttribute) "true" else null)
   }
