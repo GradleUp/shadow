@@ -35,6 +35,9 @@ internal inline val Project.runtimeConfiguration: Configuration
 internal inline val Project.sourceSets: SourceSetContainer
   get() = extensions.getByType(SourceSetContainer::class.java)
 
+internal inline val Project.sourceSetsOrNull: SourceSetContainer?
+  get() = extensions.findByType(SourceSetContainer::class.java)
+
 internal inline val Project.distributions: DistributionContainer
   get() = extensions.getByType(DistributionContainer::class.java)
 
