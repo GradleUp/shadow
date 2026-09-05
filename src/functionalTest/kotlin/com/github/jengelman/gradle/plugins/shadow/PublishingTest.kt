@@ -349,6 +349,46 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun dontPublishSourcesWhenGenerateSourcesJarDisabled() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          |java {
+          |  withSourcesJar()
+          |}
+          """
+            .trimMargin(),
+        shadowBlock =
+          """
+          |archiveClassifier = ''
+          |generateSourcesJar = false
+          """
+            .trimMargin(),
+        publicationsBlock =
+          """
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |}
+          """
+            .trimMargin(),
+      )
+    )
+
+    val result = publish(infoArgument)
+
+    assertThat(result.output)
+      .contains("Skipping adding shadowSourcesElements variant to shadow component.")
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries.filter { it.contains("sources") }).isEmpty()
+    assertShadowJarCommon(repoJarPath("$artifactRoot/maven-1.0.jar"))
+    assertPomCommon(repoPath("$artifactRoot/maven-1.0.pom"))
+    val gmm = gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module"))
+    assertShadowVariantCommon(gmm)
+    assertThat(gmm.variantNames).containsOnly(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME)
+  }
+
+  @Test
   fun publishCustomShadowJar() {
     projectScript.appendText(
       publishConfiguration(

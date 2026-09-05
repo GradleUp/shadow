@@ -138,8 +138,11 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowSourcesElements = configurations.shadowSourcesElements
-    // If `withSourcesJar` is present.
+    // If `withSourcesJar` is present and `generateSourcesJar` is enabled.
     val sourcesElements = { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) }
+    val shouldAddSources = {
+      sourcesElements() != null && tasks.shadowJar.flatMap { it.generateSourcesJar }.get()
+    }
 
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
@@ -152,7 +155,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     shadowComponent.addVariants(
       outgoingConfiguration = shadowSourcesElements,
       logger = logger,
-      shouldAdd = { sourcesElements() != null },
+      shouldAdd = shouldAddSources,
     )
 
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
@@ -166,7 +169,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       component.addVariants(
         outgoingConfiguration = shadowSourcesElements,
         logger = logger,
-        shouldAdd = { addIntoJavaComponent.get() && sourcesElements() != null },
+        shouldAdd = { addIntoJavaComponent.get() && shouldAddSources() },
       ) {
         mapToOptional()
       }
