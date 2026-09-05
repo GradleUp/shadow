@@ -1,18 +1,15 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
-import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import java.nio.file.Path
-import kotlin.io.path.appendText
+import kotlin.io.path.bufferedWriter
+import kotlin.io.path.copyTo
+import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
-import kotlin.io.path.createFile
-import kotlin.io.path.createParentDirectories
 import kotlin.io.path.exists
-import kotlin.io.path.invariantSeparatorsPathString
-import kotlin.io.path.isRegularFile
-import kotlin.io.path.name
-import kotlin.io.path.writeText
 import org.apache.maven.model.Dependency
+import org.apache.maven.model.DependencyManagement
 import org.apache.maven.model.Model
+import org.apache.maven.model.io.xpp3.MavenXpp3Writer
 import org.gradle.api.logging.Logging
 
 class AppendableMavenRepository(val root: Path) {
@@ -21,9 +18,6 @@ class AppendableMavenRepository(val root: Path) {
 
   init {
     check(root.exists()) { "Maven repository root directory does not exist: $root" }
-
-    root.resolve("settings.gradle").createFile().writeText("rootProject.name = '${root.name}'\n")
-    root.resolve("build.gradle").createFile()
     jarsDir = root.resolve("jars").createDirectory()
   }
 
@@ -49,26 +43,48 @@ class AppendableMavenRepository(val root: Path) {
     return bomModule.coordinate
   }
 
-  private var publishCounter = 0
-
   fun publish() {
     check(modules.isNotEmpty()) { "No modules to publish. Please add at least one module." }
-    modules
-      .groupBy { it::class }
-      .forEach { (type, group) ->
-        @Suppress("UNCHECKED_CAST")
-        when (type) {
-          JarModule::class -> {
-            configureJarModules(group as List<JarModule>)
+    val writer = MavenXpp3Writer()
+
+    modules.forEach { module ->
+      val groupPath = module.groupId.replace('.', '/')
+      val versionDir =
+        root.resolve("$groupPath/${module.artifactId}/${module.version}").createDirectories()
+      val pomFile = versionDir.resolve("${module.artifactId}-${module.version}.pom")
+
+      val model =
+        Model().apply {
+          modelVersion = "4.0.0"
+          groupId = module.groupId
+          artifactId = module.artifactId
+          version = module.version
+          when (module) {
+            is JarModule -> {
+              dependencies = module.dependencies
+            }
+            is BomModule -> {
+              packaging = "pom"
+              dependencyManagement =
+                DependencyManagement().apply { dependencies = module.dependencies }
+            }
           }
-          BomModule::class -> {
-            configureBomModules(group as List<BomModule>)
-          }
-          else -> error("Unsupported module type: $type")
+        }
+
+      pomFile.bufferedWriter().use { writer.write(it, model) }
+
+      if (module is JarModule) {
+        val jar = module.existingJar ?: error("No jar file provided for ${module.coordinate}")
+        val targetJar = versionDir.resolve("${module.artifactId}-${module.version}.jar")
+        jar.copyTo(targetJar, overwrite = true)
+
+        module.existingSourcesJar?.let { sourcesJar ->
+          val targetSourcesJar =
+            versionDir.resolve("${module.artifactId}-${module.version}-sources.jar")
+          sourcesJar.copyTo(targetSourcesJar, overwrite = true)
         }
       }
-
-    gradleRunner(projectDir = root, arguments = listOf("publish", "--stacktrace")).build()
+    }
 
     logger.info(
       """
@@ -80,104 +96,9 @@ class AppendableMavenRepository(val root: Path) {
     modules.clear()
   }
 
-  private fun configureJarModules(jarModules: List<JarModule>) {
-    val mavenPublications =
-      jarModules.joinToString("\n") { module ->
-        var index = -1
-        val nodes =
-          module.dependencies.joinToString("\n") {
-            index++
-            val node = "dependencyNode$index"
-            """
-            |def $node = dependenciesNode.appendNode('dependency')
-            |$node.appendNode('groupId', '${it.groupId}')
-            |$node.appendNode('artifactId', '${it.artifactId}')
-            |$node.appendNode('version', '${it.version}')
-            |$node.appendNode('scope', '${it.scope}')
-            """
-              .trimMargin()
-          }
-        module.createMavenPublication(
-          """
-          |artifact '${module.artifactPath}'
-          |pom.withXml { xml ->
-          |  def dependenciesNode = xml.asNode().get('dependencies') ?: xml.asNode().appendNode('dependencies')
-          |  $nodes
-          |}
-          """
-            .trimMargin()
-        )
-      }
-    val scriptContent =
-      """
-      |plugins {
-      |  id 'maven-publish'
-      |}
-      |publishing {
-      |  publications {
-      |    $mavenPublications
-      |  }
-      |  repositories {
-      |    maven { url = '${root.toUri()}' }
-      |  }
-      |}
-      """
-        .trimMargin()
-    val jarsModule = "jars-module-${publishCounter++}"
-    root.resolve("settings.gradle").appendText("include '$jarsModule'\n")
-    root.resolve("$jarsModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
-  }
-
-  private fun configureBomModules(bomModules: List<BomModule>) {
-    // BOM modules are published one by one.
-    bomModules.forEach { module ->
-      val scriptContent =
-        """
-        |plugins {
-        |  id 'maven-publish'
-        |  id 'java-platform'
-        |}
-        |dependencies {
-        |  constraints {
-        |    ${module.dependencies.joinToString("\n") { "api '${it.coordinate}'" }}
-        |  }
-        |}
-        |publishing {
-        |  publications {
-        |    ${module.createMavenPublication("from components.javaPlatform")}
-        |  }
-        |  repositories {
-        |    maven { url = '${root.toUri()}' }
-        |  }
-        |}
-        """
-          .trimMargin()
-      val pomModule = "pom-module-${publishCounter++}"
-      root.resolve("settings.gradle").appendText("include '$pomModule'\n")
-      root.resolve("$pomModule/build.gradle").createFileIfNotExists().writeText(scriptContent)
-    }
-  }
-
-  private fun Module.createMavenPublication(block: String): String {
-    return """
-           |create('${coordinate.replace(":", "")}', MavenPublication) {
-           |  artifactId = '$artifactId'
-           |  groupId = '$groupId'
-           |  version = '$version'
-           |  $block
-           |}
-           """
-      .trimMargin()
-  }
-
-  sealed class Module(groupId: String, artifactId: String, version: String) : Model() {
+  sealed class Module(val groupId: String, val artifactId: String, val version: String) {
     val coordinate = "$groupId:$artifactId:$version"
-
-    init {
-      this.groupId = groupId
-      this.artifactId = artifactId
-      this.version = version
-    }
+    val dependencies = mutableListOf<Dependency>()
 
     fun addDependency(coordinate: String, scope: String = "runtime") {
       val (groupId, artifactId, version) =
@@ -192,23 +113,17 @@ class AppendableMavenRepository(val root: Path) {
           it.version = version
           it.scope = scope
         }
-      addDependency(dependency)
+      dependencies += dependency
     }
   }
 
   inner class JarModule(groupId: String, artifactId: String, version: String) :
     Module(groupId, artifactId, version) {
-    private var existingJar: Path? = null
+    var existingJar: Path? = null
+      private set
 
-    val artifactPath: String
-      get() =
-        existingJar
-          ?.also {
-            check(it.exists() && it.isRegularFile()) {
-              "Jar file does not exist or is not a regular file: $it"
-            }
-          }
-          ?.invariantSeparatorsPathString ?: error("No jar file provided for $coordinate")
+    var existingSourcesJar: Path? = null
+      private set
 
     fun useJar(existingJar: Path) {
       this.existingJar = existingJar
@@ -218,25 +133,18 @@ class AppendableMavenRepository(val root: Path) {
       val jarPath = jarsDir.resolve("${coordinate.replace(':', '-')}.jar")
       existingJar = JarBuilder(jarPath).apply(builder).write()
     }
+
+    fun buildSourcesJar(builder: JarBuilder.() -> Unit) {
+      val jarPath = jarsDir.resolve("${coordinate.replace(':', '-')}-sources.jar")
+      existingSourcesJar = JarBuilder(jarPath).apply(builder).write()
+    }
   }
 
   class BomModule(groupId: String, artifactId: String, version: String) :
-    Module(groupId, artifactId, version) {
-    init {
-      packaging = "pom"
-    }
-  }
+    Module(groupId, artifactId, version)
 }
 
 private val logger = Logging.getLogger(AppendableMavenRepository::class.java)
 
 val Dependency.coordinate: String
   get() = "$groupId:$artifactId:$version"
-
-private fun Path.createFileIfNotExists(): Path {
-  if (!exists()) {
-    createParentDirectories()
-    createFile()
-  }
-  return this
-}
