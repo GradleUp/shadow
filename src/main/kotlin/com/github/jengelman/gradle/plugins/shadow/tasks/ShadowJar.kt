@@ -11,7 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
-import com.github.jengelman.gradle.plugins.shadow.internal.generateShadowedSourcesJar
+import com.github.jengelman.gradle.plugins.shadow.internal.generateSourcesJar
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
@@ -821,7 +821,7 @@ public abstract class ShadowJar : Jar() {
 
   private fun generateShadowedSourcesJar() {
     if (!generateSourcesJar.get() || !archiveSourcesFile.isPresent) return
-    generateShadowedSourcesJar(
+    generateSourcesJar(
       sourcesJarFile = archiveSourcesFile.get().asFile,
       sourceSetsSourceDirs = sourceSetsSourceDirs,
       includedSourcesJars = includedSourcesJars.files,

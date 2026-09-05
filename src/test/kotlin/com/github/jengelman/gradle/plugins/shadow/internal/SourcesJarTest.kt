@@ -61,7 +61,7 @@ class SourcesJarTest {
   }
 
   @Test
-  fun generateShadowedSourcesJarDeterministicOrdering(@TempDir tempDir: File) {
+  fun deterministicOrdering(@TempDir tempDir: File) {
     val srcDir = tempDir.resolve("src").apply { mkdirs() }
     srcDir.resolve("z/sub/Z.java").apply {
       parentFile.mkdirs()
@@ -77,7 +77,7 @@ class SourcesJarTest {
     }
 
     val outputJar = tempDir.resolve("output-sources.jar")
-    generateShadowedSourcesJar(
+    generateSourcesJar(
       sourcesJarFile = outputJar,
       sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
       includedSourcesJars = emptyList(),
@@ -105,7 +105,7 @@ class SourcesJarTest {
   }
 
   @Test
-  fun generateShadowedSourcesJarRespectsExcludedDirectory(@TempDir tempDir: File) {
+  fun respectsExcludedDirectory(@TempDir tempDir: File) {
     val srcDir = tempDir.resolve("src").apply { mkdirs() }
     srcDir.resolve("Excluded.java").writeText("public class Excluded {}")
 
@@ -115,7 +115,7 @@ class SourcesJarTest {
       }
 
     val outputJar = tempDir.resolve("output-sources.jar")
-    generateShadowedSourcesJar(
+    generateSourcesJar(
       sourcesJarFile = outputJar,
       sourceSetsSourceDirs = testObjectFactory.fileCollection().from(fileTree),
       includedSourcesJars = emptyList(),
@@ -141,7 +141,7 @@ class SourcesJarTest {
       }
 
     assertFailure {
-        generateShadowedSourcesJar(
+        generateSourcesJar(
           sourcesJarFile = invalidFile,
           sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
           includedSourcesJars = emptyList(),

@@ -10,7 +10,7 @@ import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
 import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
-internal fun generateShadowedSourcesJar(
+internal fun generateSourcesJar(
   sourcesJarFile: File,
   sourceSetsSourceDirs: FileCollection,
   includedSourcesJars: Iterable<File>,
