@@ -8,7 +8,6 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
-import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
 import java.util.zip.ZipFile
@@ -18,50 +17,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 class SourcesJarTest {
-
-  @Test
-  fun extractPackageStatements() {
-    assertThat(extractPackage("package com.example.foo;")).isEqualTo("com.example.foo")
-    assertThat(extractPackage("package com.example.foo")).isEqualTo("com.example.foo")
-    assertThat(extractPackage("  package   com.example.foo.bar  ; "))
-      .isEqualTo("com.example.foo.bar")
-    assertThat(
-        extractPackage(
-          """
-          /*
-           * Multi-line header comment.
-           */
-          package com.example.license;
-          public class License {}
-          """
-            .trimIndent()
-        )
-      )
-      .isEqualTo("com.example.license")
-    assertThat(
-        extractPackage(
-          """
-          @file:JvmName("MyUtils")
-          package com.example.annotated
-          fun test() {}
-          """
-            .trimIndent()
-        )
-      )
-      .isEqualTo("com.example.annotated")
-    assertThat(
-        extractPackage(
-          """
-          package a
-          package b.c
-          class Chained
-          """
-            .trimIndent()
-        )
-      )
-      .isEqualTo("a.b.c")
-    assertThat(extractPackage("public class NoPackage {}")).isEqualTo("")
-  }
 
   @Test
   fun isUnusedMatching() {
@@ -103,44 +58,6 @@ class SourcesJarTest {
     assertThat(isUnused("com/example/Unknown.java", unusedSet, sourceToClasses)).isFalse()
     assertThat(isUnused("com/example/UnusedJava.java", emptySet(), sourceToClasses)).isFalse()
     assertThat(isUnused("Main.java", setOf("Other"), sourceToClasses)).isFalse()
-  }
-
-  @Test
-  fun generateShadowedSourcesJarNormalizesPackageDirectory(@TempDir tempDir: File) {
-    val srcDir = tempDir.resolve("src").apply { mkdirs() }
-    val flatMismatchedFile = srcDir.resolve("Mismatched.kt")
-    flatMismatchedFile.writeText(
-      """
-      package com.example.nested
-      class Mismatched
-      """
-        .trimIndent()
-    )
-
-    val outputJar = tempDir.resolve("output-sources.jar")
-    generateShadowedSourcesJar(
-      sourcesJarFile = outputJar,
-      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
-      includedSourcesJars = emptyList(),
-      relocators = listOf(SimpleRelocator("com.example", "shadow.example")),
-      unusedClasses = emptySet(),
-      entryCompression = ZipEntryCompression.DEFLATED,
-      isZip64 = false,
-      metadataCharset = null,
-      preserveFileTimestamps = true,
-    )
-
-    assertThat(outputJar.exists()).isTrue()
-    val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
-    assertThat(entries)
-      .containsOnly(
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-        "shadow/",
-        "shadow/example/",
-        "shadow/example/nested/",
-        "shadow/example/nested/Mismatched.kt",
-      )
   }
 
   @Test

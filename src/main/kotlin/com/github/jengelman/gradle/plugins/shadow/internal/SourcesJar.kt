@@ -62,14 +62,10 @@ internal fun generateShadowedSourcesJar(
         for ((file, relPath) in filesWithRelPaths.sortedBy { it.second }) {
           val isSource = isSourceFile(relPath)
           if (isSource) {
-            val text = file.readText(charset)
-            val pkg = extractPackage(text)
-            val simpleName = file.name
-            val canonicalPath =
-              if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
-            if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) continue
-            val relocatedPath = relocators.relocateSourcePath(canonicalPath)
+            if (isUnused(relPath, unusedClasses, sourceToClasses)) continue
+            val relocatedPath = relocators.relocateSourcePath(relPath)
             if (visitedFiles.add(relocatedPath)) {
+              val text = file.readText(charset)
               val transformedText = relocators.remapSource(text)
               val bytes = transformedText.toByteArray(charset)
               zos.writeEntry(
@@ -116,14 +112,10 @@ internal fun generateShadowedSourcesJar(
                 }
                 val isSource = isSourceFile(name)
                 if (isSource) {
-                  val text = getInputStream(entry).bufferedReader(charset).readText()
-                  val pkg = extractPackage(text)
-                  val simpleName = name.substringAfterLast('/')
-                  val canonicalPath =
-                    if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
-                  if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) return@forEach
-                  val relocatedPath = relocators.relocateSourcePath(canonicalPath)
+                  if (isUnused(name, unusedClasses, sourceToClasses)) return@forEach
+                  val relocatedPath = relocators.relocateSourcePath(name)
                   if (visitedFiles.add(relocatedPath)) {
+                    val text = getInputStream(entry).bufferedReader(charset).readText()
                     val transformedText = relocators.remapSource(text)
                     val bytes = transformedText.toByteArray(charset)
                     zos.writeEntry(
@@ -170,13 +162,6 @@ internal fun generateShadowedSourcesJar(
     sourcesJarFile.delete()
     gradleError("Could not create shadowed sources JAR '$sourcesJarFile'.", e)
   }
-}
-
-private val packageRegex = """(?:^|\n)\s*package\s+([a-zA-Z0-9_.]+)""".toRegex()
-
-internal fun extractPackage(text: String): String {
-  val matches = packageRegex.findAll(text).map { it.groupValues[1] }.toList()
-  return if (matches.isEmpty()) "" else matches.joinToString(".")
 }
 
 internal fun buildSourceToClassesMap(

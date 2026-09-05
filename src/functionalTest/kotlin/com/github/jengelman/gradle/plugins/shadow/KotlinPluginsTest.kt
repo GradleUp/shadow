@@ -337,46 +337,6 @@ class KotlinPluginsTest : BasePluginTest() {
       )
   }
 
-  @Test
-  fun generateShadowedSourcesJarNormalizesPackageDirectory() {
-    val stdlib = compileOnlyStdlib(true)
-    path("src/main/kotlin/FlatFile.kt")
-      .writeText(
-        """
-        |package my.custom.nested
-        |
-        |class FlatClass
-        """
-          .trimMargin()
-      )
-    projectScript.writeText(
-      """
-      |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
-      |dependencies {
-      |  $stdlib
-      |}
-      |$shadowJarTask {
-      |  generateSourcesJar = true
-      |  relocate 'my.custom', 'shadow.custom'
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly(
-        "shadow/",
-        "shadow/custom/",
-        "shadow/custom/nested/",
-        "shadow/custom/nested/FlatFile.kt",
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-      )
-    }
-  }
-
   private fun compileOnlyStdlib(exclude: Boolean): String {
     return if (exclude) {
       // Disable the stdlib dependency added via `implementation`.
