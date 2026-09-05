@@ -362,6 +362,7 @@ class PublishingTest : BasePluginTest() {
         shadowBlock =
           """
           |archiveClassifier = 'shaded'
+          |archiveSourcesFile = layout.buildDirectory.file('custom.jar')
           """
             .trimMargin(),
         publicationsBlock =

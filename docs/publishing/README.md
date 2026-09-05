@@ -629,11 +629,21 @@ When publishing alongside standard Java artifacts (e.g. publishing `from(compone
 
 #### Replacement Scenario
 
-When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = ""`), the companion shadowed sources JAR automatically uses the standard `sources` classifier. In this scenario, ensure standard `jar` and `sourcesJar` tasks are disabled so that only the shadowed artifacts are produced and published without destination or coordinate conflicts:
+When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = ""`), the companion shadowed sources JAR automatically uses the standard `sources` classifier.
+
+To publish shadowed artifacts as the primary publication:
+
+1. **Publish from `components["shadow"]` (Recommended)**: Publish the `shadow` component directly in your Maven publication, and disable standard archive tasks to prevent destination file collisions in `build/libs`:
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
     java {
       withSourcesJar()
     }
@@ -649,11 +659,25 @@ When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = "
     tasks.shadowJar {
       archiveClassifier = ""
     }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+    }
     ```
 
 === ":simple-apachegroovy: build.gradle"
 
     ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
     java {
       withSourcesJar()
     }
@@ -668,6 +692,54 @@ When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = "
 
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       archiveClassifier = ''
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+        }
+      }
+    }
+    ```
+
+2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, disabling the `jar` or `sourcesJar` tasks does not remove standard variants from the `java` software component. You must also explicitly skip the standard publication variants:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    components.named<org.gradle.api.component.AdhocComponentWithVariants>("java") {
+      withVariantsFromConfiguration(configurations["runtimeElements"]) { skip() }
+      withVariantsFromConfiguration(configurations["sourcesElements"]) { skip() }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    components.named('java', org.gradle.api.component.AdhocComponentWithVariants) {
+      withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
+      withVariantsFromConfiguration(configurations.sourcesElements) { skip() }
     }
     ```
 

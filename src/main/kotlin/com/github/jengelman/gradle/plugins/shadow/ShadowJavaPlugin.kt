@@ -11,7 +11,6 @@ import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurablePublishArtifact
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
 import org.gradle.api.attributes.Bundling
@@ -94,14 +93,11 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           objects.named(DocsType::class.java, DocsType.SOURCES),
         )
       }
-      val sourcesArtifact =
-        outgoing.artifact(tasks.shadowJar.flatMap { it.archiveSourcesFile }) { artifact ->
-          artifact.builtBy(tasks.shadowJar)
-          artifact.type = "jar"
-        }
-      tasks.shadowJar.configure { shadowJar ->
-        val shadowClassifier = shadowJar.archiveClassifier.orNull
-        (sourcesArtifact as? ConfigurablePublishArtifact)?.classifier =
+      outgoing.artifact(tasks.shadowJar.flatMap { it.archiveSourcesFile }) { artifact ->
+        artifact.builtBy(tasks.shadowJar)
+        artifact.type = "jar"
+        val shadowClassifier = tasks.shadowJar.flatMap { it.archiveClassifier }.orNull
+        artifact.classifier =
           if (shadowClassifier.isNullOrEmpty()) "sources" else "$shadowClassifier-sources"
       }
     }
