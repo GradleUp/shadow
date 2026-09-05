@@ -180,7 +180,7 @@ constructor(
     return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
-  private companion object {
+  internal companion object {
     /** Match dot, slash or space at end of string */
     val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
 

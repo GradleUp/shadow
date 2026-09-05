@@ -94,12 +94,9 @@ internal fun generateShadowedSourcesJar(
             val canonicalPath =
               if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
             if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) continue
-            val relocatedPath = relocators.relocatePath(canonicalPath)
+            val relocatedPath = relocators.relocateSourcePath(canonicalPath)
             if (visitedFiles.add(relocatedPath)) {
-              var transformedText = text
-              for (relocator in relocators) {
-                transformedText = relocator.applyToSourceContent(transformedText)
-              }
+              val transformedText = relocators.remapSource(text)
               val bytes = transformedText.toByteArray(charset)
               zos.writeEntry(
                 name = relocatedPath,
@@ -151,12 +148,9 @@ internal fun generateShadowedSourcesJar(
                   val canonicalPath =
                     if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
                   if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) return@forEach
-                  val relocatedPath = relocators.relocatePath(canonicalPath)
+                  val relocatedPath = relocators.relocateSourcePath(canonicalPath)
                   if (visitedFiles.add(relocatedPath)) {
-                    var transformedText = text
-                    for (relocator in relocators) {
-                      transformedText = relocator.applyToSourceContent(transformedText)
-                    }
+                    val transformedText = relocators.remapSource(text)
                     val bytes = transformedText.toByteArray(charset)
                     zos.writeEntry(
                       name = relocatedPath,
@@ -287,11 +281,4 @@ internal fun isUnused(
   if (unusedClasses.isEmpty()) return false
   val classes = sourceToClasses[canonicalPath] ?: return false
   return classes.isNotEmpty() && classes.all { it in unusedClasses }
-}
-
-private fun isSourceFile(path: String): Boolean {
-  return path.endsWith(".java") ||
-    path.endsWith(".kt") ||
-    path.endsWith(".groovy") ||
-    path.endsWith(".scala")
 }
