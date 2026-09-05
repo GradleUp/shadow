@@ -156,12 +156,26 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsAtLeast("my/Main.class", "h/H.class", "k/CustomUtils.class")
-      containsNone("h/UnusedH.class", "k/CustomUnusedUtils.class")
+      containsOnly(
+        "my/",
+        "h/",
+        "k/",
+        "my/Main.class",
+        "h/H.class",
+        "k/CustomUtils.class",
+        *manifestEntries,
+      )
     }
     assertThat(outputShadowedSourcesJar).useAll {
-      containsAtLeast("my/Main.java", "h/H.java", "k/Utils.kt")
-      containsNone("h/UnusedH.java", "k/UnusedUtils.kt")
+      containsOnly(
+        "my/",
+        "h/",
+        "k/",
+        "my/Main.java",
+        "h/H.java",
+        "k/Utils.kt",
+        *manifestEntries,
+      )
     }
   }
 

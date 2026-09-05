@@ -919,21 +919,31 @@ class PublishingTest : BasePluginTest() {
       )
 
     assertThat(repoJarPath("$artifactRoot/my-all-1.0.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
+        "g/",
+        "h/",
         "my/CommonMain.class",
         "my/JvmMain.class",
         "g/G.class",
         "h/H.class",
+        "h/UnusedH.class",
+        "META-INF/my_maven.kotlin_module",
         *manifestEntries,
       )
     }
 
     assertThat(repoJarPath("$artifactRoot/my-all-1.0-sources.jar")).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
+        "g/",
+        "h/",
         "my/CommonMain.kt",
         "my/JvmMain.kt",
         "g/G.java",
         "h/H.java",
+        "h/UnusedH.java",
+        *manifestEntries,
       )
     }
 

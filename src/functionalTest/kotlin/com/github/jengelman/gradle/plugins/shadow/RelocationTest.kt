@@ -9,8 +9,6 @@ import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -921,8 +919,11 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedSourcesJar).useAll {
-      containsAtLeast("my/Main.java")
-      containsNone("my/Excluded.java")
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        *manifestEntries,
+      )
     }
   }
 

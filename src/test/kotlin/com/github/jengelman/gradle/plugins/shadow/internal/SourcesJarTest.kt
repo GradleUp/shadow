@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.containsAtLeast
+import assertk.assertions.containsOnly
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -131,7 +131,15 @@ class SourcesJarTest {
 
     assertThat(outputJar.exists()).isTrue()
     val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
-    assertThat(entries).containsAtLeast("shadow/example/nested/Mismatched.kt")
+    assertThat(entries)
+      .containsOnly(
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+        "shadow/",
+        "shadow/example/",
+        "shadow/example/nested/",
+        "shadow/example/nested/Mismatched.kt",
+      )
   }
 
   @Test

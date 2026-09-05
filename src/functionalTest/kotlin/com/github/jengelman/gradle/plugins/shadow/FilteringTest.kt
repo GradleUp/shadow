@@ -2,8 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
@@ -260,12 +258,10 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsAtLeast("g/G.class")
-      containsNone("h/H.class", "h/UnusedH.class")
+      containsOnly(*entriesInAB, "g/", "g/G.class", *manifestEntries)
     }
     assertThat(outputShadowedSourcesJar).useAll {
-      containsAtLeast("g/G.java")
-      containsNone("h/H.java", "h/UnusedH.java")
+      containsOnly("g/", "g/G.java", *manifestEntries)
     }
   }
 

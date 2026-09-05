@@ -8,7 +8,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
@@ -337,6 +336,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
   @Test
   fun generateShadowedSourcesJarNormalizesPackageDirectory() {
+    val stdlib = compileOnlyStdlib(true)
     path("src/main/kotlin/FlatFile.kt")
       .writeText(
         """
@@ -349,6 +349,9 @@ class KotlinPluginsTest : BasePluginTest() {
     projectScript.writeText(
       """
       |${getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.jvm")}
+      |dependencies {
+      |  $stdlib
+      |}
       |$shadowJarTask {
       |  generateSourcesJar = true
       |  relocate 'my.custom', 'shadow.custom'
@@ -360,8 +363,13 @@ class KotlinPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedSourcesJar).useAll {
-      containsAtLeast("shadow/custom/nested/FlatFile.kt")
-      containsNone("FlatFile.kt")
+      containsOnly(
+        "shadow/",
+        "shadow/custom/",
+        "shadow/custom/nested/",
+        "shadow/custom/nested/FlatFile.kt",
+        *manifestEntries,
+      )
     }
   }
 

@@ -295,7 +295,7 @@ class JavaPluginsTest : BasePluginTest() {
     // The fact that server compiled successfully against `client.junit.framework.Test`
     // means it consumed the shadowed artifact during compilation.
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
-      containsAtLeast("server/Server.class")
+      containsOnly("server/", "server/Server.class", *manifestEntries)
     }
   }
 
@@ -1176,7 +1176,13 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
-      containsAtLeast("com/company/Main.class", "com/company/Utils.class", manifestEntry)
+      containsOnly(
+        "com/",
+        "com/company/",
+        "com/company/Main.class",
+        "com/company/Utils.class",
+        *manifestEntries,
+      )
     }
   }
 
@@ -1333,9 +1339,13 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedSourcesJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
+        "config/",
+        "config/sub/",
         "my/Main.java",
         "config/sub/app.properties",
+        *manifestEntries,
       )
     }
   }
@@ -1365,10 +1375,12 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedSourcesJar).useAll {
-      containsAtLeast(
+      containsOnly(
+        "my/",
         "my/Main.java",
         "a.properties",
         "b.properties",
+        *manifestEntries,
       )
     }
   }
