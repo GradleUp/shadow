@@ -1,7 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertThat
-import assertk.assertions.containsExactlyInAnyOrder
+import assertk.assertions.containsOnly
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
@@ -53,8 +53,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       artifactLicenseFile.writeText("artifact license file content")
       artifactLicense.set(artifactLicenseFile)
 
-      assertThat(elements)
-        .containsExactlyInAnyOrder("license one", "   license two", "license three")
+      assertThat(elements).containsOnly("license one", "   license two", "license three")
 
       assertThat(buildLicense())
         .isEqualTo(
@@ -90,7 +89,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       artifactLicenseFile.writeText("artifact license file content")
       artifactLicense.set(artifactLicenseFile)
 
-      assertThat(elements).containsExactlyInAnyOrder("license one")
+      assertThat(elements).containsOnly("license one")
 
       assertThat(buildLicense())
         .isEqualTo(

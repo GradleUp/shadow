@@ -4,8 +4,6 @@ import assertk.assertThat
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import kotlin.io.path.appendText
@@ -29,7 +27,7 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(outputImplShadowedJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "api/",
         "lib/",
         "impl/",
@@ -37,6 +35,7 @@ class MinimizeTest : BasePluginTest() {
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
+        *junitResourceEntries,
         *manifestEntries,
       )
       classLoader {
@@ -115,8 +114,14 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("client/Client.class", "server/Server.class")
-      containsNone("junit/framework/Test.class")
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.class",
+        "server/Server.class",
+        *junitResourceEntries,
+        *manifestEntries,
+      )
       classLoader {
         loadClass("client.Client")
         loadClass("server.Server")
@@ -143,8 +148,12 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("server/Server.class", *junitEntries)
-      containsNone("client/Client.class")
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
+      )
       classLoader {
         loadClass("server.Server")
         loadClass("junit.framework.Test")
@@ -217,7 +226,14 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.class",
+        "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
+      )
       classLoader {
         loadClass("client.Client")
         loadClass("server.Server")
@@ -236,7 +252,14 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(serverShadowJarPath)
 
     assertThat(outputServerShadowedJar).useAll {
-      containsAtLeast("client/Client.class", "server/Server.class", *junitEntries)
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.class",
+        "server/Server.class",
+        *junitEntries,
+        *manifestEntries,
+      )
       classLoader {
         loadClass("client.Client")
         loadClass("server.Server")
@@ -285,7 +308,7 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
 
     assertThat(outputImplShadowedJar).useAll {
-      containsAtLeast(
+      containsOnly(
         "api/",
         "lib/",
         "impl/",
@@ -293,6 +316,7 @@ class MinimizeTest : BasePluginTest() {
         "api/Entity.class",
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
+        *junitResourceEntries,
         *manifestEntries,
       )
     }

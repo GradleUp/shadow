@@ -416,6 +416,20 @@ abstract class BasePluginTest {
           it.name == "junit3.8.2/"
         }
     val junitEntries: Array<String> = junitRawEntries.map { it.name }.toTypedArray()
+    val junitResourceEntries: Array<String> =
+      arrayOf(
+        "junit/",
+        "junit/runner/",
+        "junit/runner/excluded.properties",
+        "junit/runner/logo.gif",
+        "junit/runner/smalllogo.gif",
+        "junit/swingui/",
+        "junit/swingui/icons/",
+        "junit/swingui/icons/error.gif",
+        "junit/swingui/icons/failure.gif",
+        "junit/swingui/icons/hierarchy.gif",
+        "junit/swingui/icons/ok.gif",
+      )
     const val manifestEntry = "META-INF/MANIFEST.MF"
     val manifestEntries = arrayOf("META-INF/", manifestEntry)
 

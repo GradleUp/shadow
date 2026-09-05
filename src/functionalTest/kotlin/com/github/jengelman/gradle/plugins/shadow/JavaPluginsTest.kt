@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.internal.multiReleaseAttribute
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -281,7 +280,7 @@ class JavaPluginsTest : BasePluginTest() {
     // The fact that server compiled successfully against `client.junit.framework.Test`
     // means it consumed the shadowed artifact during compilation.
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
-      containsAtLeast("server/Server.class")
+      containsOnly("server/", "server/Server.class", *manifestEntries)
     }
   }
 
@@ -1162,7 +1161,13 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
 
     assertThat(jarPath("app/build/libs/app-all.jar")).useAll {
-      containsAtLeast("com/company/Main.class", "com/company/Utils.class", manifestEntry)
+      containsOnly(
+        "com/",
+        "com/company/",
+        "com/company/Main.class",
+        "com/company/Utils.class",
+        *manifestEntries,
+      )
     }
   }
 
