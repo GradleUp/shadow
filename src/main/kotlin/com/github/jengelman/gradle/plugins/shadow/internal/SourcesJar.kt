@@ -20,7 +20,6 @@ internal fun generateShadowedSourcesJar(
   preserveFileTimestamps: Boolean,
 ) {
   val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }.sortedBy { it.path }
-  if (sourceSetsSourceDirs.none() && sourcesJars.isEmpty()) return
 
   val visitedFiles = mutableSetOf<String>()
   val charset = metadataCharset?.let(Charset::forName) ?: Charsets.UTF_8
@@ -49,54 +48,60 @@ internal fun generateShadowedSourcesJar(
           write("Manifest-Version: 1.0\n\n".toByteArray(charset))
         }
 
-        val sortedSourceDirs = sourceSetsSourceDirs.filter { it.exists() }.sortedBy { it.path }
-        for (srcDir in sortedSourceDirs) {
-          srcDir
-            .walkTopDown()
-            .filter { it.isFile }
-            .toList()
-            .sortedBy { it.relativeTo(srcDir).invariantSeparatorsPath }
-            .forEach { file ->
-              val relPath = file.relativeTo(srcDir).invariantSeparatorsPath
-              val isSource = isSourceFile(relPath)
-              if (isSource) {
-                val text = file.readText(charset)
-                val pkg = extractPackage(text)
-                val simpleName = file.name
-                val canonicalPath =
-                  if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
-                if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) return@forEach
-                val relocatedPath = relocators.relocatePath(canonicalPath)
-                if (visitedFiles.add(relocatedPath)) {
-                  var transformedText = text
-                  for (relocator in relocators) {
-                    transformedText = relocator.applyToSourceContent(transformedText)
-                  }
-                  val bytes = transformedText.toByteArray(charset)
-                  zos.writeEntry(
-                    name = relocatedPath,
-                    preserveLastModified = preserveFileTimestamps,
-                    lastModified = file.lastModified(),
-                    unixMode = UnixMode.file(),
-                  ) {
-                    write(bytes)
-                  }
+        val sourceItems = sourceSetsSourceDirs.filter { it.exists() }.sortedBy { it.path }
+        for (item in sourceItems) {
+          val filesWithRelPaths: List<Pair<File, String>> =
+            if (item.isDirectory) {
+              item
+                .walkTopDown()
+                .filter { it.isFile }
+                .toList()
+                .sortedBy { it.relativeTo(item).invariantSeparatorsPath }
+                .map { it to it.relativeTo(item).invariantSeparatorsPath }
+            } else {
+              listOf(item to item.name)
+            }
+
+          for ((file, relPath) in filesWithRelPaths) {
+            val isSource = isSourceFile(relPath)
+            if (isSource) {
+              val text = file.readText(charset)
+              val pkg = extractPackage(text)
+              val simpleName = file.name
+              val canonicalPath =
+                if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
+              if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) continue
+              val relocatedPath = relocators.relocatePath(canonicalPath)
+              if (visitedFiles.add(relocatedPath)) {
+                var transformedText = text
+                for (relocator in relocators) {
+                  transformedText = relocator.applyToSourceContent(transformedText)
                 }
-              } else {
-                val relocatedPath = relocators.relocatePath(relPath)
-                if (visitedFiles.add(relocatedPath)) {
-                  val bytes = file.readBytes()
-                  zos.writeEntry(
-                    name = relocatedPath,
-                    preserveLastModified = preserveFileTimestamps,
-                    lastModified = file.lastModified(),
-                    unixMode = UnixMode.file(),
-                  ) {
-                    write(bytes)
-                  }
+                val bytes = transformedText.toByteArray(charset)
+                zos.writeEntry(
+                  name = relocatedPath,
+                  preserveLastModified = preserveFileTimestamps,
+                  lastModified = file.lastModified(),
+                  unixMode = UnixMode.file(),
+                ) {
+                  write(bytes)
+                }
+              }
+            } else {
+              val relocatedPath = relocators.relocatePath(relPath)
+              if (visitedFiles.add(relocatedPath)) {
+                val bytes = file.readBytes()
+                zos.writeEntry(
+                  name = relocatedPath,
+                  preserveLastModified = preserveFileTimestamps,
+                  lastModified = file.lastModified(),
+                  unixMode = UnixMode.file(),
+                ) {
+                  write(bytes)
                 }
               }
             }
+          }
         }
 
         sourcesJars.forEach { jarFile ->

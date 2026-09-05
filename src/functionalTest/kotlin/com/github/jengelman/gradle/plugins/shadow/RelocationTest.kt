@@ -9,6 +9,8 @@ import assertk.assertions.isNotEqualTo
 import assertk.fail
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONSTANT_TIME_FOR_ZIP_ENTRIES
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsNone
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -879,6 +881,48 @@ class RelocationTest : BasePluginTest() {
           """
             .trimMargin()
         )
+    }
+  }
+
+  @Test
+  fun relocateShadowedSourcesJarRespectsSourceDirectorySetFilters() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |public class Main {}
+        """
+          .trimMargin()
+      )
+    path("src/main/java/my/Excluded.java")
+      .writeText(
+        """
+        |package my;
+        |public class Excluded {}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |sourceSets {
+      |  main {
+      |    java {
+      |      exclude '**/Excluded.java'
+      |    }
+      |  }
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsAtLeast("my/Main.java")
+      containsNone("my/Excluded.java")
     }
   }
 

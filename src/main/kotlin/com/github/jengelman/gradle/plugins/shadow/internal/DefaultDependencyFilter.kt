@@ -44,22 +44,23 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
       includedDependencies = includes,
       excludedDependencies = excludes,
     )
-    val componentIds =
-      configuration.incoming.resolutionResult.allDependencies
-        .filterIsInstance<ResolvedDependencyResult>()
-        .map { it.selected.id }
-        .toSet()
+    val allResolvedDependencies =
+      configuration.incoming.resolutionResult.allDependencies.filterIsInstance<
+        ResolvedDependencyResult
+      >()
+
+    val includedDependenciesResults = allResolvedDependencies.filter { dep ->
+      includes.any { inc ->
+        inc.moduleGroup == dep.selected.moduleVersion?.group &&
+          inc.moduleName == dep.selected.moduleVersion?.name &&
+          inc.moduleVersion == dep.selected.moduleVersion?.version
+      }
+    }
 
     val externalComponentIds =
-      componentIds
+      includedDependenciesResults
+        .map { it.selected.id }
         .filterIsInstance<ModuleComponentIdentifier>()
-        .filter { id ->
-          includes.any {
-            it.moduleGroup == id.group &&
-              it.moduleName == id.module &&
-              it.moduleVersion == id.version
-          }
-        }
         .toSet()
 
     val externalSourcesFiles =
@@ -73,7 +74,12 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
         .filterIsInstance<ResolvedArtifactResult>()
         .map { it.file }
 
-    val includedProjectNames = includes.map { it.moduleName }.toSet()
+    val projectComponentIds =
+      includedDependenciesResults
+        .map { it.selected.id }
+        .filterIsInstance<ProjectComponentIdentifier>()
+        .toSet()
+
     val projectSourcesFiles =
       try {
         configuration.incoming
@@ -89,9 +95,7 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
                 project.objects.named(DocsType::class.java, DocsType.SOURCES),
               )
             }
-            view.componentFilter { id ->
-              id is ProjectComponentIdentifier && id.projectName in includedProjectNames
-            }
+            view.componentFilter { id -> id in projectComponentIds }
             view.lenient(true)
           }
           .files

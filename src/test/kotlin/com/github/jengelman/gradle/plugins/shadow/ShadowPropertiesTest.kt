@@ -182,7 +182,7 @@ class ShadowPropertiesTest {
       assertThat(shadowJarTask.generateSourcesJar.get()).isTrue()
       assertThat(shadowJarTask.sourceSetsSourceDirs.files)
         .containsOnly(
-          *javaPluginExtension.sourceSets.getByName("main").allSource.srcDirs.toTypedArray()
+          *javaPluginExtension.sourceSets.getByName("main").allSource.files.toTypedArray()
         )
     }
 
