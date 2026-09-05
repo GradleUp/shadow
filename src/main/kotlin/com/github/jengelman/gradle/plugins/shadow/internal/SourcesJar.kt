@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
 import java.nio.charset.Charset
+import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
 import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
@@ -11,7 +12,7 @@ import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 internal fun generateShadowedSourcesJar(
   sourcesJarFile: File,
-  sourceSetsSourceDirs: Iterable<File>,
+  sourceSetsSourceDirs: FileCollection,
   includedSourcesJars: Iterable<File>,
   classesDirs: Iterable<File> = emptyList(),
   dependencies: Iterable<File> = emptyList(),
@@ -51,41 +52,14 @@ internal fun generateShadowedSourcesJar(
           write("Manifest-Version: 1.0\n\n".toByteArray(charset))
         }
 
-        val sourceItems = sourceSetsSourceDirs.filter { it.exists() }
-        val (dirs, files) = sourceItems.partition { it.isDirectory }
-        val normalizedDirs =
-          dirs.map { it to it.normalize().toPath() }.sortedByDescending { it.second.nameCount }
-
         val filesWithRelPaths = mutableListOf<Pair<File, String>>()
-        val coveredDirs = mutableSetOf<File>()
-
-        for (file in files.sortedBy { it.path }) {
-          val filePath = file.normalize().toPath()
-          val matchingDir =
-            normalizedDirs.firstOrNull { (_, dirPath) -> filePath.startsWith(dirPath) }?.first
-          if (matchingDir != null) {
-            coveredDirs.add(matchingDir)
-            filesWithRelPaths.add(file to file.relativeTo(matchingDir).invariantSeparatorsPath)
-          } else {
-            filesWithRelPaths.add(file to file.name)
+        sourceSetsSourceDirs.asFileTree.visit { details ->
+          if (!details.isDirectory) {
+            filesWithRelPaths.add(details.file to details.relativePath.pathString)
           }
         }
 
-        for ((dir, dirPath) in normalizedDirs.sortedBy { it.second.nameCount }) {
-          if (coveredDirs.none { dirPath.startsWith(it.normalize().toPath()) }) {
-            coveredDirs.add(dir)
-            dir
-              .walkTopDown()
-              .filter { it.isFile }
-              .toList()
-              .sortedBy { it.relativeTo(dir).invariantSeparatorsPath }
-              .forEach { f ->
-                filesWithRelPaths.add(f to f.relativeTo(dir).invariantSeparatorsPath)
-              }
-          }
-        }
-
-        for ((file, relPath) in filesWithRelPaths) {
+        for ((file, relPath) in filesWithRelPaths.sortedBy { it.second }) {
           val isSource = isSourceFile(relPath)
           if (isSource) {
             val text = file.readText(charset)

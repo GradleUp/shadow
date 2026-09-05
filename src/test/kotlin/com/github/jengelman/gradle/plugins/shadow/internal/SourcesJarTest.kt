@@ -9,6 +9,7 @@ import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
+import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
 import java.util.zip.ZipFile
 import org.gradle.api.GradleException
@@ -119,7 +120,7 @@ class SourcesJarTest {
     val outputJar = tempDir.resolve("output-sources.jar")
     generateShadowedSourcesJar(
       sourcesJarFile = outputJar,
-      sourceSetsSourceDirs = listOf(srcDir),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
       includedSourcesJars = emptyList(),
       relocators = listOf(SimpleRelocator("com.example", "shadow.example")),
       unusedClasses = emptySet(),
@@ -161,7 +162,7 @@ class SourcesJarTest {
     val outputJar = tempDir.resolve("output-sources.jar")
     generateShadowedSourcesJar(
       sourcesJarFile = outputJar,
-      sourceSetsSourceDirs = listOf(srcDir),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
       includedSourcesJars = emptyList(),
       relocators = emptyList(),
       unusedClasses = emptySet(),
@@ -189,6 +190,33 @@ class SourcesJarTest {
   }
 
   @Test
+  fun generateShadowedSourcesJarRespectsExcludedDirectory(@TempDir tempDir: File) {
+    val srcDir = tempDir.resolve("src").apply { mkdirs() }
+    srcDir.resolve("Excluded.java").writeText("public class Excluded {}")
+
+    val fileTree =
+      testObjectFactory.fileCollection().from(srcDir).asFileTree.matching {
+        it.exclude("**/Excluded.java")
+      }
+
+    val outputJar = tempDir.resolve("output-sources.jar")
+    generateShadowedSourcesJar(
+      sourcesJarFile = outputJar,
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(fileTree),
+      includedSourcesJars = emptyList(),
+      relocators = emptyList(),
+      unusedClasses = emptySet(),
+      entryCompression = ZipEntryCompression.DEFLATED,
+      isZip64 = false,
+      metadataCharset = null,
+      preserveFileTimestamps = true,
+    )
+
+    val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
+    assertThat(entries).containsOnly("META-INF/", "META-INF/MANIFEST.MF")
+  }
+
+  @Test
   fun throwsGradleExceptionOnFailure(@TempDir tempDir: File) {
     val invalidFile = tempDir.resolve("not-a-file").apply { mkdirs() }
     val srcDir =
@@ -200,7 +228,7 @@ class SourcesJarTest {
     assertFailure {
         generateShadowedSourcesJar(
           sourcesJarFile = invalidFile,
-          sourceSetsSourceDirs = listOf(srcDir),
+          sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
           includedSourcesJars = emptyList(),
           relocators = emptyList(),
           unusedClasses = emptySet(),

@@ -40,9 +40,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
         task.generateSourcesJar.flatMap { generate ->
           if (generate) {
             kotlinJvmMain.map {
-              it.allKotlinSourceSets.flatMap { ss ->
-                listOf(ss.kotlin.sourceDirectories, ss.kotlin)
-              }
+              it.allKotlinSourceSets.map { ss -> ss.kotlin }
             }
           } else {
             provider { emptySet() }

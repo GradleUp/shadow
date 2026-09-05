@@ -823,7 +823,7 @@ public abstract class ShadowJar : Jar() {
     if (!generateSourcesJar.get() || !archiveSourcesFile.isPresent) return
     generateShadowedSourcesJar(
       sourcesJarFile = archiveSourcesFile.get().asFile,
-      sourceSetsSourceDirs = sourceSetsSourceDirs.files,
+      sourceSetsSourceDirs = sourceSetsSourceDirs,
       includedSourcesJars = includedSourcesJars.files,
       classesDirs = sourceSetsClassesDirs.files,
       dependencies = includedDependencies.files,

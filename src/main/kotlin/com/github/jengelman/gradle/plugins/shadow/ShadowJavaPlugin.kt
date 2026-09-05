@@ -50,7 +50,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         task.sourceSetsSourceDirs.convention(
           task.generateSourcesJar.flatMap { generate ->
             if (generate) {
-              mainSourceSet.map { it.allSource.sourceDirectories + it.allSource }
+              mainSourceSet.map { it.allSource }
             } else {
               provider { emptySet() }
             }
