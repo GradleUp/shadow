@@ -825,6 +825,8 @@ public abstract class ShadowJar : Jar() {
       sourcesJarFile = archiveSourcesFile.get().asFile,
       sourceSetsSourceDirs = sourceSetsSourceDirs.files,
       includedSourcesJars = includedSourcesJars.files,
+      classesDirs = sourceSetsClassesDirs.files,
+      dependencies = includedDependencies.files,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
       entryCompression = entryCompression,

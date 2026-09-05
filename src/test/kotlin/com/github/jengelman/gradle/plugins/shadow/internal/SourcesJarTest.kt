@@ -67,115 +67,41 @@ class SourcesJarTest {
     val unusedSet =
       setOf(
         "com.example.UnusedJava",
+        "com.example.UnusedJava\$Inner",
         "com.example.UnusedKtClass",
         "com.example.DefaultFacadeKt",
         "com.example.CustomFacade",
       )
+    val sourceToClasses =
+      mapOf(
+        "com/example/UnusedJava.java" to
+          setOf("com.example.UnusedJava", "com.example.UnusedJava\$Inner"),
+        "com/example/PartiallyUsedJava.java" to
+          setOf("com.example.UnusedJava", "com.example.UsedHelper"),
+        "com/example/UsedJava.java" to setOf("com.example.UsedJava"),
+        "com/example/UnusedKtClass.kt" to setOf("com.example.UnusedKtClass"),
+        "com/example/DefaultFacade.kt" to setOf("com.example.DefaultFacadeKt"),
+        "com/example/Utils.kt" to setOf("com.example.CustomFacade"),
+        "com/example/MixedUtils.kt" to setOf("com.example.CustomFacade", "com.example.UsedClass"),
+        "Main.java" to setOf("Main"),
+      )
 
-    assertThat(isUnused("UnusedJava.java", "com.example", "class UnusedJava {}", unusedSet))
-      .isTrue()
-    assertThat(isUnused("UsedJava.java", "com.example", "class UsedJava {}", unusedSet)).isFalse()
+    // All classes unused in file -> unused
+    assertThat(isUnused("com/example/UnusedJava.java", unusedSet, sourceToClasses)).isTrue()
+    assertThat(isUnused("com/example/UnusedKtClass.kt", unusedSet, sourceToClasses)).isTrue()
+    assertThat(isUnused("com/example/DefaultFacade.kt", unusedSet, sourceToClasses)).isTrue()
+    assertThat(isUnused("com/example/Utils.kt", unusedSet, sourceToClasses)).isTrue()
+    assertThat(isUnused("Main.java", setOf("Main"), sourceToClasses)).isTrue()
 
-    assertThat(isUnused("UnusedKtClass.kt", "com.example", "class UnusedKtClass", unusedSet))
-      .isTrue()
-    assertThat(
-        isUnused(
-          "DefaultFacade.kt",
-          "com.example",
-          "fun topLevel() {}",
-          unusedSet,
-        )
-      )
-      .isTrue()
-    assertThat(
-        isUnused(
-          "Utils.kt",
-          "com.example",
-          """
-          @file:JvmName("CustomFacade")
-          package com.example
-          fun util() {}
-          """
-            .trimIndent(),
-          unusedSet,
-        )
-      )
-      .isTrue()
-    assertThat(
-        isUnused(
-          "Utils.kt",
-          "com.example",
-          """
-          @file:kotlin.jvm.JvmName(name = "CustomFacade")
-          package com.example
-          fun util() {}
-          """
-            .trimIndent(),
-          unusedSet,
-        )
-      )
-      .isTrue()
-    assertThat(
-        isUnused(
-          "UsedUtils.kt",
-          "com.example",
-          """
-          @file:JvmName("UsedFacade")
-          package com.example
-          fun util() {}
-          """
-            .trimIndent(),
-          unusedSet,
-        )
-      )
-      .isFalse()
-    assertThat(
-        isUnused(
-          "BracketedUtils.kt",
-          "com.example",
-          """
-          @file:[JvmName("CustomFacade")]
-          package com.example
-          fun util() {}
-          """
-            .trimIndent(),
-          unusedSet,
-        )
-      )
-      .isTrue()
-    assertThat(
-        isUnused(
-          "BracketedMultiUtils.kt",
-          "com.example",
-          """
-          @file:[Suppress("unused") JvmName("CustomFacade")]
-          package com.example
-          fun util() {}
-          """
-            .trimIndent(),
-          unusedSet,
-        )
-      )
-      .isTrue()
-    assertThat(
-        isUnused(
-          "BracketedMultiUtilsReversed.kt",
-          "com.example",
-          """
-          @file:[JvmName("CustomFacade") Suppress("unused")]
-          package com.example
-          fun util() {}
-          """
-            .trimIndent(),
-          unusedSet,
-        )
-      )
-      .isTrue()
+    // At least one class is used in file -> NOT unused (kept!)
+    assertThat(isUnused("com/example/PartiallyUsedJava.java", unusedSet, sourceToClasses)).isFalse()
+    assertThat(isUnused("com/example/MixedUtils.kt", unusedSet, sourceToClasses)).isFalse()
+    assertThat(isUnused("com/example/UsedJava.java", unusedSet, sourceToClasses)).isFalse()
 
-    assertThat(isUnused("UnusedJava.java", "com.example", "class UnusedJava {}", emptySet()))
-      .isFalse()
-    assertThat(isUnused("Main.java", "", "class Main {}", setOf("Main"))).isTrue()
-    assertThat(isUnused("Main.java", "", "class Main {}", setOf("Other"))).isFalse()
+    // Unknown source file or empty unused set -> kept
+    assertThat(isUnused("com/example/Unknown.java", unusedSet, sourceToClasses)).isFalse()
+    assertThat(isUnused("com/example/UnusedJava.java", emptySet(), sourceToClasses)).isFalse()
+    assertThat(isUnused("Main.java", setOf("Other"), sourceToClasses)).isFalse()
   }
 
   @Test

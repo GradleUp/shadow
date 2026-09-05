@@ -80,8 +80,11 @@ fun createDefaultLocalMavenRepository(junitJar: Path): AppendableMavenRepository
       val k =
         jarModule("my", "k", "1.0") {
           buildJar {
-            insert("k/CustomUtils.class", createEmptyClassBytes("k/CustomUtils"))
-            insert("k/CustomUnusedUtils.class", createEmptyClassBytes("k/CustomUnusedUtils"))
+            insert("k/CustomUtils.class", createEmptyClassBytes("k/CustomUtils", "Utils.kt"))
+            insert(
+              "k/CustomUnusedUtils.class",
+              createEmptyClassBytes("k/CustomUnusedUtils", "UnusedUtils.kt"),
+            )
           }
           buildSourcesJar {
             insert(

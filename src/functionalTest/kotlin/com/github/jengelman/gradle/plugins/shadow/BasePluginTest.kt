@@ -408,10 +408,16 @@ abstract class BasePluginTest {
       }
     }
 
-    fun createEmptyClassBytes(internalName: String): ByteArray {
+    fun createEmptyClassBytes(
+      internalName: String,
+      sourceFile: String? = "${internalName.substringAfterLast('/')}.java",
+    ): ByteArray {
       return ClassWriter(0)
         .apply {
           visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+          if (sourceFile != null) {
+            visitSource(sourceFile, null)
+          }
           visitEnd()
         }
         .toByteArray()

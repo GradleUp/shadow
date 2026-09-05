@@ -10,6 +10,8 @@ internal fun generateShadowedSourcesJar(
   sourcesJarFile: File,
   sourceSetsSourceDirs: Iterable<File>,
   includedSourcesJars: Iterable<File>,
+  classesDirs: Iterable<File> = emptyList(),
+  dependencies: Iterable<File> = emptyList(),
   relocators: Iterable<Relocator>,
   unusedClasses: Set<String> = emptySet(),
   entryCompression: ZipEntryCompression,
@@ -22,6 +24,12 @@ internal fun generateShadowedSourcesJar(
 
   val visitedFiles = mutableSetOf<String>()
   val charset = metadataCharset?.let(Charset::forName) ?: Charsets.UTF_8
+  val sourceToClasses =
+    if (unusedClasses.isNotEmpty()) {
+      buildSourceToClassesMap(classesDirs = classesDirs, dependencies = dependencies)
+    } else {
+      emptyMap()
+    }
 
   try {
     sourcesJarFile
@@ -55,9 +63,9 @@ internal fun generateShadowedSourcesJar(
                 val text = file.readText(charset)
                 val pkg = extractPackage(text)
                 val simpleName = file.name
-                if (isUnused(simpleName, pkg, text, unusedClasses)) return@forEach
                 val canonicalPath =
                   if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
+                if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) return@forEach
                 val relocatedPath = relocators.relocatePath(canonicalPath)
                 if (visitedFiles.add(relocatedPath)) {
                   var transformedText = text
@@ -113,9 +121,9 @@ internal fun generateShadowedSourcesJar(
                   val text = getInputStream(entry).bufferedReader(charset).readText()
                   val pkg = extractPackage(text)
                   val simpleName = name.substringAfterLast('/')
-                  if (isUnused(simpleName, pkg, text, unusedClasses)) return@forEach
                   val canonicalPath =
                     if (pkg.isEmpty()) simpleName else "${pkg.replace('.', '/')}/$simpleName"
+                  if (isUnused(canonicalPath, unusedClasses, sourceToClasses)) return@forEach
                   val relocatedPath = relocators.relocatePath(canonicalPath)
                   if (visitedFiles.add(relocatedPath)) {
                     var transformedText = text
@@ -171,34 +179,92 @@ internal fun generateShadowedSourcesJar(
 
 private val packageRegex = """(?:^|\n)\s*package\s+([a-zA-Z0-9_.]+)""".toRegex()
 
-private val jvmNameRegex =
-  """@file\s*:\s*(?:\[[^]]*?)?(?:kotlin\s*\.\s*jvm\s*\.\s*)?JvmName\s*\(\s*(?:name\s*=\s*)?"([^"]+)""""
-    .toRegex()
-
 internal fun extractPackage(text: String): String {
   val matches = packageRegex.findAll(text).map { it.groupValues[1] }.toList()
   return if (matches.isEmpty()) "" else matches.joinToString(".")
 }
 
-internal fun isUnused(
-  fileName: String,
-  pkg: String,
-  text: String,
-  unusedClasses: Set<String>,
-): Boolean {
-  if (unusedClasses.isEmpty()) return false
-  val simpleName = fileName.substringBeforeLast('.')
-  val className = if (pkg.isEmpty()) simpleName else "$pkg.$simpleName"
-  if (unusedClasses.contains(className)) return true
+internal fun buildSourceToClassesMap(
+  classesDirs: Iterable<File>,
+  dependencies: Iterable<File>,
+): Map<String, Set<String>> {
+  val sourceToClasses = mutableMapOf<String, MutableSet<String>>()
 
-  if (fileName.endsWith(".kt")) {
-    val customJvmName = jvmNameRegex.find(text)?.groupValues?.get(1)
-    val facadeName = customJvmName ?: "${simpleName}Kt"
-    val facadeClassName = if (pkg.isEmpty()) facadeName else "$pkg.$facadeName"
-    if (unusedClasses.contains(facadeClassName)) return true
+  fun processClassBytes(bytes: ByteArray) {
+    try {
+      var internalName: String? = null
+      var sourceFile: String? = null
+      val reader = org.vafer.jdeb.shaded.objectweb.asm.ClassReader(bytes)
+      reader.accept(
+        object :
+          org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor(
+            org.vafer.jdeb.shaded.objectweb.asm.Opcodes.ASM9
+          ) {
+          override fun visit(
+            version: Int,
+            access: Int,
+            name: String,
+            signature: String?,
+            superName: String?,
+            interfaces: Array<out String>?,
+          ) {
+            internalName = name
+            super.visit(version, access, name, signature, superName, interfaces)
+          }
+
+          override fun visitSource(source: String?, debug: String?) {
+            sourceFile = source
+            super.visitSource(source, debug)
+          }
+        },
+        org.vafer.jdeb.shaded.objectweb.asm.ClassReader.SKIP_CODE or
+          org.vafer.jdeb.shaded.objectweb.asm.ClassReader.SKIP_FRAMES,
+      )
+
+      val name = internalName ?: return
+      val source = sourceFile ?: return
+      val pkg = name.substringBeforeLast('/', "")
+      val canonicalSourcePath = if (pkg.isEmpty()) source else "$pkg/$source"
+      val className = name.replace('/', '.')
+      sourceToClasses.getOrPut(canonicalSourcePath) { mutableSetOf() }.add(className)
+    } catch (_: Exception) {
+      // Ignore invalid class files
+    }
   }
 
-  return false
+  for (dir in classesDirs.filter { it.isDirectory }) {
+    dir
+      .walkTopDown()
+      .filter { it.isFile && it.name.endsWith(".class") }
+      .forEach { file -> processClassBytes(file.readBytes()) }
+  }
+
+  for (file in
+    dependencies.filter { it.isFile && (it.name.endsWith(".jar") || it.name.endsWith(".zip")) }) {
+    try {
+      file.useZip {
+        entries()
+          .toList()
+          .filter { !it.isDirectory && it.name.endsWith(".class") }
+          .forEach { entry -> processClassBytes(getInputStream(entry).readBytes()) }
+      }
+    } catch (_: Exception) {
+      // Ignore invalid archives
+    }
+  }
+
+  return sourceToClasses
+}
+
+internal fun isUnused(
+  canonicalPath: String,
+  unusedClasses: Set<String>,
+  sourceToClasses: Map<String, Set<String>>,
+): Boolean {
+  if (unusedClasses.isEmpty()) return false
+  val classes = sourceToClasses[canonicalPath] ?: return false
+  if (classes.isEmpty()) return false
+  return classes.all { it in unusedClasses }
 }
 
 private fun isSourceFile(path: String): Boolean {
