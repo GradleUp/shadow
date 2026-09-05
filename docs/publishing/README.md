@@ -364,7 +364,7 @@ Or set different `archiveClassifier` values for the standard tasks:
     }
 
     tasks.named<Jar>("sourcesJar") {
-      (this as org.gradle.jvm.tasks.Jar).archiveClassifier = "ignored-sources"
+      archiveClassifier = "ignored-sources"
     }
     ```
 
