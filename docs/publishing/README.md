@@ -306,12 +306,20 @@ If you want to replace standard JARs with the shadowed ones, disable the standar
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
+    plugins {
+      java
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.jar {
       enabled = false
     }
 
-    // If `java.withSourcesJar()` is enabled:
-    tasks.matching { it.name == "sourcesJar" }.configureEach {
+    tasks.named<Jar>("sourcesJar") {
       enabled = false
     }
     ```
@@ -319,12 +327,20 @@ If you want to replace standard JARs with the shadowed ones, disable the standar
 === ":simple-apachegroovy: build.gradle"
 
     ```groovy
+    plugins {
+      id('java')
+      id('com.gradleup.shadow')
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.named('jar', Jar) {
       enabled = false
     }
 
-    // If `java.withSourcesJar()` is enabled:
-    tasks.matching { it.name == 'sourcesJar' }.configureEach {
+    tasks.named('sourcesJar', Jar) {
       enabled = false
     }
     ```
@@ -334,12 +350,20 @@ Or set different `archiveClassifier` values for the standard tasks:
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
+    plugins {
+      java
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.jar {
       archiveClassifier = "ignored"
     }
 
-    // If `java.withSourcesJar()` is enabled:
-    tasks.matching { it.name == "sourcesJar" }.configureEach {
+    tasks.named<Jar>("sourcesJar") {
       (this as org.gradle.jvm.tasks.Jar).archiveClassifier = "ignored-sources"
     }
     ```
@@ -347,12 +371,20 @@ Or set different `archiveClassifier` values for the standard tasks:
 === ":simple-apachegroovy: build.gradle"
 
     ```groovy
+    plugins {
+      id('java')
+      id('com.gradleup.shadow')
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.named('jar', Jar) {
       archiveClassifier = 'ignored'
     }
 
-    // If `java.withSourcesJar()` is enabled:
-    tasks.matching { it.name == 'sourcesJar' }.configureEach {
+    tasks.named('sourcesJar', Jar) {
       archiveClassifier = 'ignored-sources'
     }
     ```
@@ -658,7 +690,7 @@ To publish shadowed artifacts as the primary publication:
       enabled = false
     }
 
-    tasks.named("sourcesJar") {
+    tasks.named<Jar>("sourcesJar") {
       enabled = false
     }
 
@@ -688,11 +720,11 @@ To publish shadowed artifacts as the primary publication:
       withSourcesJar()
     }
 
-    tasks.named('jar') {
+    tasks.named('jar', Jar) {
       enabled = false
     }
 
-    tasks.named('sourcesJar') {
+    tasks.named('sourcesJar', Jar) {
       enabled = false
     }
 
