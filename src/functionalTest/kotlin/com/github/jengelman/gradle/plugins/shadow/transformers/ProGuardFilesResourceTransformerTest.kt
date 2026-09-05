@@ -41,7 +41,8 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
         "META-INF/proguard/rules.pro",
         "META-INF/proguard/client.pro",
         "META-INF/proguard/server.pro",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getContent("META-INF/proguard/rules.pro")
         .isEqualTo(
@@ -113,7 +114,8 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
         "relocated/foo/FooDriver.class",
         "META-INF/proguard/",
         "META-INF/proguard/rules.pro",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getContent("META-INF/proguard/rules.pro")
         .isEqualTo(

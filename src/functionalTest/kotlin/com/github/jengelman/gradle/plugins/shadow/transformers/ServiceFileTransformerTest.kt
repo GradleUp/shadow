@@ -91,7 +91,8 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         "relocated/foo/FooDriver.class",
         "META-INF/services/",
         "META-INF/services/relocated.com.example.Driver",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getContent("META-INF/services/relocated.com.example.Driver")
         .isEqualTo(
@@ -154,7 +155,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
         "relocated/com/example/Driver.class",
         "relocated/foo/FooDriver.class",
         "META-INF/services/relocated.com.example.Driver",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       getContent("META-INF/services/relocated.com.example.Driver")
         .isEqualTo(

@@ -154,7 +154,7 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("foo/", "foo/bar", "foo/baz", *manifestEntries)
+      containsOnly("foo/", "foo/bar", "foo/baz", "META-INF/", "META-INF/MANIFEST.MF")
       getContent("foo/bar").isEqualTo("bar1")
       getContent("foo/baz").isEqualTo("baz3")
     }
@@ -178,7 +178,9 @@ class TransformersTest : BaseTransformerTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -194,7 +196,7 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("foo/", "foo/Bar.txt", "foo/bar.txt", *manifestEntries)
+      containsOnly("foo/", "foo/Bar.txt", "foo/bar.txt", "META-INF/", "META-INF/MANIFEST.MF")
       getContent("foo/Bar.txt").isEqualTo("Bar")
       getContent("foo/bar.txt").isEqualTo("bar")
     }
@@ -219,7 +221,7 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("META-INF/LICENSE", *manifestEntries)
+      containsOnly("META-INF/LICENSE", "META-INF/", "META-INF/MANIFEST.MF")
       getContent("META-INF/LICENSE")
         .isEqualTo(
           """
@@ -379,7 +381,11 @@ class TransformersTest : BaseTransformerTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("META-INF/kotlin-stdlib.shadow.kotlin_module", *manifestEntries)
+      containsOnly(
+        "META-INF/kotlin-stdlib.shadow.kotlin_module",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
       getBytes("META-INF/kotlin-stdlib.shadow.kotlin_module").isNotEqualTo(moduleBytes)
     }
   }

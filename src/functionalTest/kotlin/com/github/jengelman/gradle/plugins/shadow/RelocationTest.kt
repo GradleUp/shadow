@@ -63,7 +63,13 @@ class RelocationTest : BasePluginTest() {
     val result = runWithSuccess(shadowJarPath, infoArgument)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("my/", mainClassEntry, *relocatedEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *relocatedEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
       classLoader {
         val pkg = relocationPrefix.replace('/', '.')
         loadClass("my.Main")
@@ -110,7 +116,8 @@ class RelocationTest : BasePluginTest() {
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("a.BaseTestRunner")
@@ -163,7 +170,8 @@ class RelocationTest : BasePluginTest() {
         *runnerEntries,
         *frameworkEntries,
         *otherJunitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("junit.runner.BaseTestRunner")
@@ -207,7 +215,14 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("my/", "shadow/", "my/MyTest.class", *relocatedEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        "shadow/",
+        "my/MyTest.class",
+        *relocatedEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
       classLoader {
         val myTest = loadClass("my.MyTest")
         val test = loadClass("shadow.junit.Test")
@@ -242,7 +257,8 @@ class RelocationTest : BasePluginTest() {
         "bar/Foo.class",
         "bar/foo.properties",
         "bar/dep.properties",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("bar.Foo")
@@ -365,7 +381,12 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("kotlin/", "kotlin/kotlin.kotlin_builtins", *manifestEntries)
+      containsOnly(
+        "kotlin/",
+        "kotlin/kotlin.kotlin_builtins",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -400,9 +421,13 @@ class RelocationTest : BasePluginTest() {
 
     assertThat(outputShadowedJar).useAll {
       if (exclude) {
-        containsOnly(*junitEntries, *manifestEntries)
+        containsOnly(*junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
       } else {
-        containsOnly("foo/", "foo/$manifestEntry", *junitEntries.map { "foo/$it" }.toTypedArray())
+        containsOnly(
+          "foo/",
+          "foo/META-INF/MANIFEST.MF",
+          *junitEntries.map { "foo/$it" }.toTypedArray(),
+        )
       }
     }
   }
@@ -426,7 +451,13 @@ class RelocationTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("foo/", "foo/my/", "foo/META-INF/", "foo/$mainClassEntry", "foo/$manifestEntry")
+      containsOnly(
+        "foo/",
+        "foo/my/",
+        "foo/META-INF/",
+        "foo/$mainClassEntry",
+        "foo/META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -584,12 +615,12 @@ class RelocationTest : BasePluginTest() {
 
     if (enableKotlinModuleRemapping) {
       assertThat(outputShadowedJar).useAll {
-        containsOnly(relocatedModuleFilePath, *manifestEntries)
+        containsOnly(relocatedModuleFilePath, "META-INF/", "META-INF/MANIFEST.MF")
         getBytes(relocatedModuleFilePath).isNotEqualTo(originalModuleFileBytes)
       }
     } else {
       assertThat(outputShadowedJar).useAll {
-        containsOnly(originalModuleFilePath, *manifestEntries)
+        containsOnly(originalModuleFilePath, "META-INF/", "META-INF/MANIFEST.MF")
         getBytes(originalModuleFilePath).isEqualTo(originalModuleFileBytes)
       }
       return
@@ -639,7 +670,7 @@ class RelocationTest : BasePluginTest() {
       containsOnly(
         "my/Main.class",
         "relocated/foo/Foo.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("my.Main")
@@ -675,7 +706,8 @@ class RelocationTest : BasePluginTest() {
         "shadow/foo/",
         "shadow/foo/Bar.class",
         "shadow/foo/bar.class",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
 
       val upperBytes = getBytes("shadow/foo/Bar.class")
@@ -762,7 +794,8 @@ class RelocationTest : BasePluginTest() {
         "shadow/",
         "shadow/g/",
         "shadow/g/G.java",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getContent("my/Main.java")
         .isEqualTo(
@@ -807,7 +840,8 @@ class RelocationTest : BasePluginTest() {
       containsOnly(
         "my/",
         "my/Main.java",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -828,7 +862,9 @@ class RelocationTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedSourcesJar).useAll { containsOnly(*manifestEntries) }
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly("META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -869,7 +905,8 @@ class RelocationTest : BasePluginTest() {
         "shadow/",
         "shadow/extra/",
         "shadow/extra/Extra.java",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getContent("shadow/extra/Extra.java")
         .isEqualTo(
@@ -922,7 +959,8 @@ class RelocationTest : BasePluginTest() {
       containsOnly(
         "my/",
         "my/Main.java",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -963,7 +1001,8 @@ class RelocationTest : BasePluginTest() {
         "shadow/",
         "shadow/ext/",
         "shadow/ext/Ext.java",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getContent("shadow/ext/Ext.java")
         .isEqualTo(

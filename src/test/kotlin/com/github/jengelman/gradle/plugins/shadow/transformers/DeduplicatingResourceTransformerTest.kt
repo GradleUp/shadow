@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow.transformers
 
 import assertk.assertFailure
 import assertk.assertThat
-import assertk.assertions.containsExactlyInAnyOrder
 import assertk.assertions.containsOnly
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
@@ -74,7 +73,7 @@ class DeduplicatingResourceTransformerTest :
       assertThat(canTransformResource("differing-content-2", file3)).isFalse()
 
       assertThat(sources.keys)
-        .containsExactlyInAnyOrder(
+        .containsOnly(
           "multiple-contents",
           "single-source",
           "same-content-twice",

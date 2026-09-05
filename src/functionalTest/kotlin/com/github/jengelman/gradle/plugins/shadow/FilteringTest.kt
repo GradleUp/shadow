@@ -30,7 +30,9 @@ class FilteringTest : BasePluginTest() {
   fun includeAllDependencies() {
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -47,7 +49,7 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("a.properties", "b.properties", *manifestEntries)
+      containsOnly("a.properties", "b.properties", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -111,7 +113,13 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("d.properties", "my/", "my/Passed.class", *manifestEntries)
+      containsOnly(
+        "d.properties",
+        "my/",
+        "my/Passed.class",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
       classLoader {
         loadClass("my.Passed")
       }
@@ -175,7 +183,8 @@ class FilteringTest : BasePluginTest() {
         "server/",
         "client/Client.class",
         "server/Server.class",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("client.Client")
@@ -188,7 +197,8 @@ class FilteringTest : BasePluginTest() {
         "server/",
         "client/Client.java",
         "server/Server.java",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -209,7 +219,7 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("a.properties", "b.properties", *manifestEntries)
+      containsOnly("a.properties", "b.properties", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -233,7 +243,7 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("f.properties", *entriesInAB, *manifestEntries)
+      containsOnly("f.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -258,29 +268,35 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly(*entriesInAB, "g/", "g/G.class", *manifestEntries)
+      containsOnly(*entriesInAB, "g/", "g/G.class", "META-INF/", "META-INF/MANIFEST.MF")
     }
     assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly("g/", "g/G.java", *manifestEntries)
+      containsOnly("g/", "g/G.java", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
   private fun commonAssertions() {
     assertThat(outputShadowedJar).useAll {
-      containsOnly("c.properties", *entriesInAB, *manifestEntries)
+      containsOnly("c.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
   private fun commonServerAssertions() {
     assertThat(outputServerShadowedJar).useAll {
-      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        *junitEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
       classLoader {
         loadClass("server.Server")
         loadClass("junit.framework.Test")
       }
     }
     assertThat(outputServerShadowedSourcesJar).useAll {
-      containsOnly("server/", "server/Server.java", *manifestEntries)
+      containsOnly("server/", "server/Server.java", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 }

@@ -10,7 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
-import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
+import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.invariantEolString
@@ -89,7 +89,7 @@ class ApplicationPluginTest : BasePluginTest() {
 
     commonAssertions(
       jarPath("myapp-shadow/lib/myapp-1.0-all.jar", installPath),
-      entriesContained = arrayOf(mainClass, *junitEntries),
+      entriesContained = arrayOf("my/", mainClass, *junitEntries),
     )
 
     val unixScript = path("myapp-shadow/bin/myapp", installPath)
@@ -159,7 +159,7 @@ class ApplicationPluginTest : BasePluginTest() {
     assertions(result.output, "foo")
     commonAssertions(
       jarPath("build/libs/myapp-1.0-all.jar"),
-      entriesContained = entriesInA + arrayOf(mainClass, main2ClassEntry),
+      entriesContained = arrayOf("my/", mainClass, main2ClassEntry, *entriesInA),
       mainClassAttr = "my.Main2",
     )
 
@@ -340,12 +340,12 @@ class ApplicationPluginTest : BasePluginTest() {
 
   private fun commonAssertions(
     jarPath: JarPath,
-    entriesContained: Array<String> = entriesInA + mainClass,
+    entriesContained: Array<String> = arrayOf("my/", mainClass, *entriesInA),
     mainClassAttr: String = "my.Main",
     classPathAttr: String? = null,
   ) {
     assertThat(jarPath).useAll {
-      containsAtLeast(*entriesContained)
+      containsOnly(*entriesContained, "META-INF/", "META-INF/MANIFEST.MF")
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassAttr)
       getMainAttr(classPathAttributeKey).isEqualTo(classPathAttr)
     }

@@ -57,7 +57,8 @@ class KotlinPluginsTest : BasePluginTest() {
           "META-INF/my_my.kotlin_module",
           mainClassEntry,
           *junitEntries,
-          *manifestEntries,
+          "META-INF/",
+          "META-INF/MANIFEST.MF",
         )
       if (excludeStdlib) {
         containsOnly(*entries)
@@ -108,7 +109,8 @@ class KotlinPluginsTest : BasePluginTest() {
           "META-INF/my_my.kotlin_module",
           mainClassEntry,
           *entriesInAB,
-          *manifestEntries,
+          "META-INF/",
+          "META-INF/MANIFEST.MF",
         )
       if (excludeStdlib) {
         containsOnly(*entries)
@@ -152,7 +154,8 @@ class KotlinPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      val entries = arrayOf("my/", mainClassEntry, *entriesInAB, *manifestEntries)
+      val entries =
+        arrayOf("my/", mainClassEntry, *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
       containsAtLeast(*entries)
       classLoader {
         loadClass("my.Main")
@@ -368,7 +371,8 @@ class KotlinPluginsTest : BasePluginTest() {
         "shadow/custom/",
         "shadow/custom/nested/",
         "shadow/custom/nested/FlatFile.kt",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }

@@ -37,12 +37,14 @@ class CachingTest : BasePluginTest() {
         .trimMargin()
     )
 
-    assertCompositeExecutions { containsOnly(*entriesInAB, *manifestEntries) }
+    assertCompositeExecutions {
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
 
     val replaced = projectScript.readText().replace("implementation 'my:b:1.0'", "")
     projectScript.writeText(replaced)
 
-    assertCompositeExecutions { containsOnly(*entriesInA, *manifestEntries) }
+    assertCompositeExecutions { containsOnly(*entriesInA, "META-INF/", "META-INF/MANIFEST.MF") }
   }
 
   @Test
@@ -57,7 +59,9 @@ class CachingTest : BasePluginTest() {
         .trimMargin()
     )
 
-    assertCompositeExecutions { containsOnly(*entriesInAB, *manifestEntries) }
+    assertCompositeExecutions {
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
 
     projectScript.appendText(
       """
@@ -70,7 +74,7 @@ class CachingTest : BasePluginTest() {
 
     assertExecutionsFromCacheAndUpToDate()
     assertThat(jarPath("build/libs/foo-1.0-all.jar")).useAll {
-      containsOnly(*entriesInAB, *manifestEntries)
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -198,7 +202,14 @@ class CachingTest : BasePluginTest() {
     )
 
     assertCompositeExecutions {
-      containsOnly("my/", mainClassEntry, main2ClassEntry, *entriesInAB, *manifestEntries)
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        main2ClassEntry,
+        *entriesInAB,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
 
     projectScript.appendText(
@@ -212,7 +223,13 @@ class CachingTest : BasePluginTest() {
     )
 
     assertCompositeExecutions {
-      containsOnly("my/", mainClassEntry, main2ClassEntry, *manifestEntries)
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        main2ClassEntry,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
 
     projectScript.appendText(
@@ -225,7 +242,9 @@ class CachingTest : BasePluginTest() {
         .trimMargin()
     )
 
-    assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
+    assertCompositeExecutions {
+      containsOnly("my/", mainClassEntry, "META-INF/", "META-INF/MANIFEST.MF")
+    }
 
     projectScript.appendText(
       """
@@ -238,7 +257,13 @@ class CachingTest : BasePluginTest() {
     )
 
     assertCompositeExecutions {
-      containsOnly("my/", mainClassEntry, main2ClassEntry, *manifestEntries)
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        main2ClassEntry,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -255,7 +280,13 @@ class CachingTest : BasePluginTest() {
     )
 
     assertCompositeExecutions {
-      containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *junitEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
 
     projectScript.appendText(
@@ -269,7 +300,9 @@ class CachingTest : BasePluginTest() {
         .trimMargin()
     )
 
-    assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
+    assertCompositeExecutions {
+      containsOnly("my/", mainClassEntry, "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -293,7 +326,8 @@ class CachingTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
 
@@ -310,7 +344,13 @@ class CachingTest : BasePluginTest() {
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
-      containsOnly("server/", "server/Server.class", *junitEntries, *manifestEntries)
+      containsOnly(
+        "server/",
+        "server/Server.class",
+        *junitEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -328,7 +368,7 @@ class CachingTest : BasePluginTest() {
         containsOnly(
           "client/Used.class",
           "server/Server.class",
-          manifestEntry,
+          "META-INF/MANIFEST.MF",
         )
       }
 
@@ -340,7 +380,7 @@ class CachingTest : BasePluginTest() {
           "client/Used.class",
           "client/Reflective.class",
           "server/Server.class",
-          manifestEntry,
+          "META-INF/MANIFEST.MF",
         )
       }
       assertExecutionsFromCacheAndUpToDate()
@@ -362,7 +402,7 @@ class CachingTest : BasePluginTest() {
         containsOnly(
           "client/Used.class",
           "server/Server.class",
-          manifestEntry,
+          "META-INF/MANIFEST.MF",
         )
       }
 
@@ -376,7 +416,7 @@ class CachingTest : BasePluginTest() {
           "client/Reflective.class",
           "server/Server.class",
           "META-INF/proguard/client.pro",
-          manifestEntry,
+          "META-INF/MANIFEST.MF",
         )
       }
       assertExecutionsFromCacheAndUpToDate()
@@ -398,7 +438,13 @@ class CachingTest : BasePluginTest() {
     val mainClassEntry = writeClass(withImports = true)
 
     assertCompositeExecutions {
-      containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        mainClassEntry,
+        *junitEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
 
     projectScript.appendText(
@@ -413,7 +459,15 @@ class CachingTest : BasePluginTest() {
       junitEntries.map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
 
     assertCompositeExecutions {
-      containsOnly("my/", "foo/", "foo/junit/", mainClassEntry, *relocatedEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        "foo/",
+        "foo/junit/",
+        mainClassEntry,
+        *relocatedEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -436,7 +490,15 @@ class CachingTest : BasePluginTest() {
       junitEntries.map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
 
     assertCompositeExecutions {
-      containsOnly("my/", "foo/", "foo/junit/", mainClassEntry, *fooEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        "foo/",
+        "foo/junit/",
+        mainClassEntry,
+        *fooEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
 
     val replaced = projectScript.readText().replace("foo.junit.framework", "bar.junit.framework")
@@ -445,7 +507,15 @@ class CachingTest : BasePluginTest() {
       junitEntries.map { it.replace("junit/framework/", "bar/junit/framework/") }.toTypedArray()
 
     assertCompositeExecutions {
-      containsOnly("my/", "bar/", "bar/junit/", mainClassEntry, *barEntries, *manifestEntries)
+      containsOnly(
+        "my/",
+        "bar/",
+        "bar/junit/",
+        mainClassEntry,
+        *barEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -453,7 +523,9 @@ class CachingTest : BasePluginTest() {
   fun serviceFileTransformerPropsChanged() {
     val mainClassEntry = writeClass()
     val assertions = {
-      assertCompositeExecutions { containsOnly("my/", mainClassEntry, *manifestEntries) }
+      assertCompositeExecutions {
+        containsOnly("my/", mainClassEntry, "META-INF/", "META-INF/MANIFEST.MF")
+      }
     }
 
     assertions()
