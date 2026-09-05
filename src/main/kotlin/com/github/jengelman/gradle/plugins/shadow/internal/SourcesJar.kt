@@ -164,7 +164,7 @@ internal fun generateSourcesJar(
   }
 }
 
-internal fun buildSourceToClassesMap(
+private fun buildSourceToClassesMap(
   classesDirs: Iterable<File>,
   dependencies: Iterable<File>,
 ): Map<String, Set<String>> {

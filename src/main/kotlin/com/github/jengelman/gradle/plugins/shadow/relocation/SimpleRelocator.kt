@@ -182,7 +182,7 @@ constructor(
 
   internal companion object {
     /** Match dot, slash or space at end of string */
-    val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
+    private val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
 
     /**
      * Match
@@ -193,7 +193,7 @@ constructor(
      *
      * at end of string
      */
-    val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
+    private val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
       Pattern.compile(
         "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
           "|" +
@@ -202,7 +202,7 @@ constructor(
           "([{}(=;,]|\\*/) $"
       )
 
-    fun normalizePatterns(patterns: Collection<String>?) = buildSet {
+    private fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
         // Regex patterns don't need to be normalized and stay as is.
@@ -273,7 +273,7 @@ constructor(
       return !nextChar.isLetterOrDigit() && nextChar != '_'
     }
 
-    fun shadeSourceWithFilters(
+    private fun shadeSourceWithFilters(
       sourceContent: String,
       patternFrom: String,
       patternTo: String,
