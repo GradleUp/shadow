@@ -613,6 +613,64 @@ When Gradle's standard `java.withSourcesJar()` is enabled, the Shadow plugin aut
 The published Maven publication will include both `<artifactId>-<version>-all.jar` and
 `<artifactId>-<version>-all-sources.jar`.
 
+### Local File Names vs. Published Classifiers
+
+The Shadow plugin distinguishes between the **local output file** on disk and the **published artifact classifier** in Maven repositories and Gradle Module Metadata:
+
+| Configuration | Local Output File (`archiveSourcesFile` in `build/libs`) | Published Classifier | Published File (Maven Repository) | Use Case |
+|:---|:---|:---|:---|:---|
+| `archiveClassifier = "all"` *(default)* | `<name>-<version>-all-sources.jar` | `all-sources` | `<artifactId>-<version>-all-sources.jar` | **Coexistence** (coexists with standard `sources`) |
+| `archiveClassifier = "shaded"` | `<name>-<version>-shaded-sources.jar` | `shaded-sources` | `<artifactId>-<version>-shaded-sources.jar` | **Coexistence** (custom classifier) |
+| `archiveClassifier = ""` | `<name>-<version>-sources.jar` | `sources` | `<artifactId>-<version>-sources.jar` | **Replacement** (replaces standard `sources`) |
+
+#### Coexistence Scenario
+
+When publishing alongside standard Java artifacts (e.g. publishing `from(components["java"])` with `shadow.addShadowVariantIntoJavaComponent = true`), the standard sources variant uses classifier `sources`. To prevent coordinate collisions within the same publication, the shadowed sources variant dynamically derives its classifier as `<archiveClassifier>-sources` (such as `all-sources` or `shaded-sources`).
+
+#### Replacement Scenario
+
+When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = ""`), the companion shadowed sources JAR automatically uses the standard `sources` classifier. In this scenario, ensure standard `jar` and `sourcesJar` tasks are disabled so that only the shadowed artifacts are produced and published without destination or coordinate conflicts:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    java {
+      withSourcesJar()
+    }
+
+    tasks.jar {
+      enabled = false
+    }
+
+    tasks.named("sourcesJar") {
+      enabled = false
+    }
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    java {
+      withSourcesJar()
+    }
+
+    tasks.named('jar') {
+      enabled = false
+    }
+
+    tasks.named('sourcesJar') {
+      enabled = false
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+    ```
+
 > [!NOTE]
 > Generating the companion shadowed sources JAR is controlled by [`generateSourcesJar`][ShadowJar.generateSourcesJar].
 > In Java projects, it defaults to `true` when `java.withSourcesJar()` is enabled, and `false` otherwise to avoid

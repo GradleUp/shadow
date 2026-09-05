@@ -349,6 +349,75 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun publishWithSourcesJarAndCustomClassifier() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          |java {
+          |  withSourcesJar()
+          |}
+          """
+            .trimMargin(),
+        shadowBlock =
+          """
+          |archiveClassifier = 'shaded'
+          """
+            .trimMargin(),
+        publicationsBlock =
+          """
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |}
+          """
+            .trimMargin(),
+      )
+    )
+
+    publish()
+
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries.filter { it.endsWith(".jar") })
+      .containsOnly(
+        "maven-1.0-shaded.jar",
+        "maven-1.0-shaded-sources.jar",
+      )
+  }
+
+  @Test
+  fun publishJavaComponentWithShadowAndSourcesVariants() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          |java {
+          |  withSourcesJar()
+          |}
+          """
+            .trimMargin(),
+        publicationsBlock =
+          """
+          |shadow(MavenPublication) {
+          |  from components.java
+          |}
+          """
+            .trimMargin(),
+      )
+    )
+
+    publish()
+
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries.filter { it.endsWith(".jar") })
+      .containsOnly(
+        "maven-1.0.jar",
+        "maven-1.0-sources.jar",
+        "maven-1.0-all.jar",
+        "maven-1.0-all-sources.jar",
+      )
+  }
+
+  @Test
   fun dontPublishSourcesWhenGenerateSourcesJarDisabled() {
     projectScript.appendText(
       publishConfiguration(
