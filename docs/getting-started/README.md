@@ -138,10 +138,11 @@ in their build logic), Shadow will automatically configure the following behavio
   - `META-INF/versions/**/module-info.class`
   - `module-info.class`
 - Configures the [`ShadowJar`][ShadowJar] task to generate a companion **Shadowed Sources JAR** containing both
-  project sources and shadowed dependency sources with relocated packages when `java.withSourcesJar()` is enabled
-  (or when [`generateSourcesJar`][ShadowJar.generateSourcesJar] is set to `true`).
+  project sources and shadowed dependency sources with relocated packages when `java.withSourcesJar()` is enabled (or
+  when [`generateSourcesJar`][ShadowJar.generateSourcesJar] is set to `true`).
 - Creates and registers the `shadow` component in the project (used for integrating with
-  [`maven-publish`][maven-publish]), including the `shadowSourcesElements` variant when `java.withSourcesJar()` is enabled.
+  [`maven-publish`][maven-publish]), including the `shadowSourcesElements` variant when `java.withSourcesJar()` is
+  enabled.
 
 ## ShadowJar Command Line options
 
