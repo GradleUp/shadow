@@ -345,7 +345,7 @@ class ApplicationPluginTest : BasePluginTest() {
     classPathAttr: String? = null,
   ) {
     assertThat(jarPath).useAll {
-      containsOnly(*entriesContained, *manifestEntries)
+      containsOnly(*entriesContained, "META-INF/", "META-INF/MANIFEST.MF")
       getMainAttr(mainClassAttributeKey).isEqualTo(mainClassAttr)
       getMainAttr(classPathAttributeKey).isEqualTo(classPathAttr)
     }

@@ -46,7 +46,7 @@ class R8MinimizationTest : BasePluginTest() {
       containsExactly(
         "app/App.class",
         "lib/Used.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
@@ -79,7 +79,7 @@ class R8MinimizationTest : BasePluginTest() {
         "app/App.class",
         "service/DefaultGreeter.class",
         "service/Greeter.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
         "META-INF/services/service.Greeter",
       )
       getContent("META-INF/services/service.Greeter").isEqualTo("service.DefaultGreeter\n")
@@ -112,7 +112,7 @@ class R8MinimizationTest : BasePluginTest() {
         "app/App.class",
         "lib/Reflective.class",
         "lib/Used.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
@@ -157,7 +157,7 @@ class R8MinimizationTest : BasePluginTest() {
     assertThat(outputAppShadowedJar).useAll {
       containsExactly(
         "lib/Reflective.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("lib.Reflective")
@@ -197,7 +197,8 @@ class R8MinimizationTest : BasePluginTest() {
       containsExactly(
         "app/App.class",
         "lib/Used.class",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
         "app/",
         "lib/",
       )
@@ -273,7 +274,7 @@ class R8MinimizationTest : BasePluginTest() {
         "app/App.class",
         "lib/Reflective.class",
         "lib/Used.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
         "META-INF/proguard/lib.pro",
       )
       classLoader {
@@ -334,7 +335,7 @@ class R8MinimizationTest : BasePluginTest() {
         "lib/Reflective.class",
         "lib/Unused.class",
         "lib/Used.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
         "META-INF/proguard/lib.pro",
       )
       classLoader {
@@ -366,7 +367,7 @@ class R8MinimizationTest : BasePluginTest() {
       containsExactly(
         "a/a.class",
         "app/App.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
@@ -394,7 +395,7 @@ class R8MinimizationTest : BasePluginTest() {
     assertThat(outputAppShadowedJar).useAll {
       containsExactly(
         "app/App.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -420,7 +421,7 @@ class R8MinimizationTest : BasePluginTest() {
         "lib/Reflective.class",
         "lib/Unused.class",
         "lib/Used.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
@@ -474,7 +475,7 @@ class R8MinimizationTest : BasePluginTest() {
         "app/App.class",
         "lib/Used.class",
         *junitEntries.filterNot { it.endsWith('/') }.toTypedArray(),
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
@@ -559,7 +560,7 @@ class R8MinimizationTest : BasePluginTest() {
       containsExactly(
         "app/App.class",
         "lib/Used.class",
-        manifestEntry,
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("lib.Used")
