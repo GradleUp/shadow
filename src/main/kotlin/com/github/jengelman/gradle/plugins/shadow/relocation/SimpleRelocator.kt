@@ -233,7 +233,7 @@ constructor(
       }
     }
 
-    private fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+    fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
       if (patternPrefix.isEmpty()) return emptySet()
       val result = mutableSetOf<String>()
       val dotPrefix = patternPrefix.replace('/', '.')
@@ -265,7 +265,7 @@ constructor(
       return result
     }
 
-    private fun matchesSubpattern(snippet: String, subpattern: String): Boolean {
+    fun matchesSubpattern(snippet: String, subpattern: String): Boolean {
       if (!snippet.startsWith(subpattern)) return false
       if (subpattern.isEmpty() || snippet.length == subpattern.length) return true
       if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
@@ -273,7 +273,7 @@ constructor(
       return !nextChar.isLetterOrDigit() && nextChar != '_'
     }
 
-    private fun shadeSourceWithFilters(
+    fun shadeSourceWithFilters(
       sourceContent: String,
       patternFrom: String,
       patternTo: String,
