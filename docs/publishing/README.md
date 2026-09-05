@@ -615,25 +615,31 @@ The published Maven publication will include both `<artifactId>-<version>-all.ja
 
 ### Local File Names vs. Published Classifiers
 
-The Shadow plugin distinguishes between the **local output file** on disk and the **published artifact classifier** in Maven repositories and Gradle Module Metadata:
+The Shadow plugin distinguishes between the **local output file** on disk and the **published artifact classifier** in
+Maven repositories and Gradle Module Metadata:
 
-| Configuration | Local Output File (`archiveSourcesFile` in `build/libs`) | Published Classifier | Published File (Maven Repository) | Use Case |
-|:---|:---|:---|:---|:---|
-| `archiveClassifier = "all"` *(default)* | `<name>-<version>-all-sources.jar` | `all-sources` | `<artifactId>-<version>-all-sources.jar` | **Coexistence** (coexists with standard `sources`) |
-| `archiveClassifier = "shaded"` | `<name>-<version>-shaded-sources.jar` | `shaded-sources` | `<artifactId>-<version>-shaded-sources.jar` | **Coexistence** (custom classifier) |
-| `archiveClassifier = ""` | `<name>-<version>-sources.jar` | `sources` | `<artifactId>-<version>-sources.jar` | **Replacement** (replaces standard `sources`) |
+| Configuration                           | Local Output File (`archiveSourcesFile` in `build/libs`) | Published Classifier | Published File (Maven Repository)           | Use Case                                           |
+|:----------------------------------------|:---------------------------------------------------------|:---------------------|:--------------------------------------------|:---------------------------------------------------|
+| `archiveClassifier = "all"` *(default)* | `<name>-<version>-all-sources.jar`                       | `all-sources`        | `<artifactId>-<version>-all-sources.jar`    | **Coexistence** (coexists with standard `sources`) |
+| `archiveClassifier = "shaded"`          | `<name>-<version>-shaded-sources.jar`                    | `shaded-sources`     | `<artifactId>-<version>-shaded-sources.jar` | **Coexistence** (custom classifier)                |
+| `archiveClassifier = ""`                | `<name>-<version>-sources.jar`                           | `sources`            | `<artifactId>-<version>-sources.jar`        | **Replacement** (replaces standard `sources`)      |
 
 #### Coexistence Scenario
 
-When publishing alongside standard Java artifacts (e.g. publishing `from(components["java"])` with `shadow.addShadowVariantIntoJavaComponent = true`), the standard sources variant uses classifier `sources`. To prevent coordinate collisions within the same publication, the shadowed sources variant dynamically derives its classifier as `<archiveClassifier>-sources` (such as `all-sources` or `shaded-sources`).
+When publishing alongside standard Java artifacts (e.g. publishing `from(components["java"])` with
+`shadow.addShadowVariantIntoJavaComponent = true`), the standard sources variant uses classifier `sources`. To prevent
+coordinate collisions within the same publication, the shadowed sources variant dynamically derives its classifier as
+`<archiveClassifier>-sources` (such as `all-sources` or `shaded-sources`).
 
 #### Replacement Scenario
 
-When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = ""`), the companion shadowed sources JAR automatically uses the standard `sources` classifier.
+When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = ""`), the companion shadowed sources JAR
+automatically uses the standard `sources` classifier.
 
 To publish shadowed artifacts as the primary publication:
 
-1. **Publish from `components["shadow"]` (Recommended)**: Publish the `shadow` component directly in your Maven publication, and disable standard archive tasks to prevent destination file collisions in `build/libs`:
+1. **Publish from `components["shadow"]` (Recommended)**: Publish the `shadow` component directly in your Maven
+   publication, and disable standard archive tasks to prevent destination file collisions in `build/libs`:
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -703,7 +709,9 @@ To publish shadowed artifacts as the primary publication:
     }
     ```
 
-2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, disabling the `jar` or `sourcesJar` tasks does not remove standard variants from the `java` software component. You must also explicitly skip the standard publication variants:
+2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, disabling the `jar` or `sourcesJar`
+   tasks does not remove standard variants from the `java` software component. You must also explicitly skip the
+   standard publication variants:
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -747,12 +755,14 @@ To publish shadowed artifacts as the primary publication:
 > Generating the companion shadowed sources JAR is controlled by [`generateSourcesJar`][ShadowJar.generateSourcesJar].
 > In Java projects, it defaults to `true` when `java.withSourcesJar()` is enabled, and `false` otherwise to avoid
 > unnecessary build overhead for application builds. If `withSourcesJar()` is omitted, publishing from
-> `components["shadow"]` will only publish the shadowed binary JAR, preserving backward compatibility for existing builds.
+> `components["shadow"]` will only publish the shadowed binary JAR, preserving backward compatibility for existing
+builds.
 > You can also explicitly toggle generation via `generateSourcesJar = true` (or `--generate-sources-jar`).
 
 ### Customizing the Sources Archive File
 
-The companion shadowed sources JAR output location is configured via [`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
+The companion shadowed sources JAR output location is configured via
+[`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
 which defaults to the same destination and base name as `archiveFile` with `-sources.jar` suffix:
 
 === ":material-language-kotlin: build.gradle.kts"
