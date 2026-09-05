@@ -295,13 +295,23 @@ You may want to publish the shadowed JAR instead of the original JAR. This can b
     ```
 
 Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting the `archiveClassifier` of
-[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases. If
-you don't need the standard JAR, you can disable the `jar` task like:
+[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of standard tasks and `shadowJar`:
+
+- The binary shadowed JAR is output to `<archiveBaseName>-<archiveVersion>.jar`, conflicting with the `jar` task.
+- When `generateSourcesJar` is enabled (such as when `java.withSourcesJar()` is used), the companion shadowed sources
+  JAR is output to `<archiveBaseName>-<archiveVersion>-sources.jar`, conflicting with the standard `sourcesJar` task.
+
+If you want to replace standard JARs with the shadowed ones, disable the standard `jar` and `sourcesJar` tasks:
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.jar {
+      enabled = false
+    }
+
+    // If `java.withSourcesJar()` is enabled:
+    tasks.matching { it.name == "sourcesJar" }.configureEach {
       enabled = false
     }
     ```
@@ -312,15 +322,25 @@ you don't need the standard JAR, you can disable the `jar` task like:
     tasks.named('jar', Jar) {
       enabled = false
     }
+
+    // If `java.withSourcesJar()` is enabled:
+    tasks.matching { it.name == 'sourcesJar' }.configureEach {
+      enabled = false
+    }
     ```
 
-Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
+Or set different `archiveClassifier` values for the standard tasks:
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
     tasks.jar {
       archiveClassifier = "ignored"
+    }
+
+    // If `java.withSourcesJar()` is enabled:
+    tasks.matching { it.name == "sourcesJar" }.configureEach {
+      (this as org.gradle.jvm.tasks.Jar).archiveClassifier = "ignored-sources"
     }
     ```
 
@@ -329,6 +349,11 @@ Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
     ```groovy
     tasks.named('jar', Jar) {
       archiveClassifier = 'ignored'
+    }
+
+    // If `java.withSourcesJar()` is enabled:
+    tasks.matching { it.name == 'sourcesJar' }.configureEach {
+      archiveClassifier = 'ignored-sources'
     }
     ```
 
