@@ -383,6 +383,9 @@ class PublishingTest : BasePluginTest() {
         "maven-1.0-shaded.jar",
         "maven-1.0-shaded-sources.jar",
       )
+    val gmm = gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module"))
+    assertThat(gmm.shadowSourcesElementsVariant.fileNames.single())
+      .isEqualTo("maven-1.0-shaded-sources.jar")
   }
 
   @Test

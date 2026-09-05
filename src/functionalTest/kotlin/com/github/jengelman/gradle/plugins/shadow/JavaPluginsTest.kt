@@ -1316,6 +1316,30 @@ class JavaPluginsTest : BasePluginTest() {
       )
   }
 
+  @Test
+  fun sourcesJarPreservesResourceRelativePath() {
+    writeClass()
+    path("src/main/resources/config/sub/app.properties").writeText("key=value")
+
+    projectScript.appendText(
+      """
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsAtLeast(
+        "my/Main.java",
+        "config/sub/app.properties",
+      )
+    }
+  }
+
   private fun dependencies(configuration: String, vararg flags: String): String {
     return runWithSuccess("dependencies", "--configuration", configuration, *flags).output
   }

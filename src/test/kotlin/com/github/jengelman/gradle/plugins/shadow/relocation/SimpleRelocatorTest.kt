@@ -358,6 +358,41 @@ class SimpleRelocatorTest {
   }
 
   @Test
+  fun relocateSourceFileWithPrefixCollision() {
+    val relocator =
+      SimpleRelocator(
+        "org.example",
+        "relocated.org.example",
+        includes = listOf("org.example.In"),
+      )
+    val source =
+      """
+      |import org.example.In;
+      |import org.example.Input;
+      |import org.example.In.Nested;
+      |
+      |public class Test {
+      |  org.example.In a;
+      |  org.example.Input b;
+      |}
+      """
+        .trimMargin()
+    val expected =
+      """
+      |import relocated.org.example.In;
+      |import org.example.Input;
+      |import relocated.org.example.In.Nested;
+      |
+      |public class Test {
+      |  relocated.org.example.In a;
+      |  org.example.Input b;
+      |}
+      """
+        .trimMargin()
+    assertThat(relocator.applyToSourceContent(source)).isEqualTo(expected)
+  }
+
+  @Test
   fun relocateSourceWithExcludes() {
     // Main relocator with excludes
     val relocator =

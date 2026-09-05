@@ -180,9 +180,12 @@ class ShadowPropertiesTest {
       javaPluginExtension.withSourcesJar()
       val shadowJarTask = tasks.shadowJar.get()
       assertThat(shadowJarTask.generateSourcesJar.get()).isTrue()
+      val mainSourceSet = javaPluginExtension.sourceSets.getByName("main")
       assertThat(shadowJarTask.sourceSetsSourceDirs.files)
         .containsOnly(
-          *javaPluginExtension.sourceSets.getByName("main").allSource.files.toTypedArray()
+          *(mainSourceSet.allSource.sourceDirectories + mainSourceSet.allSource)
+            .files
+            .toTypedArray()
         )
     }
 
