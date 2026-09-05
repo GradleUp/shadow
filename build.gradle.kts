@@ -140,6 +140,7 @@ dependencies {
 
   testPluginRuntimeOnly(libs.foojayResolver)
   testPluginRuntimeOnly(libs.pluginPublish)
+  testPluginRuntimeOnly(libs.dokka)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }

@@ -2,6 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsAtLeast
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
@@ -12,6 +13,9 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
+import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -279,6 +283,57 @@ class KotlinPluginsTest : BasePluginTest() {
       .contains(
         "$SHADOW_JAR_TASK_NAME task already exists, skipping configuration for target: $jvmTargetName", // Logged from Shadow.
         "Declaring multiple Kotlin Targets of the same type is not supported.", // Thrown from KGP.
+      )
+  }
+
+  @Test
+  fun generateDokkaFromShadowedSourcesJar() {
+    path("src/main/kotlin/my/Main.kt")
+      .writeText(
+        """
+        |package my
+        |/** Main class doc */
+        |class Main
+        """
+          .trimMargin()
+      )
+    projectScript.writeText(
+      """
+      |plugins {
+      |  id 'org.jetbrains.kotlin.jvm'
+      |  id 'com.gradleup.shadow'
+      |  id 'org.jetbrains.dokka'
+      |}
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |  relocate 'g', 'shadow.g'
+      |}
+      |def extractShadowedSources = tasks.register('extractShadowedSources', Sync) {
+      |  from zipTree($shadowJarTask.flatMap { it.archiveSourcesFile })
+      |  into layout.buildDirectory.dir('extracted-shadowed-sources')
+      |}
+      |dokka {
+      |  dokkaSourceSets.configureEach {
+      |    classpath.from($shadowJarTask.flatMap { it.archiveFile })
+      |    sourceRoots.from(extractShadowedSources.map { it.destinationDir })
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess("dokkaGenerateHtml")
+
+    val dokkaDir = projectRoot.resolve("build/dokka/html")
+    val dokkaFiles = dokkaDir.walk().map { it.relativeTo(dokkaDir).invariantSeparatorsPathString }
+    assertThat(dokkaFiles)
+      .containsAtLeast(
+        "index.html",
+        "my/my/-main/index.html",
+        "my/shadow.g/-g/index.html",
       )
   }
 

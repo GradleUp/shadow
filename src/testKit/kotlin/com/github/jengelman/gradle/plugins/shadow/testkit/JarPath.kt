@@ -122,6 +122,6 @@ fun Assert<URLClassLoader>.runMain(
   os.toString().invariantEolString
 }
 
-private fun Assert<JarPath>.toEntries() = transform { actual ->
+fun Assert<JarPath>.toEntries() = transform { actual ->
   actual.entries().toList().map { it.name }
 }

@@ -51,6 +51,23 @@ sealed interface SnippetExecutable {
         """
             .trimMargin()
         )
+      // TODO: https://github.com/Kotlin/dokka/issues/4488
+      projectRoot
+        .resolve("gradle.properties")
+        .writeText(
+          """
+          |# Dokka 2.2.0 DGPv2 is the default, but the plugin still looks up these properties dynamically.
+          |# Setting them here avoids cross-project property lookups that break isolated projects.
+          |org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
+          |org.jetbrains.dokka.experimental.gradle.pluginMode.noWarn=true
+          |org.jetbrains.dokka.experimental.gradle.pluginMode.nowarn=true
+          |org.jetbrains.dokka.experimental.tryK2=true
+          |org.jetbrains.dokka.experimental.tryK2.noWarn=true
+          |org.jetbrains.dokka.experimental.tryK2.nowarn=true
+          |org.jetbrains.dokka.internal.enableWorkaroundKT80551=true
+          """
+            .trimMargin()
+        )
       val pluginsBlock =
         """
         |plugins {

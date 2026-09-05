@@ -18,6 +18,7 @@ import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransform
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
+import com.github.jengelman.gradle.plugins.shadow.util.createDefaultLocalMavenRepository
 import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
@@ -27,7 +28,6 @@ import kotlin.io.path.appendText
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createDirectory
 import kotlin.io.path.createFile
-import kotlin.io.path.createTempDirectory
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.deleteRecursively
 import kotlin.io.path.exists
@@ -61,6 +61,9 @@ abstract class BasePluginTest {
   lateinit var artifactBJar: Path
     private set
 
+  lateinit var artifactGJar: Path
+    private set
+
   val projectScript: Path
     get() = path("build.gradle")
 
@@ -73,57 +76,22 @@ abstract class BasePluginTest {
   open val outputShadowedJar: JarPath
     get() = jarPath("build/libs/my-1.0-all.jar")
 
+  val outputShadowedSourcesJar: JarPath
+    get() = jarPath("build/libs/my-1.0-all-sources.jar")
+
   val outputServerShadowedJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
 
+  val outputServerShadowedSourcesJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all-sources.jar")
+
   @BeforeAll
   fun beforeAll() {
-    localRepo =
-      AppendableMavenRepository(
-          root = createTempDirectory().resolve("local-maven-repo").createDirectories()
-        )
-        .apply {
-          jarModule("junit", "junit", "3.8.2") { useJar(junitJar) }
-          val a =
-            jarModule("my", "a", "1.0") {
-              buildJar {
-                insert("a.properties", "a")
-                insert("a2.properties", "a2")
-              }
-            }
-          val b = jarModule("my", "b", "1.0") { buildJar { insert("b.properties", "b") } }
-          val c = jarModule("my", "c", "1.0") { buildJar { insert("c.properties", "c") } }
-          val d =
-            jarModule("my", "d", "1.0") {
-              buildJar { insert("d.properties", "d") }
-              // Depends on c but c does not depend on d.
-              addDependency(c)
-            }
-          val e =
-            jarModule("my", "e", "1.0") {
-              buildJar { insert("e.properties", "e") }
-              // Circular dependency with f.
-              addDependency("my:f:1.0")
-            }
-          val f =
-            jarModule("my", "f", "1.0") {
-              buildJar { insert("f.properties", "f") }
-              // Circular dependency with e.
-              addDependency(e)
-            }
-          bomModule("my", "bom", "1.0") {
-            addDependency(a)
-            addDependency(b)
-            addDependency(c)
-            addDependency(d)
-            addDependency(e)
-            addDependency(f)
-          }
-        }
-    localRepo.publish()
+    localRepo = createDefaultLocalMavenRepository(junitJar).apply { publish() }
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactGJar = path("my/g/1.0/g-1.0.jar", parent = localRepo.root)
   }
 
   @BeforeEach
@@ -295,6 +263,9 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |java {
+        |  withSourcesJar()
+        |}
         |dependencies {
         |  implementation 'junit:junit:3.8.2'
         |}
@@ -316,6 +287,9 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |java {
+        |  withSourcesJar()
+        |}
         |dependencies {
         |  implementation project(':client')
         |}
@@ -446,10 +420,16 @@ abstract class BasePluginTest {
       }
     }
 
-    fun createEmptyClassBytes(internalName: String): ByteArray {
+    fun createEmptyClassBytes(
+      internalName: String,
+      sourceFile: String? = "${internalName.substringAfterLast('/')}.java",
+    ): ByteArray {
       return ClassWriter(0)
         .apply {
           visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+          if (sourceFile != null) {
+            visitSource(sourceFile, null)
+          }
           visitEnd()
         }
         .toByteArray()

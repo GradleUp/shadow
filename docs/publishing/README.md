@@ -295,13 +295,31 @@ You may want to publish the shadowed JAR instead of the original JAR. This can b
     ```
 
 Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting the `archiveClassifier` of
-[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of these two tasks in some cases. If
-you don't need the standard JAR, you can disable the `jar` task like:
+[`ShadowJar`][ShadowJar] to `""` (empty) will make collisions between the outputs of standard tasks and `shadowJar`:
+
+- The binary shadowed JAR is output to `<archiveBaseName>-<archiveVersion>.jar`, conflicting with the `jar` task.
+- When `generateSourcesJar` is enabled (such as when `java.withSourcesJar()` is used), the companion shadowed sources
+  JAR is output to `<archiveBaseName>-<archiveVersion>-sources.jar`, conflicting with the standard `sourcesJar` task.
+
+If you want to replace standard JARs with the shadowed ones, disable the standard `jar` and `sourcesJar` tasks:
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
+    plugins {
+      java
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.jar {
+      enabled = false
+    }
+
+    tasks.named<Jar>("sourcesJar") {
       enabled = false
     }
     ```
@@ -309,26 +327,65 @@ you don't need the standard JAR, you can disable the `jar` task like:
 === ":simple-apachegroovy: build.gradle"
 
     ```groovy
+    plugins {
+      id('java')
+      id('com.gradleup.shadow')
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.named('jar', Jar) {
+      enabled = false
+    }
+
+    tasks.named('sourcesJar', Jar) {
       enabled = false
     }
     ```
 
-Or set a different `archiveClassifier` for the standard [`Jar`][Jar] like:
+Or set different `archiveClassifier` values for the standard tasks:
 
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
+    plugins {
+      java
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.jar {
       archiveClassifier = "ignored"
     }
+
+    tasks.named<Jar>("sourcesJar") {
+      archiveClassifier = "ignored-sources"
+    }
     ```
 
 === ":simple-apachegroovy: build.gradle"
 
     ```groovy
+    plugins {
+      id('java')
+      id('com.gradleup.shadow')
+    }
+
+    java {
+      withSourcesJar()
+    }
+
     tasks.named('jar', Jar) {
       archiveClassifier = 'ignored'
+    }
+
+    tasks.named('sourcesJar', Jar) {
+      archiveClassifier = 'ignored-sources'
     }
     ```
 
@@ -515,10 +572,429 @@ customizable properties listed in [Configuring Output Name][configuring-output-n
 We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will
 be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
+## Shadowed Sources JAR
+
+When publishing a shadowed library, consumers and IDEs need a corresponding sources JAR to navigate source code and
+inspect implementations. A standard sources JAR only contains your project's original un-relocated sources, which
+causes broken navigation when consumers reference relocated packages.
+
+Shadow automatically generates a **Shadowed Sources JAR** containing:
+
+- Source files from your project's source sets (`Java`, `Kotlin`, `Groovy`, `Scala`).
+- Source files resolved and merged from all bundled dependencies' `-sources.jar` archives.
+- Relocated package declarations, imports, and symbol references that match your [`relocate`][ShadowJar.relocate] rules.
+- Normalized package directory layout matching the declared `package` in each source file.
+- Automatic filtering: dependencies excluded in `dependencies { exclude(...) }` or unused classes removed via
+  `minimize()` are automatically excluded from the shadowed sources JAR as well.
+
+### Publishing with `withSourcesJar()`
+
+When Gradle's standard `java.withSourcesJar()` is enabled, the Shadow plugin automatically registers the
+`shadowSourcesElements` variant and publishes the shadowed sources JAR alongside the shadowed binary JAR:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+        }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+    ```
+
+The published Maven publication will include both `<artifactId>-<version>-all.jar` and
+`<artifactId>-<version>-all-sources.jar`.
+
+### Local File Names vs. Published Classifiers
+
+The Shadow plugin distinguishes between the **local output file** on disk and the **published artifact classifier** in
+Maven repositories and Gradle Module Metadata:
+
+| Configuration                           | Local Output File (`archiveSourcesFile` in `build/libs`) | Published Classifier | Published File (Maven Repository)           | Use Case                                           |
+|:----------------------------------------|:---------------------------------------------------------|:---------------------|:--------------------------------------------|:---------------------------------------------------|
+| `archiveClassifier = "all"` *(default)* | `<name>-<version>-all-sources.jar`                       | `all-sources`        | `<artifactId>-<version>-all-sources.jar`    | **Coexistence** (coexists with standard `sources`) |
+| `archiveClassifier = "shaded"`          | `<name>-<version>-shaded-sources.jar`                    | `shaded-sources`     | `<artifactId>-<version>-shaded-sources.jar` | **Coexistence** (custom classifier)                |
+| `archiveClassifier = ""`                | `<name>-<version>-sources.jar`                           | `sources`            | `<artifactId>-<version>-sources.jar`        | **Replacement** (replaces standard `sources`)      |
+
+#### Coexistence Scenario
+
+When publishing alongside standard Java artifacts (e.g. publishing `from(components["java"])` with
+`shadow.addShadowVariantIntoJavaComponent = true`), the standard sources variant uses classifier `sources`. To prevent
+coordinate collisions within the same publication, the shadowed sources variant dynamically derives its classifier as
+`<archiveClassifier>-sources` (such as `all-sources` or `shaded-sources`).
+
+#### Replacement Scenario
+
+When configuring `shadowJar` to replace the standard JAR (`archiveClassifier = ""`), the companion shadowed sources JAR
+automatically uses the standard `sources` classifier.
+
+To publish shadowed artifacts as the primary publication:
+
+1. **Publish from `components["shadow"]` (Recommended)**: Publish the `shadow` component directly in your Maven
+   publication, and disable standard archive tasks to prevent destination file collisions in `build/libs`:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    tasks.jar {
+      enabled = false
+    }
+
+    tasks.named<Jar>("sourcesJar") {
+      enabled = false
+    }
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["shadow"])
+        }
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    tasks.named('jar', Jar) {
+      enabled = false
+    }
+
+    tasks.named('sourcesJar', Jar) {
+      enabled = false
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.shadow
+        }
+      }
+    }
+    ```
+
+2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, disabling the `jar` or `sourcesJar`
+   tasks does not remove standard variants from the `java` software component. You must also explicitly skip the
+   standard publication variants:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      java
+      `maven-publish`
+      id("com.gradleup.shadow")
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    components.named<org.gradle.api.component.AdhocComponentWithVariants>("java") {
+      withVariantsFromConfiguration(configurations["runtimeElements"]) { skip() }
+      withVariantsFromConfiguration(configurations["sourcesElements"]) { skip() }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'java'
+      id 'maven-publish'
+      id 'com.gradleup.shadow'
+    }
+
+    java {
+      withSourcesJar()
+    }
+
+    components.named('java', org.gradle.api.component.AdhocComponentWithVariants) {
+      withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
+      withVariantsFromConfiguration(configurations.sourcesElements) { skip() }
+    }
+    ```
+
+> [!NOTE]
+> Generating the companion shadowed sources JAR is controlled by [`generateSourcesJar`][ShadowJar.generateSourcesJar].
+> In Java projects, it defaults to `true` when `java.withSourcesJar()` is enabled, and `false` otherwise to avoid
+> unnecessary build overhead for application builds. If `withSourcesJar()` is omitted, publishing from
+> `components["shadow"]` will only publish the shadowed binary JAR, preserving backward compatibility for existing
+builds.
+> You can also explicitly toggle generation via `generateSourcesJar = true` (or `--generate-sources-jar`).
+
+### Customizing the Sources Archive File
+
+The companion shadowed sources JAR output location is configured via
+[`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
+which defaults to the same destination and base name as `archiveFile` with `-sources.jar` suffix:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.shadowJar {
+      archiveSourcesFile = layout.buildDirectory.file("custom-libs/my-sources.jar")
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveSourcesFile = layout.buildDirectory.file('custom-libs/my-sources.jar')
+    }
+    ```
+
+You can also customize the source inputs included in the companion sources JAR using
+[`sourceSetsSourceDirs`][ShadowJar.sourceSetsSourceDirs] and
+[`includedSourcesJars`][ShadowJar.includedSourcesJars]:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.shadowJar {
+      // Add custom source directories
+      sourceSetsSourceDirs.from("src/extra/java")
+
+      // Add additional dependency sources JARs
+      includedSourcesJars.from("libs/external-lib-sources.jar")
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      // Add custom source directories
+      sourceSetsSourceDirs.from('src/extra/java')
+
+      // Add additional dependency sources JARs
+      includedSourcesJars.from('libs/external-lib-sources.jar')
+    }
+    ```
+
+### Publishing with Kotlin Multiplatform (KMP)
+
+In Kotlin Multiplatform (KMP) projects, publications are managed by the Kotlin Gradle Plugin (KGP) per target (such as
+the `jvm` publication). You can attach the shadowed sources JAR artifact to the `jvm` Maven publication:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      id("org.jetbrains.kotlin.multiplatform")
+      id("com.gradleup.shadow")
+      `maven-publish`
+    }
+
+    kotlin {
+      jvm()
+    }
+
+    publishing {
+      publications {
+        withType<MavenPublication>().configureEach {
+          if (name == "jvm") {
+            artifact(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveSourcesFile }) {
+              classifier = "sources"
+            }
+          }
+        }
+      }
+      repositories {
+        maven("https://repo.myorg.com")
+      }
+    }
+
+    tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+      generateSourcesJar = true
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'org.jetbrains.kotlin.multiplatform'
+      id 'com.gradleup.shadow'
+      id 'maven-publish'
+    }
+
+    kotlin {
+      jvm()
+    }
+
+    publishing {
+      publications {
+        withType(MavenPublication).configureEach {
+          if (name == 'jvm') {
+            artifact(tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).flatMap { it.archiveSourcesFile }) {
+              classifier = 'sources'
+            }
+          }
+        }
+      }
+      repositories {
+        maven { url = 'https://repo.myorg.com' }
+      }
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      generateSourcesJar = true
+    }
+    ```
+
+## Generating Javadoc or Dokka from Shadowed Sources
+
+When creating fat / shadowed libraries, you may want to generate a complete Javadoc or Dokka JAR covering both your
+project sources and shadowed dependency sources with relocated packages.
+
+Because `shadowJar` outputs the shadowed sources archive at `archiveSourcesFile` (where relocated packages and source
+contents have already been transformed), you can configure the `javadoc` task (or Dokka task) to consume the shadowed
+sources and classes directly from `shadowJar`. The generated documentation will reflect the relocated package names
+(e.g. `shadow.com.Example` instead of `com.Example`).
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    tasks.javadoc {
+      classpath = files(tasks.shadowJar.flatMap { it.archiveFile })
+      source = zipTree(tasks.shadowJar.flatMap { it.archiveSourcesFile })
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    tasks.named('javadoc', Javadoc) {
+      classpath = files(tasks.named('shadowJar').flatMap { it.archiveFile })
+      source = zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
+    }
+    ```
+
+If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed sources and configure `sourceRoots`:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    plugins {
+      kotlin("jvm")
+      id("org.jetbrains.dokka")
+      id("com.gradleup.shadow")
+    }
+
+    val extractShadowedSources = tasks.register<Sync>("extractShadowedSources") {
+      from(zipTree(tasks.shadowJar.flatMap { it.archiveSourcesFile }))
+      into(layout.buildDirectory.dir("extracted-shadowed-sources"))
+    }
+
+    dokka {
+      dokkaSourceSets.configureEach {
+        classpath.setFrom(tasks.shadowJar.flatMap { it.archiveFile })
+        sourceRoots.setFrom(extractShadowedSources.map { it.destinationDir })
+      }
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    plugins {
+      id 'org.jetbrains.kotlin.jvm'
+      id 'org.jetbrains.dokka'
+      id 'com.gradleup.shadow'
+    }
+
+    tasks.register('extractShadowedSources', Sync) {
+      from zipTree(tasks.named('shadowJar').flatMap { it.archiveSourcesFile })
+      into layout.buildDirectory.dir('extracted-shadowed-sources')
+    }
+
+    dokka {
+      dokkaSourceSets.configureEach {
+        classpath.from(tasks.named('shadowJar').flatMap { it.archiveFile })
+        sourceRoots.from(extractShadowedSources.map { it.destinationDir })
+      }
+    }
+    ```
 
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
 [MavenPublication.artifact]: https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html#org.gradle.api.publish.maven.MavenPublication:artifact(java.lang.Object)
 [ShadowJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/index.html
+[ShadowJar.archiveSourcesFile]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/archive-sources-file.html
+[ShadowJar.generateSourcesJar]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/generate-sources-jar.html
+[ShadowJar.includedSourcesJars]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/included-sources-jars.html
+[ShadowJar.relocate]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/relocate.html
+[ShadowJar.sourceSetsSourceDirs]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.tasks/-shadow-jar/source-sets-source-dirs.html
 [maven-publish]: https://docs.gradle.org/current/userguide/publishing_maven.html
 [gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
 [configuring-output-name]: ../configuration/README.md#configuring-output-name
+[dokka]: https://kotlinlang.org/docs/dokka-introduction.html
