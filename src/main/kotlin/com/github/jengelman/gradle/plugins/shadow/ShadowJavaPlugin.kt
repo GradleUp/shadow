@@ -48,6 +48,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null }
         )
         task.sourceSetsSourceDirs.convention(
+          // Avoid snapshotting source inputs when sources JAR generation is disabled.
           task.generateSourcesJar.flatMap { generate ->
             if (generate) {
               mainSourceSet.map { it.allSource }
