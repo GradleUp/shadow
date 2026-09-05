@@ -5,6 +5,9 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
 import java.nio.charset.Charset
 import org.gradle.api.tasks.bundling.ZipEntryCompression
+import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
+import org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor
+import org.vafer.jdeb.shaded.objectweb.asm.Opcodes
 
 internal fun generateShadowedSourcesJar(
   sourcesJarFile: File,
@@ -218,32 +221,28 @@ internal fun buildSourceToClassesMap(
     try {
       var internalName: String? = null
       var sourceFile: String? = null
-      val reader = org.vafer.jdeb.shaded.objectweb.asm.ClassReader(bytes)
-      reader.accept(
-        object :
-          org.vafer.jdeb.shaded.objectweb.asm.ClassVisitor(
-            org.vafer.jdeb.shaded.objectweb.asm.Opcodes.ASM9
-          ) {
-          override fun visit(
-            version: Int,
-            access: Int,
-            name: String,
-            signature: String?,
-            superName: String?,
-            interfaces: Array<out String>?,
-          ) {
-            internalName = name
-            super.visit(version, access, name, signature, superName, interfaces)
-          }
+      ClassReader(bytes)
+        .accept(
+          object : ClassVisitor(Opcodes.ASM9) {
+            override fun visit(
+              version: Int,
+              access: Int,
+              name: String,
+              signature: String?,
+              superName: String?,
+              interfaces: Array<out String>?,
+            ) {
+              internalName = name
+              super.visit(version, access, name, signature, superName, interfaces)
+            }
 
-          override fun visitSource(source: String?, debug: String?) {
-            sourceFile = source
-            super.visitSource(source, debug)
-          }
-        },
-        org.vafer.jdeb.shaded.objectweb.asm.ClassReader.SKIP_CODE or
-          org.vafer.jdeb.shaded.objectweb.asm.ClassReader.SKIP_FRAMES,
-      )
+            override fun visitSource(source: String?, debug: String?) {
+              sourceFile = source
+              super.visitSource(source, debug)
+            }
+          },
+          ClassReader.SKIP_CODE or ClassReader.SKIP_FRAMES,
+        )
 
       val name = internalName ?: return
       val source = sourceFile ?: return
@@ -256,7 +255,7 @@ internal fun buildSourceToClassesMap(
     }
   }
 
-  for (dir in classesDirs.filter { it.isDirectory }) {
+  for (dir in classesDirs.filter(File::isDirectory)) {
     dir
       .walkTopDown()
       .filter { it.isFile && it.name.endsWith(".class") }
@@ -264,7 +263,7 @@ internal fun buildSourceToClassesMap(
   }
 
   for (file in
-    dependencies.filter { it.isFile && (it.name.endsWith(".jar") || it.name.endsWith(".zip")) }) {
+    dependencies.filter { it.isFile && (it.extension == "jar" || it.extension == "zip") }) {
     try {
       file.useZip {
         entries()
@@ -287,8 +286,7 @@ internal fun isUnused(
 ): Boolean {
   if (unusedClasses.isEmpty()) return false
   val classes = sourceToClasses[canonicalPath] ?: return false
-  if (classes.isEmpty()) return false
-  return classes.all { it in unusedClasses }
+  return classes.isNotEmpty() && classes.all { it in unusedClasses }
 }
 
 private fun isSourceFile(path: String): Boolean {

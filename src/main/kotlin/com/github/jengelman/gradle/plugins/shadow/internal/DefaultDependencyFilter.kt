@@ -44,18 +44,17 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
       includedDependencies = includes,
       excludedDependencies = excludes,
     )
-    val allResolvedDependencies =
-      configuration.incoming.resolutionResult.allDependencies.filterIsInstance<
-        ResolvedDependencyResult
-      >()
 
-    val includedDependenciesResults = allResolvedDependencies.filter { dep ->
-      includes.any { inc ->
-        inc.moduleGroup == dep.selected.moduleVersion?.group &&
-          inc.moduleName == dep.selected.moduleVersion?.name &&
-          inc.moduleVersion == dep.selected.moduleVersion?.version
-      }
-    }
+    val includedDependenciesResults =
+      configuration.incoming.resolutionResult.allDependencies
+        .filterIsInstance<ResolvedDependencyResult>()
+        .filter { dep ->
+          includes.any { inc ->
+            inc.moduleGroup == dep.selected.moduleVersion?.group &&
+              inc.moduleName == dep.selected.moduleVersion?.name &&
+              inc.moduleVersion == dep.selected.moduleVersion?.version
+          }
+        }
 
     val externalComponentIds =
       includedDependenciesResults
