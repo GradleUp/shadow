@@ -5,14 +5,18 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.io.File
+import java.util.Date
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
+import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
@@ -25,6 +29,8 @@ import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.tasks.TaskDependency
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -93,13 +99,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           objects.named(DocsType::class.java, DocsType.SOURCES),
         )
       }
-      outgoing.artifact(tasks.shadowJar.flatMap { it.archiveSourcesFile }) { artifact ->
-        artifact.builtBy(tasks.shadowJar)
-        artifact.type = "jar"
-        val shadowClassifier = tasks.shadowJar.flatMap { it.archiveClassifier }.orNull
-        artifact.classifier =
-          if (shadowClassifier.isNullOrEmpty()) "sources" else "$shadowClassifier-sources"
-      }
+      outgoing.artifact(ShadowSourcesPublishArtifact(tasks.shadowJar))
     }
 
     // See more details in #2086.
@@ -230,5 +230,29 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     public inline val ConfigurationContainer.shadowSourcesElements:
       NamedDomainObjectProvider<ConsumableConfiguration>
       get() = named(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
+  }
+}
+
+internal class ShadowSourcesPublishArtifact(private val shadowJarTask: TaskProvider<ShadowJar>) :
+  PublishArtifact {
+  override fun getName(): String = shadowJarTask.flatMap { it.archiveBaseName }.orNull ?: ""
+
+  override fun getExtension(): String =
+    shadowJarTask.flatMap { it.archiveExtension }.orNull ?: "jar"
+
+  override fun getType(): String = "jar"
+
+  override fun getClassifier(): String {
+    val shadowClassifier = shadowJarTask.flatMap { it.archiveClassifier }.orNull
+    return if (shadowClassifier.isNullOrEmpty()) "sources" else "$shadowClassifier-sources"
+  }
+
+  override fun getFile(): File = shadowJarTask.flatMap { it.archiveSourcesFile }.get().asFile
+
+  override fun getDate(): Date? = null
+
+  @Suppress("EagerGradleConfiguration")
+  override fun getBuildDependencies(): TaskDependency = TaskDependency {
+    setOf(shadowJarTask.get())
   }
 }

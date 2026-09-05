@@ -1340,6 +1340,39 @@ class JavaPluginsTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun sourcesJarHandlesOverlappingSourceDirectoryPrefixes() {
+    writeClass()
+    path("src/main/res/a.properties").writeText("a=1")
+    path("src/main/resources/b.properties").writeText("b=2")
+
+    projectScript.appendText(
+      """
+      |sourceSets {
+      |  main {
+      |    resources {
+      |      srcDir 'src/main/res'
+      |    }
+      |  }
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsAtLeast(
+        "my/Main.java",
+        "a.properties",
+        "b.properties",
+      )
+    }
+  }
+
   private fun dependencies(configuration: String, vararg flags: String): String {
     return runWithSuccess("dependencies", "--configuration", configuration, *flags).output
   }

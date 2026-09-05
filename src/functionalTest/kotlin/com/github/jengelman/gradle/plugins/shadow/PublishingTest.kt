@@ -389,6 +389,45 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun publishWithSourcesJarAndCustomClassifierAfterPublishingBlock() {
+    projectScript.appendText(
+      """
+      |apply plugin: 'maven-publish'
+      |java {
+      |  withSourcesJar()
+      |}
+      |publishing {
+      |  repositories {
+      |    maven { url = '${remoteRepoPath.toUri()}' }
+      |  }
+      |  publications {
+      |    shadow(MavenPublication) {
+      |      from components.shadow
+      |    }
+      |  }
+      |}
+      |tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      |  archiveClassifier = 'shaded'
+      |  archiveSourcesFile = layout.buildDirectory.file('custom.jar')
+      |}
+      """
+        .trimMargin()
+    )
+
+    publish()
+
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries.filter { it.endsWith(".jar") })
+      .containsOnly(
+        "maven-1.0-shaded.jar",
+        "maven-1.0-shaded-sources.jar",
+      )
+    val gmm = gmmAdapter.fromJson(repoPath("$artifactRoot/maven-1.0.module"))
+    assertThat(gmm.shadowSourcesElementsVariant.fileNames.single())
+      .isEqualTo("maven-1.0-shaded-sources.jar")
+  }
+
+  @Test
   fun publishJavaComponentWithShadowAndSourcesVariants() {
     projectScript.appendText(
       publishConfiguration(

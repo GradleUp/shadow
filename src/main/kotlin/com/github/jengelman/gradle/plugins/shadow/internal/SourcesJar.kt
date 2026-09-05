@@ -50,30 +50,34 @@ internal fun generateShadowedSourcesJar(
 
         val sourceItems = sourceSetsSourceDirs.filter { it.exists() }
         val (dirs, files) = sourceItems.partition { it.isDirectory }
-        val sortedDirs = dirs.sortedByDescending { it.path.length }
+        val normalizedDirs =
+          dirs.map { it to it.normalize().toPath() }.sortedByDescending { it.second.nameCount }
 
         val filesWithRelPaths = mutableListOf<Pair<File, String>>()
-        val dirsCoveredByFiles = mutableSetOf<File>()
+        val coveredDirs = mutableSetOf<File>()
 
         for (file in files.sortedBy { it.path }) {
-          val matchingDir = sortedDirs.firstOrNull { file.startsWith(it) }
+          val filePath = file.normalize().toPath()
+          val matchingDir =
+            normalizedDirs.firstOrNull { (_, dirPath) -> filePath.startsWith(dirPath) }?.first
           if (matchingDir != null) {
-            dirsCoveredByFiles.add(matchingDir)
+            coveredDirs.add(matchingDir)
             filesWithRelPaths.add(file to file.relativeTo(matchingDir).invariantSeparatorsPath)
           } else {
             filesWithRelPaths.add(file to file.name)
           }
         }
 
-        for (dir in dirs.sortedBy { it.path }) {
-          if (dir !in dirsCoveredByFiles) {
+        for ((dir, dirPath) in normalizedDirs.sortedBy { it.second.nameCount }) {
+          if (coveredDirs.none { dirPath.startsWith(it.normalize().toPath()) }) {
+            coveredDirs.add(dir)
             dir
               .walkTopDown()
               .filter { it.isFile }
               .toList()
               .sortedBy { it.relativeTo(dir).invariantSeparatorsPath }
-              .forEach { file ->
-                filesWithRelPaths.add(file to file.relativeTo(dir).invariantSeparatorsPath)
+              .forEach { f ->
+                filesWithRelPaths.add(f to f.relativeTo(dir).invariantSeparatorsPath)
               }
           }
         }
