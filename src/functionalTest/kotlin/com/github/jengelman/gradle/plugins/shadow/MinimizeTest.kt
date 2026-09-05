@@ -36,7 +36,8 @@ class MinimizeTest : BasePluginTest() {
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         *junitResourceEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("impl.SimpleEntity")
@@ -78,7 +79,8 @@ class MinimizeTest : BasePluginTest() {
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         "lib/UnusedLibEntity.class",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("impl.SimpleEntity")
@@ -120,7 +122,8 @@ class MinimizeTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitResourceEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("client.Client")
@@ -152,7 +155,8 @@ class MinimizeTest : BasePluginTest() {
         "server/",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("server.Server")
@@ -186,7 +190,8 @@ class MinimizeTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("client.Client")
@@ -232,7 +237,8 @@ class MinimizeTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("client.Client")
@@ -258,7 +264,8 @@ class MinimizeTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("client.Client")
@@ -288,7 +295,7 @@ class MinimizeTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("e.properties", "f.properties", *manifestEntries)
+      containsOnly("e.properties", "f.properties", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -317,7 +324,8 @@ class MinimizeTest : BasePluginTest() {
         "api/UnusedEntity.class",
         "lib/LibEntity.class",
         *junitResourceEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }

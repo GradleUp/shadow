@@ -149,7 +149,8 @@ class JavaPluginsTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -163,7 +164,7 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(":server:jar")
 
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
-      containsOnly("server/", "server/Server.class", *manifestEntries)
+      containsOnly("server/", "server/Server.class", "META-INF/", "META-INF/MANIFEST.MF")
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
       containsOnly(
@@ -171,7 +172,8 @@ class JavaPluginsTest : BasePluginTest() {
         "client/junit/",
         "client/Client.class",
         *relocatedEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -192,7 +194,8 @@ class JavaPluginsTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *relocatedEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
     assertThat(jarPath("client/build/libs/client-1.0-all.jar")).useAll {
@@ -201,7 +204,8 @@ class JavaPluginsTest : BasePluginTest() {
         "client/junit/",
         "client/Client.class",
         *relocatedEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -280,7 +284,7 @@ class JavaPluginsTest : BasePluginTest() {
     // The fact that server compiled successfully against `client.junit.framework.Test`
     // means it consumed the shadowed artifact during compilation.
     assertThat(jarPath("server/build/libs/server-1.0.jar")).useAll {
-      containsOnly("server/", "server/Server.class", *manifestEntries)
+      containsOnly("server/", "server/Server.class", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -385,7 +389,8 @@ class JavaPluginsTest : BasePluginTest() {
         "client/Custom2.class",
         "server/Server.class",
         *junitEntries,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -447,7 +452,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll { containsOnly("META-INF/a.properties", *manifestEntries) }
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("META-INF/a.properties", "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -465,7 +472,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll { containsOnly(*entriesInA, *manifestEntries) }
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*entriesInA, "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -503,7 +512,8 @@ class JavaPluginsTest : BasePluginTest() {
         "implementation.properties",
         "runtime-only.properties",
         *entriesInB,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -590,7 +600,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll { containsOnly(*junitEntries, *manifestEntries) }
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test // #459, #852
@@ -625,7 +637,8 @@ class JavaPluginsTest : BasePluginTest() {
         "META-INF/gradle-plugins/",
         "META-INF/gradle-plugins/my.plugin.properties",
         *entriesInA,
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -681,7 +694,7 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(testShadowJarTask)
 
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
-      containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
+      containsOnly("my/", mainClassEntry, *junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
       getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
       classLoader {
         runMain("my.Main", "foo")
@@ -730,7 +743,7 @@ class JavaPluginsTest : BasePluginTest() {
     assertThat(result.output).contains("Has ShadowPlugin: false", "Has ShadowBasePlugin: false")
 
     assertThat(jarPath("build/libs/my-1.0-test.jar")).useAll {
-      containsOnly("my/", mainClassEntry, *junitEntries, *manifestEntries)
+      containsOnly("my/", mainClassEntry, *junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
       getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
       classLoader {
         runMain("my.Main", "foo")
@@ -767,11 +780,11 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess("jar", dependencyShadowJar)
 
     assertThat(jarPath("build/libs/my-1.0.jar")).useAll {
-      containsOnly("my/", mainClassEntry, *manifestEntries)
+      containsOnly("my/", mainClassEntry, "META-INF/", "META-INF/MANIFEST.MF")
       transform { it.mainAttrSize }.isEqualTo(1)
     }
     assertThat(jarPath("build/libs/my-1.0-dep.jar")).useAll {
-      containsOnly(*junitEntries, *manifestEntries)
+      containsOnly(*junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
       transform { it.mainAttrSize }.isEqualTo(1)
     }
   }
@@ -881,10 +894,11 @@ class JavaPluginsTest : BasePluginTest() {
         "my/",
         "Bar/",
         "Bar/Foo",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
         "META-INF/a-1.0.jar",
         "META-INF/b.properties",
         mainClassEntry,
-        *manifestEntries,
       )
       getContent("Bar/Foo").isEqualTo("Foo")
       getContent("META-INF/b.properties").isEqualTo("b")
@@ -917,7 +931,7 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("a-1.0.jar", "b-1.0.jar", *manifestEntries)
+      containsOnly("a-1.0.jar", "b-1.0.jar", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -943,7 +957,7 @@ class JavaPluginsTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("module-info.class", "my/", mainClassEntry, *manifestEntries)
+      containsOnly("module-info.class", "my/", mainClassEntry, "META-INF/", "META-INF/MANIFEST.MF")
       getContent("module-info.class").all {
         isNotEmpty()
         // It's the compiled class instead of the original content.
@@ -985,7 +999,9 @@ class JavaPluginsTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(outputShadowedJar).useAll { containsOnly(*entriesInAB, *manifestEntries) }
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
   }
 
   @Test
@@ -1166,7 +1182,8 @@ class JavaPluginsTest : BasePluginTest() {
         "com/company/",
         "com/company/Main.class",
         "com/company/Utils.class",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
     }
   }
@@ -1255,7 +1272,8 @@ class JavaPluginsTest : BasePluginTest() {
         "Foo.txt",
         "bar.class",
         "Bar.class",
-        *manifestEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
       )
       getBytes("Bar.class").isEqualTo(createEmptyClassBytes("Bar"))
       getBytes("bar.class").isEqualTo(createEmptyClassBytes("bar"))

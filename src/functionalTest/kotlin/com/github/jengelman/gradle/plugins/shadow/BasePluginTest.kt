@@ -430,8 +430,6 @@ abstract class BasePluginTest {
         "junit/swingui/icons/hierarchy.gif",
         "junit/swingui/icons/ok.gif",
       )
-    const val manifestEntry = "META-INF/MANIFEST.MF"
-    val manifestEntries = arrayOf("META-INF/", manifestEntry)
 
     val shadowJarTask: String =
       "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"

@@ -317,7 +317,7 @@ class PublishingTest : BasePluginTest() {
     publish()
 
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-tests.jar")).useAll {
-      containsOnly(*junitEntries, *manifestEntries)
+      containsOnly(*junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 
@@ -491,9 +491,11 @@ class PublishingTest : BasePluginTest() {
         "maven-all-1.0.pom.sha512",
       )
 
-    assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll { containsOnly(*manifestEntries) }
+    assertThat(repoJarPath("my/maven/1.0/maven-1.0.jar")).useAll {
+      containsOnly("META-INF/", "META-INF/MANIFEST.MF")
+    }
     assertThat(repoJarPath("my/maven/1.0/maven-1.0-all.jar")).useAll {
-      containsOnly(*entriesInAB, *manifestEntries)
+      containsOnly(*entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
     }
 
     assertPomCommon(repoPath("my/maven/1.0/maven-1.0.pom"), arrayOf("my:a:1.0", "my:b:1.0"))
