@@ -2,9 +2,9 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertFailure
 import assertk.assertThat
+import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.hasMessage
-import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
@@ -91,18 +91,16 @@ class SourcesJarTest {
 
     val entries = ZipFile(outputJar).use { zip -> zip.entries().toList().map { it.name } }
     assertThat(entries)
-      .isEqualTo(
-        listOf(
-          "META-INF/MANIFEST.MF",
-          "a/A.java",
-          "m/M.java",
-          "z/sub/Z.java",
-          "META-INF/",
-          "a/",
-          "m/",
-          "z/",
-          "z/sub/",
-        )
+      .containsExactly(
+        "META-INF/MANIFEST.MF",
+        "a/A.java",
+        "m/M.java",
+        "z/sub/Z.java",
+        "META-INF/",
+        "a/",
+        "m/",
+        "z/",
+        "z/sub/",
       )
   }
 
