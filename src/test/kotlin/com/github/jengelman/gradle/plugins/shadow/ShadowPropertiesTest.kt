@@ -168,10 +168,7 @@ class ShadowPropertiesTest {
           isEqualTo(destinationDirectory.file("my-project-1.0.0-all-sources.jar").get().asFile)
           isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
         }
-        assertThat(sourceSetsSourceDirs.files)
-          .containsOnly(
-            *javaPluginExtension.sourceSets.getByName("main").allSource.srcDirs.toTypedArray()
-          )
+        assertThat(sourceSetsSourceDirs.files).isEmpty()
         assertThat(includedSourcesJars.files).isEmpty()
       }
     }
@@ -183,6 +180,10 @@ class ShadowPropertiesTest {
       javaPluginExtension.withSourcesJar()
       val shadowJarTask = tasks.shadowJar.get()
       assertThat(shadowJarTask.generateSourcesJar.get()).isTrue()
+      assertThat(shadowJarTask.sourceSetsSourceDirs.files)
+        .containsOnly(
+          *javaPluginExtension.sourceSets.getByName("main").allSource.srcDirs.toTypedArray()
+        )
     }
 
   @Test

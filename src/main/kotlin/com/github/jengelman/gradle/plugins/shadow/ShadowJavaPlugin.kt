@@ -44,9 +44,17 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val taskProvider =
       registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
         task.from(mainSourceSet.map { it.output })
-        task.sourceSetsSourceDirs.convention(mainSourceSet.map { it.allSource.srcDirs })
         task.generateSourcesJar.convention(
           provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null }
+        )
+        task.sourceSetsSourceDirs.convention(
+          task.generateSourcesJar.flatMap { generate ->
+            if (generate) {
+              mainSourceSet.map { it.allSource.srcDirs }
+            } else {
+              provider { emptySet() }
+            }
+          }
         )
         task.configurations.convention(provider { listOf(runtimeConfiguration) })
       }

@@ -202,29 +202,6 @@ public abstract class ShadowJar : Jar() {
   }
 
   /**
-   * Source JARs resolved from bundled dependencies to be merged into the companion shadowed sources
-   * JAR.
-   */
-  @get:InputFiles
-  @get:PathSensitive(PathSensitivity.NONE)
-  public open val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
-    dependencyFilter.zip(configurations) { df, cs ->
-      (df as? DefaultDependencyFilter)?.resolveSourcesJars(cs) ?: project.files()
-    }
-  }
-
-  /**
-   * Source directories from project source sets to be included in the companion shadowed sources
-   * JAR.
-   *
-   * In projects applying the `shadow` plugin for Java or Kotlin Multiplatform, this defaults to the
-   * relevant source sets' source directories.
-   */
-  @get:InputFiles
-  @get:PathSensitive(PathSensitivity.RELATIVE)
-  public open val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
-
-  /**
    * If `true`, generates a companion shadowed sources JAR containing project and dependency
    * sources.
    *
@@ -238,6 +215,37 @@ public abstract class ShadowJar : Jar() {
       "Generates a companion shadowed sources JAR containing project and dependency sources.",
   )
   public open val generateSourcesJar: Property<Boolean> = objectFactory.property(false)
+
+  /**
+   * Source JARs resolved from bundled dependencies to be merged into the companion shadowed sources
+   * JAR.
+   */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.NONE)
+  public open val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
+    // Avoid resolving sources JARs during task input snapshotting when sources JAR generation is
+    // disabled.
+    generateSourcesJar.flatMap {
+      if (it) {
+        dependencyFilter.zip(configurations) { df, cs ->
+          (df as? DefaultDependencyFilter)?.resolveSourcesJars(cs) ?: project.files()
+        }
+      } else {
+        project.provider { emptySet() }
+      }
+    }
+  }
+
+  /**
+   * Source directories from project source sets to be included in the companion shadowed sources
+   * JAR.
+   *
+   * In projects applying the `shadow` plugin for Java or Kotlin Multiplatform, this defaults to the
+   * relevant source sets' source directories.
+   */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  public open val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
 
   /**
    * The destination location of the companion shadowed sources JAR.

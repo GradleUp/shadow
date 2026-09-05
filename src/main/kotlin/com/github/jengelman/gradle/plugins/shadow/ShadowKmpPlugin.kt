@@ -37,7 +37,13 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
     registerShadowJarCommon(tasks.named(target.artifactsTaskName, Jar::class.java)) { task ->
       task.from(kotlinJvmMain.map { it.output.allOutputs })
       task.sourceSetsSourceDirs.convention(
-        kotlinJvmMain.map { it.allKotlinSourceSets.flatMap { ss -> ss.kotlin.srcDirs } }
+        task.generateSourcesJar.flatMap { generate ->
+          if (generate) {
+            kotlinJvmMain.map { it.allKotlinSourceSets.flatMap { ss -> ss.kotlin.srcDirs } }
+          } else {
+            provider { emptySet() }
+          }
+        }
       )
       task.configurations.convention(
         kotlinJvmMain
