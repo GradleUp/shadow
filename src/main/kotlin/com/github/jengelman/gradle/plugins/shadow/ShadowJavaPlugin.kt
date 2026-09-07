@@ -45,6 +45,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
         task.from(mainSourceSet.map { it.output })
         task.generateSourcesJar.convention(
+          // If `withSourcesJar` is present in `java` block.
           provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null }
         )
         task.sourceSetsSourceDirs.convention(
@@ -150,11 +151,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
     val shadowRuntimeElements = configurations.shadowRuntimeElements
     val shadowSourcesElements = configurations.shadowSourcesElements
-    // If `withSourcesJar` is present and `generateSourcesJar` is enabled.
-    val shouldAddSources = {
-      configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null &&
-        tasks.shadowJar.flatMap { it.generateSourcesJar }.get()
-    }
+    val generateSourcesJar = { tasks.shadowJar.flatMap { it.generateSourcesJar }.get() }
 
     val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
     components.add(shadowComponent)
@@ -167,7 +164,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     shadowComponent.addVariants(
       outgoingConfiguration = shadowSourcesElements,
       logger = logger,
-      shouldAdd = shouldAddSources,
+      shouldAdd = generateSourcesJar,
     )
 
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
@@ -181,7 +178,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       component.addVariants(
         outgoingConfiguration = shadowSourcesElements,
         logger = logger,
-        shouldAdd = { addIntoJavaComponent.get() && shouldAddSources() },
+        shouldAdd = { addIntoJavaComponent.get() && generateSourcesJar() },
       ) {
         mapToOptional()
       }
