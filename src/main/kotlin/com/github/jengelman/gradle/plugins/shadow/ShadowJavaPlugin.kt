@@ -153,19 +153,21 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     val shadowSourcesElements = configurations.shadowSourcesElements
     val generateSourcesJar = { tasks.shadowJar.flatMap { it.generateSourcesJar }.get() }
 
-    val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
-    components.add(shadowComponent)
-    shadowComponent.addVariants(
-      outgoingConfiguration = shadowRuntimeElements,
-      logger = logger,
-    ) {
-      mapToMavenScope("runtime")
+    softwareComponentFactory.adhoc(COMPONENT_NAME).let { component ->
+      components.add(component)
+      component.addVariants(
+        outgoingConfiguration = shadowRuntimeElements,
+        logger = logger,
+        shouldAdd = { true },
+      ) {
+        mapToMavenScope("runtime")
+      }
+      component.addVariants(
+        outgoingConfiguration = shadowSourcesElements,
+        logger = logger,
+        shouldAdd = generateSourcesJar,
+      )
     }
-    shadowComponent.addVariants(
-      outgoingConfiguration = shadowSourcesElements,
-      logger = logger,
-      shouldAdd = generateSourcesJar,
-    )
 
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
       component.addVariants(
@@ -188,7 +190,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   private fun AdhocComponentWithVariants.addVariants(
     outgoingConfiguration: NamedDomainObjectProvider<ConsumableConfiguration>,
     logger: Logger,
-    shouldAdd: () -> Boolean = { true },
+    shouldAdd: () -> Boolean,
     action: ConfigurationVariantDetails.() -> Unit = {},
   ) {
     addVariantsFromConfiguration(outgoingConfiguration) { variant ->
