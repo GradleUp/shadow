@@ -12,7 +12,7 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsUrl
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
 import java.net.URL
@@ -114,7 +114,7 @@ class Log4j2PluginsCacheFileTransformerTest :
     }
 
   private companion object {
-    val pluginCacheUrl: URL = requireResourceAsPath(PLUGIN_CACHE_FILE).toUri().toURL()
+    val pluginCacheUrl: URL = requireResourceAsUrl(PLUGIN_CACHE_FILE)
 
     fun context(vararg relocators: Relocator): TransformerContext {
       return resourceContext(PLUGIN_CACHE_FILE, relocators = relocators)

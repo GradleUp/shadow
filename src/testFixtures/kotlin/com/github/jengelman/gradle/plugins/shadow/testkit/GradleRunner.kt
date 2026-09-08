@@ -2,7 +2,7 @@ package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.assertThat
 import assertk.assertions.doesNotContain
-import com.github.jengelman.gradle.plugins.shadow.TestKitBuildConfig.TEST_GRADLE_VERSION
+import com.github.jengelman.gradle.plugins.shadow.TestFixturesBuildConfig.TEST_GRADLE_VERSION
 import java.nio.file.Path
 import kotlin.io.path.Path
 import kotlin.io.path.absolutePathString

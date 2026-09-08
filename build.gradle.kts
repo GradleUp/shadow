@@ -1,6 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 import com.github.jengelman.gradle.plugins.shadow.buildlogic.GenerateDocTests
+import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.JAVADOC_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
@@ -10,6 +11,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
@@ -20,6 +22,7 @@ plugins {
   alias(libs.plugins.spotless)
   alias(libs.plugins.buildConfig)
   id("build-logic")
+  id("java-test-fixtures")
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -77,9 +80,6 @@ val testPluginClasspath =
     extendsFrom(configurations.compileOnly, testPluginRuntimeOnly)
   }
 
-val testKit = sourceSets.register("testKit")
-val testKitImplementation = configurations.named("testKitImplementation")
-
 configurations.configureEach {
   when (name) {
     API_ELEMENTS_CONFIGURATION_NAME,
@@ -88,6 +88,7 @@ configurations.configureEach {
     SOURCES_ELEMENTS_CONFIGURATION_NAME ->
       outgoing {
         // Main/current capability.
+        capability("$group:${project.name}:$version")
         capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
 
         // Historical capabilities.
@@ -108,13 +109,24 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
 }
 
-configurations.named(API_ELEMENTS_CONFIGURATION_NAME) {
-  attributes.attribute(
-    // TODO: https://github.com/gradle/gradle/issues/24608
-    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-    objects.named(libs.versions.minGradle.get()),
+listOf(
+    API_ELEMENTS_CONFIGURATION_NAME,
+    RUNTIME_ELEMENTS_CONFIGURATION_NAME,
+    "testFixturesApiElements",
+    "testFixturesRuntimeElements",
   )
-}
+  .forEach {
+    configurations.named(it) {
+      attributes.attribute(
+        // TODO: https://github.com/gradle/gradle/issues/24608
+        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+        objects.named(libs.versions.minGradle.get()),
+      )
+      if (it.startsWith("testFixtures")) {
+        attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
+      }
+    }
+  }
 
 val testGradleVersion: String =
   providers.gradleProperty("testGradleVersion").orNull.let {
@@ -135,8 +147,8 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
-  testKitImplementation(gradleTestKit())
-  testKitImplementation(libs.assertk)
+  testFixturesImplementation(gradleTestKit())
+  testFixturesImplementation(libs.assertk)
 
   testPluginRuntimeOnly(libs.foojayResolver)
   testPluginRuntimeOnly(libs.pluginPublish)
@@ -186,7 +198,7 @@ testing.suites {
   withType<JvmTestSuite>().configureEach {
     useJUnitJupiter(libs.junit.bom.map { checkNotNull(it.version) })
     dependencies {
-      implementation(testKit.get().output)
+      implementation(testFixtures(project()))
       implementation(libs.assertk)
     }
     targets.configureEach {
@@ -216,7 +228,12 @@ gradlePlugin {
     }
   }
 
-  testSourceSets(sourceSets["test"], sourceSets["functionalTest"], sourceSets["documentTest"])
+  testSourceSets(
+    sourceSets["test"],
+    sourceSets["functionalTest"],
+    sourceSets["documentTest"],
+    sourceSets["testFixtures"],
+  )
 }
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
@@ -246,9 +263,15 @@ buildConfig {
   sourceSets.named("main") {
     buildConfigField("DEFAULT_R8_DEPENDENCY", libs.r8.map(Dependency::toString))
   }
-  sourceSets.named("testKit") {
+  sourceSets.named("testFixtures") {
     buildConfigField("TEST_GRADLE_VERSION", testGradleVersion)
   }
+}
+
+// Skip publishing of test fixture API & runtime variants.
+(components["java"] as AdhocComponentWithVariants).run {
+  withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
+  withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
 }
 
 tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
