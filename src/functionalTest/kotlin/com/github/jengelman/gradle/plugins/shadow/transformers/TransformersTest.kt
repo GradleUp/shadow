@@ -7,6 +7,7 @@ import assertk.assertions.isNotEqualTo
 import assertk.assertions.isNotNull
 import assertk.assertions.isNull
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.testkit.CustomResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
 import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
@@ -169,8 +170,7 @@ class TransformersTest : BaseTransformerTest() {
       |  implementation 'my:b:1.0'
       |}
       |$shadowJarTask {
-      |  // Use Transformer.Companion (no-op) to mock a custom transformer here.
-      |  transform(${ResourceTransformer.Companion::class.java.name})
+      |  transform(${CustomResourceTransformer::class.java.name})
       |}
       """
         .trimMargin()

@@ -5,11 +5,11 @@ import assertk.assertThat
 import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
+import com.github.jengelman.gradle.plugins.shadow.testkit.CustomResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.transformers.GroovyExtensionModuleTransformer
-import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
@@ -575,8 +575,7 @@ class CachingTest : BasePluginTest() {
     projectScript.appendText(
       """
       |$shadowJarTask {
-      |  // Use Transformer.Companion (no-op) to mock a custom transformer here, it's not cacheable.
-      |  transform(${ResourceTransformer.Companion::class.java.name})
+      |  transform(${CustomResourceTransformer::class.java.name})
       |}
       """
         .trimMargin()
