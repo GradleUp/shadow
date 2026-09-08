@@ -135,9 +135,11 @@ dependencies {
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
+  testKitImplementation(sourceSets.main.map { it.output })
   testKitImplementation(gradleTestKit())
   testKitImplementation(libs.assertk)
 
+  testPluginRuntimeOnly(testKit.map { it.output })
   testPluginRuntimeOnly(libs.foojayResolver)
   testPluginRuntimeOnly(libs.pluginPublish)
 
