@@ -87,8 +87,10 @@ configurations.configureEach {
     SOURCES_ELEMENTS_CONFIGURATION_NAME ->
       outgoing {
         // Main/current capability.
-        capability("$group:${project.name}:$version")
         capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
+
+        // Default project capability, required for java-test-fixtures to resolve project().
+        capability("$group:${project.name}:$version")
 
         // Historical capabilities.
         capability("io.github.goooler.shadow:shadow-gradle-plugin:$version")
