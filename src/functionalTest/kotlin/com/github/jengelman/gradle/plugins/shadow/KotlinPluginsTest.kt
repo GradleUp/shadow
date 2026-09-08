@@ -170,7 +170,12 @@ class KotlinPluginsTest : BasePluginTest() {
         .trimMargin()
     )
 
-    val result = runWithFailure(shadowJarPath)
+    val result =
+      runWithFailure(
+        shadowJarPath,
+        // TODO: https://youtrack.jetbrains.com/issue/KT-89265
+        failOnDeprecations = false,
+      )
 
     assertThat(result.output)
       .contains(
