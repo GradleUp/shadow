@@ -11,7 +11,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmDefaultMode
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.dsl.KotlinVersion
 import org.jetbrains.kotlin.gradle.dsl.abi.ExperimentalAbiValidation
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 plugins {
   alias(libs.plugins.kotlin.jvm)
@@ -21,8 +20,8 @@ plugins {
   alias(libs.plugins.pluginPublish)
   alias(libs.plugins.spotless)
   alias(libs.plugins.buildConfig)
+  `java-test-fixtures`
   id("build-logic")
-  id("java-test-fixtures")
 }
 
 version = providers.gradleProperty("VERSION_NAME").get()
@@ -109,24 +108,13 @@ publishing.publications.withType<MavenPublication>().configureEach {
   suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
 }
 
-listOf(
-    API_ELEMENTS_CONFIGURATION_NAME,
-    RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-    "testFixturesApiElements",
-    "testFixturesRuntimeElements",
+configurations.apiElements {
+  attributes.attribute(
+    // TODO: https://github.com/gradle/gradle/issues/24608
+    GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+    objects.named(libs.versions.minGradle.get()),
   )
-  .forEach {
-    configurations.named(it) {
-      attributes.attribute(
-        // TODO: https://github.com/gradle/gradle/issues/24608
-        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-        objects.named(libs.versions.minGradle.get()),
-      )
-      if (it.startsWith("testFixtures")) {
-        attributes.attribute(KotlinPlatformType.attribute, KotlinPlatformType.jvm)
-      }
-    }
-  }
+}
 
 val testGradleVersion: String =
   providers.gradleProperty("testGradleVersion").orNull.let {
@@ -228,12 +216,7 @@ gradlePlugin {
     }
   }
 
-  testSourceSets(
-    sourceSets["test"],
-    sourceSets["functionalTest"],
-    sourceSets["documentTest"],
-    sourceSets["testFixtures"],
-  )
+  testSourceSets(sourceSets["test"], sourceSets["functionalTest"], sourceSets["documentTest"])
 }
 
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
@@ -269,6 +252,7 @@ buildConfig {
 }
 
 // Skip publishing of test fixture API & runtime variants.
+// TODO: https://github.com/vanniktech/gradle-maven-publish-plugin/issues/1431
 (components["java"] as AdhocComponentWithVariants).run {
   withVariantsFromConfiguration(configurations["testFixturesApiElements"]) { skip() }
   withVariantsFromConfiguration(configurations["testFixturesRuntimeElements"]) { skip() }
