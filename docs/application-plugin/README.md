@@ -40,7 +40,7 @@ When applied along with the `application` plugin, the `runShadow` task will be c
 the shadowed JAR. The `runShadow` task is a [`JavaExec`][JavaExec] task that is configured to execute
 `java -jar myproject-all.jar`. It can be configured the same as any other [`JavaExec`][JavaExec] task.
 
-<!-- test: ApplicationPluginTest#runShadowCanPassArgs -->
+<!-- test: ApplicationPluginTest#integrationWithApplicationPluginAndJavaToolchains -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

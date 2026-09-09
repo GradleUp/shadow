@@ -5,7 +5,7 @@ Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all depende
 merging can be configured using the [`configurations`][ShadowJar.configurations] property of the
 [`ShadowJar`][ShadowJar] task type.
 
-<!-- test: JavaPluginsTest#overrideConfigurations -->
+<!-- test: JavaPluginsTest#registerCustomShadowJarThatContainsDependenciesOnly -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

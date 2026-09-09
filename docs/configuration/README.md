@@ -175,7 +175,7 @@ Main-Class: my.Main
 If it is desired to merge a manifest from another [`Jar`][Jar] task, the `manifest.from` methods can be used to
 configure the upstream.
 
-<!-- test: JavaPluginsTest#manifestFromTaskOutputs -->
+<!-- test: ShadowPropertiesTest#inheritManifestAttrsFromJars -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

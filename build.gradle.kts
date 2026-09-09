@@ -243,6 +243,10 @@ val generateDocTests =
     description = "Generates Kotlin test source files for code snippets in documentation."
     inputDirectory = layout.projectDirectory.dir("docs")
     outputDirectory = layout.buildDirectory.dir("generated/sources/documentTest/kotlin")
+    testSourceDirectories.from(
+      sourceSets["test"].allSource.sourceDirectories,
+      sourceSets["functionalTest"].allSource.sourceDirectories,
+    )
   }
 
 kotlin.sourceSets.named("documentTest") {
