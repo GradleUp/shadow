@@ -228,9 +228,13 @@ gradlePlugin {
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
   val main = named("main")
-  named("functionalTest") {
+  val functionalTest = named("functionalTest")
+  functionalTest {
     // Import main and its classpath as dependencies and establish internal visibility.
     associateWith(main.get())
+  }
+  named("documentTest") {
+    associateWith(functionalTest.get())
   }
 }
 

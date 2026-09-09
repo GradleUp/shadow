@@ -100,7 +100,8 @@ abstract class GenerateDocTests : DefaultTask() {
               }
             val kdoc =
               if (testRef != null) {
-                "  /** @see $testRef */\n"
+                val kdocRef = testRef.replace('#', '.')
+                "  /** @see [$kdocRef] */\n"
               } else {
                 ""
               }
@@ -127,7 +128,9 @@ abstract class GenerateDocTests : DefaultTask() {
             """
             |package com.github.jengelman.gradle.plugins.shadow.docs
             |
+            |import com.github.jengelman.gradle.plugins.shadow.*
             |import com.github.jengelman.gradle.plugins.shadow.SnippetExecutable
+            |import com.github.jengelman.gradle.plugins.shadow.transformers.*
             |import java.nio.file.Path
             |import org.junit.jupiter.api.DisplayName
             |import org.junit.jupiter.api.Test
