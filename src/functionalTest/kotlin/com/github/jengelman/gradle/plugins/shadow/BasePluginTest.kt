@@ -111,6 +111,11 @@ abstract class BasePluginTest {
               // Circular dependency with e.
               addDependency(e)
             }
+          val pomDep = pomModule("my", "pom-dep", "1.0")
+          jarModule("my", "g", "1.0") {
+            buildJar { insert("g.properties", "g") }
+            addDependency(pomDep)
+          }
           bomModule("my", "bom", "1.0") {
             addDependency(a)
             addDependency(b)

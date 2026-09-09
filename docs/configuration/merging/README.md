@@ -225,6 +225,7 @@ Here are some examples:
 
 For simpler use cases, you can create a basic transformer:
 
+<!-- test: TransformersTest#useCustomTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -525,6 +526,7 @@ appended using separators (defaults to `\n`) to separate content.
     }
     ```
 
+<!-- test: AppendingTransformerTest#appendResourcesWithCustomSeparator -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

@@ -308,6 +308,7 @@ are independent and can be used together.
 
 For example, to downgrade R8 warnings to info:
 
+<!-- test: R8MinimizationTest#passCustomR8Args -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

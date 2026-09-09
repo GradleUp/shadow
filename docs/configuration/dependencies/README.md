@@ -126,6 +126,7 @@ Caused by: java.util.zip.ZipException: Archive is not a ZIP archive
 To embed such dependencies into your shadowed JAR, you can use the [`Jar.from`][Jar.from] method with a custom
 configuration.
 
+<!-- test: JavaPluginsTest#addExtraFilesViaFrom -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -177,6 +178,7 @@ configuration.
 If the non-JAR file is a transitive dependency (e.g., a POM-only metapackage) that you don't actually need in your
 shadowed JAR, you can exclude it using the `dependencies` block instead of embedding it.
 
+<!-- test: FilteringTest#excludeNonJarTransitiveDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

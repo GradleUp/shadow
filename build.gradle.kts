@@ -155,6 +155,9 @@ testing.suites {
     dependencies { implementation(libs.xmlunit) }
   }
   register<JvmTestSuite>("documentTest") {
+    dependencies {
+      implementation(sourceSets["test"].output)
+    }
     targets.configureEach {
       testTask {
         testLogging.showExceptions = false
