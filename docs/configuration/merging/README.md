@@ -121,8 +121,8 @@ Alternatively, you can follow these steps:
 1. Set the default strategy to `EXCLUDE` or `FAIL`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Bypass the duplicate entries which should be handled by the [`ResourceTransformer`][ResourceTransformer]s using
-    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
-    functions to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
+   [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
+   functions to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
 > [!WARNING]
 > **Build Cache Impact**
