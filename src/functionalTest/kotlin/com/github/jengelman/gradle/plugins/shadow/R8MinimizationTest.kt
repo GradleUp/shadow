@@ -519,7 +519,8 @@ class R8MinimizationTest : BasePluginTest() {
         """
         |minimize {
         |  r8 {
-        |    args.addAll(['--map-diagnostics', 'warning', 'info'])
+        |    // Disable shrinking to prove custom R8 args are passed through.
+        |    args.add("--no-tree-shaking")
         |  }
         |}
         """
@@ -529,12 +530,18 @@ class R8MinimizationTest : BasePluginTest() {
     runWithSuccess(appShadowJarPath)
 
     assertThat(outputAppShadowedJar).useAll {
-      containsExactly(
+      containsOnly(
+        "a/a.class",
+        "a/b.class",
+        "a/c.class",
         "app/App.class",
         "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
+        loadClass("a.a")
+        loadClass("a.b")
+        loadClass("a.c")
       }
     }
   }
