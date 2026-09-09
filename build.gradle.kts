@@ -154,24 +154,6 @@ testing.suites {
   named<JvmTestSuite>("test") {
     dependencies { implementation(libs.xmlunit) }
   }
-  register<JvmTestSuite>("documentTest") {
-    dependencies {
-      implementation(sourceSets["test"].output)
-    }
-    targets.configureEach {
-      testTask {
-        testLogging.showExceptions = false
-        addTestListener(
-          object : TestListener {
-            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
-              // Prettify test failure output in console.
-              result.exception?.message?.lineSequence()?.firstOrNull()?.let(logger::error)
-            }
-          }
-        )
-      }
-    }
-  }
   register<JvmTestSuite>("functionalTest") {
     targets.configureEach {
       testTask {
@@ -189,6 +171,25 @@ testing.suites {
       implementation(libs.apache.maven.model)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
+    }
+  }
+  register<JvmTestSuite>("documentTest") {
+    dependencies {
+      implementation(sourceSets["test"].output)
+      implementation(sourceSets["functionalTest"].output)
+    }
+    targets.configureEach {
+      testTask {
+        testLogging.showExceptions = false
+        addTestListener(
+          object : TestListener {
+            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+              // Prettify test failure output in console.
+              result.exception?.message?.lineSequence()?.firstOrNull()?.let(logger::error)
+            }
+          }
+        )
+      }
     }
   }
 
@@ -231,13 +232,9 @@ gradlePlugin {
 // This part should be placed after testing.suites to ensure the test sourceSets are created.
 kotlin.target.compilations {
   val main = named("main")
-  val functionalTest = named("functionalTest")
-  functionalTest {
+  named("functionalTest") {
     // Import main and its classpath as dependencies and establish internal visibility.
     associateWith(main.get())
-  }
-  named("documentTest") {
-    associateWith(functionalTest.get())
   }
 }
 
