@@ -92,12 +92,7 @@ abstract class GenerateDocTests : DefaultTask() {
           fileSnippets.joinToString("\n\n") {
             (lang, relativePath, _, lineNumber, snippet, sourceLocation, testRef) ->
             val functionName = "line_${lineNumber}_$lang"
-            val displayName =
-              if (testRef != null) {
-                "$relativePath:$lineNumber ($lang) -> @see $testRef"
-              } else {
-                "$relativePath:$lineNumber ($lang)"
-              }
+            val displayName = "$relativePath:$lineNumber ($lang)"
             val kdoc =
               if (testRef != null) {
                 val kdocRef = testRef.replace('#', '.')
