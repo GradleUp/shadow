@@ -21,7 +21,7 @@ moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "mosh
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:1.0.0"
 develocity = "com.gradle:develocity-gradle-plugin:4.5.1"
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
+pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
