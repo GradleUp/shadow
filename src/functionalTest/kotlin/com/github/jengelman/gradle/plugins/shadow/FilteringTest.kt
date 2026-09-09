@@ -237,6 +237,29 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun excludeNonJarTransitiveDependency() {
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency('my:pom-dep:.*'))
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("g.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
+  }
+
   private fun commonAssertions() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("c.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
