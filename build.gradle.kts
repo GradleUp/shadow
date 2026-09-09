@@ -80,12 +80,17 @@ val testPluginClasspath =
 val testKit = sourceSets.register("testKit")
 val testKitImplementation = configurations.named("testKitImplementation")
 
-configurations.configureEach {
-  when (name) {
+val publishedElements =
+  listOf(
     API_ELEMENTS_CONFIGURATION_NAME,
     RUNTIME_ELEMENTS_CONFIGURATION_NAME,
     JAVADOC_ELEMENTS_CONFIGURATION_NAME,
-    SOURCES_ELEMENTS_CONFIGURATION_NAME ->
+    SOURCES_ELEMENTS_CONFIGURATION_NAME,
+  )
+
+configurations.configureEach {
+  when (name) {
+    in publishedElements ->
       outgoing {
         // Main/current capability.
         capability("com.gradleup.shadow:shadow-gradle-plugin:$version")
@@ -102,10 +107,7 @@ configurations.configureEach {
 
 publishing.publications.withType<MavenPublication>().configureEach {
   // We don't care about capabilities being unmappable to Maven.
-  suppressPomMetadataWarningsFor(API_ELEMENTS_CONFIGURATION_NAME)
-  suppressPomMetadataWarningsFor(RUNTIME_ELEMENTS_CONFIGURATION_NAME)
-  suppressPomMetadataWarningsFor(JAVADOC_ELEMENTS_CONFIGURATION_NAME)
-  suppressPomMetadataWarningsFor(SOURCES_ELEMENTS_CONFIGURATION_NAME)
+  publishedElements.forEach(::suppressPomMetadataWarningsFor)
 }
 
 configurations.apiElements {
