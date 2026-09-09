@@ -78,6 +78,7 @@ If working with a Gradle project with the name `myApp` and version `1.0`, the de
 output a file at: `build/libs/myApp-1.0-all.jar`. You can override the properties listed above to change the output name
 of the shadowed JAR file. e.g.
 
+<!-- test: BasePluginTest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -112,6 +113,7 @@ Additionally, Shadow automatically configures the manifest of the [`ShadowJar`][
 `Class-Path` entry in the JAR manifest. The value of the `Class-Path` entry is the name of all dependencies resolved in
 the `shadow` configuration for the project.
 
+<!-- test: JavaPluginsTest#addShadowConfigurationToClassPathInManifest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -143,6 +145,7 @@ Class-Path: junit-3.8.2.jar
 The [`ShadowJar`][ShadowJar] manifest is configured in a number of ways. First, the manifest for the `shadowJar` task is
 configured to __inherit__ from the manifest of the standard `jar` task.
 
+<!-- test: JavaPluginsTest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -172,6 +175,7 @@ Main-Class: my.Main
 If it is desired to merge a manifest from another [`Jar`][Jar] task, the `manifest.from` methods can be used to
 configure the upstream.
 
+<!-- test: JavaPluginsTest#manifestFromTaskOutputs -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -211,6 +215,7 @@ into the shadow JAR. If any dependency JAR has the `Multi-Release` manifest attr
 
 You can disable this behavior by setting `addMultiReleaseAttribute` to `false`:
 
+<!-- test: JavaPluginsTest#containsMultiReleaseAttrIfAnyDependencyContainsIt -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -235,6 +240,7 @@ dependencies.
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
 
+<!-- test: JavaPluginsTest#addExtraFilesViaFrom -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

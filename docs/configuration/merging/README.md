@@ -34,6 +34,7 @@ see more details about them in [`DuplicatesStrategy`][DuplicatesStrategy].
 
 `ShadowJar` recognizes `EXCLUDE` as the default, if you want to change the strategy, you can override it like:
 
+<!-- test: ServiceFileTransformerTest#honorDuplicatesStrategyWithoutThrowing -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -72,6 +73,7 @@ Different strategies will lead to different results for `foo/bar` files in the J
 If you mix the usages of `duplicatesStrategy = DuplicatesStrategy.EXCLUDE` and
 [`ResourceTransformer`][ResourceTransformer] like below:
 
+<!-- test: ServiceFileTransformerTest#honorDuplicatesStrategyWithoutThrowing -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -119,8 +121,8 @@ Alternatively, you can follow these steps:
 1. Set the default strategy to `EXCLUDE` or `FAIL`.
 2. Apply your [`ResourceTransformer`][ResourceTransformer]s.
 3. Bypass the duplicate entries which should be handled by the [`ResourceTransformer`][ResourceTransformer]s using
-   [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
-   functions to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
+    [`filesMatching`][Jar.filesMatching], [`filesNotMatching`][Jar.filesNotMatching], or [`eachFile`][Jar.eachFile]
+    functions to set their `duplicatesStrategy` to `INCLUDE` or `WARN`.
 
 > [!WARNING]
 > **Build Cache Impact**
@@ -136,6 +138,7 @@ Optional steps:
 
 Here are some examples:
 
+<!-- test: ServiceFileTransformerTest#strategyCanBeOverriddenByFilesMatching -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -337,6 +340,7 @@ single file in the output JAR. You can use either the short syntax method
 [`mergeServiceFiles()`][ShadowJar.mergeServiceFiles] or the full syntax method [`transform`][ShadowJar.transform] to add
 the [`ServiceFileTransformer`][ServiceFileTransformer]:
 
+<!-- test: ServiceFileTransformerTest#serviceResourceTransformerWithRelocation -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -376,6 +380,7 @@ the [`ServiceFileTransformer`][ServiceFileTransformer]:
 By default, the [`ServiceFileTransformer`][ServiceFileTransformer] is configured to merge files in `META-INF/services`.
 This directory can be overridden to merge descriptor files in a different location.
 
+<!-- test: ServiceFileTransformerTest#serviceResourceTransformerAlternatePath -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -413,6 +418,7 @@ This directory can be overridden to merge descriptor files in a different locati
 The [`ServiceFileTransformer`][ServiceFileTransformer] class supports specifying specific files to include or exclude
 from merging.
 
+<!-- test: ServiceFileTransformerTest#serviceResourceTransformerAlternatePath -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -451,6 +457,7 @@ Shadow provides a specific transformer for dealing with Groovy extension module 
 syntax and how they need to be merged together. The
 [`GroovyExtensionModuleTransformer`][GroovyExtensionModuleTransformer] will handle these files.
 
+<!-- test: GroovyExtensionModuleTransformerTest#groovyExtensionModuleTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -475,6 +482,7 @@ syntax and how they need to be merged together. The
 Log4j 2.x Core components. It's a Gradle equivalent of
 [Log4j Plugin Descriptor Transformer][log4j-plugin-descriptor-transformer].
 
+<!-- test: TransformersTest#mergeLog4j2PluginCacheFiles -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -496,6 +504,7 @@ Log4j 2.x Core components. It's a Gradle equivalent of
 Generic text files can be appended together using the [`AppendingTransformer`][AppendingTransformer]. Each file is
 appended using separators (defaults to `\n`) to separate content.
 
+<!-- test: AppendingTransformerTest#appendTestProperties -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -545,6 +554,7 @@ XML document and merges each root element into a single document. There is no sh
 [`XmlAppendingTransformer`][XmlAppendingTransformer]. It must be added using the [`transform`][ShadowJar.transform]
 methods.
 
+<!-- test: TransformersTest#xmlAppendingTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -574,6 +584,7 @@ relocates matched class names and package patterns within the rules according to
 
 You can add this transformer using [`transform`][ShadowJar.transform]:
 
+<!-- test: ProGuardFilesResourceTransformerTest#mergeProguardFilesSameAndDifferentNames -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -607,6 +618,7 @@ There are lots of built-in [`ResourceTransformer`][ResourceTransformer]s provide
 You can use `include`/`exclude` and more methods to configure the patterns for those
 [`ResourceTransformer`][ResourceTransformer]s that support it. For example:
 
+<!-- test: ServiceFileTransformerTest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -646,6 +658,7 @@ You can also specify specific file paths or regular expressions to match using `
 strategies using `mappings`, rewrite property keys using `keyTransformer`, or change file encoding using
 `charsetName` (defaults to `ISO-8859-1`).
 
+<!-- test: PropertiesFileTransformerTest#configureComplexTransformerProperties -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -690,6 +703,7 @@ You can configure:
 - `firstSeparator`: Separator between the project's license and dependency licenses.
 - `separator`: Separator between individual dependency licenses.
 
+<!-- test: TransformersTest#mergeLicenseResourceTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -715,6 +729,7 @@ You can configure:
 If you instead want to discard all license files from the output JAR, you can simply use
 [`ShadowJar.exclude`][ShadowJar.exclude]:
 
+<!-- test: FilteringTest#excludeFiles -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -740,6 +755,7 @@ formatting requirements.
 You can configure properties such as `projectName`, `copyright`, `organizationName`, `organizationURL`,
 `inceptionYear`, `outputPath` (defaults to `META-INF/NOTICE`), `addHeader`, and `charsetName` (defaults to `UTF-8`).
 
+<!-- test: TransformersTest#apacheNoticeResourceTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -773,6 +789,7 @@ Maven plugins and components using the Plexus IoC container provide component de
 aggregates these component definitions into a single file and relocates the `role` and `implementation` class names
 matching the configured relocators.
 
+<!-- test: TransformersTest#componentsXmlResourceTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -799,6 +816,7 @@ relocating class and package names within configured manifest attributes (such a
 To remove a specific attribute from the manifest, map its name to
 [`ManifestResourceTransformer.NULL`][ManifestResourceTransformer.NULL].
 
+<!-- test: TransformersTest#manifestResourceTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -837,6 +855,7 @@ the specified patterns and discards any subsequent duplicates found with the sam
 This transformer is useful when `duplicatesStrategy` is set to `INCLUDE` or `WARN`, ensuring that project resources take
 precedence and duplicate dependency resources at the same path are omitted.
 
+<!-- test: TransformersTest#preserveFirstFoundResource -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -876,6 +895,7 @@ or `pom.xml` files from different dependency versions), you can exclude those pa
 > [`DeduplicatingResourceTransformer`][DeduplicatingResourceTransformer], as they handle duplicates differently and
 > combining them leads to redundant or unexpected behavior.
 
+<!-- test: TransformersTest#deduplicatingResourceTransformerWithCaseSensitiveEntries -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -904,6 +924,7 @@ resources. Shadow provides a [`FindResourceInClasspath`][FindResourceInClasspath
 To scan for resources, register a [`FindResourceInClasspath`][FindResourceInClasspath] task in your build script and
 configure its `classpath` and the resource patterns to look for:
 
+<!-- test: FindResourceInClasspathTest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

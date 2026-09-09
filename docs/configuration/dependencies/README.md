@@ -5,6 +5,7 @@ Shadow configures the default [`ShadowJar`][ShadowJar] task to merge all depende
 merging can be configured using the [`configurations`][ShadowJar.configurations] property of the
 [`ShadowJar`][ShadowJar] task type.
 
+<!-- test: JavaPluginsTest#overrideConfigurations -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -41,6 +42,7 @@ be included in the final JAR.
 The [`ShadowJar`][ShadowJar] task is a subclass of the [`Jar`][Jar] task, which means that the [`Jar.from`][Jar.from]
 method can be used to add extra files.
 
+<!-- test: JavaPluginsTest#addDependenciesViaCustomConfigurationWithoutUnzipping -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -75,6 +77,7 @@ method can be used to add extra files.
 
 Someone may need the unzipped `bar.jar` to be bundled, try out [`zipTree`][Project.zipTree]
 
+<!-- test: JavaPluginsTest#addExtraFilesViaFrom -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -214,6 +217,7 @@ dependency does not exclude any of its dependencies from the final JAR.
 The `dependency` blocks provides a number of methods for resolving dependencies using the notations familiar from
 Gradle's [`project.configurations`][Project.configurations] block.
 
+<!-- test: FilteringTest#excludeDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -242,6 +246,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
     }
     ```
 
+<!-- test: FilteringTest#filterProjectDependencies -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -280,6 +285,7 @@ Gradle's [`project.configurations`][Project.configurations] block.
 Dependencies can be filtered using regex patterns. Coupled with the `<group>:<artifact>:<version>` notation for
 dependencies, this allows for excluding/including using any of these individual fields.
 
+<!-- test: FilteringTest#excludeDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -310,6 +316,7 @@ dependencies, this allows for excluding/including using any of these individual 
 
 Any of the individual fields can be safely absent and will function as though a wildcard was specified.
 
+<!-- test: FilteringTest#excludeDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -349,6 +356,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
 - `.*:log4j-core:.*`
 - ...
 
+<!-- test: FilteringTest#excludeDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -377,6 +385,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
     }
     ```
 
+<!-- test: FilteringTest#excludeDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -409,6 +418,7 @@ This same pattern can be used for any of the dependency notation fields. e.g.
 
 You can also use type-safe project accessors or version catalog accessors to filter dependencies.
 
+<!-- test: FilteringTest#excludeDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -451,6 +461,7 @@ If more complex decisions are needed to select the dependencies to be included, 
 [`ShadowJar.dependencies`][ShadowJar.dependencies]
 block provides a method that accepts a `Closure` for selecting dependencies.
 
+<!-- test: FilteringTest#excludeTransitiveProjectDependency -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

@@ -34,8 +34,20 @@ abstract class GenerateDocTests : DefaultTask() {
           val relativePath = file.relativeTo(docRoot).invariantSeparatorsPath
           val parentDir = file.parentFile.relativeTo(docRoot).invariantSeparatorsPath
           val matcher = pattern.matcher(source)
+          var lastEnd = 0
+          var currentTestRef: String? = null
           sequence {
             while (matcher.find()) {
+              val textBefore = source.substring(lastEnd, matcher.start())
+              val testCommentMatcher = testAnnotationPattern.matcher(textBefore)
+              if (testCommentMatcher.find()) {
+                currentTestRef = testCommentMatcher.group(1).trim()
+              } else if (matcher.group(1) == "kotlin") {
+                // Reset for a new snippet group if no test annotation was found before the kotlin
+                // block
+                currentTestRef = null
+              }
+
               var line = 1
               for (i in 0 until matcher.start().coerceAtMost(source.length)) {
                 if (source[i] == '\n') line++
@@ -48,8 +60,10 @@ abstract class GenerateDocTests : DefaultTask() {
                   lineNumber = line,
                   snippet = matcher.group(2),
                   sourceLocation = "${file.toURI()}:$line",
+                  testRef = currentTestRef,
                 )
               )
+              lastEnd = matcher.end()
             }
           }
         }
@@ -76,11 +90,23 @@ abstract class GenerateDocTests : DefaultTask() {
           }
         val functionsCode =
           fileSnippets.joinToString("\n\n") {
-            (lang, relativePath, _, lineNumber, snippet, sourceLocation) ->
+            (lang, relativePath, _, lineNumber, snippet, sourceLocation, testRef) ->
             val functionName = "line_${lineNumber}_$lang"
+            val displayName =
+              if (testRef != null) {
+                "$relativePath:$lineNumber ($lang) -> @see $testRef"
+              } else {
+                "$relativePath:$lineNumber ($lang)"
+              }
+            val kdoc =
+              if (testRef != null) {
+                "  /** @see $testRef */\n"
+              } else {
+                ""
+              }
             """
-            |  @Test
-            |  @DisplayName("$relativePath:$lineNumber ($lang)")
+            |$kdoc  @Test
+            |  @DisplayName("$displayName")
             |  fun `$functionName`(@TempDir tempDir: Path) {
             |    SnippetExecutable(
             |      lang = "$lang",
@@ -125,6 +151,8 @@ private data class Snippet(
   val lineNumber: Int,
   val snippet: String,
   val sourceLocation: String,
+  val testRef: String?,
 )
 
 private val pattern = "(?ims) {4}```(groovy|kotlin)\n(.*?)\n {4}```".toPattern()
+private val testAnnotationPattern = "<!--\\s*test:\\s*([^>]+?)\\s*-->".toPattern()
