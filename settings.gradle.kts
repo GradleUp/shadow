@@ -13,7 +13,9 @@ pluginManagement {
   includeBuild("gradle/build-logic")
 }
 
-plugins { id("com.gradle.develocity") version "4.5.0" }
+plugins {
+  id("com.gradle.develocity") version "4.5.0"
+}
 
 develocity {
   buildScan {
