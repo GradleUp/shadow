@@ -28,7 +28,9 @@ group = providers.gradleProperty("GROUP").get()
 
 description = providers.gradleProperty("POM_DESCRIPTION").get()
 
-dokka { dokkaPublications.html { outputDirectory = layout.projectDirectory.dir("docs/api") } }
+dokka {
+  dokkaPublications.html { outputDirectory = layout.projectDirectory.dir("docs/api") }
+}
 
 kotlin {
   explicitApi()
@@ -255,9 +257,13 @@ buildConfig {
   }
 }
 
-tasks.pluginUnderTestMetadata { pluginClasspath.from(testPluginClasspath) }
+tasks.pluginUnderTestMetadata {
+  pluginClasspath.from(testPluginClasspath)
+}
 
-tasks.check { dependsOn(tasks.withType<Test>()) }
+tasks.check {
+  dependsOn(tasks.withType<Test>())
+}
 
 tasks.clean {
   delete +=
