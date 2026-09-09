@@ -519,7 +519,8 @@ class R8MinimizationTest : BasePluginTest() {
         """
         |minimize {
         |  r8 {
-        |    args.addAll(['--map-diagnostics', 'warning', 'info'])
+        |    // Disable shrinking to prove custom R8 args are passed through.
+        |    args.add("--no-tree-shaking")
         |  }
         |}
         """
@@ -529,13 +530,18 @@ class R8MinimizationTest : BasePluginTest() {
     runWithSuccess(appShadowJarPath)
 
     assertThat(outputAppShadowedJar).useAll {
-      containsExactly(
-        // lib/Used.class has been inlined as custom args override default `--no-minification`.
+      containsOnly(
         "app/App.class",
+        "lib/Reflective.class",
+        "lib/Unused.class",
+        "lib/Used.class",
         "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
+        loadClass("lib.Used")
+        loadClass("lib.Unused")
+        loadClass("lib.Reflective")
       }
     }
   }
