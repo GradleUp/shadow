@@ -111,6 +111,11 @@ abstract class BasePluginTest {
               // Circular dependency with e.
               addDependency(e)
             }
+          val g =
+            jarModule("my", "g", "1.0") {
+              buildJar { insert("g.properties", "g") }
+              addDependency(pomModule("my", "pom-dep", "1.0"))
+            }
           bomModule("my", "bom", "1.0") {
             addDependency(a)
             addDependency(b)
@@ -118,6 +123,7 @@ abstract class BasePluginTest {
             addDependency(d)
             addDependency(e)
             addDependency(f)
+            addDependency(g)
           }
         }
     localRepo.publish()
