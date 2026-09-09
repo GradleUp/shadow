@@ -531,17 +531,17 @@ class R8MinimizationTest : BasePluginTest() {
 
     assertThat(outputAppShadowedJar).useAll {
       containsOnly(
+        "a/a.class",
+        "a/b.class",
+        "a/c.class",
         "app/App.class",
-        "lib/Reflective.class",
-        "lib/Unused.class",
-        "lib/Used.class",
         "META-INF/MANIFEST.MF",
       )
       classLoader {
         loadClass("app.App")
-        loadClass("lib.Used")
-        loadClass("lib.Unused")
-        loadClass("lib.Reflective")
+        loadClass("a.a")
+        loadClass("a.b")
+        loadClass("a.c")
       }
     }
   }
