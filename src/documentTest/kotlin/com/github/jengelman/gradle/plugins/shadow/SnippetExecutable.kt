@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWar
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
+import com.github.jengelman.gradle.plugins.shadow.testkit.isDokkaIssue4600
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
@@ -51,6 +52,25 @@ sealed interface SnippetExecutable {
         """
             .trimMargin()
         )
+
+      // TODO: https://github.com/Kotlin/dokka/issues/4488
+      projectRoot
+        .resolve("gradle.properties")
+        .writeText(
+          """
+          |# Dokka 2.2.0 DGPv2 is the default, but the plugin still looks up these properties dynamically.
+          |# Setting them here avoids cross-project property lookups that break isolated projects.
+          |org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
+          |org.jetbrains.dokka.experimental.gradle.pluginMode.noWarn=true
+          |org.jetbrains.dokka.experimental.gradle.pluginMode.nowarn=true
+          |org.jetbrains.dokka.experimental.tryK2=true
+          |org.jetbrains.dokka.experimental.tryK2.noWarn=true
+          |org.jetbrains.dokka.experimental.tryK2.nowarn=true
+          |org.jetbrains.dokka.internal.enableWorkaroundKT80551=true
+          """
+            .trimMargin()
+        )
+
       val pluginsBlock =
         """
         |plugins {
@@ -104,6 +124,9 @@ sealed interface SnippetExecutable {
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
       val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
+
+      if (buildOutput?.isDokkaIssue4600 == true) return
+
       throw AssertionError(
         buildString {
           append("The error line in the doc is near $sourceLocation")

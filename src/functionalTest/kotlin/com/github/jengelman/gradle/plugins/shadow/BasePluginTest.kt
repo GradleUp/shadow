@@ -61,6 +61,9 @@ abstract class BasePluginTest {
   lateinit var artifactBJar: Path
     private set
 
+  lateinit var artifactGJar: Path
+    private set
+
   val projectScript: Path
     get() = path("build.gradle")
 
@@ -73,8 +76,14 @@ abstract class BasePluginTest {
   open val outputShadowedJar: JarPath
     get() = jarPath("build/libs/my-1.0-all.jar")
 
+  val outputShadowedSourcesJar: JarPath
+    get() = jarPath("build/libs/my-1.0-all-sources.jar")
+
   val outputServerShadowedJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
+
+  val outputServerShadowedSourcesJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all-sources.jar")
 
   @BeforeAll
   fun beforeAll() {
@@ -82,6 +91,7 @@ abstract class BasePluginTest {
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
+    artifactGJar = path("my/g/1.0/g-1.0.jar", parent = localRepo.root)
   }
 
   @BeforeEach
@@ -265,6 +275,9 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |java {
+        |  withSourcesJar()
+        |}
         |dependencies {
         |  implementation 'junit:junit:3.8.2'
         |}
@@ -286,6 +299,9 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |java {
+        |  withSourcesJar()
+        |}
         |dependencies {
         |  implementation project(':client')
         |}
@@ -416,10 +432,16 @@ abstract class BasePluginTest {
       }
     }
 
-    fun createEmptyClassBytes(internalName: String): ByteArray {
+    fun createEmptyClassBytes(
+      internalName: String,
+      sourceFile: String? = "${internalName.substringAfterLast('/')}.java",
+    ): ByteArray {
       return ClassWriter(0)
         .apply {
           visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+          if (sourceFile != null) {
+            visitSource(sourceFile, null)
+          }
           visitEnd()
         }
         .toByteArray()

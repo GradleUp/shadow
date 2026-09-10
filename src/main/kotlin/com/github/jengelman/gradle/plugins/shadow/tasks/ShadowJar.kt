@@ -11,6 +11,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
+import com.github.jengelman.gradle.plugins.shadow.internal.generateSourcesJar
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
@@ -51,6 +52,7 @@ import org.gradle.api.file.DuplicatesStrategy.FAIL
 import org.gradle.api.file.DuplicatesStrategy.INCLUDE
 import org.gradle.api.file.DuplicatesStrategy.INHERIT
 import org.gradle.api.file.DuplicatesStrategy.WARN
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
@@ -60,6 +62,7 @@ import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
@@ -197,6 +200,76 @@ public abstract class ShadowJar : Jar() {
   public open val includedDependencies: ConfigurableFileCollection = objectFactory.fileCollection {
     dependencyFilter.zip(configurations) { df, cs -> df.resolve(cs) }
   }
+
+  /**
+   * If `true`, generates a companion shadowed sources JAR containing project and dependency
+   * sources.
+   *
+   * In projects applying the `shadow` plugin for Java, this convention defaults to `true` when
+   * `java.withSourcesJar()` is enabled, and `false` otherwise.
+   */
+  @get:Input
+  @get:Option(
+    option = "generate-sources-jar",
+    description =
+      "Generates a companion shadowed sources JAR containing project and dependency sources.",
+  )
+  public open val generateSourcesJar: Property<Boolean> = objectFactory.property(false)
+
+  /**
+   * Source JARs resolved from bundled dependencies to be merged into the companion shadowed sources
+   * JAR.
+   */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.NONE)
+  public open val includedSourcesJars: ConfigurableFileCollection = objectFactory.fileCollection {
+    // Avoid resolving sources JARs during task input snapshotting when sources JAR generation is
+    // disabled.
+    generateSourcesJar.flatMap {
+      if (it) {
+        dependencyFilter.zip(configurations) { df, cs ->
+          (df as? DefaultDependencyFilter)?.resolveSourcesJars(cs) ?: project.files()
+        }
+      } else {
+        project.provider { emptySet() }
+      }
+    }
+  }
+
+  /**
+   * Source directories from project source sets to be included in the companion shadowed sources
+   * JAR.
+   *
+   * In projects applying the `shadow` plugin for Java or Kotlin Multiplatform, this defaults to the
+   * relevant source sets' source directories.
+   */
+  @get:InputFiles
+  @get:PathSensitive(PathSensitivity.RELATIVE)
+  public open val sourceSetsSourceDirs: ConfigurableFileCollection = objectFactory.fileCollection()
+
+  /**
+   * The destination location of the companion shadowed sources JAR.
+   *
+   * Defaults to
+   * `<destinationDirectory>/<archiveBaseName>-<archiveClassifier>-sources.<archiveExtension>`.
+   */
+  @get:Optional
+  @get:OutputFile
+  public open val archiveSourcesFile: RegularFileProperty =
+    objectFactory
+      .fileProperty()
+      .convention(
+        destinationDirectory.file(
+          archiveFileName.map { name ->
+            val idx = name.lastIndexOf('.')
+            if (idx != -1) {
+              "${name.substring(0, idx)}-sources${name.substring(idx)}"
+            } else {
+              "$name-sources"
+            }
+          }
+        )
+      )
 
   /**
    * Enables auto relocation of packages in the dependencies.
@@ -540,6 +613,7 @@ public abstract class ShadowJar : Jar() {
     addIncludedDependencies()
     injectManifestAttributes()
     super.copy()
+    generateShadowedSourcesJar()
     runR8Minimization()
   }
 
@@ -559,6 +633,7 @@ public abstract class ShadowJar : Jar() {
     if (unusedClasses.isNotEmpty()) {
       logger.info("Found {} unused classes to drop for minimization.", unusedClasses.size)
     }
+    this.unusedClasses = unusedClasses
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -739,6 +814,25 @@ public abstract class ShadowJar : Jar() {
       sourceSetsClassesDirs = sourceSetsClassesDirs,
       keptDependencyFiles = includedDependencies - toMinimize,
       relocators = relocators.get() + packageRelocators,
+    )
+  }
+
+  private var unusedClasses: Set<String> = emptySet()
+
+  private fun generateShadowedSourcesJar() {
+    if (!generateSourcesJar.get() || !archiveSourcesFile.isPresent) return
+    generateSourcesJar(
+      sourcesJarFile = archiveSourcesFile.get().asFile,
+      sourceSetsSourceDirs = sourceSetsSourceDirs,
+      includedSourcesJars = includedSourcesJars.files,
+      classesDirs = sourceSetsClassesDirs.files,
+      dependencies = includedDependencies.files,
+      relocators = relocators.get() + packageRelocators,
+      unusedClasses = unusedClasses,
+      entryCompression = entryCompression,
+      isZip64 = isZip64,
+      metadataCharset = metadataCharset,
+      preserveFileTimestamps = isPreserveFileTimestamps,
     )
   }
 

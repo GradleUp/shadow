@@ -3,6 +3,7 @@ package com.github.jengelman.gradle.plugins.shadow
 import assertk.all
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.containsAtLeast
 import assertk.assertions.containsMatch
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
@@ -29,6 +30,8 @@ import kotlin.io.path.deleteExisting
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
+import kotlin.io.path.relativeTo
+import kotlin.io.path.walk
 import kotlin.io.path.writeText
 import kotlin.reflect.full.declaredFunctions
 import kotlin.reflect.jvm.javaMethod
@@ -126,6 +129,8 @@ class JavaPluginsTest : BasePluginTest() {
         |     --no-enable-kotlin-module-remapping     Disables option --enable-kotlin-module-remapping.
         |     --fail-on-duplicate-entries     Fails build if the ZIP entries in the shadowed JAR are duplicate.
         |     --no-fail-on-duplicate-entries     Disables option --fail-on-duplicate-entries.
+        |     --generate-sources-jar     Generates a companion shadowed sources JAR containing project and dependency sources.
+        |     --no-generate-sources-jar     Disables option --generate-sources-jar.
         |     --main-class     Main class attribute to add to manifest.
         |     --minimize-jar     Minimizes the jar by removing unused classes.
         |     --no-minimize-jar     Disables option --minimize-jar.
@@ -149,6 +154,16 @@ class JavaPluginsTest : BasePluginTest() {
         "client/Client.class",
         "server/Server.class",
         *junitEntries,
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+    }
+    assertThat(outputServerShadowedSourcesJar).useAll {
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.java",
+        "server/Server.java",
         "META-INF/",
         "META-INF/MANIFEST.MF",
       )
@@ -1279,6 +1294,114 @@ class JavaPluginsTest : BasePluginTest() {
       getBytes("bar.class").isEqualTo(createEmptyClassBytes("bar"))
       getContent("foo.txt").isEqualTo("lower")
       getContent("Foo.txt").isEqualTo("upper")
+    }
+  }
+
+  @Test
+  fun generateJavadocFromShadowedSourcesJar() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |/** Main class doc */
+        |public class Main {
+        |  public static void main(String[] args) {}
+        |}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |  relocate 'g', 'shadow.g'
+      |}
+      |tasks.named('javadoc', Javadoc) {
+      |  classpath = files($shadowJarTask.flatMap { it.archiveFile })
+      |  source = zipTree($shadowJarTask.flatMap { it.archiveSourcesFile }).matching { include('**/*.java') }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess("javadoc")
+
+    val javadocDir = projectRoot.resolve("build/docs/javadoc")
+    val javadocFiles =
+      javadocDir.walk().map { it.relativeTo(javadocDir).invariantSeparatorsPathString }
+    assertThat(javadocFiles)
+      .containsAtLeast(
+        "index.html",
+        "my/Main.html",
+        "shadow/g/G.html",
+      )
+  }
+
+  @Test
+  fun sourcesJarPreservesResourceRelativePath() {
+    writeClass()
+    path("src/main/resources/config/sub/app.properties").writeText("key=value")
+
+    projectScript.appendText(
+      """
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "config/",
+        "config/sub/",
+        "my/Main.java",
+        "config/sub/app.properties",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+    }
+  }
+
+  @Test
+  fun sourcesJarHandlesOverlappingSourceDirectoryPrefixes() {
+    writeClass()
+    path("src/main/res/a.properties").writeText("a=1")
+    path("src/main/resources/b.properties").writeText("b=2")
+
+    projectScript.appendText(
+      """
+      |sourceSets {
+      |  main {
+      |    resources {
+      |      srcDir 'src/main/res'
+      |    }
+      |  }
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        "a.properties",
+        "b.properties",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 

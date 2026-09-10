@@ -105,8 +105,9 @@ When adding new features or public APIs:
 
 - Prefer exact and complete matching using `isEqualTo` for string assertions whenever possible instead of partial
   matching (e.g., `contains`).
-- Prefer complete assertions like `containsOnly` for collections whenever possible instead of partial assertions like
-  `containsAtLeast` or `containsNone`.
+- Prefer complete assertions like `containsOnly` (or `containsExactly` when order matters) for collections whenever
+  possible instead of partial assertions like `containsAtLeast` or `containsNone`. Prefer `containsExactly(...)` over
+  `isEqualTo(listOf(...))` when verifying exact collection elements in order.
 - Raw multiline strings in tests should be constructed using `.trimMargin()`.
 - Prefer `=` property assignment over `.set(...)` in Gradle build scripts (both in documentation snippets and functional
   tests) unless `.set(...)` is explicitly required.
