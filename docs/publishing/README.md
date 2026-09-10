@@ -328,8 +328,8 @@ If you want to replace standard JARs with the shadowed ones, disable the standar
 
     ```groovy
     plugins {
-      id('java')
-      id('com.gradleup.shadow')
+      id 'java'
+      id 'com.gradleup.shadow'
     }
 
     java {
@@ -372,8 +372,8 @@ Or set different `archiveClassifier` values for the standard tasks:
 
     ```groovy
     plugins {
-      id('java')
-      id('com.gradleup.shadow')
+      id 'java'
+      id 'com.gradleup.shadow'
     }
 
     java {
@@ -834,10 +834,10 @@ You can also customize the source inputs included in the companion sources JAR u
     ```groovy
     tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
       // Add custom source directories
-      sourceSetsSourceDirs.from('src/extra/java')
+      sourceSetsSourceDirs.from 'src/extra/java'
 
       // Add additional dependency sources JARs
-      includedSourcesJars.from('libs/external-lib-sources.jar')
+      includedSourcesJars.from 'libs/external-lib-sources.jar'
     }
     ```
 
@@ -980,8 +980,8 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 
     dokka {
       dokkaSourceSets.configureEach {
-        classpath.from(tasks.named('shadowJar').flatMap { it.archiveFile })
-        sourceRoots.from(extractShadowedSources.map { it.destinationDir })
+        classpath.from tasks.named('shadowJar').flatMap { it.archiveFile }
+        sourceRoots.from extractShadowedSources.map { it.destinationDir }
       }
     }
     ```
