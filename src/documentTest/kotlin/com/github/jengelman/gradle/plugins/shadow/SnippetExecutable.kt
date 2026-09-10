@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWar
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
+import com.github.jengelman.gradle.plugins.shadow.testkit.isDokkaIssue4600
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
@@ -51,6 +52,7 @@ sealed interface SnippetExecutable {
         """
             .trimMargin()
         )
+
       // TODO: https://github.com/Kotlin/dokka/issues/4488
       projectRoot
         .resolve("gradle.properties")
@@ -68,6 +70,7 @@ sealed interface SnippetExecutable {
           """
             .trimMargin()
         )
+
       val pluginsBlock =
         """
         |plugins {
@@ -104,28 +107,26 @@ sealed interface SnippetExecutable {
       }
       projectRoot.resolve("main/LICENSE").writeText("Sample License")
 
-      val containsDokka = withoutImports.contains("dokka")
       // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
       // CC/IP because transient script classloaders cannot be serialized.
       val runnerArgs =
-        commonGradleArgs
-          .filterNot {
-            (withoutImports.contains("class ") &&
-              (it == "--configuration-cache" || it.contains("isolated-projects"))) ||
-              (containsDokka && it.startsWith("--warning-mode="))
+        if (withoutImports.contains("class ")) {
+          commonGradleArgs.filterNot {
+            it == "--configuration-cache" || it.contains("isolated-projects")
           }
-          .let { if (containsDokka) it + "--warning-mode=all" else it }
+        } else {
+          commonGradleArgs.toList()
+        }
 
       gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
         .build()
         .also { gradleBuildOutput = it.output }
-        .apply {
-          if (!containsDokka) {
-            assertNoDeprecationWarnings()
-          }
-        }
+        .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
       val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
+
+      if (buildOutput?.isDokkaIssue4600 == true) return
+
       throw AssertionError(
         buildString {
           append("The error line in the doc is near $sourceLocation")

@@ -7,10 +7,10 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
-import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
+import com.github.jengelman.gradle.plugins.shadow.testkit.isDokkaIssue4600
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
@@ -331,11 +331,14 @@ class KotlinPluginsTest : BasePluginTest() {
         .trimMargin()
     )
 
-    runWithSuccess("dokkaGenerateHtml", failOnDeprecations = false) {
-      withArguments(
-        commonGradleArgs.filterNot { it.startsWith("--warning-mode=") } +
-          listOf("dokkaGenerateHtml", "--warning-mode=all")
-      )
+    try {
+      runWithSuccess("dokkaGenerateHtml")
+    } catch (t: Throwable) {
+      if (t.stackTraceToString().isDokkaIssue4600) {
+        // Do nothing.
+      } else {
+        throw t
+      }
     }
 
     val dokkaDir = projectRoot.resolve("build/dokka/html")
