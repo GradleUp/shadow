@@ -40,6 +40,7 @@ val commonGradleArgs =
   setOf(
     "--configuration-cache",
     "--build-cache",
+    "--parallel",
     "--stacktrace",
     "--warning-mode=fail",
     "-Dorg.gradle.configuration-cache.parallel=true",
