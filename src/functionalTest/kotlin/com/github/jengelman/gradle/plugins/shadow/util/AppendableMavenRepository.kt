@@ -43,6 +43,17 @@ class AppendableMavenRepository(val root: Path) {
     return bomModule.coordinate
   }
 
+  fun pomModule(
+    groupId: String,
+    artifactId: String,
+    version: String,
+    action: PomModule.() -> Unit = {},
+  ): String {
+    val pomModule = PomModule(groupId, artifactId, version).also(action)
+    modules += pomModule
+    return pomModule.coordinate
+  }
+
   fun publish() {
     check(modules.isNotEmpty()) { "No modules to publish. Please add at least one module." }
     val writer = MavenXpp3Writer()
@@ -67,6 +78,10 @@ class AppendableMavenRepository(val root: Path) {
               packaging = "pom"
               dependencyManagement =
                 DependencyManagement().apply { dependencies = module.dependencies }
+            }
+            is PomModule -> {
+              packaging = "pom"
+              dependencies = module.dependencies
             }
           }
         }
@@ -141,6 +156,9 @@ class AppendableMavenRepository(val root: Path) {
   }
 
   class BomModule(groupId: String, artifactId: String, version: String) :
+    Module(groupId, artifactId, version)
+
+  class PomModule(groupId: String, artifactId: String, version: String) :
     Module(groupId, artifactId, version)
 }
 

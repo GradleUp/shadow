@@ -513,6 +513,40 @@ class R8MinimizationTest : BasePluginTest() {
   }
 
   @Test
+  fun passCustomR8Args() {
+    writeR8AppAndLibModules(
+      appShadowBlock =
+        """
+        |minimize {
+        |  r8 {
+        |    // Disable shrinking to prove custom R8 args are passed through.
+        |    args.add("--no-tree-shaking")
+        |  }
+        |}
+        """
+          .trimMargin()
+    )
+
+    runWithSuccess(appShadowJarPath)
+
+    assertThat(outputAppShadowedJar).useAll {
+      containsOnly(
+        "a/a.class",
+        "a/b.class",
+        "a/c.class",
+        "app/App.class",
+        "META-INF/MANIFEST.MF",
+      )
+      classLoader {
+        loadClass("app.App")
+        loadClass("a.a")
+        loadClass("a.b")
+        loadClass("a.c")
+      }
+    }
+  }
+
+  @Test
   fun supportClasspathInR8() {
     writeR8AppAndLibModules(
       appShadowBlock =

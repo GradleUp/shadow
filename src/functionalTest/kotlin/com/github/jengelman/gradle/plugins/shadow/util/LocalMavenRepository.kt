@@ -107,6 +107,11 @@ fun createDefaultLocalMavenRepository(junitJar: Path): AppendableMavenRepository
             )
           }
         }
+      val l =
+        jarModule("my", "l", "1.0") {
+          buildJar { insert("l.properties", "l") }
+          addDependency(pomModule("my", "pom-dep", "1.0"))
+        }
       bomModule("my", "bom", "1.0") {
         addDependency(a)
         addDependency(b)
@@ -117,6 +122,7 @@ fun createDefaultLocalMavenRepository(junitJar: Path): AppendableMavenRepository
         addDependency(g)
         addDependency(h)
         addDependency(k)
+        addDependency(l)
       }
     }
 }

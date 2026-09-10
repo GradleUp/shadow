@@ -181,16 +181,28 @@ abstract class BasePluginTest {
     return JarBuilder(path("temp/$relative")).apply(builder).write()
   }
 
-  fun runWithSuccess(vararg arguments: String, block: GradleRunner.() -> Unit = {}): BuildResult {
-    return runner(arguments = arguments.toList(), block = block)
-      .build()
-      .assertNoDeprecationWarnings()
+  fun runWithSuccess(
+    vararg arguments: String,
+    failOnDeprecations: Boolean = true,
+    block: GradleRunner.() -> Unit = {},
+  ): BuildResult {
+    return runner(arguments = arguments.toList(), block = block).build().apply {
+      if (failOnDeprecations) {
+        assertNoDeprecationWarnings()
+      }
+    }
   }
 
-  fun runWithFailure(vararg arguments: String, block: GradleRunner.() -> Unit = {}): BuildResult {
-    return runner(arguments = arguments.toList(), block = block)
-      .buildAndFail()
-      .assertNoDeprecationWarnings()
+  fun runWithFailure(
+    vararg arguments: String,
+    failOnDeprecations: Boolean = true,
+    block: GradleRunner.() -> Unit = {},
+  ): BuildResult {
+    return runner(arguments = arguments.toList(), block = block).buildAndFail().apply {
+      if (failOnDeprecations) {
+        assertNoDeprecationWarnings()
+      }
+    }
   }
 
   fun writeClass(

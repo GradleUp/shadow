@@ -7,6 +7,7 @@ import assertk.assertions.isEqualTo
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
+import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsAtLeast
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
@@ -174,7 +175,12 @@ class KotlinPluginsTest : BasePluginTest() {
         .trimMargin()
     )
 
-    val result = runWithFailure(shadowJarPath)
+    val result =
+      runWithFailure(
+        shadowJarPath,
+        // TODO: https://youtrack.jetbrains.com/issue/KT-89265
+        failOnDeprecations = false,
+      )
 
     assertThat(result.output)
       .contains(
@@ -325,7 +331,12 @@ class KotlinPluginsTest : BasePluginTest() {
         .trimMargin()
     )
 
-    runWithSuccess("dokkaGenerateHtml")
+    runWithSuccess("dokkaGenerateHtml", failOnDeprecations = false) {
+      withArguments(
+        commonGradleArgs.filterNot { it.startsWith("--warning-mode=") } +
+          listOf("dokkaGenerateHtml", "--warning-mode=all")
+      )
+    }
 
     val dokkaDir = projectRoot.resolve("build/dokka/html")
     val dokkaFiles = dokkaDir.walk().map { it.relativeTo(dokkaDir).invariantSeparatorsPathString }

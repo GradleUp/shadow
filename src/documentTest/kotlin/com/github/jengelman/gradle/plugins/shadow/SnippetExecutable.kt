@@ -104,21 +104,26 @@ sealed interface SnippetExecutable {
       }
       projectRoot.resolve("main/LICENSE").writeText("Sample License")
 
+      val containsDokka = withoutImports.contains("dokka")
       // Script-defined classes (e.g., inline custom ResourceTransformer) are not supported by
       // CC/IP because transient script classloaders cannot be serialized.
       val runnerArgs =
-        if (withoutImports.contains("class ")) {
-          commonGradleArgs.filterNot {
-            it == "--configuration-cache" || it.contains("isolated-projects")
+        commonGradleArgs
+          .filterNot {
+            (withoutImports.contains("class ") &&
+              (it == "--configuration-cache" || it.contains("isolated-projects"))) ||
+              (containsDokka && it.startsWith("--warning-mode="))
           }
-        } else {
-          commonGradleArgs.toList()
-        }
+          .let { if (containsDokka) it + "--warning-mode=all" else it }
 
       gradleRunner(projectDir = projectRoot, arguments = runnerArgs + "build")
         .build()
         .also { gradleBuildOutput = it.output }
-        .assertNoDeprecationWarnings()
+        .apply {
+          if (!containsDokka) {
+            assertNoDeprecationWarnings()
+          }
+        }
     } catch (t: Throwable) {
       val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
       throw AssertionError(

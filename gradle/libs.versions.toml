@@ -1,12 +1,12 @@
 [versions]
 minGradle = "9.4.0"
-kotlin = "2.4.10"
+kotlin = "2.4.20"
 moshi = "1.15.2"
-pluginPublish = "2.1.1"
+pluginPublish = "2.2.0"
 dokka = "2.2.0"
 
 [libraries]
-apache-ant = "org.apache.ant:ant:1.10.17"
+apache-ant = "org.apache.ant:ant:1.10.18"
 apache-log4j = "org.apache.logging.log4j:log4j-core:2.26.1"
 apache-maven-model = "org.apache.maven:maven-model:3.9.16"
 jdependency = "org.vafer:jdependency:2.16"
@@ -20,9 +20,9 @@ moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:1.0.0"
-develocity = "com.gradle:develocity-gradle-plugin:4.5.0"
+develocity = "com.gradle:develocity-gradle-plugin:4.5.1"
 kotlin-gradlePlugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
-pluginPublish = { module = "com.gradle.publish:plugin-publish-plugin", version.ref = "pluginPublish" }
+pluginPublish = { module = "com.gradle.plugin-publish:com.gradle.plugin-publish.gradle.plugin", version.ref = "pluginPublish" }
 dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dokka" }
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0"

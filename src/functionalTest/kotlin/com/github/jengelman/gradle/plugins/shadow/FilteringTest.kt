@@ -248,6 +248,29 @@ class FilteringTest : BasePluginTest() {
   }
 
   @Test
+  fun excludeNonJarTransitiveDependency() {
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:l:1.0'
+      |}
+      |$shadowJarTask {
+      |  dependencies {
+      |    exclude(dependency('my:pom-dep:.*'))
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("l.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
+  }
+
+  @Test
   fun excludeDependencyFromSourcesJar() {
     projectScript.appendText(
       """
