@@ -16,6 +16,11 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
+import java.util.concurrent.ArrayBlockingQueue
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCopyDetails
@@ -71,9 +76,36 @@ internal constructor(
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
+    val threadPool: ExecutorService =
+      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors().coerceAtLeast(2))
+    val queue = ArrayBlockingQueue<ProcessItem>(128)
+
     try {
       zipOutStream.use { zos ->
-        stream.process(StreamAction(zos))
+        val writer = threadPool.submit {
+          while (true) {
+            val item = queue.take()
+            if (item === POISON_PILL) break
+            val bytes = item.futureBytes.get()
+            zos.writeEntry(
+              name = item.entryName,
+              preserveLastModified = isPreserveFileTimestamps,
+              lastModified = item.lastModified,
+              unixMode = item.unixMode,
+            ) {
+              write(bytes)
+            }
+          }
+        }
+
+        try {
+          stream.process(StreamAction(threadPool, queue))
+        } finally {
+          queue.put(POISON_PILL)
+        }
+
+        writer.get()
+
         processTransformers(zos)
         addDirs(zos)
         checkDuplicateEntries(zos)
@@ -98,6 +130,9 @@ internal constructor(
       }
       zipFile.delete()
       throw e
+    } finally {
+      threadPool.shutdown()
+      threadPool.awaitTermination(1, TimeUnit.MINUTES)
     }
     return WorkResults.didWork(true)
   }
@@ -150,8 +185,17 @@ internal constructor(
     }
   }
 
-  private inner class StreamAction(private val zipOutStr: ZipOutputStream) :
-    CopyActionProcessingStreamAction {
+  private class ProcessItem(
+    val entryName: String,
+    val futureBytes: CompletableFuture<ByteArray>,
+    val lastModified: Long,
+    val unixMode: UnixMode,
+  )
+
+  private inner class StreamAction(
+    private val executor: ExecutorService,
+    private val queue: ArrayBlockingQueue<ProcessItem>,
+  ) : CopyActionProcessingStreamAction {
     init {
       logger.info("Relocator count: {}.", relocators.size)
     }
@@ -173,24 +217,56 @@ internal constructor(
       when {
         path.endsWith(".class") -> {
           if (isUnused(path)) return
+          val rawBytes = fileDetails.inputStream().use { it.readBytes() }
           if (relocators.isEmpty()) {
-            fileDetails.writeToZip(path)
+            sendEntry(
+              entryName = path,
+              fileDetails = fileDetails,
+              futureBytes = CompletableFuture.completedFuture(rawBytes),
+            )
           } else {
-            with(fileDetails) {
-              // Temporarily remove the multi-release prefix.
-              val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
-              val pathSuffix = path.removePrefix(multiReleasePrefix)
-              val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-              writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
-            }
+            // Temporarily remove the multi-release prefix.
+            val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
+            val pathSuffix = path.removePrefix(multiReleasePrefix)
+            val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
+            val future =
+              CompletableFuture.supplyAsync(
+                { remapClass(bytes = rawBytes, path = path, relocators = relocators) },
+                executor,
+              )
+            sendEntry(
+              entryName = relocatedPath,
+              fileDetails = fileDetails,
+              futureBytes = future,
+            )
           }
         }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          fileDetails.writeToZip(relocated)
+          val rawBytes = fileDetails.inputStream().use { it.readBytes() }
+          sendEntry(
+            entryName = relocated,
+            fileDetails = fileDetails,
+            futureBytes = CompletableFuture.completedFuture(rawBytes),
+          )
         }
       }
+    }
+
+    private fun sendEntry(
+      entryName: String,
+      fileDetails: FileCopyDetails,
+      futureBytes: CompletableFuture<ByteArray>,
+    ) {
+      queue.put(
+        ProcessItem(
+          entryName = entryName,
+          futureBytes = futureBytes,
+          lastModified = fileDetails.lastModified,
+          unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
+        )
+      )
     }
 
     private fun isUnused(classPath: String): Boolean {
@@ -212,26 +288,18 @@ internal constructor(
       }
       return true
     }
-
-    private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
-      zipOutStr.writeEntry(
-        name = entryName,
-        preserveLastModified = isPreserveFileTimestamps,
-        lastModified = lastModified,
-        unixMode = UnixMode.file(permissions.toUnixNumeric()),
-      ) {
-        if (bytes == null) {
-          copyTo(this)
-        } else {
-          write(bytes)
-        }
-      }
-    }
   }
 
   public companion object {
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
+    private val POISON_PILL =
+      ProcessItem(
+        entryName = "",
+        futureBytes = CompletableFuture.completedFuture(ByteArray(0)),
+        lastModified = 0L,
+        unixMode = UnixMode.file(),
+      )
 
     @Deprecated(
       message =
