@@ -16,11 +16,14 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import java.util.concurrent.ArrayBlockingQueue
-import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCopyDetails
@@ -76,35 +79,34 @@ internal constructor(
   private val visitedDirs = mutableMapOf<String, FileCopyDetails>()
 
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
-    val threadPool: ExecutorService =
-      Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors().coerceAtLeast(2))
-    val queue = ArrayBlockingQueue<ProcessItem>(128)
-
     try {
       zipOutStream.use { zos ->
-        val writer = threadPool.submit {
-          while (true) {
-            val item = queue.take()
-            if (item === POISON_PILL) break
-            val bytes = item.futureBytes.get()
-            zos.writeEntry(
-              name = item.entryName,
-              preserveLastModified = isPreserveFileTimestamps,
-              lastModified = item.lastModified,
-              unixMode = item.unixMode,
-            ) {
-              write(bytes)
+        runBlocking {
+          val channel = Channel<ProcessItem>(capacity = 128)
+
+          val writer =
+            launch(Dispatchers.Default) {
+              for (item in channel) {
+                val bytes = item.deferredBytes.await()
+                zos.writeEntry(
+                  name = item.entryName,
+                  preserveLastModified = isPreserveFileTimestamps,
+                  lastModified = item.lastModified,
+                  unixMode = item.unixMode,
+                ) {
+                  write(bytes)
+                }
+              }
             }
+
+          try {
+            stream.process(StreamAction(this, channel))
+          } finally {
+            channel.close()
           }
-        }
 
-        try {
-          stream.process(StreamAction(threadPool, queue))
-        } finally {
-          queue.put(POISON_PILL)
+          writer.join()
         }
-
-        writer.get()
 
         processTransformers(zos)
         addDirs(zos)
@@ -130,9 +132,6 @@ internal constructor(
       }
       zipFile.delete()
       throw e
-    } finally {
-      threadPool.shutdown()
-      threadPool.awaitTermination(1, TimeUnit.MINUTES)
     }
     return WorkResults.didWork(true)
   }
@@ -187,14 +186,14 @@ internal constructor(
 
   private class ProcessItem(
     val entryName: String,
-    val futureBytes: CompletableFuture<ByteArray>,
+    val deferredBytes: Deferred<ByteArray>,
     val lastModified: Long,
     val unixMode: UnixMode,
   )
 
   private inner class StreamAction(
-    private val executor: ExecutorService,
-    private val queue: ArrayBlockingQueue<ProcessItem>,
+    private val scope: CoroutineScope,
+    private val channel: Channel<ProcessItem>,
   ) : CopyActionProcessingStreamAction {
     init {
       logger.info("Relocator count: {}.", relocators.size)
@@ -222,22 +221,21 @@ internal constructor(
             sendEntry(
               entryName = path,
               fileDetails = fileDetails,
-              futureBytes = CompletableFuture.completedFuture(rawBytes),
+              deferredBytes = CompletableDeferred(rawBytes),
             )
           } else {
             // Temporarily remove the multi-release prefix.
             val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
             val pathSuffix = path.removePrefix(multiReleasePrefix)
             val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-            val future =
-              CompletableFuture.supplyAsync(
-                { remapClass(bytes = rawBytes, path = path, relocators = relocators) },
-                executor,
-              )
+            val deferred =
+              scope.async(Dispatchers.Default) {
+                remapClass(bytes = rawBytes, path = path, relocators = relocators)
+              }
             sendEntry(
               entryName = relocatedPath,
               fileDetails = fileDetails,
-              futureBytes = future,
+              deferredBytes = deferred,
             )
           }
         }
@@ -248,7 +246,7 @@ internal constructor(
           sendEntry(
             entryName = relocated,
             fileDetails = fileDetails,
-            futureBytes = CompletableFuture.completedFuture(rawBytes),
+            deferredBytes = CompletableDeferred(rawBytes),
           )
         }
       }
@@ -257,16 +255,18 @@ internal constructor(
     private fun sendEntry(
       entryName: String,
       fileDetails: FileCopyDetails,
-      futureBytes: CompletableFuture<ByteArray>,
+      deferredBytes: Deferred<ByteArray>,
     ) {
-      queue.put(
-        ProcessItem(
-          entryName = entryName,
-          futureBytes = futureBytes,
-          lastModified = fileDetails.lastModified,
-          unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
+      runBlocking {
+        channel.send(
+          ProcessItem(
+            entryName = entryName,
+            deferredBytes = deferredBytes,
+            lastModified = fileDetails.lastModified,
+            unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
+          )
         )
-      )
+      }
     }
 
     private fun isUnused(classPath: String): Boolean {
@@ -293,13 +293,6 @@ internal constructor(
   public companion object {
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
-    private val POISON_PILL =
-      ProcessItem(
-        entryName = "",
-        futureBytes = CompletableFuture.completedFuture(ByteArray(0)),
-        lastModified = 0L,
-        unixMode = UnixMode.file(),
-      )
 
     @Deprecated(
       message =
