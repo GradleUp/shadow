@@ -6,7 +6,7 @@ site_name: Shadow Gradle Plugin
 site_url: https://gradleup.com/shadow/
 repo_name: Shadow
 repo_url: https://github.com/GradleUp/shadow
-site_description: "A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin."
+site_description: "A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing with R8/ProGuard. The Gradle counterpart to Maven Shade Plugin."
 site_author: GradleUp developers
 edit_uri: edit/main/docs
 copyright: 'Copyright &copy; GradleUp developers'
