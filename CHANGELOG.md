@@ -28,6 +28,7 @@
   - `XmlAppendingTransformer`
 - Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
 - Remove redundant JAR normalization for R8 output. ([#2236](https://github.com/GradleUp/shadow/pull/2236))
+- Parallelize bytecode remapping in `ShadowCopyAction`. ([#2302](https://github.com/GradleUp/shadow/pull/2302))
 
 ### Deprecated
 
