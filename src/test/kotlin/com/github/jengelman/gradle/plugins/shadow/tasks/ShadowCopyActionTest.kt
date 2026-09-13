@@ -92,11 +92,8 @@ class ShadowCopyActionTest {
     }
 
     val result = action.execute(stream)
-
     assertThat(result.didWork).isTrue()
-    zipFile.useZip {
-      assertThat(size()).isEqualTo(65536)
-    }
+    zipFile.useZip { assertThat(size()).isEqualTo(65536) }
   }
 
   private fun ShadowCopyAction(
