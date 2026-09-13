@@ -12,12 +12,12 @@ jdependency = "org.vafer:jdependency:2.16"
 jdom2 = "org.jdom:jdom2:2.0.6.1"
 kotlin-metadata = { module = "org.jetbrains.kotlin:kotlin-metadata-jvm", version.ref = "kotlin" }
 kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
+kotlinx-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1"
 plexus-utils = "org.codehaus.plexus:plexus-utils:4.1.0"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.2.0"
 xmlunit = "org.xmlunit:xmlunit-legacy:2.13.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
-kotlinx-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.1"
 
 foojayResolver = "org.gradle.toolchains.foojay-resolver-convention:org.gradle.toolchains.foojay-resolver-convention.gradle.plugin:1.0.0"
 develocity = "com.gradle:develocity-gradle-plugin:4.5.1"

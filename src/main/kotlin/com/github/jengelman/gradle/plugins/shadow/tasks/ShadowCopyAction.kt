@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
+import com.github.jengelman.gradle.plugins.shadow.internal.readBytes
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -216,7 +217,7 @@ internal constructor(
       when {
         path.endsWith(".class") -> {
           if (isUnused(path)) return
-          val rawBytes = fileDetails.inputStream().use { it.readBytes() }
+          val rawBytes = fileDetails.readBytes()
           if (relocators.isEmpty()) {
             sendEntry(
               entryName = path,
@@ -230,7 +231,7 @@ internal constructor(
             val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
             val deferred =
               scope.async(Dispatchers.Default) {
-                remapClass(bytes = rawBytes, path = path, relocators = relocators)
+                rawBytes.remapClass(relocators = relocators, path = path)
               }
             sendEntry(
               entryName = relocatedPath,
@@ -242,7 +243,7 @@ internal constructor(
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          val rawBytes = fileDetails.inputStream().use { it.readBytes() }
+          val rawBytes = fileDetails.readBytes()
           sendEntry(
             entryName = relocated,
             fileDetails = fileDetails,

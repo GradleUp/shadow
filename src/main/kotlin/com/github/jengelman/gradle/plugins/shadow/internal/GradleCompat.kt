@@ -74,6 +74,8 @@ internal fun FileTreeElement.inputStream(): InputStream =
     file.inputStream()
   }
 
+internal fun FileTreeElement.readBytes(): ByteArray = inputStream().use(InputStream::readBytes)
+
 internal inline fun <reified V : Any> ObjectFactory.property(
   defaultValue: Any? = null
 ): Property<V> =
