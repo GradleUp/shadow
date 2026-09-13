@@ -110,6 +110,10 @@ When adding new features or public APIs:
 - Raw multiline strings in tests should be constructed using `.trimMargin()`.
 - Prefer `=` property assignment over `.set(...)` in Gradle build scripts (both in documentation snippets and functional
   tests) unless `.set(...)` is explicitly required.
+- When adding or updating code snippets in documentation (`docs/`), ensure there are corresponding functional or unit
+  tests covering and verifying the actual behavioral logic. Annotate the snippet group with
+  `<!-- test: TestClass#testMethod -->` directly above the tab group so that `generateDocTests` can link and validate
+  the reference.
 
 ### Before Submitting a Pull Request
 
