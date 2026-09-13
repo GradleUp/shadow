@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
+import com.github.jengelman.gradle.plugins.shadow.internal.readBytes
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -87,14 +88,13 @@ internal constructor(
           val writer =
             launch(Dispatchers.Default) {
               for (item in channel) {
-                val bytes = item.deferredBytes.await()
                 zos.writeEntry(
                   name = item.entryName,
                   preserveLastModified = isPreserveFileTimestamps,
                   lastModified = item.lastModified,
                   unixMode = item.unixMode,
                 ) {
-                  write(bytes)
+                  write(item.deferredBytes.await())
                 }
               }
             }
@@ -184,13 +184,6 @@ internal constructor(
     }
   }
 
-  private class ProcessItem(
-    val entryName: String,
-    val deferredBytes: Deferred<ByteArray>,
-    val lastModified: Long,
-    val unixMode: UnixMode,
-  )
-
   private inner class StreamAction(
     private val scope: CoroutineScope,
     private val channel: Channel<ProcessItem>,
@@ -216,11 +209,10 @@ internal constructor(
       when {
         path.endsWith(".class") -> {
           if (isUnused(path)) return
-          val rawBytes = fileDetails.inputStream().use { it.readBytes() }
+          val rawBytes = fileDetails.readBytes()
           if (relocators.isEmpty()) {
-            sendEntry(
+            fileDetails.sendEntry(
               entryName = path,
-              fileDetails = fileDetails,
               deferredBytes = CompletableDeferred(rawBytes),
             )
           } else {
@@ -228,33 +220,29 @@ internal constructor(
             val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
             val pathSuffix = path.removePrefix(multiReleasePrefix)
             val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-            val deferred =
-              scope.async(Dispatchers.Default) {
-                remapClass(bytes = rawBytes, path = path, relocators = relocators)
-              }
-            sendEntry(
+            fileDetails.sendEntry(
               entryName = relocatedPath,
-              fileDetails = fileDetails,
-              deferredBytes = deferred,
+              deferredBytes =
+                scope.async(Dispatchers.Default) {
+                  rawBytes.remapClass(relocators = relocators, path = path)
+                },
             )
           }
         }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          val rawBytes = fileDetails.inputStream().use { it.readBytes() }
-          sendEntry(
+          val rawBytes = fileDetails.readBytes()
+          fileDetails.sendEntry(
             entryName = relocated,
-            fileDetails = fileDetails,
             deferredBytes = CompletableDeferred(rawBytes),
           )
         }
       }
     }
 
-    private fun sendEntry(
+    private fun FileCopyDetails.sendEntry(
       entryName: String,
-      fileDetails: FileCopyDetails,
       deferredBytes: Deferred<ByteArray>,
     ) {
       runBlocking {
@@ -262,8 +250,8 @@ internal constructor(
           ProcessItem(
             entryName = entryName,
             deferredBytes = deferredBytes,
-            lastModified = fileDetails.lastModified,
-            unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
+            lastModified = lastModified,
+            unixMode = UnixMode.file(permissions.toUnixNumeric()),
           )
         )
       }
@@ -289,6 +277,13 @@ internal constructor(
       return true
     }
   }
+
+  private class ProcessItem(
+    val entryName: String,
+    val deferredBytes: Deferred<ByteArray>,
+    val lastModified: Long,
+    val unixMode: UnixMode,
+  )
 
   public companion object {
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
