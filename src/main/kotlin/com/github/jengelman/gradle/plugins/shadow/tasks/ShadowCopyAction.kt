@@ -176,13 +176,14 @@ internal constructor(
           if (relocators.isEmpty()) {
             fileDetails.writeToZip(path)
           } else {
-            with(fileDetails) {
-              // Temporarily remove the multi-release prefix.
-              val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
-              val pathSuffix = path.removePrefix(multiReleasePrefix)
-              val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-              writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
-            }
+            // Temporarily remove the multi-release prefix.
+            val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
+            val pathSuffix = path.removePrefix(multiReleasePrefix)
+            val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
+            fileDetails.writeToZip(
+              entryName = relocatedPath,
+              bytes = fileDetails.remapClass(relocators = relocators),
+            )
           }
         }
         else -> {
