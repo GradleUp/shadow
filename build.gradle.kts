@@ -153,10 +153,7 @@ dependencies {
 
 testing.suites {
   named<JvmTestSuite>("test") {
-    dependencies {
-      implementation(libs.kotlinx.coroutines)
-      implementation(libs.xmlunit)
-    }
+    dependencies { implementation(libs.xmlunit) }
   }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
