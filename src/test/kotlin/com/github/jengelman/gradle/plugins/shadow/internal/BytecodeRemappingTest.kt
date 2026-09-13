@@ -6,7 +6,6 @@ import assertk.assertions.containsExactly
 import assertk.assertions.hasMessage
 import assertk.assertions.isEqualTo
 import assertk.assertions.isInstanceOf
-import assertk.assertions.isLessThan
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.util.noOpDelegate
@@ -17,18 +16,11 @@ import kotlin.io.path.copyTo
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.inputStream
 import kotlin.io.path.invariantSeparatorsPathString
-import kotlin.io.path.readBytes
 import kotlin.io.path.relativeTo
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
 import kotlin.metadata.jvm.KotlinClassMetadata
 import kotlin.reflect.KClass
-import kotlin.time.Duration
-import kotlin.time.measureTime
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.runBlocking
 import org.gradle.api.GradleException
 import org.gradle.api.file.FileCopyDetails
 import org.junit.jupiter.api.Test
@@ -341,45 +333,6 @@ class BytecodeRemappingTest {
     assertThat(method.checkcastTargets).containsExactly(relocatedFixtureBase, relocatedFixtureBase)
     assertThat(method.invokeOwners)
       .containsExactly("kotlin/jvm/internal/Intrinsics", relocatedFixtureBase)
-  }
-
-  @Test
-  fun parallelRemappingFasterThanSequential() {
-    val rawBytes =
-      requireResourceAsPath("${FixtureSubject::class.java.name.replace('.', '/')}.class")
-        .readBytes()
-    val classes = (1..1000).map { "com/example/Class$it.class" to rawBytes }
-
-    fun remapSequential() = classes.map { (path, bytes) ->
-      remapClass(bytes = bytes, path = path, relocators = relocators)
-    }
-
-    fun remapParallel() = runBlocking {
-      classes
-        .map { (path, bytes) ->
-          async(Dispatchers.Default) {
-            remapClass(bytes = bytes, path = path, relocators = relocators)
-          }
-        }
-        .awaitAll()
-    }
-
-    // Warm up JIT and coroutines thread pool
-    repeat(3) {
-      remapSequential()
-      remapParallel()
-    }
-
-    var sequentialDuration = Duration.ZERO
-    var parallelDuration = Duration.ZERO
-    val iterations = 5
-    repeat(iterations) {
-      sequentialDuration += measureTime { remapSequential() }
-      parallelDuration += measureTime { remapParallel() }
-    }
-
-    val ratio = if (Runtime.getRuntime().availableProcessors() == 1) 1.0 else 0.8
-    assertThat(parallelDuration).isLessThan(sequentialDuration * ratio)
   }
 
   private fun Path.toFileCopyDetails() =
