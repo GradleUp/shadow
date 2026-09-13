@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
+import com.github.jengelman.gradle.plugins.shadow.internal.readBytes
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -16,6 +17,14 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCopyDetails
@@ -73,7 +82,33 @@ internal constructor(
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
     try {
       zipOutStream.use { zos ->
-        stream.process(StreamAction(zos))
+        runBlocking {
+          val channel = Channel<ProcessItem>(capacity = 128)
+
+          val writer =
+            launch(Dispatchers.Default) {
+              for (item in channel) {
+                val bytes = item.deferredBytes.await()
+                zos.writeEntry(
+                  name = item.entryName,
+                  preserveLastModified = isPreserveFileTimestamps,
+                  lastModified = item.lastModified,
+                  unixMode = item.unixMode,
+                ) {
+                  write(bytes)
+                }
+              }
+            }
+
+          try {
+            stream.process(StreamAction(this, channel))
+          } finally {
+            channel.close()
+          }
+
+          writer.join()
+        }
+
         processTransformers(zos)
         addDirs(zos)
         checkDuplicateEntries(zos)
@@ -150,8 +185,17 @@ internal constructor(
     }
   }
 
-  private inner class StreamAction(private val zipOutStr: ZipOutputStream) :
-    CopyActionProcessingStreamAction {
+  private class ProcessItem(
+    val entryName: String,
+    val deferredBytes: Deferred<ByteArray>,
+    val lastModified: Long,
+    val unixMode: UnixMode,
+  )
+
+  private inner class StreamAction(
+    private val scope: CoroutineScope,
+    private val channel: Channel<ProcessItem>,
+  ) : CopyActionProcessingStreamAction {
     init {
       logger.info("Relocator count: {}.", relocators.size)
     }
@@ -173,23 +217,56 @@ internal constructor(
       when {
         path.endsWith(".class") -> {
           if (isUnused(path)) return
+          val rawBytes = fileDetails.readBytes()
           if (relocators.isEmpty()) {
-            fileDetails.writeToZip(path)
+            sendEntry(
+              entryName = path,
+              fileDetails = fileDetails,
+              deferredBytes = CompletableDeferred(rawBytes),
+            )
           } else {
-            with(fileDetails) {
-              // Temporarily remove the multi-release prefix.
-              val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
-              val pathSuffix = path.removePrefix(multiReleasePrefix)
-              val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-              writeToZip(entryName = relocatedPath, bytes = remapClass(relocators = relocators))
-            }
+            // Temporarily remove the multi-release prefix.
+            val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
+            val pathSuffix = path.removePrefix(multiReleasePrefix)
+            val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
+            val deferred =
+              scope.async(Dispatchers.Default) {
+                rawBytes.remapClass(relocators = relocators, path = path)
+              }
+            sendEntry(
+              entryName = relocatedPath,
+              fileDetails = fileDetails,
+              deferredBytes = deferred,
+            )
           }
         }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          fileDetails.writeToZip(relocated)
+          val rawBytes = fileDetails.readBytes()
+          sendEntry(
+            entryName = relocated,
+            fileDetails = fileDetails,
+            deferredBytes = CompletableDeferred(rawBytes),
+          )
         }
+      }
+    }
+
+    private fun sendEntry(
+      entryName: String,
+      fileDetails: FileCopyDetails,
+      deferredBytes: Deferred<ByteArray>,
+    ) {
+      runBlocking {
+        channel.send(
+          ProcessItem(
+            entryName = entryName,
+            deferredBytes = deferredBytes,
+            lastModified = fileDetails.lastModified,
+            unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
+          )
+        )
       }
     }
 
@@ -211,21 +288,6 @@ internal constructor(
         )
       }
       return true
-    }
-
-    private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
-      zipOutStr.writeEntry(
-        name = entryName,
-        preserveLastModified = isPreserveFileTimestamps,
-        lastModified = lastModified,
-        unixMode = UnixMode.file(permissions.toUnixNumeric()),
-      ) {
-        if (bytes == null) {
-          copyTo(this)
-        } else {
-          write(bytes)
-        }
-      }
     }
   }
 
