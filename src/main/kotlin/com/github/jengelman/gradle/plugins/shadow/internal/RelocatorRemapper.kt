@@ -13,28 +13,29 @@ import org.vafer.jdeb.shaded.objectweb.asm.commons.Remapper
  * (possibly) remapped class bytes. If no remapping is required, the original bytes are returned.
  */
 internal fun FileCopyDetails.remapClass(relocators: Set<Relocator>): ByteArray =
-  remapClass(bytes = inputStream().use { it.readBytes() }, path = path, relocators = relocators)
+  readBytes().remapClass(relocators = relocators, path = path)
 
-internal fun remapClass(bytes: ByteArray, path: String, relocators: Set<Relocator>): ByteArray {
-  var modified = false
-  val remapper = RelocatorRemapper(relocators) { modified = true }
+internal fun ByteArray.remapClass(relocators: Set<Relocator>, path: String): ByteArray =
+  let { bytes ->
+    var modified = false
+    val remapper = RelocatorRemapper(relocators) { modified = true }
 
-  // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant
-  // pool. Copying the original constant pool should be avoided because it would keep references
-  // to the original class names. This is not a problem at runtime (because these entries in the
-  // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
-  // that use the constant pool to determine the dependencies of a class.
-  return try {
-    val cw = ClassWriter(0)
-    val cr = ClassReader(bytes)
-    val cv = ClassRemapper(cw, remapper)
-    cr.accept(cv, ClassReader.EXPAND_FRAMES)
-    // If we didn't need to change anything, keep the original bytes as-is.
-    if (modified) cw.toByteArray() else bytes
-  } catch (t: Throwable) {
-    gradleError("Error in ASM processing class $path", t)
+    // We don't pass the ClassReader here. This forces the ClassWriter to rebuild the constant
+    // pool. Copying the original constant pool should be avoided because it would keep references
+    // to the original class names. This is not a problem at runtime (because these entries in the
+    // constant pool are never used), but confuses some tools such as Felix's maven-bundle-plugin
+    // that use the constant pool to determine the dependencies of a class.
+    try {
+      val cw = ClassWriter(0)
+      val cr = ClassReader(bytes)
+      val cv = ClassRemapper(cw, remapper)
+      cr.accept(cv, ClassReader.EXPAND_FRAMES)
+      // If we didn't need to change anything, keep the original bytes as-is.
+      if (modified) cw.toByteArray() else bytes
+    } catch (t: Throwable) {
+      gradleError("Error in ASM processing class $path", t)
+    }
   }
-}
 
 private class RelocatorRemapper(
   private val relocators: Set<Relocator>,
