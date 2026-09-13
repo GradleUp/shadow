@@ -23,9 +23,15 @@ internal value class UnixMode private constructor(internal val value: Int) {
 
 /** Workaround to provide access to written [ZipOutputStream.entries]. */
 internal class TrackingZipOutputStream : ZipOutputStream {
-  constructor(out: OutputStream) : super(out)
+  private val outStream: OutputStream?
 
-  constructor(file: File) : super(file)
+  constructor(out: OutputStream) : super(out) {
+    this.outStream = out
+  }
+
+  constructor(file: File) : super(file) {
+    this.outStream = null
+  }
 
   private val _entries = mutableListOf<ZipEntry>()
   val entries: List<ZipEntry> = _entries
@@ -33,6 +39,22 @@ internal class TrackingZipOutputStream : ZipOutputStream {
   override fun putNextEntry(archiveEntry: ZipEntry) {
     super.putNextEntry(archiveEntry)
     _entries.add(archiveEntry)
+  }
+
+  override fun close() {
+    try {
+      super.close()
+    } finally {
+      outStream?.close()
+      (rafField?.get(this) as? AutoCloseable)?.close()
+    }
+  }
+
+  private companion object {
+    val rafField = runCatching {
+      ZipOutputStream::class.java.getDeclaredField("raf").apply { isAccessible = true }
+    }
+      .getOrNull()
   }
 }
 
