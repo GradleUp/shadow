@@ -21,8 +21,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipOutputStream
@@ -82,29 +80,9 @@ internal constructor(
     try {
       zipOutStream.use { zos ->
         runBlocking {
-          val channel = Channel<ProcessItem>(capacity = 128)
-
-          val writer =
-            launch(Dispatchers.Default) {
-              for (item in channel) {
-                zos.writeEntry(
-                  name = item.entryName,
-                  preserveLastModified = isPreserveFileTimestamps,
-                  lastModified = item.lastModified,
-                  unixMode = item.unixMode,
-                ) {
-                  item.writeContent(this)
-                }
-              }
-            }
-
-          try {
-            stream.process(StreamAction(this, channel))
-          } finally {
-            channel.close()
-          }
-
-          writer.join()
+          val action = StreamAction(this, zos)
+          stream.process(action)
+          action.flush()
         }
 
         processTransformers(zos)
@@ -185,8 +163,10 @@ internal constructor(
 
   private inner class StreamAction(
     private val scope: CoroutineScope,
-    private val channel: Channel<ProcessItem>,
+    private val zipOutStr: ZipOutputStream,
   ) : CopyActionProcessingStreamAction {
+    private val pendingEntries = ArrayDeque<PendingEntry>()
+
     init {
       logger.info("Relocator count: {}.", relocators.size)
     }
@@ -209,58 +189,65 @@ internal constructor(
         path.endsWith(".class") -> {
           if (isUnused(path)) return
           if (relocators.isEmpty()) {
-            fileDetails.sendStreamEntry(path)
+            runBlocking { flush() }
+            fileDetails.writeToZip(path)
           } else {
             // Temporarily remove the multi-release prefix.
             val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
             val pathSuffix = path.removePrefix(multiReleasePrefix)
             val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
             val rawBytes = fileDetails.readBytes()
-            fileDetails.sendDeferredEntry(
-              entryName = relocatedPath,
-              deferredBytes =
-                scope.async(Dispatchers.Default) {
-                  rawBytes.remapClass(relocators = relocators, path = path)
-                },
+            val deferred =
+              scope.async(Dispatchers.Default) {
+                rawBytes.remapClass(relocators = relocators, path = path)
+              }
+            pendingEntries.addLast(
+              PendingEntry(
+                entryName = relocatedPath,
+                deferredBytes = deferred,
+                lastModified = fileDetails.lastModified,
+                unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
+              )
             )
+            if (pendingEntries.size >= 128) {
+              runBlocking { writePendingEntry(pendingEntries.removeFirst()) }
+            }
           }
         }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          fileDetails.sendStreamEntry(relocated)
+          runBlocking { flush() }
+          fileDetails.writeToZip(relocated)
         }
       }
     }
 
-    private fun FileCopyDetails.sendStreamEntry(entryName: String) {
-      sendItem(
-        ProcessItem(
-          entryName = entryName,
-          writeContent = { copyTo(it) },
-          lastModified = lastModified,
-          unixMode = UnixMode.file(permissions.toUnixNumeric()),
-        )
-      )
+    suspend fun flush() {
+      while (pendingEntries.isNotEmpty()) {
+        writePendingEntry(pendingEntries.removeFirst())
+      }
     }
 
-    private fun FileCopyDetails.sendDeferredEntry(
-      entryName: String,
-      deferredBytes: Deferred<ByteArray>,
-    ) {
-      sendItem(
-        ProcessItem(
-          entryName = entryName,
-          writeContent = { it.write(deferredBytes.await()) },
-          lastModified = lastModified,
-          unixMode = UnixMode.file(permissions.toUnixNumeric()),
-        )
-      )
+    private suspend fun writePendingEntry(entry: PendingEntry) {
+      zipOutStr.writeEntry(
+        name = entry.entryName,
+        preserveLastModified = isPreserveFileTimestamps,
+        lastModified = entry.lastModified,
+        unixMode = entry.unixMode,
+      ) {
+        write(entry.deferredBytes.await())
+      }
     }
 
-    private fun sendItem(item: ProcessItem) {
-      if (!channel.trySend(item).isSuccess) {
-        runBlocking { channel.send(item) }
+    private fun FileCopyDetails.writeToZip(entryName: String) {
+      zipOutStr.writeEntry(
+        name = entryName,
+        preserveLastModified = isPreserveFileTimestamps,
+        lastModified = lastModified,
+        unixMode = UnixMode.file(permissions.toUnixNumeric()),
+      ) {
+        copyTo(this)
       }
     }
 
@@ -285,9 +272,9 @@ internal constructor(
     }
   }
 
-  private class ProcessItem(
+  private class PendingEntry(
     val entryName: String,
-    val writeContent: suspend (ZipOutputStream) -> Unit,
+    val deferredBytes: Deferred<ByteArray>,
     val lastModified: Long,
     val unixMode: UnixMode,
   )
