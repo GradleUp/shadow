@@ -245,15 +245,15 @@ internal constructor(
       entryName: String,
       deferredBytes: Deferred<ByteArray>,
     ) {
-      runBlocking {
-        channel.send(
-          ProcessItem(
-            entryName = entryName,
-            deferredBytes = deferredBytes,
-            lastModified = lastModified,
-            unixMode = UnixMode.file(permissions.toUnixNumeric()),
-          )
+      val item =
+        ProcessItem(
+          entryName = entryName,
+          deferredBytes = deferredBytes,
+          lastModified = lastModified,
+          unixMode = UnixMode.file(permissions.toUnixNumeric()),
         )
+      if (!channel.trySend(item).isSuccess) {
+        runBlocking { channel.send(item) }
       }
     }
 
