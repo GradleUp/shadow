@@ -17,7 +17,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
@@ -94,7 +93,7 @@ internal constructor(
                   lastModified = item.lastModified,
                   unixMode = item.unixMode,
                 ) {
-                  write(item.deferredBytes.await())
+                  item.writeContent(this)
                 }
               }
             }
@@ -209,18 +208,15 @@ internal constructor(
       when {
         path.endsWith(".class") -> {
           if (isUnused(path)) return
-          val rawBytes = fileDetails.readBytes()
           if (relocators.isEmpty()) {
-            fileDetails.sendEntry(
-              entryName = path,
-              deferredBytes = CompletableDeferred(rawBytes),
-            )
+            fileDetails.sendStreamEntry(path)
           } else {
             // Temporarily remove the multi-release prefix.
             val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
             val pathSuffix = path.removePrefix(multiReleasePrefix)
             val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-            fileDetails.sendEntry(
+            val rawBytes = fileDetails.readBytes()
+            fileDetails.sendDeferredEntry(
               entryName = relocatedPath,
               deferredBytes =
                 scope.async(Dispatchers.Default) {
@@ -232,26 +228,37 @@ internal constructor(
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          val rawBytes = fileDetails.readBytes()
-          fileDetails.sendEntry(
-            entryName = relocated,
-            deferredBytes = CompletableDeferred(rawBytes),
-          )
+          fileDetails.sendStreamEntry(relocated)
         }
       }
     }
 
-    private fun FileCopyDetails.sendEntry(
-      entryName: String,
-      deferredBytes: Deferred<ByteArray>,
-    ) {
-      val item =
+    private fun FileCopyDetails.sendStreamEntry(entryName: String) {
+      sendItem(
         ProcessItem(
           entryName = entryName,
-          deferredBytes = deferredBytes,
+          writeContent = { copyTo(it) },
           lastModified = lastModified,
           unixMode = UnixMode.file(permissions.toUnixNumeric()),
         )
+      )
+    }
+
+    private fun FileCopyDetails.sendDeferredEntry(
+      entryName: String,
+      deferredBytes: Deferred<ByteArray>,
+    ) {
+      sendItem(
+        ProcessItem(
+          entryName = entryName,
+          writeContent = { it.write(deferredBytes.await()) },
+          lastModified = lastModified,
+          unixMode = UnixMode.file(permissions.toUnixNumeric()),
+        )
+      )
+    }
+
+    private fun sendItem(item: ProcessItem) {
       if (!channel.trySend(item).isSuccess) {
         runBlocking { channel.send(item) }
       }
@@ -280,7 +287,7 @@ internal constructor(
 
   private class ProcessItem(
     val entryName: String,
-    val deferredBytes: Deferred<ByteArray>,
+    val writeContent: suspend (ZipOutputStream) -> Unit,
     val lastModified: Long,
     val unixMode: UnixMode,
   )
