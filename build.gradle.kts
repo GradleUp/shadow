@@ -154,21 +154,6 @@ testing.suites {
   named<JvmTestSuite>("test") {
     dependencies { implementation(libs.xmlunit) }
   }
-  register<JvmTestSuite>("documentTest") {
-    targets.configureEach {
-      testTask {
-        testLogging.showExceptions = false
-        addTestListener(
-          object : TestListener {
-            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
-              // Prettify test failure output in console.
-              result.exception?.message?.lineSequence()?.firstOrNull()?.let(logger::error)
-            }
-          }
-        )
-      }
-    }
-  }
   register<JvmTestSuite>("functionalTest") {
     targets.configureEach {
       testTask {
@@ -186,6 +171,25 @@ testing.suites {
       implementation(libs.apache.maven.model)
       implementation(libs.moshi)
       implementation(libs.moshi.kotlin)
+    }
+  }
+  register<JvmTestSuite>("documentTest") {
+    dependencies {
+      implementation(sourceSets["test"].output)
+      implementation(sourceSets["functionalTest"].output)
+    }
+    targets.configureEach {
+      testTask {
+        testLogging.showExceptions = false
+        addTestListener(
+          object : TestListener {
+            override fun afterTest(testDescriptor: TestDescriptor, result: TestResult) {
+              // Prettify test failure output in console.
+              result.exception?.message?.lineSequence()?.firstOrNull()?.let(logger::error)
+            }
+          }
+        )
+      }
     }
   }
 
@@ -244,6 +248,10 @@ val generateDocTests =
     description = "Generates Kotlin test source files for code snippets in documentation."
     inputDirectory = layout.projectDirectory.dir("docs")
     outputDirectory = layout.buildDirectory.dir("generated/sources/documentTest/kotlin")
+    testSourceDirectories.from(
+      sourceSets["test"].allSource.sourceDirectories,
+      sourceSets["functionalTest"].allSource.sourceDirectories,
+    )
   }
 
 kotlin.sourceSets.named("documentTest") {
