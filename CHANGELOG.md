@@ -29,7 +29,8 @@
 - Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
 - Remove redundant JAR normalization for R8 output. ([#2236](https://github.com/GradleUp/shadow/pull/2236))
 - Parallelize bytecode remapping. ([#2302](https://github.com/GradleUp/shadow/pull/2302))  
-  Custom `Relocator` implementations must now be thread-safe.
+  Custom `Relocator` implementations must now be thread-safe.  
+  Significantly improves `shadowJar` execution performance when relocating classes (up to ~4.6x faster on large dependencies).
 
 ### Deprecated
 
