@@ -171,8 +171,7 @@ class ShadowCopyActionTest {
 
     var sequentialDuration = Duration.ZERO
     var parallelDuration = Duration.ZERO
-    val iterations = 5
-    repeat(iterations) {
+    repeat(5) {
       sequentialDuration += measureTime { remapSequential() }
       parallelDuration += measureTime { remapParallel() }
     }

@@ -80,7 +80,7 @@ internal constructor(
     try {
       zipOutStream.use { zos ->
         runBlocking {
-          val action = StreamAction(this, zos)
+          val action = StreamAction(zos, this)
           stream.process(action)
           action.flush()
         }
@@ -162,8 +162,8 @@ internal constructor(
   }
 
   private inner class StreamAction(
-    private val scope: CoroutineScope,
     private val zipOutStr: ZipOutputStream,
+    private val scope: CoroutineScope,
   ) : CopyActionProcessingStreamAction {
     private val pendingEntries = ArrayDeque<PendingEntry>()
 
@@ -203,13 +203,12 @@ internal constructor(
             pendingEntries.addLast(
               PendingEntry(
                 entryName = relocatedPath,
+                fileDetails = fileDetails,
                 deferredBytes = deferred,
-                lastModified = fileDetails.lastModified,
-                unixMode = UnixMode.file(fileDetails.permissions.toUnixNumeric()),
               )
             )
-            if (pendingEntries.size >= 128) {
-              runBlocking { writePendingEntry(pendingEntries.removeFirst()) }
+            if (pendingEntries.size >= MAX_PENDING_ENTRIES) {
+              runBlocking { pendingEntries.removeFirst().writeToZip() }
             }
           }
         }
@@ -226,29 +225,7 @@ internal constructor(
 
     suspend fun flush() {
       while (pendingEntries.isNotEmpty()) {
-        writePendingEntry(pendingEntries.removeFirst())
-      }
-    }
-
-    private suspend fun writePendingEntry(entry: PendingEntry) {
-      zipOutStr.writeEntry(
-        name = entry.entryName,
-        preserveLastModified = isPreserveFileTimestamps,
-        lastModified = entry.lastModified,
-        unixMode = entry.unixMode,
-      ) {
-        write(entry.deferredBytes.await())
-      }
-    }
-
-    private fun FileCopyDetails.writeToZip(entryName: String) {
-      zipOutStr.writeEntry(
-        name = entryName,
-        preserveLastModified = isPreserveFileTimestamps,
-        lastModified = lastModified,
-        unixMode = UnixMode.file(permissions.toUnixNumeric()),
-      ) {
-        copyTo(this)
+        pendingEntries.removeFirst().writeToZip()
       }
     }
 
@@ -271,18 +248,42 @@ internal constructor(
       }
       return true
     }
+
+    private suspend fun PendingEntry.writeToZip() {
+      fileDetails.writeToZip(entryName, deferredBytes.await())
+    }
+
+    private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
+      zipOutStr.writeEntry(
+        name = entryName,
+        preserveLastModified = isPreserveFileTimestamps,
+        lastModified = lastModified,
+        unixMode = UnixMode.file(permissions.toUnixNumeric()),
+      ) {
+        if (bytes == null) {
+          copyTo(this)
+        } else {
+          write(bytes)
+        }
+      }
+    }
   }
 
   private class PendingEntry(
     val entryName: String,
+    val fileDetails: FileCopyDetails,
     val deferredBytes: Deferred<ByteArray>,
-    val lastModified: Long,
-    val unixMode: UnixMode,
   )
 
   public companion object {
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
+
+    /**
+     * Maximum number of in-flight parallel class remapping tasks in the sliding window. Bounds
+     * memory consumption on large archives while keeping worker threads saturated.
+     */
+    private const val MAX_PENDING_ENTRIES = 128
 
     @Deprecated(
       message =
