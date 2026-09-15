@@ -189,7 +189,6 @@ internal constructor(
         path.endsWith(".class") -> {
           if (isUnused(path)) return
           if (relocators.isEmpty()) {
-            runBlocking { flush() }
             fileDetails.writeToZip(path)
           } else {
             // Temporarily remove the multi-release prefix.
@@ -217,7 +216,9 @@ internal constructor(
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
-          runBlocking { flush() }
+          if (pendingEntries.isNotEmpty()) {
+            runBlocking { flush() }
+          }
           fileDetails.writeToZip(relocated)
         }
       }
