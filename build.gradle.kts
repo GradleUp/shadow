@@ -131,6 +131,7 @@ dependencies {
   compileOnly(libs.develocity)
   compileOnly(libs.kotlin.gradlePlugin)
   compileOnly(libs.kotlin.reflect)
+  compileOnly(libs.kotlinx.coroutines)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.log4j)
   implementation(libs.jdependency)
@@ -152,7 +153,10 @@ dependencies {
 
 testing.suites {
   named<JvmTestSuite>("test") {
-    dependencies { implementation(libs.xmlunit) }
+    dependencies {
+      implementation(libs.kotlinx.coroutines)
+      implementation(libs.xmlunit)
+    }
   }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {

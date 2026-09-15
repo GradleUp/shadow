@@ -9,6 +9,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
+import com.github.jengelman.gradle.plugins.shadow.internal.readBytes
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
@@ -16,6 +17,11 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.TransformerContext
 import java.io.File
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.apache.tools.zip.Zip64RequiredException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCopyDetails
@@ -73,7 +79,12 @@ internal constructor(
   override fun execute(stream: CopyActionProcessingStream): WorkResult {
     try {
       zipOutStream.use { zos ->
-        stream.process(StreamAction(zos))
+        runBlocking {
+          val action = StreamAction(this, zos)
+          stream.process(action)
+          action.flush()
+        }
+
         processTransformers(zos)
         addDirs(zos)
         checkDuplicateEntries(zos)
@@ -150,8 +161,12 @@ internal constructor(
     }
   }
 
-  private inner class StreamAction(private val zipOutStr: ZipOutputStream) :
-    CopyActionProcessingStreamAction {
+  private inner class StreamAction(
+    private val scope: CoroutineScope,
+    private val zipOutStr: ZipOutputStream,
+  ) : CopyActionProcessingStreamAction {
+    private val pendingEntries = ArrayDeque<PendingEntry>()
+
     init {
       logger.info("Relocator count: {}.", relocators.size)
     }
@@ -180,17 +195,37 @@ internal constructor(
             val multiReleasePrefix = multiReleaseRegex.find(path)?.value.orEmpty()
             val pathSuffix = path.removePrefix(multiReleasePrefix)
             val relocatedPath = multiReleasePrefix + relocators.relocatePath(pathSuffix)
-            fileDetails.writeToZip(
-              entryName = relocatedPath,
-              bytes = fileDetails.remapClass(relocators = relocators),
+            val rawBytes = fileDetails.readBytes()
+            val deferred =
+              scope.async(Dispatchers.Default) {
+                rawBytes.remapClass(relocators = relocators, path = path)
+              }
+            pendingEntries.addLast(
+              PendingEntry(
+                entryName = relocatedPath,
+                fileDetails = fileDetails,
+                deferredBytes = deferred,
+              )
             )
+            if (pendingEntries.size >= MAX_PENDING_ENTRIES) {
+              runBlocking { pendingEntries.removeFirst().writeToZip() }
+            }
           }
         }
         else -> {
           val relocated = relocators.relocatePath(path)
           if (transform(fileDetails, relocated)) return
+          if (pendingEntries.isNotEmpty()) {
+            runBlocking { flush() }
+          }
           fileDetails.writeToZip(relocated)
         }
+      }
+    }
+
+    suspend fun flush() {
+      while (pendingEntries.isNotEmpty()) {
+        pendingEntries.removeFirst().writeToZip()
       }
     }
 
@@ -214,6 +249,10 @@ internal constructor(
       return true
     }
 
+    private suspend fun PendingEntry.writeToZip() {
+      fileDetails.writeToZip(entryName, deferredBytes.await())
+    }
+
     private fun FileCopyDetails.writeToZip(entryName: String, bytes: ByteArray? = null) {
       zipOutStr.writeEntry(
         name = entryName,
@@ -230,9 +269,21 @@ internal constructor(
     }
   }
 
+  private class PendingEntry(
+    val entryName: String,
+    val fileDetails: FileCopyDetails,
+    val deferredBytes: Deferred<ByteArray>,
+  )
+
   public companion object {
     private val logger = Logging.getLogger(@Suppress("DEPRECATION") ShadowCopyAction::class.java)
     private val multiReleaseRegex = "^META-INF/versions/\\d+/".toRegex()
+
+    /**
+     * Maximum number of in-flight parallel class remapping tasks in the sliding window. Bounds
+     * memory consumption on large archives while keeping worker threads saturated.
+     */
+    private const val MAX_PENDING_ENTRIES = 128
 
     @Deprecated(
       message =
