@@ -10,6 +10,7 @@ downstream project.
 Shadow uses the ASM library to modify class byte code to replace the package name and any import statements for a class.
 Any non-class files that are stored within a package structure are also relocated to the new location.
 
+<!-- test: RelocationTest#relocateDependencyFiles -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -45,6 +46,7 @@ class `junit.framework.TestCase` becomes `shadow.junit.TestCase`. In the resulti
 Specific classes or files can be `included`/`excluded` from the relocation operation if necessary. Use
 [Ant Path Matcher][ant-path-matcher] syntax to specify matching path for your files and directories.
 
+<!-- test: RelocationTest#relocateDependencyFilesWithFiltering -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -74,6 +76,7 @@ Specific classes or files can be `included`/`excluded` from the relocation opera
 For a more advanced path matching you might want to use [Regular Expressions][regular-expressions] instead. Wrap the
 expression in `%regex[]` before passing it to `include`/`exclude`.
 
+<!-- test: RelocationTest#relocateDependencyFilesWithFiltering -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -98,6 +101,7 @@ It may be desirable to relocate all packages in a Shadow JAR except for a select
 specifying a relocation with an empty string `''` as the pattern to match on all packages. An `exclude` filter can then
 be used to prevent relocation of specific packages.
 
+<!-- test: RelocationTest#relocateAllPackagesButCertainOne -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -138,6 +142,7 @@ public class Bar {
 
 in your project, and you configure the relocation like:
 
+<!-- test: RelocationTest#relocateStringConstantsByDefault -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -157,6 +162,7 @@ in your project, and you configure the relocation like:
 the string constant `"foo.Bar"` will be relocated to `"my.foo.Bar"` by default. This may not be what you want, you can
 skip relocating string constants in the classes like:
 
+<!-- test: RelocationTest#disableStringConstantsRelocation -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -188,6 +194,7 @@ removed for clarity reasons in version 4.0.0.
 To configure automatic dependency relocation, set `enableAutoRelocation = true` and optionally specify a custom
 `relocationPrefix` to override the default value of `"shadow"`.
 
+<!-- test: RelocationTest#autoRelocation -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -227,6 +234,7 @@ runtime. See more details and discussion in [#1622][#1622].
 If you want to relocate the resources of the project only and exclude all dependencies (related to a normal JAR but with
 relocating), you can try out the trick like:
 
+<!-- test: RelocationTest#relocateProjectResourcesOnly -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -266,6 +274,7 @@ and [-keeppackagenames][keeppackagenames].
 To use R8 for package relocation, enable R8 under `minimize` and provide ProGuard repackaging directives via
 `proguardRules` or an external rule file:
 
+<!-- test: RelocationTest#relocateWithR8 -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
