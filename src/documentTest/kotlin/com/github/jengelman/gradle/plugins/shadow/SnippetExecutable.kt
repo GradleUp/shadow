@@ -144,9 +144,34 @@ sealed interface SnippetExecutable {
       target.appendLine(line)
     }
 
+    // TODO: Remove this workaround once a new snapshot with kotlinx-coroutines-core dependency is
+    //  published to remote repositories.
+    //  Currently, remote snapshot POMs lack the kotlinx-coroutines-core dependency, which causes
+    //  NoClassDefFoundError when executing local ShadowCopyAction in tests using
+    //  buildscript { classpath(...) }.
+    val patchedWithoutImports =
+      withoutImports
+        .toString()
+        .replace(
+          """classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")""",
+          """
+          classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
+          classpath("org.jetbrains.kotlinx:kotlinx-coroutines-core:+")
+          """
+            .trimIndent(),
+        )
+        .replace(
+          """classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'""",
+          """
+          classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
+          classpath 'org.jetbrains.kotlinx:kotlinx-coroutines-core:+'
+          """
+            .trimIndent(),
+        )
+
     return imports.toString() to
       // Replace the version placeholders.
-      withoutImports.toString().replace("<version>", "+")
+      patchedWithoutImports.replace("<version>", "+")
   }
 }
 
