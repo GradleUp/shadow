@@ -131,12 +131,12 @@ dependencies {
   compileOnly(libs.develocity)
   compileOnly(libs.kotlin.gradlePlugin)
   compileOnly(libs.kotlin.reflect)
-  compileOnly(libs.kotlinx.coroutines)
   api(libs.apache.ant) // Types from Ant are exposed in the public API.
   implementation(libs.apache.log4j)
   implementation(libs.jdependency)
   implementation(libs.jdom2)
   implementation(libs.kotlin.metadata)
+  implementation(libs.kotlinx.coroutines)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
@@ -154,7 +154,6 @@ dependencies {
 testing.suites {
   named<JvmTestSuite>("test") {
     dependencies {
-      implementation(libs.kotlinx.coroutines)
       implementation(libs.xmlunit)
     }
   }
