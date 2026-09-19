@@ -358,14 +358,53 @@ class SimpleRelocatorTest {
   }
 
   @Test
+  fun relocateSourceFileWithPrefixCollision() {
+    val relocator =
+      SimpleRelocator(
+        "org.example",
+        "relocated.org.example",
+        includes = listOf("org.example.In"),
+      )
+    val source =
+      """
+      |import org.example.In;
+      |import org.example.Input;
+      |import org.example.In.Nested;
+      |
+      |public class Test {
+      |  org.example.In a;
+      |  org.example.Input b;
+      |}
+      """
+        .trimMargin()
+    val expected =
+      """
+      |import relocated.org.example.In;
+      |import org.example.Input;
+      |import relocated.org.example.In.Nested;
+      |
+      |public class Test {
+      |  relocated.org.example.In a;
+      |  org.example.Input b;
+      |}
+      """
+        .trimMargin()
+    assertThat(relocator.applyToSourceContent(source)).isEqualTo(expected)
+  }
+
+  @Test
   fun relocateSourceWithExcludes() {
-    // Main relocator with in-/excludes
+    // Main relocator with excludes
     val relocator =
       SimpleRelocator(
         "org.apache.maven",
         "com.acme.maven",
-        listOf("foo.bar", "zot.baz"),
-        listOf("irrelevant.exclude", "org.apache.maven.exclude1", "org.apache.maven.sub.exclude2"),
+        excludes =
+          listOf(
+            "irrelevant.exclude",
+            "org.apache.maven.exclude1",
+            "org.apache.maven.sub.exclude2",
+          ),
       )
     // Make sure not to replace variables 'io' and 'ioInput', package 'java.io'
     val ioRelocator = SimpleRelocator("io", "shaded.io")
@@ -381,6 +420,70 @@ class SimpleRelocatorTest {
         )
       )
       .isEqualTo(relocatedFile)
+  }
+
+  @Test
+  fun relocateSourceWithIncludes() {
+    val relocator =
+      SimpleRelocator(
+        "org.apache.maven",
+        "com.acme.maven",
+        includes = listOf("org.apache.maven.hello.*", "org.apache.maven.In"),
+      )
+    val input =
+      """
+      |package org.apache.maven.hello;
+      |import org.apache.maven.hello.World;
+      |import org.apache.maven.other.Other;
+      |import org.apache.maven.In;
+      |import org.apache.maven.NotIn;
+      """
+        .trimMargin()
+    val expected =
+      """
+      |package com.acme.maven.hello;
+      |import com.acme.maven.hello.World;
+      |import org.apache.maven.other.Other;
+      |import com.acme.maven.In;
+      |import org.apache.maven.NotIn;
+      """
+        .trimMargin()
+    assertThat(relocator.applyToSourceContent(input)).isEqualTo(expected)
+  }
+
+  @Test
+  fun relocateSourceWithDslExcludeAndInclude() {
+    val relocatorExclude = SimpleRelocator("org.apache.maven", "com.acme.maven")
+    relocatorExclude.exclude("org.apache.maven.exclude1.*")
+    val inputExclude =
+      """
+      |import org.apache.maven.hello.World;
+      |import org.apache.maven.exclude1.Ex1;
+      """
+        .trimMargin()
+    val expectedExclude =
+      """
+      |import com.acme.maven.hello.World;
+      |import org.apache.maven.exclude1.Ex1;
+      """
+        .trimMargin()
+    assertThat(relocatorExclude.applyToSourceContent(inputExclude)).isEqualTo(expectedExclude)
+
+    val relocatorInclude = SimpleRelocator("org.apache.maven", "com.acme.maven")
+    relocatorInclude.include("org.apache.maven.hello.*")
+    val inputInclude =
+      """
+      |import org.apache.maven.hello.World;
+      |import org.apache.maven.other.Other;
+      """
+        .trimMargin()
+    val expectedInclude =
+      """
+      |import com.acme.maven.hello.World;
+      |import org.apache.maven.other.Other;
+      """
+        .trimMargin()
+    assertThat(relocatorInclude.applyToSourceContent(inputInclude)).isEqualTo(expectedInclude)
   }
 
   private companion object {

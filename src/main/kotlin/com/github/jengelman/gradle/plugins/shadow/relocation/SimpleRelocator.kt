@@ -66,32 +66,16 @@ constructor(
     if (!excludes.isNullOrEmpty()) {
       this.excludes.addAll(excludes)
     }
-
-    if (!rawString) {
-      // Create exclude pattern sets for sources.
-      for (exclude in this.excludes) {
-        // Excludes should be subpackages of the global pattern.
-        if (exclude.startsWith(this.pattern)) {
-          sourcePackageExcludes.add(
-            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), "")
-          )
-        }
-        // Excludes should be subpackages of the global pattern.
-        if (exclude.startsWith(pathPattern)) {
-          sourcePathExcludes.add(
-            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), "")
-          )
-        }
-      }
-    }
   }
 
   public open fun include(pattern: String) {
     includes.addAll(normalizePatterns(listOf(pattern)))
+    includes.add(pattern)
   }
 
   public open fun exclude(pattern: String) {
     excludes.addAll(normalizePatterns(listOf(pattern)))
+    excludes.add(pattern)
   }
 
   override fun canRelocatePath(path: String): Boolean {
@@ -127,15 +111,27 @@ constructor(
     return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }
 
-  /**
-   * We don't call this function now, so we don't have to expose [sourcePackageExcludes] and
-   * [sourcePathExcludes] as inputs.
-   */
   override fun applyToSourceContent(sourceContent: String): String {
-    if (rawString) return sourceContent
+    if (rawString || pattern.isEmpty()) return sourceContent
+    val sourceIncludes = getSourceSubpatterns(includes, pattern)
+    val sourceExcludes = getSourceSubpatterns(excludes, pattern)
     val content =
-      shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes)
-    return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes)
+      shadeSourceWithFilters(
+        sourceContent = sourceContent,
+        patternFrom = pattern,
+        patternTo = shadedPattern,
+        includedPatterns = sourceIncludes,
+        hasIncludes = includes.isNotEmpty(),
+        excludedPatterns = sourceExcludes,
+      )
+    return shadeSourceWithFilters(
+      sourceContent = content,
+      patternFrom = pathPattern,
+      patternTo = shadedPathPattern,
+      includedPatterns = sourceIncludes,
+      hasIncludes = includes.isNotEmpty(),
+      excludedPatterns = sourceExcludes,
+    )
   }
 
   override fun equals(other: Any?): Boolean {
@@ -147,8 +143,6 @@ constructor(
       pathPattern == other.pathPattern &&
       shadedPattern == other.shadedPattern &&
       shadedPathPattern == other.shadedPathPattern &&
-      sourcePackageExcludes == other.sourcePackageExcludes &&
-      sourcePathExcludes == other.sourcePathExcludes &&
       includes == other.includes &&
       excludes == other.excludes
   }
@@ -161,8 +155,6 @@ constructor(
       pathPattern,
       shadedPattern,
       shadedPathPattern,
-      sourcePackageExcludes,
-      sourcePathExcludes,
       includes,
       excludes,
     )
@@ -175,8 +167,6 @@ constructor(
     append("pathPattern='$pathPattern'").append(", ")
     append("shadedPattern='$shadedPattern'").append(", ")
     append("shadedPathPattern='$shadedPathPattern'").append(", ")
-    append("sourcePackageExcludes=$sourcePackageExcludes").append(", ")
-    append("sourcePathExcludes=$sourcePathExcludes").append(", ")
     append("includes=$includes").append(", ")
     append("excludes=$excludes")
     append(")")
@@ -190,9 +180,9 @@ constructor(
     return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
-  private companion object {
+  internal companion object {
     /** Match dot, slash or space at end of string */
-    val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
+    private val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
 
     /**
      * Match
@@ -203,7 +193,7 @@ constructor(
      *
      * at end of string
      */
-    val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
+    private val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
       Pattern.compile(
         "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
           "|" +
@@ -212,7 +202,7 @@ constructor(
           "([{}(=;,]|\\*/) $"
       )
 
-    fun normalizePatterns(patterns: Collection<String>?) = buildSet {
+    private fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
         // Regex patterns don't need to be normalized and stay as is.
@@ -243,31 +233,71 @@ constructor(
       }
     }
 
-    fun shadeSourceWithExcludes(
+    fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+      if (patternPrefix.isEmpty()) return emptySet()
+      val result = mutableSetOf<String>()
+      val dotPrefix = patternPrefix.replace('/', '.')
+      val slashPrefix = patternPrefix.replace('.', '/')
+      val trailingWildcardRegex = "[./][*]+$".toRegex()
+
+      for (pat in patterns) {
+        val dotPat = pat.replace('/', '.')
+        if (dotPat.startsWith(dotPrefix)) {
+          val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
+          if (sub.isEmpty()) {
+            result.add("")
+          } else {
+            result.add(sub)
+            result.add(sub.replace('.', '/'))
+          }
+        }
+        val slashPat = pat.replace('.', '/')
+        if (slashPat.startsWith(slashPrefix)) {
+          val sub = slashPat.substring(slashPrefix.length).replaceFirst(trailingWildcardRegex, "")
+          if (sub.isEmpty()) {
+            result.add("")
+          } else {
+            result.add(sub)
+            result.add(sub.replace('/', '.'))
+          }
+        }
+      }
+      return result
+    }
+
+    fun matchesSubpattern(snippet: String, subpattern: String): Boolean {
+      if (!snippet.startsWith(subpattern)) return false
+      if (subpattern.isEmpty() || snippet.length == subpattern.length) return true
+      if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
+      val nextChar = snippet[subpattern.length]
+      return !nextChar.isLetterOrDigit() && nextChar != '_'
+    }
+
+    private fun shadeSourceWithFilters(
       sourceContent: String,
       patternFrom: String,
       patternTo: String,
+      includedPatterns: Set<String>,
+      hasIncludes: Boolean,
       excludedPatterns: Set<String>,
     ): String {
-      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original
-      // source.
+      if (hasIncludes && includedPatterns.isEmpty()) {
+        return sourceContent
+      }
+
       val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
-      // Make sure that search pattern starts at word boundary and that we look for literal ".", not
-      // regex jokers.
       val snippets =
         sourceContent
           .split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
           .filter(CharSequence::isNotEmpty)
+
       snippets.forEachIndexed { i, snippet ->
         val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
-        var doExclude = false
-        for (excludedPattern in excludedPatterns) {
-          if (snippet.startsWith(excludedPattern)) {
-            doExclude = true
-            break
-          }
-        }
+
+        val isIncluded = !hasIncludes || includedPatterns.any { matchesSubpattern(snippet, it) }
+        val isExcluded = excludedPatterns.any { matchesSubpattern(snippet, it) }
+
         if (isFirstSnippet) {
           shadedSourceContent.append(snippet)
         } else {
@@ -275,8 +305,9 @@ constructor(
           val afterDotSlashSpace =
             RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
           val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
-          val shouldExclude = doExclude || afterDotSlashSpace && !afterJavaKeyWord
-          shadedSourceContent.append(if (shouldExclude) patternFrom else patternTo).append(snippet)
+          val shouldRelocate =
+            isIncluded && !isExcluded && (!afterDotSlashSpace || afterJavaKeyWord)
+          shadedSourceContent.append(if (shouldRelocate) patternTo else patternFrom).append(snippet)
         }
       }
       return shadedSourceContent.toString()
