@@ -15,7 +15,7 @@ kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref =
 kotlinx-coroutines = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.11.0"
 plexus-utils = "org.codehaus.plexus:plexus-utils:4.1.0"
 plexus-xml = "org.codehaus.plexus:plexus-xml:4.2.0"
-xmlunit = "org.xmlunit:xmlunit-legacy:2.13.0"
+xmlunit = "org.xmlunit:xmlunit-legacy:2.14.0"
 moshi = { module = "com.squareup.moshi:moshi", version.ref = "moshi" }
 moshi-kotlin = { module = "com.squareup.moshi:moshi-kotlin", version.ref = "moshi" }
 
