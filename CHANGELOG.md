@@ -19,7 +19,7 @@
 - Bump min Gradle requirement to 9.4.0. ([#2114](https://github.com/GradleUp/shadow/pull/2114))
 - Remove runtime dependencies on Commons Codec and Commons IO by using JDK APIs. ([#2136](https://github.com/GradleUp/shadow/pull/2136))
 - **POTENTIALLY BREAKING:** Remove `Serializable` from `DependencyFilter`. ([#2144](https://github.com/GradleUp/shadow/pull/2144))
-- Bump default R8 from `9.1.31` to `9.4.14`. ([#2193](https://github.com/GradleUp/shadow/pull/2193))
+- Bump default R8 from `9.1.31` to `9.4.24`. ([#2305](https://github.com/GradleUp/shadow/pull/2305))
 - Allow repackaging Service file classes with R8. ([#2174](https://github.com/GradleUp/shadow/pull/2174))
 - Normalize line separators to LF (`\n`) in `ResourceTransformer`s for reproducible builds. ([#2197](https://github.com/GradleUp/shadow/pull/2197))
   - `ApacheNoticeResourceTransformer`
@@ -29,6 +29,9 @@
   - `XmlAppendingTransformer`
 - Append terminating newline in `ServiceFileTransformer`. ([#2202](https://github.com/GradleUp/shadow/pull/2202))
 - Remove redundant JAR normalization for R8 output. ([#2236](https://github.com/GradleUp/shadow/pull/2236))
+- Parallelize bytecode remapping. ([#2302](https://github.com/GradleUp/shadow/pull/2302))  
+  Custom `Relocator` implementations must now be thread-safe.  
+  Significantly improves `shadowJar` execution performance when relocating classes (up to ~4.6x faster on large dependencies).
 
 ### Deprecated
 
@@ -968,7 +971,7 @@ type.
 - [Sergey Tselovalnikov](https://github.com/SerCeMan) - Upgrade to ASM 6.2.1 to support Java 11
 - [Chris Cowan](https://github.com/Macil) - Add support for `shadowJar.preserveFileTimestamps` property.
   See [Jar.preserveFileTimestamps](https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html#org.gradle.api.tasks.bundling.Jar:preserveFileTimestamps)
-- [Paul N. Baker](https://github.com/nikole-dunixi) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files
+- [Paul N. Baker](https://github.com/Ghost) - Add `Log4j2PluginsCacheFileTransformer` to process Log4j DAT files
   during merge.
 - [Felipe Lima](https://github.com/felipecsl) - Fix the long standing "No property `mainClassName`" issue.
 - [debanne](https://github.com/debanne) - Implement JAR minimization actions. This will attempt to exclude unused

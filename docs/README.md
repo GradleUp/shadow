@@ -4,8 +4,8 @@
 
 # Introduction
 
-A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing applications with
-R8/ProGuard. The Gradle counterpart to Maven Shade Plugin.
+A Gradle plugin for creating fat/uber JARs, transforming files, relocating packages, and optimizing with R8/ProGuard.
+The Gradle counterpart to Maven Shade Plugin.
 
 > [!WARNING]
 > **Plugin ID Change**

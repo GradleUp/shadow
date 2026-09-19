@@ -136,6 +136,7 @@ dependencies {
   implementation(libs.jdependency)
   implementation(libs.jdom2)
   implementation(libs.kotlin.metadata)
+  implementation(libs.kotlinx.coroutines)
   implementation(libs.plexus.utils)
   implementation(libs.plexus.xml)
 
@@ -153,7 +154,9 @@ dependencies {
 
 testing.suites {
   named<JvmTestSuite>("test") {
-    dependencies { implementation(libs.xmlunit) }
+    dependencies {
+      implementation(libs.xmlunit)
+    }
   }
   register<JvmTestSuite>("documentTest") {
     targets.configureEach {
