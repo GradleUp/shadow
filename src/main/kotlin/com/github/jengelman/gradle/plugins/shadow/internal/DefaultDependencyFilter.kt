@@ -40,7 +40,7 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
       excludedDependencies = excludes,
     )
 
-    val includedDependenciesResults =
+    val includedComponentIds =
       configuration.incoming.resolutionResult.allDependencies
         .filterIsInstance<ResolvedDependencyResult>()
         .filter { dep ->
@@ -50,29 +50,25 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
               inc.moduleVersion == dep.selected.moduleVersion?.version
           }
         }
+        .map { it.selected.id }
+        .toSet()
 
-    val includedComponentIds = includedDependenciesResults.map { it.selected.id }.toSet()
-
-    return try {
-      configuration.incoming
-        .artifactView { view ->
-          view.withVariantReselection()
-          view.attributes { attrs ->
-            attrs.attribute(
-              Category.CATEGORY_ATTRIBUTE,
-              project.objects.named(Category::class.java, Category.DOCUMENTATION),
-            )
-            attrs.attribute(
-              DocsType.DOCS_TYPE_ATTRIBUTE,
-              project.objects.named(DocsType::class.java, DocsType.SOURCES),
-            )
-          }
-          view.componentFilter { id -> id in includedComponentIds }
-          view.lenient(true)
+    return configuration.incoming
+      .artifactView { view ->
+        view.withVariantReselection()
+        view.attributes { attrs ->
+          attrs.attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            project.objects.named(Category::class.java, Category.DOCUMENTATION),
+          )
+          attrs.attribute(
+            DocsType.DOCS_TYPE_ATTRIBUTE,
+            project.objects.named(DocsType::class.java, DocsType.SOURCES),
+          )
         }
-        .files
-    } catch (_: Exception) {
-      project.files()
-    }
+        view.componentFilter { id -> id in includedComponentIds }
+        view.lenient(true)
+      }
+      .files
   }
 }
