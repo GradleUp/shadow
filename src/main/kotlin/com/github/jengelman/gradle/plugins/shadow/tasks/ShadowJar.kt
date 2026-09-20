@@ -193,7 +193,7 @@ public abstract class ShadowJar : Jar() {
 
   @get:Internal // The resolved result is tracked by includedDependencies.
   public open val dependencyFilter: Property<DependencyFilter> =
-    objectFactory.property(DefaultDependencyFilter(project))
+    objectFactory.property(objectFactory.newInstance(DefaultDependencyFilter::class.java))
 
   /** Final dependencies to be shadowed. */
   @get:Classpath

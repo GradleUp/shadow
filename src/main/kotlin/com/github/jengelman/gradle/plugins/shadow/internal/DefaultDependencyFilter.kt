@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
+import javax.inject.Inject
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
@@ -8,9 +9,14 @@ import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.file.FileCollection
+import org.gradle.api.model.ObjectFactory
 
-internal class DefaultDependencyFilter(@Transient private val project: Project) :
-  DependencyFilter.AbstractDependencyFilter(project) {
+internal abstract class DefaultDependencyFilter
+@Inject
+constructor(
+  project: Project,
+  private val objectFactory: ObjectFactory,
+) : DependencyFilter.AbstractDependencyFilter(project) {
   override fun resolve(
     dependencies: Set<ResolvedDependency>,
     includedDependencies: MutableSet<ResolvedDependency>,
@@ -28,7 +34,8 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
   fun resolveSourcesJars(configurations: Collection<Configuration>): FileCollection {
     return configurations
       .map { resolveSourcesJars(it) }
-      .reduceOrNull { acc, fileCollection -> acc + fileCollection } ?: project.files()
+      .reduceOrNull { acc, fileCollection -> acc + fileCollection }
+      ?: objectFactory.fileCollection()
   }
 
   private fun resolveSourcesJars(configuration: Configuration): FileCollection {
@@ -59,11 +66,11 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
         view.attributes { attrs ->
           attrs.attribute(
             Category.CATEGORY_ATTRIBUTE,
-            project.objects.named(Category::class.java, Category.DOCUMENTATION),
+            objectFactory.named(Category::class.java, Category.DOCUMENTATION),
           )
           attrs.attribute(
             DocsType.DOCS_TYPE_ATTRIBUTE,
-            project.objects.named(DocsType::class.java, DocsType.SOURCES),
+            objectFactory.named(DocsType::class.java, DocsType.SOURCES),
           )
         }
         view.componentFilter { id -> id in includedComponentIds }
