@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
@@ -143,10 +144,15 @@ internal fun Iterable<Relocator>.relocateSourcePath(path: String): String {
     val className = pathWithoutExt.replace('/', '.')
 
     for (relocator in this) {
-      if (relocator.canRelocateClass(className) || relocator.canRelocatePath(pathWithoutExt)) {
-        val relocatedWithoutExt = relocator.relocatePath(RelocatePathContext(pathWithoutExt))
-        return "$relocatedWithoutExt.$extension"
-      }
+      val relocatedWithoutExt =
+        when {
+          relocator.canRelocatePath(pathWithoutExt) ->
+            relocator.relocatePath(RelocatePathContext(pathWithoutExt))
+          relocator.canRelocateClass(className) ->
+            relocator.relocateClass(RelocateClassContext(className)).replace('.', '/')
+          else -> continue
+        }
+      return "$relocatedWithoutExt.$extension"
     }
     return path
   }

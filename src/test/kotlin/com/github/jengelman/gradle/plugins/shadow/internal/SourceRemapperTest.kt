@@ -174,4 +174,29 @@ class SourceRemapperTest {
 
     assertThat(relocators.remapSource(input)).isEqualTo(expected)
   }
+
+  @Test
+  fun relocateSourcePathWithClassOnlyRelocator() {
+    val classOnlyRelocator =
+      object : Relocator {
+        override fun canRelocatePath(path: String) = false
+
+        override fun relocatePath(context: RelocatePathContext) = context.path
+
+        override fun canRelocateClass(className: String) = className.startsWith("custom.pkg.")
+
+        override fun relocateClass(context: RelocateClassContext) =
+          context.className.replaceFirst("custom.pkg.", "shaded.pkg.")
+
+        override fun applyToSourceContent(sourceContent: String) = sourceContent
+      }
+    val relocators = listOf(classOnlyRelocator)
+
+    assertThat(relocators.relocateSourcePath("custom/pkg/MyClass.java"))
+      .isEqualTo("shaded/pkg/MyClass.java")
+    assertThat(relocators.relocateSourcePath("custom/pkg/sub/OtherClass.kt"))
+      .isEqualTo("shaded/pkg/sub/OtherClass.kt")
+    assertThat(relocators.relocateSourcePath("unrelated/pkg/Unrelated.java"))
+      .isEqualTo("unrelated/pkg/Unrelated.java")
+  }
 }
