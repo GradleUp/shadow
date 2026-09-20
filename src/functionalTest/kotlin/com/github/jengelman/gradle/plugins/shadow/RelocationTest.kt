@@ -2,7 +2,6 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
-import assertk.assertions.doesNotExist
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -16,7 +15,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
-import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import kotlin.io.path.appendText
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
@@ -742,23 +740,6 @@ class RelocationTest : BasePluginTest() {
   }
 
   @Test
-  fun generateNoShadowedSourcesJarByDefault() {
-    writeClass()
-    projectScript.appendText(
-      """
-      |dependencies {
-      |  implementation 'my:g:1.0'
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar")).doesNotExist()
-  }
-
-  @Test
   fun generateShadowedSourcesJarWithRelocation() {
     path("src/main/java/my/Main.java")
       .writeText(
@@ -812,202 +793,6 @@ class RelocationTest : BasePluginTest() {
           """
           |package shadow.g;
           |public class G {}
-          """
-            .trimMargin()
-        )
-    }
-  }
-
-  @Test
-  fun generateShadowedSourcesJarWhenNoIncludedSourcesJars() {
-    writeClass()
-    projectScript.appendText(
-      """
-      |dependencies {
-      |  implementation 'my:b:1.0'
-      |}
-      |$shadowJarTask {
-      |  generateSourcesJar = true
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly(
-        "my/",
-        "my/Main.java",
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-      )
-    }
-  }
-
-  @Test
-  fun generateEmptyShadowedSourcesJarWhenNoSources() {
-    projectScript.appendText(
-      """
-      |dependencies {
-      |  implementation 'my:b:1.0'
-      |}
-      |$shadowJarTask {
-      |  generateSourcesJar = true
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly("META-INF/", "META-INF/MANIFEST.MF")
-    }
-  }
-
-  @Test
-  fun generateShadowedSourcesJarWithCustomSourceSetsSourceDirs() {
-    path("src/main/java/my/Main.java")
-      .writeText(
-        """
-        |package my;
-        |public class Main {}
-        """
-          .trimMargin()
-      )
-    path("src/extra/java/extra/Extra.java")
-      .writeText(
-        """
-        |package extra;
-        |public class Extra {}
-        """
-          .trimMargin()
-      )
-    projectScript.appendText(
-      """
-      |$shadowJarTask {
-      |  generateSourcesJar = true
-      |  sourceSetsSourceDirs.from('src/extra/java')
-      |  relocate('extra', 'shadow.extra')
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly(
-        "my/",
-        "my/Main.java",
-        "shadow/",
-        "shadow/extra/",
-        "shadow/extra/Extra.java",
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-      )
-      getContent("shadow/extra/Extra.java")
-        .isEqualTo(
-          """
-          |package shadow.extra;
-          |public class Extra {}
-          """
-            .trimMargin()
-        )
-    }
-  }
-
-  @Test
-  fun relocateShadowedSourcesJarRespectsSourceDirectorySetFilters() {
-    path("src/main/java/my/Main.java")
-      .writeText(
-        """
-        |package my;
-        |public class Main {}
-        """
-          .trimMargin()
-      )
-    path("src/main/java/my/Excluded.java")
-      .writeText(
-        """
-        |package my;
-        |public class Excluded {}
-        """
-          .trimMargin()
-      )
-    projectScript.appendText(
-      """
-      |sourceSets {
-      |  main {
-      |    java {
-      |      exclude '**/Excluded.java'
-      |    }
-      |  }
-      |}
-      |$shadowJarTask {
-      |  generateSourcesJar = true
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly(
-        "my/",
-        "my/Main.java",
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-      )
-    }
-  }
-
-  @Test
-  fun generateShadowedSourcesJarWithCustomIncludedSourcesJars() {
-    writeClass()
-    val customSourcesJar = path("libs/external-sources.jar")
-    customSourcesJar.parent.toFile().mkdirs()
-    JarBuilder(customSourcesJar)
-      .insert(
-        "ext/Ext.java",
-        """
-        package ext;
-        public class Ext {}
-        """
-          .trimIndent(),
-      )
-      .write()
-
-    projectScript.appendText(
-      """
-      |$shadowJarTask {
-      |  generateSourcesJar = true
-      |  includedSourcesJars.from('libs/external-sources.jar')
-      |  relocate('ext', 'shadow.ext')
-      |}
-      """
-        .trimMargin()
-    )
-
-    runWithSuccess(shadowJarPath)
-
-    assertThat(outputShadowedSourcesJar).useAll {
-      containsOnly(
-        "my/",
-        "my/Main.java",
-        "shadow/",
-        "shadow/ext/",
-        "shadow/ext/Ext.java",
-        "META-INF/",
-        "META-INF/MANIFEST.MF",
-      )
-      getContent("shadow/ext/Ext.java")
-        .isEqualTo(
-          """
-          |package shadow.ext;
-          |public class Ext {}
           """
             .trimMargin()
         )

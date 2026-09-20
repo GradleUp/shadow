@@ -298,6 +298,52 @@ class FilteringTest : BasePluginTest() {
     }
   }
 
+  @Test
+  fun sourcesJarRespectsSourceDirectorySetFilters() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |public class Main {}
+        """
+          .trimMargin()
+      )
+    path("src/main/java/my/Excluded.java")
+      .writeText(
+        """
+        |package my;
+        |public class Excluded {}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |sourceSets {
+      |  main {
+      |    java {
+      |      exclude '**/Excluded.java'
+      |    }
+      |  }
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+    }
+  }
+
   private fun commonAssertions() {
     assertThat(outputShadowedJar).useAll {
       containsOnly("c.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
