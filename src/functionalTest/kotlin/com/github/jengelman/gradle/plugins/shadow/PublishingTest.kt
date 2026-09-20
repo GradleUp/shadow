@@ -248,6 +248,13 @@ class PublishingTest : BasePluginTest() {
   fun publishShadowJarInsteadOfJar() {
     projectScript.appendText(
       publishConfiguration(
+        projectBlock =
+          """
+          |tasks.named('jar', Jar) {
+          |  enabled = false
+          |}
+          """
+            .trimMargin(),
         shadowBlock =
           """
           |archiveClassifier = ''
@@ -298,6 +305,12 @@ class PublishingTest : BasePluginTest() {
           """
           |java {
           |  withSourcesJar()
+          |}
+          |tasks.named('jar', Jar) {
+          |  enabled = false
+          |}
+          |tasks.named('sourcesJar', Jar) {
+          |  enabled = false
           |}
           """
             .trimMargin(),
@@ -528,6 +541,9 @@ class PublishingTest : BasePluginTest() {
           """
           |java {
           |  withSourcesJar()
+          |}
+          |tasks.named('jar', Jar) {
+          |  enabled = false
           |}
           """
             .trimMargin(),
