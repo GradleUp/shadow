@@ -592,6 +592,10 @@ Shadow automatically generates a **Shadowed Sources JAR** containing:
 When Gradle's standard `java.withSourcesJar()` is enabled, the Shadow plugin automatically registers the
 `shadowSourcesElements` variant and publishes the shadowed sources JAR alongside the shadowed binary JAR:
 
+> [!TIP]
+> In Kotlin/JVM projects applying `id("org.jetbrains.kotlin.jvm")`, configure `java { withSourcesJar() }` in the same
+> way. The Kotlin JVM plugin applies Gradle's Java plugin internally.
+
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -788,7 +792,8 @@ To publish shadowed artifacts as the primary publication:
 > In Java projects, it defaults to `true` when `java.withSourcesJar()` is enabled, and `false` otherwise to avoid
 > unnecessary build overhead for application builds. If `withSourcesJar()` is omitted, publishing from
 > `components["shadow"]` will only publish the shadowed binary JAR, preserving backward compatibility for existing
-builds.
+> builds. In Kotlin Multiplatform (KMP) projects, it defaults to the JVM target's sources publishing setting
+> (`true` by default, or `false` when `withSourcesJar(publish = false)` is configured).
 > You can also explicitly toggle generation via `generateSourcesJar = true` (or `--generate-sources-jar`).
 
 ### Customizing the Sources Archive File
@@ -873,10 +878,6 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
         maven("https://repo.myorg.com")
       }
     }
-
-    tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
-      generateSourcesJar = true
-    }
     ```
 
 === ":simple-apachegroovy: build.gradle"
@@ -906,11 +907,11 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
         maven { url = 'https://repo.myorg.com' }
       }
     }
-
-    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
-      generateSourcesJar = true
-    }
     ```
+
+In KMP projects, `generateSourcesJar` is enabled by default via the JVM target's sources publishing setting
+(`target.isSourcesPublishable`). If you want to disable companion sources JAR generation, configure
+`withSourcesJar(publish = false)` on the target or set `generateSourcesJar = false` on the `shadowJar` task.
 
 ## Generating Javadoc or Dokka from Shadowed Sources
 

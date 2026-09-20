@@ -4,6 +4,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
 import com.github.jengelman.gradle.plugins.shadow.internal.mainClassAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.SHADOW_JAR_TASK_NAME
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
@@ -14,6 +15,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.isDokkaIssue4600
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import kotlin.io.path.appendText
+import kotlin.io.path.exists
 import kotlin.io.path.invariantSeparatorsPathString
 import kotlin.io.path.relativeTo
 import kotlin.io.path.walk
@@ -349,6 +351,65 @@ class KotlinPluginsTest : BasePluginTest() {
         "my/my/-main/index.html",
         "my/shadow.g/-g/index.html",
       )
+  }
+
+  @Test
+  fun generateSourcesJarByDefaultInKmp() {
+    val stdlib = compileOnlyStdlib(true)
+    writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "JvmMain")
+    projectScript.appendText(
+      """
+      |kotlin {
+      |  jvm()
+      |  sourceSets {
+      |    jvmMain {
+      |      dependencies {
+      |        $stdlib
+      |      }
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/JvmMain.kt",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+    }
+  }
+
+  @Test
+  fun disableSourcesJarInKmpWithSourcesJarFalse() {
+    val stdlib = compileOnlyStdlib(true)
+    writeClass(sourceSet = "jvmMain", jvmLang = JvmLang.Kotlin, className = "JvmMain")
+    projectScript.appendText(
+      """
+      |kotlin {
+      |  jvm {
+      |    withSourcesJar(false)
+      |  }
+      |  sourceSets {
+      |    jvmMain {
+      |      dependencies {
+      |        $stdlib
+      |      }
+      |    }
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar").exists()).isFalse()
   }
 
   private fun compileOnlyStdlib(exclude: Boolean): String {

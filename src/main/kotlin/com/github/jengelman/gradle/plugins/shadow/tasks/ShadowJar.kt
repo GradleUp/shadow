@@ -206,7 +206,9 @@ public abstract class ShadowJar : Jar() {
    * sources.
    *
    * In projects applying the `shadow` plugin for Java, this convention defaults to `true` when
-   * `java.withSourcesJar()` is enabled, and `false` otherwise.
+   * `java.withSourcesJar()` is enabled, and `false` otherwise. In projects applying the `shadow`
+   * plugin for Kotlin Multiplatform, this convention defaults to `true` when sources publishing is
+   * enabled on the JVM target, and `false` otherwise.
    */
   @get:Input
   @get:Option(
