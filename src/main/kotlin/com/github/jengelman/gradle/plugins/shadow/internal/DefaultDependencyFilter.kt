@@ -4,15 +4,10 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
 import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
-import org.gradle.api.artifacts.component.ProjectComponentIdentifier
-import org.gradle.api.artifacts.result.ResolvedArtifactResult
 import org.gradle.api.artifacts.result.ResolvedDependencyResult
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
 import org.gradle.api.file.FileCollection
-import org.gradle.jvm.JvmLibrary
-import org.gradle.language.base.artifact.SourcesArtifact
 
 internal class DefaultDependencyFilter(@Transient private val project: Project) :
   DependencyFilter.AbstractDependencyFilter(project) {
@@ -56,52 +51,28 @@ internal class DefaultDependencyFilter(@Transient private val project: Project) 
           }
         }
 
-    val externalComponentIds =
-      includedDependenciesResults
-        .map { it.selected.id }
-        .filterIsInstance<ModuleComponentIdentifier>()
-        .toSet()
+    val includedComponentIds = includedDependenciesResults.map { it.selected.id }.toSet()
 
-    val externalSourcesFiles =
-      project.dependencies
-        .createArtifactResolutionQuery()
-        .forComponents(externalComponentIds)
-        .withArtifacts(JvmLibrary::class.java, SourcesArtifact::class.java)
-        .execute()
-        .resolvedComponents
-        .flatMap { it.getArtifacts(SourcesArtifact::class.java) }
-        .filterIsInstance<ResolvedArtifactResult>()
-        .map { it.file }
-
-    val projectComponentIds =
-      includedDependenciesResults
-        .map { it.selected.id }
-        .filterIsInstance<ProjectComponentIdentifier>()
-        .toSet()
-
-    val projectSourcesFiles =
-      try {
-        configuration.incoming
-          .artifactView { view ->
-            view.withVariantReselection()
-            view.attributes { attrs ->
-              attrs.attribute(
-                Category.CATEGORY_ATTRIBUTE,
-                project.objects.named(Category::class.java, Category.DOCUMENTATION),
-              )
-              attrs.attribute(
-                DocsType.DOCS_TYPE_ATTRIBUTE,
-                project.objects.named(DocsType::class.java, DocsType.SOURCES),
-              )
-            }
-            view.componentFilter { id -> id in projectComponentIds }
-            view.lenient(true)
+    return try {
+      configuration.incoming
+        .artifactView { view ->
+          view.withVariantReselection()
+          view.attributes { attrs ->
+            attrs.attribute(
+              Category.CATEGORY_ATTRIBUTE,
+              project.objects.named(Category::class.java, Category.DOCUMENTATION),
+            )
+            attrs.attribute(
+              DocsType.DOCS_TYPE_ATTRIBUTE,
+              project.objects.named(DocsType::class.java, DocsType.SOURCES),
+            )
           }
-          .files
-      } catch (_: Exception) {
-        project.files()
-      }
-
-    return project.files(externalSourcesFiles) + projectSourcesFiles
+          view.componentFilter { id -> id in includedComponentIds }
+          view.lenient(true)
+        }
+        .files
+    } catch (_: Exception) {
+      project.files()
+    }
   }
 }
