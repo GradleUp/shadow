@@ -60,15 +60,19 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
     result.append(sourceContent, lastIndex, matchStart)
     lastIndex = matchEnd
 
-    val previousSnippet = sourceContent.substring(0, matchStart)
-    val previousSnippetOneLine = previousSnippet.replace("\\s+".toRegex(), " ")
+    var cursor = matchStart - 1
+    while (cursor >= 0 && sourceContent[cursor].isWhitespace()) {
+      cursor--
+    }
+    val lookbackStart = (cursor - 64).coerceAtLeast(0)
+    val previousSnippetOneLine =
+      sourceContent.substring(lookbackStart, matchStart).replace("\\s+".toRegex(), " ")
     val afterDotSlashSpace = RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
     val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
     val contextValid = !afterDotSlashSpace || afterJavaKeyWord
 
     var replaced = false
     if (contextValid) {
-      val suffixSnippet = sourceContent.substring(matchEnd)
       for (relocator in relocatorList) {
         if (
           relocator is SimpleRelocator && !relocator.rawString && relocator.pattern.isNotEmpty()
@@ -86,9 +90,11 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
             }
             val isIncluded =
               !hasIncludes ||
-                sourceIncludes.any { SimpleRelocator.matchesSubpattern(suffixSnippet, it) }
+                sourceIncludes.any {
+                  SimpleRelocator.matchesSubpattern(sourceContent, matchEnd, it)
+                }
             val isExcluded = sourceExcludes.any {
-              SimpleRelocator.matchesSubpattern(suffixSnippet, it)
+              SimpleRelocator.matchesSubpattern(sourceContent, matchEnd, it)
             }
             if (isIncluded && !isExcluded) {
               result.append(

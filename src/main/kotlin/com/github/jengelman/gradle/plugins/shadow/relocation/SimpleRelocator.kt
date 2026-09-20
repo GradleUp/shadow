@@ -265,13 +265,20 @@ constructor(
       return result
     }
 
-    fun matchesSubpattern(snippet: String, subpattern: String): Boolean {
-      if (!snippet.startsWith(subpattern)) return false
-      if (subpattern.isEmpty() || snippet.length == subpattern.length) return true
+    fun matchesSubpattern(content: CharSequence, offset: Int, subpattern: String): Boolean {
+      val subLen = subpattern.length
+      if (offset + subLen > content.length) return false
+      for (i in 0 until subLen) {
+        if (content[offset + i] != subpattern[i]) return false
+      }
+      if (subLen == 0 || offset + subLen == content.length) return true
       if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
-      val nextChar = snippet[subpattern.length]
+      val nextChar = content[offset + subLen]
       return !nextChar.isLetterOrDigit() && nextChar != '_'
     }
+
+    fun matchesSubpattern(snippet: String, subpattern: String): Boolean =
+      matchesSubpattern(snippet, 0, subpattern)
 
     private fun shadeSourceWithFilters(
       sourceContent: String,
