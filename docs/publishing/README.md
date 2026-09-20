@@ -754,9 +754,11 @@ To publish shadowed artifacts as the primary publication:
     }
     ```
 
-2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, disabling the `jar` or `sourcesJar`
-   tasks does not remove standard variants from the `java` software component. You must also explicitly skip the
-   standard publication variants (skipping `sourcesElements` is only needed when `java.withSourcesJar()` is enabled):
+2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, Gradle ties the component's
+   primary artifact to the `jar` task, so `tasks.jar` must remain enabled (the `shadowJar` task will overwrite its output
+   in `build/libs`). To avoid publishing standard variants alongside shadowed ones in Gradle Module Metadata and POM,
+   you must explicitly skip them using `withVariantsFromConfiguration` (skipping `sourcesElements` is only needed when
+   `java.withSourcesJar()` is enabled, after which `sourcesJar` can also be disabled):
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -771,10 +773,27 @@ To publish shadowed artifacts as the primary publication:
       withSourcesJar()
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
+    tasks.named<Jar>("sourcesJar") {
+      enabled = false
+    }
+
+    tasks.shadowJar {
+      archiveClassifier = ""
+    }
+
     components.named<org.gradle.api.component.AdhocComponentWithVariants>("java") {
       withVariantsFromConfiguration(configurations["runtimeElements"]) { skip() }
       // Only needed when java.withSourcesJar() is enabled.
       withVariantsFromConfiguration(configurations["sourcesElements"]) { skip() }
+    }
+
+    publishing {
+      publications {
+        create<MavenPublication>("shadow") {
+          from(components["java"])
+        }
+      }
     }
     ```
 
@@ -791,10 +810,27 @@ To publish shadowed artifacts as the primary publication:
       withSourcesJar()
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
+    tasks.named('sourcesJar', Jar) {
+      enabled = false
+    }
+
+    tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+
     components.named('java', org.gradle.api.component.AdhocComponentWithVariants) {
       withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
       // Only needed when java.withSourcesJar() is enabled.
       withVariantsFromConfiguration(configurations.sourcesElements) { skip() }
+    }
+
+    publishing {
+      publications {
+        shadow(MavenPublication) {
+          from components.java
+        }
+      }
     }
     ```
 
