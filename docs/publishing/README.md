@@ -301,7 +301,9 @@ Because the default `archiveClassifier` of [`Jar`][Jar] is `""` (empty), setting
 - When `generateSourcesJar` is enabled (such as when `java.withSourcesJar()` is used), the companion shadowed sources
   JAR is output to `<archiveBaseName>-<archiveVersion>-sources.jar`, conflicting with the standard `sourcesJar` task.
 
-If you want to replace standard JARs with the shadowed ones, disable the standard `jar` and `sourcesJar` tasks:
+If you want to replace standard JARs with the shadowed ones, disable the standard tasks (note that `sourcesJar` is only
+created and needs handling when `java.withSourcesJar()` is enabled; if `withSourcesJar()` is not used, you only need to
+configure the `jar` task):
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -319,6 +321,7 @@ If you want to replace standard JARs with the shadowed ones, disable the standar
       enabled = false
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
     tasks.named<Jar>("sourcesJar") {
       enabled = false
     }
@@ -340,6 +343,7 @@ If you want to replace standard JARs with the shadowed ones, disable the standar
       enabled = false
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
     tasks.named('sourcesJar', Jar) {
       enabled = false
     }
@@ -363,6 +367,7 @@ Or set different `archiveClassifier` values for the standard tasks:
       archiveClassifier = "ignored"
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
     tasks.named<Jar>("sourcesJar") {
       archiveClassifier = "ignored-sources"
     }
@@ -384,6 +389,7 @@ Or set different `archiveClassifier` values for the standard tasks:
       archiveClassifier = 'ignored'
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
     tasks.named('sourcesJar', Jar) {
       archiveClassifier = 'ignored-sources'
     }
@@ -675,7 +681,8 @@ automatically uses the standard `sources` classifier.
 To publish shadowed artifacts as the primary publication:
 
 1. **Publish from `components["shadow"]` (Recommended)**: Publish the `shadow` component directly in your Maven
-   publication, and disable standard archive tasks to prevent destination file collisions in `build/libs`:
+   publication, and disable standard archive tasks to prevent destination file collisions in `build/libs` (disabling
+   `sourcesJar` is only needed when `java.withSourcesJar()` is enabled):
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -694,6 +701,7 @@ To publish shadowed artifacts as the primary publication:
       enabled = false
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
     tasks.named<Jar>("sourcesJar") {
       enabled = false
     }
@@ -728,6 +736,7 @@ To publish shadowed artifacts as the primary publication:
       enabled = false
     }
 
+    // Only needed when java.withSourcesJar() is enabled.
     tasks.named('sourcesJar', Jar) {
       enabled = false
     }
@@ -747,7 +756,7 @@ To publish shadowed artifacts as the primary publication:
 
 2. **Publish from `components["java"]`**: If publishing `from(components["java"])`, disabling the `jar` or `sourcesJar`
    tasks does not remove standard variants from the `java` software component. You must also explicitly skip the
-   standard publication variants:
+   standard publication variants (skipping `sourcesElements` is only needed when `java.withSourcesJar()` is enabled):
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -764,6 +773,7 @@ To publish shadowed artifacts as the primary publication:
 
     components.named<org.gradle.api.component.AdhocComponentWithVariants>("java") {
       withVariantsFromConfiguration(configurations["runtimeElements"]) { skip() }
+      // Only needed when java.withSourcesJar() is enabled.
       withVariantsFromConfiguration(configurations["sourcesElements"]) { skip() }
     }
     ```
@@ -783,6 +793,7 @@ To publish shadowed artifacts as the primary publication:
 
     components.named('java', org.gradle.api.component.AdhocComponentWithVariants) {
       withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
+      // Only needed when java.withSourcesJar() is enabled.
       withVariantsFromConfiguration(configurations.sourcesElements) { skip() }
     }
     ```
