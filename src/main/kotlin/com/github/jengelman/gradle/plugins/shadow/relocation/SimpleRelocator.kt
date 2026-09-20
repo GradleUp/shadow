@@ -1,8 +1,8 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import com.github.jengelman.gradle.plugins.shadow.internal.RX_ENDS_WITH_DOT_SLASH_SPACE
-import com.github.jengelman.gradle.plugins.shadow.internal.RX_ENDS_WITH_JAVA_KEYWORD
+import com.github.jengelman.gradle.plugins.shadow.internal.RX_WHITESPACE
 import com.github.jengelman.gradle.plugins.shadow.internal.getSourceSubpatterns
+import com.github.jengelman.gradle.plugins.shadow.internal.isJavaContextValid
 import com.github.jengelman.gradle.plugins.shadow.internal.matchesSubpattern
 import java.util.Objects
 import java.util.regex.Pattern
@@ -250,12 +250,9 @@ constructor(
         if (isFirstSnippet) {
           shadedSourceContent.append(snippet)
         } else {
-          val previousSnippetOneLine = previousSnippet.replace("\\s+".toRegex(), " ")
-          val afterDotSlashSpace =
-            RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
-          val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
+          val previousSnippetOneLine = previousSnippet.replace(RX_WHITESPACE, " ")
           val shouldRelocate =
-            isIncluded && !isExcluded && (!afterDotSlashSpace || afterJavaKeyWord)
+            isIncluded && !isExcluded && previousSnippetOneLine.isJavaContextValid()
           shadedSourceContent.append(if (shouldRelocate) patternTo else patternFrom).append(snippet)
         }
       }

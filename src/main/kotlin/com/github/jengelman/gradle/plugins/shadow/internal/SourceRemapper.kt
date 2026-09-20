@@ -48,7 +48,7 @@ private val KEYWORDS =
  *
  * at end of string
  */
-internal val RX_ENDS_WITH_JAVA_KEYWORD =
+private val RX_ENDS_WITH_JAVA_KEYWORD =
   listOf(
       "\\b(${KEYWORDS.joinToString("|")}) $",
       "\\{@link( \\*)* $",
@@ -57,7 +57,29 @@ internal val RX_ENDS_WITH_JAVA_KEYWORD =
     .joinToString("|")
     .toPattern()
 
-internal val RX_ENDS_WITH_DOT_SLASH_SPACE = "[./ ]$".toPattern()
+private val RX_ENDS_WITH_DOT_SLASH_SPACE = "[./ ]$".toPattern()
+
+internal val RX_WHITESPACE = "\\s+".toRegex()
+
+internal fun String.isJavaContextValid(): Boolean {
+  if (!RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(this).find()) {
+    return true
+  }
+  if (endsWith(' ')) {
+    var end = length - 1
+    while (end > 0 && this[end - 1].isWhitespace()) {
+      end--
+    }
+    var start = end
+    while (start > 0 && this[start - 1].isJavaIdentifierPart()) {
+      start--
+    }
+    if (start < end && substring(start, end) in KEYWORDS) {
+      return true
+    }
+  }
+  return RX_ENDS_WITH_JAVA_KEYWORD.matcher(this).find()
+}
 
 /**
  * Remaps source content by applying relocators in a single pass with first-match-wins precedence,
@@ -115,10 +137,8 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
     }
     val lookbackStart = (cursor - 64).coerceAtLeast(0)
     val previousSnippetOneLine =
-      sourceContent.substring(lookbackStart, matchStart).replace("\\s+".toRegex(), " ")
-    val afterDotSlashSpace = RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
-    val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
-    val contextValid = !afterDotSlashSpace || afterJavaKeyWord
+      sourceContent.substring(lookbackStart, matchStart).replace(RX_WHITESPACE, " ")
+    val contextValid = previousSnippetOneLine.isJavaContextValid()
 
     var replaced = false
     if (contextValid) {
