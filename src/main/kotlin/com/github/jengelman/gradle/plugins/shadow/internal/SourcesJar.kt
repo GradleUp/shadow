@@ -3,7 +3,6 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
-import java.nio.charset.Charset
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
@@ -26,7 +25,6 @@ internal fun generateSourcesJar(
   val sourcesJars = includedSourcesJars.filter { it.exists() && it.isFile }.sortedBy { it.path }
 
   val visitedFiles = mutableSetOf<String>()
-  val charset = metadataCharset?.let(Charset::forName) ?: Charsets.UTF_8
   val sourceToClasses =
     if (unusedClasses.isNotEmpty()) {
       buildSourceToClassesMap(classesDirs = classesDirs, dependencies = dependencies)
@@ -35,6 +33,7 @@ internal fun generateSourcesJar(
     }
 
   try {
+    sourcesJarFile.parentFile?.mkdirs()
     sourcesJarFile
       .createZipOutputStream(
         entryCompression = entryCompression,
@@ -49,7 +48,7 @@ internal fun generateSourcesJar(
           preserveLastModified = preserveFileTimestamps,
           unixMode = UnixMode.file(),
         ) {
-          write("Manifest-Version: 1.0\n\n".toByteArray(charset))
+          write("Manifest-Version: 1.0\n\n".toByteArray())
         }
 
         val filesWithRelPaths = mutableListOf<Pair<File, String>>()
@@ -65,9 +64,9 @@ internal fun generateSourcesJar(
             if (isUnused(relPath, unusedClasses, sourceToClasses)) continue
             val relocatedPath = relocators.relocateSourcePath(relPath)
             if (visitedFiles.add(relocatedPath)) {
-              val text = file.readText(charset)
+              val text = file.readText()
               val transformedText = relocators.remapSource(text)
-              val bytes = transformedText.toByteArray(charset)
+              val bytes = transformedText.toByteArray()
               zos.writeEntry(
                 name = relocatedPath,
                 preserveLastModified = preserveFileTimestamps,
@@ -115,9 +114,9 @@ internal fun generateSourcesJar(
                   if (isUnused(name, unusedClasses, sourceToClasses)) return@forEach
                   val relocatedPath = relocators.relocateSourcePath(name)
                   if (visitedFiles.add(relocatedPath)) {
-                    val text = getInputStream(entry).bufferedReader(charset).readText()
+                    val text = getInputStream(entry).bufferedReader().readText()
                     val transformedText = relocators.remapSource(text)
-                    val bytes = transformedText.toByteArray(charset)
+                    val bytes = transformedText.toByteArray()
                     zos.writeEntry(
                       name = relocatedPath,
                       preserveLastModified = preserveFileTimestamps,

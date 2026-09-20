@@ -5,11 +5,13 @@ import assertk.assertThat
 import assertk.assertions.containsExactly
 import assertk.assertions.containsOnly
 import assertk.assertions.hasMessage
+import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isInstanceOf
 import assertk.assertions.isTrue
 import com.github.jengelman.gradle.plugins.shadow.util.testObjectFactory
 import java.io.File
+import java.nio.charset.StandardCharsets
 import java.util.zip.ZipFile
 import org.gradle.api.GradleException
 import org.gradle.api.tasks.bundling.ZipEntryCompression
@@ -17,6 +19,49 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 
 class SourcesJarTest {
+
+  @Test
+  fun metadataCharsetDoesNotChangeSourceEncoding(@TempDir tempDir: File) {
+    val srcDir = tempDir.resolve("src").apply { mkdirs() }
+    val sourceBytes = "class Main { val message = \"你好\" }\n".toByteArray(StandardCharsets.UTF_8)
+    srcDir.resolve("Main.kt").writeBytes(sourceBytes)
+
+    val outputJar = tempDir.resolve("output-sources.jar")
+    generateSourcesJar(
+      sourcesJarFile = outputJar,
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      includedSourcesJars = emptyList(),
+      relocators = emptyList(),
+      entryCompression = ZipEntryCompression.DEFLATED,
+      isZip64 = false,
+      metadataCharset = "US-ASCII",
+      preserveFileTimestamps = true,
+    )
+
+    val archivedSource =
+      ZipFile(outputJar).use { zip -> zip.getInputStream(zip.getEntry("Main.kt")).readBytes() }
+    assertThat(archivedSource).isEqualTo(sourceBytes)
+  }
+
+  @Test
+  fun createsParentDirectoryForOutput(@TempDir tempDir: File) {
+    val srcDir = tempDir.resolve("src").apply { mkdirs() }
+    srcDir.resolve("Main.java").writeText("class Main {}")
+    val outputJar = tempDir.resolve("nested/output-sources.jar")
+
+    generateSourcesJar(
+      sourcesJarFile = outputJar,
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      includedSourcesJars = emptyList(),
+      relocators = emptyList(),
+      entryCompression = ZipEntryCompression.DEFLATED,
+      isZip64 = false,
+      metadataCharset = null,
+      preserveFileTimestamps = true,
+    )
+
+    assertThat(outputJar.isFile).isTrue()
+  }
 
   @Test
   fun isUnusedMatching() {
