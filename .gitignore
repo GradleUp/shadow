@@ -23,3 +23,8 @@ bin
 ### MkDocs ###
 docs/api
 site
+
+### Python ###
+__pycache__/
+*.pyc
+
