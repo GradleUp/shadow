@@ -62,19 +62,14 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     <p>
 
     ```kotlin
-    buildscript {
-      repositories {
-        mavenCentral()
-        maven("https://central.sonatype.com/repository/maven-snapshots/")
-      }
-      dependencies {
-        // You can get the latest snapshot version from `VERSION_NAME` declared in https://github.com/GradleUp/shadow/blob/main/gradle.properties
-        classpath("com.gradleup.shadow:shadow-gradle-plugin:<version>")
-      }
+    // First of all, add https://central.sonatype.com/repository/maven-snapshots/ repo
+    // into `pluginManagement { repositories {} }` in settings.gradle.kts
+
+    plugins {
+      java
+      // You can get the latest snapshot version from `VERSION_NAME` declared in https://github.com/GradleUp/shadow/blob/main/gradle.properties
+      id("com.gradleup.shadow") version "<version>"
     }
-    // `apply plugin` stuff are used with `buildscript`.
-    apply(plugin = "java")
-    apply(plugin = "com.gradleup.shadow")
     ```
 
     </p>
@@ -88,19 +83,14 @@ Alternatively, the plugin can be added to the buildscript classpath and applied:
     <p>
 
     ```groovy
-    buildscript {
-      repositories {
-        mavenCentral()
-        maven { url = 'https://central.sonatype.com/repository/maven-snapshots/' }
-      }
-      dependencies {
-        // You can get the latest snapshot version from `VERSION_NAME` declared in https://github.com/GradleUp/shadow/blob/main/gradle.properties
-        classpath 'com.gradleup.shadow:shadow-gradle-plugin:<version>'
-      }
+    // First of all, add https://central.sonatype.com/repository/maven-snapshots/ repo
+    // into `pluginManagement { repositories {} }` in settings.gradle
+
+    plugins {
+      id 'java'
+      // You can get the latest snapshot version from `VERSION_NAME` declared in https://github.com/GradleUp/shadow/blob/main/gradle.properties
+      id 'com.gradleup.shadow' version '<version>'
     }
-    // `apply plugin` stuff are used with `buildscript`.
-    apply plugin: 'java'
-    apply plugin: 'com.gradleup.shadow'
     ```
 
     </p>
