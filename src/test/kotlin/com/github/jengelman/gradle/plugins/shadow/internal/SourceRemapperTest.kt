@@ -2,10 +2,80 @@ package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
 import assertk.assertions.isEqualTo
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocateClassContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
+import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import org.junit.jupiter.api.Test
 
 class SourceRemapperTest {
+
+  @Test
+  fun appliesCustomRelocatorAlongsideSimpleRelocator() {
+    val customRelocator =
+      object : Relocator {
+        override fun canRelocatePath(path: String) = false
+
+        override fun relocatePath(context: RelocatePathContext) = context.path
+
+        override fun canRelocateClass(className: String) = false
+
+        override fun relocateClass(context: RelocateClassContext) = context.className
+
+        override fun applyToSourceContent(sourceContent: String) =
+          sourceContent.replace("CUSTOM_NAME", "RELOCATED_NAME")
+      }
+    val relocators = listOf(SimpleRelocator("com.example", "shaded.example"), customRelocator)
+    val input =
+      """
+      |package com.example;
+      |class Main {
+      |  String value = CUSTOM_NAME;
+      |}
+      """
+        .trimMargin()
+
+    val expected =
+      """
+      |package shaded.example;
+      |class Main {
+      |  String value = RELOCATED_NAME;
+      |}
+      """
+        .trimMargin()
+
+    assertThat(relocators.remapSource(input)).isEqualTo(expected)
+  }
+
+  @Test
+  fun relocatesQualifiedNamesInExpressionsAndTypeAnnotations() {
+    val relocators = listOf(SimpleRelocator("com.example", "shaded.example"))
+    val input =
+      """
+      |class Main {
+      |  void method() {
+      |    return com.example.Factory.create();
+      |  }
+      |  com.example.Type value = new com.example.Type();
+      |  val typed: com.example.Type = com.example.Factory.create()
+      |}
+      """
+        .trimMargin()
+
+    val expected =
+      """
+      |class Main {
+      |  void method() {
+      |    return shaded.example.Factory.create();
+      |  }
+      |  shaded.example.Type value = new shaded.example.Type();
+      |  val typed: shaded.example.Type = shaded.example.Factory.create()
+      |}
+      """
+        .trimMargin()
+
+    assertThat(relocators.remapSource(input)).isEqualTo(expected)
+  }
 
   @Test
   fun chainedRelocatorsDoNotCascade() {

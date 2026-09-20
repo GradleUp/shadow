@@ -195,11 +195,11 @@ constructor(
      */
     private val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
       Pattern.compile(
-        "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
+        "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|transient|native|strictfp|extends|implements|throws|return|new|throw|instanceof|case|default|yield|val|var|fun|is|as|in) $" +
           "|" +
           "\\{@link( \\*)* $" +
           "|" +
-          "([{}(=;,]|\\*/) $"
+          "([{}(=;,:<>?&|@\\[\\]]|\\*/) $"
       )
 
     private fun normalizePatterns(patterns: Collection<String>?) = buildSet {

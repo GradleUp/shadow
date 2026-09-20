@@ -10,11 +10,11 @@ private val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
 
 private val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
   Pattern.compile(
-    "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
+    "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|transient|native|strictfp|extends|implements|throws|return|new|throw|instanceof|case|default|yield|val|var|fun|is|as|in) $" +
       "|" +
       "\\{@link( \\*)* $" +
       "|" +
-      "([{}(=;,]|\\*/) $"
+      "([{}(=;,:<>?&|@\\[\\]]|\\*/) $"
   )
 
 /**
@@ -29,6 +29,7 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
     relocatorList.filterIsInstance<SimpleRelocator>().filter {
       !it.rawString && it.pattern.isNotEmpty()
     }
+  val otherRelocators = relocatorList.filter { it !in simpleRelocators }
 
   if (simpleRelocators.isEmpty()) {
     var content = sourceContent
@@ -45,7 +46,13 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
       .distinct()
       .sortedByDescending { it.length }
 
-  if (patterns.isEmpty()) return sourceContent
+  if (patterns.isEmpty()) {
+    var content = sourceContent
+    for (relocator in otherRelocators) {
+      content = relocator.applyToSourceContent(content)
+    }
+    return content
+  }
 
   val patternRegex = Regex("\\b(" + patterns.joinToString("|") { Regex.escape(it) } + ")\\b")
 
@@ -114,7 +121,15 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
   }
 
   result.append(sourceContent, lastIndex, sourceContent.length)
-  return result.toString()
+  if (otherRelocators.isEmpty()) {
+    return result.toString()
+  }
+
+  var content = result.toString()
+  for (relocator in otherRelocators) {
+    content = relocator.applyToSourceContent(content)
+  }
+  return content
 }
 
 /**
