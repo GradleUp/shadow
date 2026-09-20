@@ -16,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.shadowDistZip
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.startShadowScripts
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.shadowSourcesElements
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
@@ -171,6 +172,8 @@ class ShadowPropertiesTest {
         assertThat(sourceSetsSourceDirs.files).isEmpty()
         assertThat(includedSourcesJars.files).isEmpty()
       }
+
+      assertThat(configurations.shadowSourcesElements.get().artifacts).isEmpty()
     }
 
   @Test
@@ -183,6 +186,44 @@ class ShadowPropertiesTest {
       val mainSourceSet = javaPluginExtension.sourceSets.getByName("main")
       assertThat(shadowJarTask.sourceSetsSourceDirs.files)
         .containsOnly(*mainSourceSet.allSource.files.toTypedArray())
+
+      val shadowSourcesElements = configurations.shadowSourcesElements.get()
+      val artifact = shadowSourcesElements.artifacts.single()
+      assertThat(artifact.classifier).isEqualTo("all-sources")
+      assertThat(artifact.name).isEqualTo("my-project")
+      assertThat(artifact.extension).isEqualTo("jar")
+      assertThat(artifact.type).isEqualTo("jar")
+      assertThat(artifact.file).isEqualTo(shadowJarTask.archiveSourcesFile.get().asFile)
+      assertThat(artifact.date).isNull()
+      assertThat(artifact.buildDependencies.getDependencies(null)).containsOnly(shadowJarTask)
+
+      // Test dynamic updates on ShadowSourcesPublishArtifact
+      shadowJarTask.archiveClassifier.set("custom")
+      assertThat(artifact.classifier).isEqualTo("custom-sources")
+
+      shadowJarTask.archiveClassifier.set("")
+      assertThat(artifact.classifier).isEqualTo("sources")
+
+      shadowJarTask.archiveBaseName.set("renamed")
+      shadowJarTask.archiveExtension.set("zip")
+      assertThat(artifact.name).isEqualTo("renamed")
+      assertThat(artifact.extension).isEqualTo("zip")
+    }
+
+  @Test
+  fun shadowSourcesElementsArtifactTogglesWithGenerateSourcesJar() =
+    with(project) {
+      plugins.apply(JavaPlugin::class.java)
+      val shadowJarTask = tasks.shadowJar.get()
+      val shadowSourcesElements = configurations.shadowSourcesElements.get()
+
+      assertThat(shadowSourcesElements.artifacts).isEmpty()
+
+      shadowJarTask.generateSourcesJar.set(true)
+      assertThat(shadowSourcesElements.artifacts.size).isEqualTo(1)
+
+      shadowJarTask.generateSourcesJar.set(false)
+      assertThat(shadowSourcesElements.artifacts).isEmpty()
     }
 
   @Test
