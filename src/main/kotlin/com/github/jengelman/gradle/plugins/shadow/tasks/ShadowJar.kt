@@ -259,16 +259,22 @@ public abstract class ShadowJar : Jar() {
     objectFactory
       .fileProperty()
       .convention(
-        destinationDirectory.file(
-          archiveFileName.map { name ->
-            val idx = name.lastIndexOf('.')
-            if (idx != -1) {
-              "${name.substring(0, idx)}-sources${name.substring(idx)}"
-            } else {
-              "$name-sources"
-            }
+        generateSourcesJar.flatMap { generate ->
+          if (generate) {
+            destinationDirectory.file(
+              archiveFileName.map { name ->
+                val idx = name.lastIndexOf('.')
+                if (idx != -1) {
+                  "${name.substring(0, idx)}-sources${name.substring(idx)}"
+                } else {
+                  "$name-sources"
+                }
+              }
+            )
+          } else {
+            project.provider { null }
           }
-        )
+        }
       )
 
   /**
