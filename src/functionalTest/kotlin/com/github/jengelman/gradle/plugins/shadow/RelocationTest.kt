@@ -2,8 +2,8 @@ package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.assertThat
 import assertk.assertions.contains
+import assertk.assertions.doesNotExist
 import assertk.assertions.isEqualTo
-import assertk.assertions.isFalse
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
 import assertk.fail
@@ -18,7 +18,6 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import kotlin.io.path.appendText
-import kotlin.io.path.exists
 import kotlin.io.path.readBytes
 import kotlin.io.path.writeText
 import kotlin.time.Duration.Companion.seconds
@@ -756,7 +755,7 @@ class RelocationTest : BasePluginTest() {
 
     runWithSuccess(shadowJarPath)
 
-    assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar").exists()).isFalse()
+    assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar")).doesNotExist()
   }
 
   @Test
