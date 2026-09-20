@@ -5,18 +5,59 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.RelocatePathContext
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
-import java.util.regex.Pattern
 
-private val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
-
-private val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
-  Pattern.compile(
-    "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|transient|native|strictfp|extends|implements|throws|return|new|throw|instanceof|case|default|yield|val|var|fun|is|as|in) $" +
-      "|" +
-      "\\{@link( \\*)* $" +
-      "|" +
-      "([{}(=;,:<>?&|@\\[\\]]|\\*/) $"
+private val KEYWORDS =
+  setOf(
+    "import",
+    "package",
+    "public",
+    "protected",
+    "private",
+    "static",
+    "final",
+    "synchronized",
+    "abstract",
+    "volatile",
+    "transient",
+    "native",
+    "strictfp",
+    "extends",
+    "implements",
+    "throws",
+    "return",
+    "new",
+    "throw",
+    "instanceof",
+    "case",
+    "default",
+    "yield",
+    "val",
+    "var",
+    "fun",
+    "is",
+    "as",
+    "in",
   )
+
+/**
+ * Match
+ * - certain Java keywords + space
+ * - beginning of Javadoc link + optional line breaks and continuations with '*'
+ * - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
+ * - (closing curly brace / closing multi-line comment) + space
+ *
+ * at end of string
+ */
+internal val RX_ENDS_WITH_JAVA_KEYWORD =
+  listOf(
+      "\\b(${KEYWORDS.joinToString("|")}) $",
+      "\\{@link( \\*)* $",
+      "([{}(=;,:<>?&|@\\[\\]]|\\*/) $",
+    )
+    .joinToString("|")
+    .toPattern()
+
+internal val RX_ENDS_WITH_DOT_SLASH_SPACE = "[./ ]$".toPattern()
 
 /**
  * Remaps source content by applying relocators in a single pass with first-match-wins precedence,
@@ -88,22 +129,15 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
           val isDotMatch = matchedText == relocator.pattern
           val isPathMatch = matchedText == relocator.pathPattern
           if (isDotMatch || isPathMatch) {
-            val sourceIncludes =
-              SimpleRelocator.getSourceSubpatterns(relocator.includes, relocator.pattern)
-            val sourceExcludes =
-              SimpleRelocator.getSourceSubpatterns(relocator.excludes, relocator.pattern)
+            val sourceIncludes = getSourceSubpatterns(relocator.includes, relocator.pattern)
+            val sourceExcludes = getSourceSubpatterns(relocator.excludes, relocator.pattern)
             val hasIncludes = relocator.includes.isNotEmpty()
             if (hasIncludes && sourceIncludes.isEmpty()) {
               continue
             }
             val isIncluded =
-              !hasIncludes ||
-                sourceIncludes.any {
-                  SimpleRelocator.matchesSubpattern(sourceContent, matchEnd, it)
-                }
-            val isExcluded = sourceExcludes.any {
-              SimpleRelocator.matchesSubpattern(sourceContent, matchEnd, it)
-            }
+              !hasIncludes || sourceIncludes.any { matchesSubpattern(sourceContent, matchEnd, it) }
+            val isExcluded = sourceExcludes.any { matchesSubpattern(sourceContent, matchEnd, it) }
             if (isIncluded && !isExcluded) {
               result.append(
                 if (isDotMatch) relocator.shadedPattern else relocator.shadedPathPattern
@@ -165,4 +199,52 @@ internal fun isSourceFile(path: String): Boolean {
     path.endsWith(".kt") ||
     path.endsWith(".groovy") ||
     path.endsWith(".scala")
+}
+
+internal fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+  if (patternPrefix.isEmpty()) return emptySet()
+  val result = mutableSetOf<String>()
+  val dotPrefix = patternPrefix.replace('/', '.')
+  val slashPrefix = patternPrefix.replace('.', '/')
+  val trailingWildcardRegex = "[./][*]+$".toRegex()
+
+  for (pat in patterns) {
+    val dotPat = pat.replace('/', '.')
+    if (dotPat.startsWith(dotPrefix)) {
+      val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
+      if (sub.isEmpty()) {
+        result.add("")
+      } else {
+        result.add(sub)
+        result.add(sub.replace('.', '/'))
+      }
+    }
+    val slashPat = pat.replace('.', '/')
+    if (slashPat.startsWith(slashPrefix)) {
+      val sub = slashPat.substring(slashPrefix.length).replaceFirst(trailingWildcardRegex, "")
+      if (sub.isEmpty()) {
+        result.add("")
+      } else {
+        result.add(sub)
+        result.add(sub.replace('/', '.'))
+      }
+    }
+  }
+  return result
+}
+
+internal fun matchesSubpattern(
+  content: CharSequence,
+  offset: Int = 0,
+  subpattern: String,
+): Boolean {
+  val subLen = subpattern.length
+  if (offset + subLen > content.length) return false
+  for (i in 0 until subLen) {
+    if (content[offset + i] != subpattern[i]) return false
+  }
+  if (subLen == 0 || offset + subLen == content.length) return true
+  if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
+  val nextChar = content[offset + subLen]
+  return !nextChar.isLetterOrDigit() && nextChar != '_'
 }

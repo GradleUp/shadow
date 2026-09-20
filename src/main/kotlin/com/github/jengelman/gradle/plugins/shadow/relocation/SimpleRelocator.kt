@@ -1,5 +1,9 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
+import com.github.jengelman.gradle.plugins.shadow.internal.RX_ENDS_WITH_DOT_SLASH_SPACE
+import com.github.jengelman.gradle.plugins.shadow.internal.RX_ENDS_WITH_JAVA_KEYWORD
+import com.github.jengelman.gradle.plugins.shadow.internal.getSourceSubpatterns
+import com.github.jengelman.gradle.plugins.shadow.internal.matchesSubpattern
 import java.util.Objects
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
@@ -180,29 +184,8 @@ constructor(
     return excludes.any { SelectorUtils.matchPath(it, path, "/", true) }
   }
 
-  internal companion object {
-    /** Match dot, slash or space at end of string */
-    private val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
-
-    /**
-     * Match
-     * - certain Java keywords + space
-     * - beginning of Javadoc link + optional line breaks and continuations with '*'
-     * - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
-     * - (closing curly brace / closing multi-line comment) + space
-     *
-     * at end of string
-     */
-    private val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
-      Pattern.compile(
-        "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|transient|native|strictfp|extends|implements|throws|return|new|throw|instanceof|case|default|yield|val|var|fun|is|as|in) $" +
-          "|" +
-          "\\{@link( \\*)* $" +
-          "|" +
-          "([{}(=;,:<>?&|@\\[\\]]|\\*/) $"
-      )
-
-    private fun normalizePatterns(patterns: Collection<String>?) = buildSet {
+  private companion object {
+    fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
         // Regex patterns don't need to be normalized and stay as is.
@@ -233,54 +216,7 @@ constructor(
       }
     }
 
-    fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
-      if (patternPrefix.isEmpty()) return emptySet()
-      val result = mutableSetOf<String>()
-      val dotPrefix = patternPrefix.replace('/', '.')
-      val slashPrefix = patternPrefix.replace('.', '/')
-      val trailingWildcardRegex = "[./][*]+$".toRegex()
-
-      for (pat in patterns) {
-        val dotPat = pat.replace('/', '.')
-        if (dotPat.startsWith(dotPrefix)) {
-          val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
-          if (sub.isEmpty()) {
-            result.add("")
-          } else {
-            result.add(sub)
-            result.add(sub.replace('.', '/'))
-          }
-        }
-        val slashPat = pat.replace('.', '/')
-        if (slashPat.startsWith(slashPrefix)) {
-          val sub = slashPat.substring(slashPrefix.length).replaceFirst(trailingWildcardRegex, "")
-          if (sub.isEmpty()) {
-            result.add("")
-          } else {
-            result.add(sub)
-            result.add(sub.replace('/', '.'))
-          }
-        }
-      }
-      return result
-    }
-
-    fun matchesSubpattern(content: CharSequence, offset: Int, subpattern: String): Boolean {
-      val subLen = subpattern.length
-      if (offset + subLen > content.length) return false
-      for (i in 0 until subLen) {
-        if (content[offset + i] != subpattern[i]) return false
-      }
-      if (subLen == 0 || offset + subLen == content.length) return true
-      if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
-      val nextChar = content[offset + subLen]
-      return !nextChar.isLetterOrDigit() && nextChar != '_'
-    }
-
-    fun matchesSubpattern(snippet: String, subpattern: String): Boolean =
-      matchesSubpattern(snippet, 0, subpattern)
-
-    private fun shadeSourceWithFilters(
+    fun shadeSourceWithFilters(
       sourceContent: String,
       patternFrom: String,
       patternTo: String,
@@ -302,8 +238,14 @@ constructor(
         val isFirstSnippet = i == 0
         val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
 
-        val isIncluded = !hasIncludes || includedPatterns.any { matchesSubpattern(snippet, it) }
-        val isExcluded = excludedPatterns.any { matchesSubpattern(snippet, it) }
+        val isIncluded =
+          !hasIncludes ||
+            includedPatterns.any {
+              matchesSubpattern(content = snippet, subpattern = it)
+            }
+        val isExcluded = excludedPatterns.any {
+          matchesSubpattern(content = snippet, subpattern = it)
+        }
 
         if (isFirstSnippet) {
           shadedSourceContent.append(snippet)
