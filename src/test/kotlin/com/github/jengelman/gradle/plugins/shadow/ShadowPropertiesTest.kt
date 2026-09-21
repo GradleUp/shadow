@@ -37,7 +37,6 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
@@ -191,26 +190,27 @@ class ShadowPropertiesTest {
         .containsOnly(*mainSourceSet.allSource.files.toTypedArray())
 
       val shadowSourcesElements = configurations.shadowSourcesElements.get()
-      val artifact = shadowSourcesElements.artifacts.single()
-      assertThat(artifact.classifier).isEqualTo("all-sources")
-      assertThat(artifact.name).isEqualTo("my-project")
-      assertThat(artifact.extension).isEqualTo("jar")
-      assertThat(artifact.type).isEqualTo("jar")
-      assertThat(artifact.file).isEqualTo(shadowJarTask.archiveSourcesFile.get().asFile)
-      assertThat(artifact.date).isNull()
-      assertThat(artifact.buildDependencies.getDependencies(null)).containsOnly(shadowJarTask)
+      with(shadowSourcesElements.artifacts.single()) {
+        assertThat(classifier).isEqualTo("all-sources")
+        assertThat(name).isEqualTo("my-project")
+        assertThat(extension).isEqualTo("jar")
+        assertThat(type).isEqualTo("jar")
+        assertThat(file).isEqualTo(shadowJarTask.archiveSourcesFile.get().asFile)
+        assertThat(date).isNull()
+        assertThat(buildDependencies.getDependencies(null)).containsOnly(shadowJarTask)
 
-      // Test dynamic updates on ShadowSourcesPublishArtifact
-      shadowJarTask.archiveClassifier.set("custom")
-      assertThat(artifact.classifier).isEqualTo("custom-sources")
+        // Test dynamic updates on ShadowSourcesPublishArtifact
+        shadowJarTask.archiveClassifier.set("custom")
+        assertThat(classifier).isEqualTo("custom-sources")
 
-      shadowJarTask.archiveClassifier.set("")
-      assertThat(artifact.classifier).isEqualTo("sources")
+        shadowJarTask.archiveClassifier.set("")
+        assertThat(classifier).isEqualTo("sources")
 
-      shadowJarTask.archiveBaseName.set("renamed")
-      shadowJarTask.archiveExtension.set("zip")
-      assertThat(artifact.name).isEqualTo("renamed")
-      assertThat(artifact.extension).isEqualTo("zip")
+        shadowJarTask.archiveBaseName.set("renamed")
+        shadowJarTask.archiveExtension.set("zip")
+        assertThat(name).isEqualTo("renamed")
+        assertThat(extension).isEqualTo("zip")
+      }
     }
 
   @Test
@@ -290,7 +290,7 @@ class ShadowPropertiesTest {
       }
 
       listOf(shadowDistZip, shadowDistTar).forEach {
-        with(it as AbstractArchiveTask) {
+        with(it) {
           assertThat(description).isEqualTo("Bundles the project as a distribution.")
           assertThat(group).isEqualTo("distribution")
           assertThat(archiveAppendix.orNull).isNull()
