@@ -5,6 +5,9 @@ import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 
 /**
  * Modified from
@@ -358,41 +361,6 @@ class SimpleRelocatorTest {
   }
 
   @Test
-  fun relocateSourceFileWithPrefixCollision() {
-    val relocator =
-      SimpleRelocator(
-        "org.example",
-        "relocated.org.example",
-        includes = listOf("org.example.In"),
-      )
-    val source =
-      """
-      |import org.example.In;
-      |import org.example.Input;
-      |import org.example.In.Nested;
-      |
-      |public class Test {
-      |  org.example.In a;
-      |  org.example.Input b;
-      |}
-      """
-        .trimMargin()
-    val expected =
-      """
-      |import relocated.org.example.In;
-      |import org.example.Input;
-      |import relocated.org.example.In.Nested;
-      |
-      |public class Test {
-      |  relocated.org.example.In a;
-      |  org.example.Input b;
-      |}
-      """
-        .trimMargin()
-    assertThat(relocator.applyToSourceContent(source)).isEqualTo(expected)
-  }
-
-  @Test
   fun relocateSourceWithExcludes() {
     // Main relocator with excludes
     val relocator =
@@ -420,35 +388,6 @@ class SimpleRelocatorTest {
         )
       )
       .isEqualTo(relocatedFile)
-  }
-
-  @Test
-  fun relocateSourceWithIncludes() {
-    val relocator =
-      SimpleRelocator(
-        "org.apache.maven",
-        "com.acme.maven",
-        includes = listOf("org.apache.maven.hello.*", "org.apache.maven.In"),
-      )
-    val input =
-      """
-      |package org.apache.maven.hello;
-      |import org.apache.maven.hello.World;
-      |import org.apache.maven.other.Other;
-      |import org.apache.maven.In;
-      |import org.apache.maven.NotIn;
-      """
-        .trimMargin()
-    val expected =
-      """
-      |package com.acme.maven.hello;
-      |import com.acme.maven.hello.World;
-      |import org.apache.maven.other.Other;
-      |import com.acme.maven.In;
-      |import org.apache.maven.NotIn;
-      """
-        .trimMargin()
-    assertThat(relocator.applyToSourceContent(input)).isEqualTo(expected)
   }
 
   @Test
@@ -486,7 +425,172 @@ class SimpleRelocatorTest {
     assertThat(relocatorInclude.applyToSourceContent(inputInclude)).isEqualTo(expectedInclude)
   }
 
+  @ParameterizedTest(name = "{0}")
+  @MethodSource("sourceRelocationProvider")
+  fun relocateSourceContent(
+    name: String,
+    relocator: SimpleRelocator,
+    input: String,
+    expected: String,
+  ) {
+    assertThat(relocator.applyToSourceContent(input)).isEqualTo(expected)
+  }
+
   private companion object {
+    @JvmStatic
+    fun sourceRelocationProvider(): List<Arguments> =
+      listOf(
+        Arguments.of(
+          "prefix collision with included class",
+          SimpleRelocator(
+            "org.example",
+            "relocated.org.example",
+            includes = listOf("org.example.In"),
+          ),
+          """
+          |import org.example.In;
+          |import org.example.Input;
+          |import org.example.In.Nested;
+          |
+          |public class Test {
+          |  org.example.In a;
+          |  org.example.Input b;
+          |}
+          """
+            .trimMargin(),
+          """
+          |import relocated.org.example.In;
+          |import org.example.Input;
+          |import relocated.org.example.In.Nested;
+          |
+          |public class Test {
+          |  relocated.org.example.In a;
+          |  org.example.Input b;
+          |}
+          """
+            .trimMargin(),
+        ),
+        Arguments.of(
+          "includes only",
+          SimpleRelocator(
+            "org.apache.maven",
+            "com.acme.maven",
+            includes = listOf("org.apache.maven.hello.*", "org.apache.maven.In"),
+          ),
+          """
+          |package org.apache.maven.hello;
+          |import org.apache.maven.hello.World;
+          |import org.apache.maven.other.Other;
+          |import org.apache.maven.In;
+          |import org.apache.maven.NotIn;
+          """
+            .trimMargin(),
+          """
+          |package com.acme.maven.hello;
+          |import com.acme.maven.hello.World;
+          |import org.apache.maven.other.Other;
+          |import com.acme.maven.In;
+          |import org.apache.maven.NotIn;
+          """
+            .trimMargin(),
+        ),
+        Arguments.of(
+          "qualified names in expressions and type annotations",
+          SimpleRelocator("com.example", "shaded.example"),
+          """
+          |class Main {
+          |  void method() {
+          |    return com.example.Factory.create();
+          |  }
+          |  com.example.Type value = new com.example.Type();
+          |  val typed: com.example.Type = com.example.Factory.create()
+          |}
+          """
+            .trimMargin(),
+          """
+          |class Main {
+          |  void method() {
+          |    return shaded.example.Factory.create();
+          |  }
+          |  shaded.example.Type value = new shaded.example.Type();
+          |  val typed: shaded.example.Type = shaded.example.Factory.create()
+          |}
+          """
+            .trimMargin(),
+        ),
+        Arguments.of(
+          "includes and excludes combined",
+          SimpleRelocator(
+            "com.example",
+            "shaded.example",
+            includes = listOf("com.example.used.*"),
+            excludes = listOf("com.example.used.Excluded"),
+          ),
+          """
+          |package com.example.used;
+          |import com.example.used.Foo;
+          |import com.example.used.Excluded;
+          |import com.example.unused.Bar;
+          """
+            .trimMargin(),
+          """
+          |package shaded.example.used;
+          |import shaded.example.used.Foo;
+          |import com.example.used.Excluded;
+          |import com.example.unused.Bar;
+          """
+            .trimMargin(),
+        ),
+        Arguments.of(
+          "multi-language constructs in Kotlin, Groovy, Scala, and Java",
+          SimpleRelocator("com.example", "shaded.example"),
+          """
+          |// Kotlin constructs
+          |val delegate by com.example.Delegate()
+          |val isType = obj is com.example.Type
+          |val asType = obj as com.example.Type
+          |val range = 0..com.example.Constants.MAX
+          |fun compute(factory: () -> com.example.Type = { com.example.Factory.create() })
+          |
+          |// Groovy constructs
+          |def dynamicVar = com.example.Factory.create()
+          |def coerced = obj as com.example.Type
+          |
+          |// Scala constructs
+          |case _: com.example.Type => true
+          |class MyService with com.example.Trait
+          |
+          |// Java expressions and operators
+          |boolean flag = condition ? com.example.Factory.create() : null;
+          |int divided = total / com.example.Constants.SCALE;
+          |int bitwise = flags & com.example.Constants.MASK;
+          """
+            .trimMargin(),
+          """
+          |// Kotlin constructs
+          |val delegate by shaded.example.Delegate()
+          |val isType = obj is shaded.example.Type
+          |val asType = obj as shaded.example.Type
+          |val range = 0..shaded.example.Constants.MAX
+          |fun compute(factory: () -> shaded.example.Type = { shaded.example.Factory.create() })
+          |
+          |// Groovy constructs
+          |def dynamicVar = shaded.example.Factory.create()
+          |def coerced = obj as shaded.example.Type
+          |
+          |// Scala constructs
+          |case _: shaded.example.Type => true
+          |class MyService with shaded.example.Trait
+          |
+          |// Java expressions and operators
+          |boolean flag = condition ? shaded.example.Factory.create() : null;
+          |int divided = total / shaded.example.Constants.SCALE;
+          |int bitwise = flags & shaded.example.Constants.MASK;
+          """
+            .trimMargin(),
+        ),
+      )
+
     val sourceFile =
       """
       |package org.apache.maven.hello;
