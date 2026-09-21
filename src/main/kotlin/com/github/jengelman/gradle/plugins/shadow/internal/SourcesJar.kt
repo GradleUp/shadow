@@ -59,7 +59,7 @@ internal fun generateSourcesJar(
         }
 
         for ((file, relPath) in filesWithRelPaths.sortedBy { it.second }) {
-          val isSource = isSourceFile(relPath)
+          val isSource = relPath.isSourceFile()
           if (isSource) {
             if (isUnused(relPath, unusedClasses, sourceToClasses)) continue
             val relocatedPath = relocators.relocateSourcePath(relPath)
@@ -109,7 +109,7 @@ internal fun generateSourcesJar(
                 ) {
                   return@forEach
                 }
-                val isSource = isSourceFile(name)
+                val isSource = name.isSourceFile()
                 if (isSource) {
                   if (isUnused(name, unusedClasses, sourceToClasses)) return@forEach
                   val relocatedPath = relocators.relocateSourcePath(name)

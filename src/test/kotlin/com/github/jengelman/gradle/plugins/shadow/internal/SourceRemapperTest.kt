@@ -78,7 +78,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun chainedRelocatorsDoNotCascade() {
+  fun appliesMultipleRelocatorsSequentially() {
     val r1 = SimpleRelocator("a.foo", "b.foo")
     val r2 = SimpleRelocator("b.foo", "c.foo")
     val relocators = listOf(r1, r2)
@@ -96,10 +96,10 @@ class SourceRemapperTest {
 
     val expected =
       """
-      |package b.foo;
+      |package c.foo;
       |import c.foo.Bar;
       |public class Main {
-      |  b.foo.Baz baz;
+      |  c.foo.Baz baz;
       |  c.foo.Bar bar;
       |}
       """

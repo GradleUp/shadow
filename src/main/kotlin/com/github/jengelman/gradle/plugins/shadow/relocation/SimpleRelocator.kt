@@ -1,6 +1,5 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import com.github.jengelman.gradle.plugins.shadow.internal.remapSource
 import java.util.Objects
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
@@ -114,7 +113,25 @@ constructor(
 
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString || pattern.isEmpty()) return sourceContent
-    return listOf(this).remapSource(sourceContent)
+    val sourceIncludes = getSourceSubpatterns(includes, pattern)
+    val sourceExcludes = getSourceSubpatterns(excludes, pattern)
+    val content =
+      shadeSource(
+        sourceContent = sourceContent,
+        patternFrom = pattern,
+        patternTo = shadedPattern,
+        includedPatterns = sourceIncludes,
+        hasIncludes = includes.isNotEmpty(),
+        excludedPatterns = sourceExcludes,
+      )
+    return shadeSource(
+      sourceContent = content,
+      patternFrom = pathPattern,
+      patternTo = shadedPathPattern,
+      includedPatterns = sourceIncludes,
+      hasIncludes = includes.isNotEmpty(),
+      excludedPatterns = sourceExcludes,
+    )
   }
 
   override fun equals(other: Any?): Boolean {
@@ -193,6 +210,164 @@ constructor(
           add(packagePattern)
         }
       }
+    }
+
+    fun shadeSource(
+      sourceContent: String,
+      patternFrom: String,
+      patternTo: String,
+      includedPatterns: Set<String>,
+      hasIncludes: Boolean,
+      excludedPatterns: Set<String>,
+    ): String {
+      if (hasIncludes && includedPatterns.isEmpty()) {
+        return sourceContent
+      }
+
+      val regex = Regex("\\b" + Regex.escape(patternFrom) + "\\b")
+      val matches = regex.findAll(sourceContent).toList()
+      if (matches.isEmpty()) return sourceContent
+
+      val result = StringBuilder((sourceContent.length * 1.1).toInt())
+      var lastIndex = 0
+
+      for (match in matches) {
+        val matchStart = match.range.first
+        val matchEnd = match.range.last + 1
+
+        result.append(sourceContent, lastIndex, matchStart)
+        lastIndex = matchEnd
+
+        val isIncluded =
+          !hasIncludes || includedPatterns.any { matchesSubpattern(sourceContent, matchEnd, it) }
+        val isExcluded = excludedPatterns.any { matchesSubpattern(sourceContent, matchEnd, it) }
+        val contextValid = isSourceContextValid(patternFrom, sourceContent, matchStart, matchEnd)
+
+        if (isIncluded && !isExcluded && contextValid) {
+          result.append(patternTo)
+        } else {
+          result.append(patternFrom)
+        }
+      }
+
+      result.append(sourceContent, lastIndex, sourceContent.length)
+      return result.toString()
+    }
+
+    fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+      if (patternPrefix.isEmpty()) return emptySet()
+      val result = mutableSetOf<String>()
+      val dotPrefix = patternPrefix.replace('/', '.')
+      val slashPrefix = patternPrefix.replace('.', '/')
+      val trailingWildcardRegex = "[./][*]+$".toRegex()
+
+      for (pat in patterns) {
+        val dotPat = pat.replace('/', '.')
+        if (dotPat.startsWith(dotPrefix)) {
+          val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
+          if (sub.isEmpty()) {
+            result.add("")
+          } else {
+            result.add(sub)
+            result.add(sub.replace('.', '/'))
+          }
+        }
+        val slashPat = pat.replace('.', '/')
+        if (slashPat.startsWith(slashPrefix)) {
+          val sub = slashPat.substring(slashPrefix.length).replaceFirst(trailingWildcardRegex, "")
+          if (sub.isEmpty()) {
+            result.add("")
+          } else {
+            result.add(sub)
+            result.add(sub.replace('/', '.'))
+          }
+        }
+      }
+      return result
+    }
+
+    fun matchesSubpattern(
+      content: CharSequence,
+      offset: Int = 0,
+      subpattern: String,
+    ): Boolean {
+      val subLen = subpattern.length
+      if (offset + subLen > content.length) return false
+      for (i in 0 until subLen) {
+        if (content[offset + i] != subpattern[i]) return false
+      }
+      if (subLen == 0 || offset + subLen == content.length) return true
+      if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
+      val nextChar = content[offset + subLen]
+      return !nextChar.isLetterOrDigit() && nextChar != '_'
+    }
+
+    fun isSourceContextValid(
+      pattern: String,
+      sourceContent: CharSequence,
+      matchStart: Int,
+      matchEnd: Int,
+    ): Boolean {
+      var prevIndex = matchStart - 1
+      while (prevIndex >= 0 && sourceContent[prevIndex].isWhitespace()) {
+        prevIndex--
+      }
+
+      if (prevIndex >= 0) {
+        val prevChar = sourceContent[prevIndex]
+        if (prevChar == '.') {
+          val beforeDot = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
+          // A dot is only a package separator if it's not a Kotlin range '..' or varargs/spread
+          // '...'
+          if (beforeDot != '.') {
+            return false
+          }
+        }
+        if (prevChar == '/') {
+          val beforeSlash = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
+          // Only reject if pattern does not contain '.' and the slash is an actual path delimiter
+          // (not closing a block comment '*/' or a single-line comment '//')
+          if (!pattern.contains('.') && beforeSlash != '*' && beforeSlash != '/') {
+            return false
+          }
+        }
+      }
+
+      // In all JVM languages, qualified names containing '.' or '/' cannot be local identifiers.
+      if (pattern.contains('.') || pattern.contains('/')) {
+        return true
+      }
+
+      // For unqualified single-word patterns (e.g. "io", "foo"), check if followed by '.' or '/'
+      var nextIndex = matchEnd
+      while (nextIndex < sourceContent.length && sourceContent[nextIndex].isWhitespace()) {
+        nextIndex++
+      }
+      if (nextIndex < sourceContent.length) {
+        val nextChar = sourceContent[nextIndex]
+        if (nextChar == '.' || nextChar == '/') {
+          return true
+        }
+      }
+
+      // Check if preceded by 'package', 'import', or '{@link'
+      if (prevIndex >= 0) {
+        var tokenStart = prevIndex
+        while (tokenStart > 0 && sourceContent[tokenStart - 1].isJavaIdentifierPart()) {
+          tokenStart--
+        }
+        val prevToken = sourceContent.subSequence(tokenStart, prevIndex + 1).toString()
+        if (prevToken == "package" || prevToken == "import") {
+          return true
+        }
+        val lookbackStart = (matchStart - 32).coerceAtLeast(0)
+        val lookbackSnippet = sourceContent.substring(lookbackStart, matchStart)
+        if (lookbackSnippet.contains("{@link")) {
+          return true
+        }
+      }
+
+      return false
     }
   }
 }
