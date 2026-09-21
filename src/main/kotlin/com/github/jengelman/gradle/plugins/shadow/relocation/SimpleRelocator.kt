@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.Objects
-import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 
@@ -28,8 +27,6 @@ constructor(
   @get:Input internal val pathPattern: String
   @get:Input internal val shadedPattern: String
   @get:Input internal val shadedPathPattern: String
-  private val sourcePackageExcludes = mutableSetOf<String>()
-  private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input public val includes: MutableSet<String> = mutableSetOf()
   @get:Input public val excludes: MutableSet<String> = mutableSetOf()
@@ -70,16 +67,14 @@ constructor(
 
   public open fun include(pattern: String) {
     includes.addAll(normalizePatterns(listOf(pattern)))
-    includes.add(pattern)
   }
 
   public open fun exclude(pattern: String) {
     excludes.addAll(normalizePatterns(listOf(pattern)))
-    excludes.add(pattern)
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
+    if (rawString) return pathPattern.toPattern().matcher(path).find()
     // If string is too short - no need to perform expensive string operations.
     if (path.length < pathPattern.length) return false
     var adjustedPath = path.removeSuffix(".class")
@@ -113,23 +108,25 @@ constructor(
 
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString || pattern.isEmpty()) return sourceContent
-    val sourceIncludes = getSourceSubpatterns(includes, pattern)
-    val sourceExcludes = getSourceSubpatterns(excludes, pattern)
+    val sourceIncludes = extractSourceSubpatterns(includes, pattern)
+    val sourceExcludes = extractSourceSubpatterns(excludes, pattern)
+    // Relocate package and class references in dot notation (e.g. "org.foo.Bar").
     val content =
-      shadeSource(
+      relocateSourcePattern(
         sourceContent = sourceContent,
         patternFrom = pattern,
         patternTo = shadedPattern,
-        includedPatterns = sourceIncludes,
         hasIncludes = includes.isNotEmpty(),
+        includedPatterns = sourceIncludes,
         excludedPatterns = sourceExcludes,
       )
-    return shadeSource(
+    // Relocate resource and classpath references in slash notation (e.g. "org/foo/Bar").
+    return relocateSourcePattern(
       sourceContent = content,
       patternFrom = pathPattern,
       patternTo = shadedPathPattern,
-      includedPatterns = sourceIncludes,
       hasIncludes = includes.isNotEmpty(),
+      includedPatterns = sourceIncludes,
       excludedPatterns = sourceExcludes,
     )
   }
@@ -212,12 +209,12 @@ constructor(
       }
     }
 
-    fun shadeSource(
+    fun relocateSourcePattern(
       sourceContent: String,
       patternFrom: String,
       patternTo: String,
-      includedPatterns: Set<String>,
       hasIncludes: Boolean,
+      includedPatterns: Set<String>,
       excludedPatterns: Set<String>,
     ): String {
       if (hasIncludes && includedPatterns.isEmpty()) {
@@ -241,7 +238,7 @@ constructor(
         val isIncluded =
           !hasIncludes || includedPatterns.any { matchesSubpattern(sourceContent, matchEnd, it) }
         val isExcluded = excludedPatterns.any { matchesSubpattern(sourceContent, matchEnd, it) }
-        val contextValid = isSourceContextValid(patternFrom, sourceContent, matchStart, matchEnd)
+        val contextValid = isValidSourceContext(patternFrom, sourceContent, matchStart, matchEnd)
 
         if (isIncluded && !isExcluded && contextValid) {
           result.append(patternTo)
@@ -254,7 +251,7 @@ constructor(
       return result.toString()
     }
 
-    fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+    fun extractSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
       if (patternPrefix.isEmpty()) return emptySet()
       val result = mutableSetOf<String>()
       val dotPrefix = patternPrefix.replace('/', '.')
@@ -302,7 +299,7 @@ constructor(
       return !nextChar.isLetterOrDigit() && nextChar != '_'
     }
 
-    fun isSourceContextValid(
+    fun isValidSourceContext(
       pattern: String,
       sourceContent: CharSequence,
       matchStart: Int,
