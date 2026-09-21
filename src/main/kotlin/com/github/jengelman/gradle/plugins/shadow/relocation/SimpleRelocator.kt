@@ -1,9 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
-import com.github.jengelman.gradle.plugins.shadow.internal.RX_WHITESPACE
-import com.github.jengelman.gradle.plugins.shadow.internal.getSourceSubpatterns
-import com.github.jengelman.gradle.plugins.shadow.internal.isJavaContextValid
-import com.github.jengelman.gradle.plugins.shadow.internal.matchesSubpattern
+import com.github.jengelman.gradle.plugins.shadow.internal.remapSource
 import java.util.Objects
 import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
@@ -117,25 +114,7 @@ constructor(
 
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString || pattern.isEmpty()) return sourceContent
-    val sourceIncludes = getSourceSubpatterns(includes, pattern)
-    val sourceExcludes = getSourceSubpatterns(excludes, pattern)
-    val content =
-      shadeSourceWithFilters(
-        sourceContent = sourceContent,
-        patternFrom = pattern,
-        patternTo = shadedPattern,
-        includedPatterns = sourceIncludes,
-        hasIncludes = includes.isNotEmpty(),
-        excludedPatterns = sourceExcludes,
-      )
-    return shadeSourceWithFilters(
-      sourceContent = content,
-      patternFrom = pathPattern,
-      patternTo = shadedPathPattern,
-      includedPatterns = sourceIncludes,
-      hasIncludes = includes.isNotEmpty(),
-      excludedPatterns = sourceExcludes,
-    )
+    return listOf(this).remapSource(sourceContent)
   }
 
   override fun equals(other: Any?): Boolean {
@@ -214,49 +193,6 @@ constructor(
           add(packagePattern)
         }
       }
-    }
-
-    fun shadeSourceWithFilters(
-      sourceContent: String,
-      patternFrom: String,
-      patternTo: String,
-      includedPatterns: Set<String>,
-      hasIncludes: Boolean,
-      excludedPatterns: Set<String>,
-    ): String {
-      if (hasIncludes && includedPatterns.isEmpty()) {
-        return sourceContent
-      }
-
-      val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
-      val snippets =
-        sourceContent
-          .split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-          .filter(CharSequence::isNotEmpty)
-
-      snippets.forEachIndexed { i, snippet ->
-        val isFirstSnippet = i == 0
-        val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
-
-        val isIncluded =
-          !hasIncludes ||
-            includedPatterns.any {
-              matchesSubpattern(content = snippet, subpattern = it)
-            }
-        val isExcluded = excludedPatterns.any {
-          matchesSubpattern(content = snippet, subpattern = it)
-        }
-
-        if (isFirstSnippet) {
-          shadedSourceContent.append(snippet)
-        } else {
-          val previousSnippetOneLine = previousSnippet.replace(RX_WHITESPACE, " ")
-          val shouldRelocate =
-            isIncluded && !isExcluded && previousSnippetOneLine.isJavaContextValid()
-          shadedSourceContent.append(if (shouldRelocate) patternTo else patternFrom).append(snippet)
-        }
-      }
-      return shadedSourceContent.toString()
     }
   }
 }

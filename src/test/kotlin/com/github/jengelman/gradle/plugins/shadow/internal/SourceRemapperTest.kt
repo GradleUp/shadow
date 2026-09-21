@@ -199,4 +199,132 @@ class SourceRemapperTest {
     assertThat(relocators.relocateSourcePath("unrelated/pkg/Unrelated.java"))
       .isEqualTo("unrelated/pkg/Unrelated.java")
   }
+
+  @Test
+  fun remapSourceWithMultiLanguageConstructs() {
+    val relocators = listOf(SimpleRelocator("com.example", "shaded.example"))
+    val input =
+      """
+      |// Kotlin constructs
+      |val delegate by com.example.Delegate()
+      |val isType = obj is com.example.Type
+      |val asType = obj as com.example.Type
+      |val range = 0..com.example.Constants.MAX
+      |fun compute(factory: () -> com.example.Type = { com.example.Factory.create() })
+      |
+      |// Groovy constructs
+      |def dynamicVar = com.example.Factory.create()
+      |def coerced = obj as com.example.Type
+      |
+      |// Scala constructs
+      |case _: com.example.Type => true
+      |class MyService with com.example.Trait
+      |
+      |// Java expressions and operators
+      |boolean flag = condition ? com.example.Factory.create() : null;
+      |int divided = total / com.example.Constants.SCALE;
+      |int bitwise = flags & com.example.Constants.MASK;
+      """
+        .trimMargin()
+
+    val expected =
+      """
+      |// Kotlin constructs
+      |val delegate by shaded.example.Delegate()
+      |val isType = obj is shaded.example.Type
+      |val asType = obj as shaded.example.Type
+      |val range = 0..shaded.example.Constants.MAX
+      |fun compute(factory: () -> shaded.example.Type = { shaded.example.Factory.create() })
+      |
+      |// Groovy constructs
+      |def dynamicVar = shaded.example.Factory.create()
+      |def coerced = obj as shaded.example.Type
+      |
+      |// Scala constructs
+      |case _: shaded.example.Type => true
+      |class MyService with shaded.example.Trait
+      |
+      |// Java expressions and operators
+      |boolean flag = condition ? shaded.example.Factory.create() : null;
+      |int divided = total / shaded.example.Constants.SCALE;
+      |int bitwise = flags & shaded.example.Constants.MASK;
+      """
+        .trimMargin()
+
+    assertThat(relocators.remapSource(input)).isEqualTo(expected)
+  }
+
+  @Test
+  fun remapSourceProtectsPrefixCollisionsAndVariables() {
+    val relocators =
+      listOf(
+        SimpleRelocator("com.example", "shaded.example"),
+        SimpleRelocator("io", "shaded.io"),
+      )
+    val input =
+      """
+      |package io;
+      |import io.netty.channel.Channel;
+      |import other.com.example.Foo;
+      |import java.io.IOException;
+      |
+      |class Main {
+      |  String io, val;
+      |  String path = "dir/com/example/File.txt";
+      |  String relocatedPath = "com/example/File.txt";
+      |  /* comment */ com.example.Type t;
+      |  // line comment com.example.Type t2;
+      |}
+      """
+        .trimMargin()
+
+    val expected =
+      """
+      |package shaded.io;
+      |import shaded.io.netty.channel.Channel;
+      |import other.com.example.Foo;
+      |import java.io.IOException;
+      |
+      |class Main {
+      |  String io, val;
+      |  String path = "dir/com/example/File.txt";
+      |  String relocatedPath = "shaded/example/File.txt";
+      |  /* comment */ shaded.example.Type t;
+      |  // line comment shaded.example.Type t2;
+      |}
+      """
+        .trimMargin()
+
+    assertThat(relocators.remapSource(input)).isEqualTo(expected)
+  }
+
+  @Test
+  fun remapSourceAtContentStartAndInJavadocLink() {
+    val relocators =
+      listOf(
+        SimpleRelocator("com.example", "shaded.example"),
+        SimpleRelocator("io", "shaded.io"),
+      )
+    val input =
+      """
+      |com.example.Factory.create()
+      |io.netty.channel.Channel.open()
+      |/**
+      | * See {@link io} or {@link com.example.Type}
+      | */
+      """
+        .trimMargin()
+
+    val expected =
+      """
+      |shaded.example.Factory.create()
+      |shaded.io.netty.channel.Channel.open()
+      |/**
+      | * See {@link shaded.io} or {@link shaded.example.Type}
+      | */
+      """
+        .trimMargin()
+
+    assertThat(relocators.remapSource(input)).isEqualTo(expected)
+  }
 }

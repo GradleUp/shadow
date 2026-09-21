@@ -6,81 +6,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 
-private val KEYWORDS =
-  setOf(
-    "import",
-    "package",
-    "public",
-    "protected",
-    "private",
-    "static",
-    "final",
-    "synchronized",
-    "abstract",
-    "volatile",
-    "transient",
-    "native",
-    "strictfp",
-    "extends",
-    "implements",
-    "throws",
-    "return",
-    "new",
-    "throw",
-    "instanceof",
-    "case",
-    "default",
-    "yield",
-    "val",
-    "var",
-    "fun",
-    "is",
-    "as",
-    "in",
-  )
-
-/**
- * Match
- * - certain Java keywords + space
- * - beginning of Javadoc link + optional line breaks and continuations with '*'
- * - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
- * - (closing curly brace / closing multi-line comment) + space
- *
- * at end of string
- */
-private val RX_ENDS_WITH_JAVA_KEYWORD =
-  listOf(
-      "\\b(${KEYWORDS.joinToString("|")}) $",
-      "\\{@link( \\*)* $",
-      "([{}(=;,:<>?&|@\\[\\]]|\\*/) $",
-    )
-    .joinToString("|")
-    .toPattern()
-
-private val RX_ENDS_WITH_DOT_SLASH_SPACE = "[./ ]$".toPattern()
-
-internal val RX_WHITESPACE = "\\s+".toRegex()
-
-internal fun String.isJavaContextValid(): Boolean {
-  if (!RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(this).find()) {
-    return true
-  }
-  if (endsWith(' ')) {
-    var end = length - 1
-    while (end > 0 && this[end - 1].isWhitespace()) {
-      end--
-    }
-    var start = end
-    while (start > 0 && this[start - 1].isJavaIdentifierPart()) {
-      start--
-    }
-    if (start < end && substring(start, end) in KEYWORDS) {
-      return true
-    }
-  }
-  return RX_ENDS_WITH_JAVA_KEYWORD.matcher(this).find()
-}
-
 /**
  * Remaps source content by applying relocators in a single pass with first-match-wins precedence,
  * avoiding cascade replacements where earlier relocations get re-relocated by subsequent rules.
@@ -131,14 +56,7 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
     result.append(sourceContent, lastIndex, matchStart)
     lastIndex = matchEnd
 
-    var cursor = matchStart - 1
-    while (cursor >= 0 && sourceContent[cursor].isWhitespace()) {
-      cursor--
-    }
-    val lookbackStart = (cursor - 64).coerceAtLeast(0)
-    val previousSnippetOneLine =
-      sourceContent.substring(lookbackStart, matchStart).replace(RX_WHITESPACE, " ")
-    val contextValid = previousSnippetOneLine.isJavaContextValid()
+    val contextValid = isSourceContextValid(matchedText, sourceContent, matchStart, matchEnd)
 
     var replaced = false
     if (contextValid) {
@@ -221,7 +139,7 @@ internal fun isSourceFile(path: String): Boolean {
     path.endsWith(".scala")
 }
 
-internal fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+private fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
   if (patternPrefix.isEmpty()) return emptySet()
   val result = mutableSetOf<String>()
   val dotPrefix = patternPrefix.replace('/', '.')
@@ -253,7 +171,7 @@ internal fun getSourceSubpatterns(patterns: Set<String>, patternPrefix: String):
   return result
 }
 
-internal fun matchesSubpattern(
+private fun matchesSubpattern(
   content: CharSequence,
   offset: Int = 0,
   subpattern: String,
@@ -267,4 +185,76 @@ internal fun matchesSubpattern(
   if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
   val nextChar = content[offset + subLen]
   return !nextChar.isLetterOrDigit() && nextChar != '_'
+}
+
+/**
+ * Determines whether a match in the source code represents a valid package/class reference rather
+ * than a subpackage of a longer package, a subpath of a longer path, or an unrelated local
+ * identifier (e.g., variable or parameter name).
+ */
+private fun isSourceContextValid(
+  pattern: String,
+  sourceContent: CharSequence,
+  matchStart: Int,
+  matchEnd: Int,
+): Boolean {
+  var prevIndex = matchStart - 1
+  while (prevIndex >= 0 && sourceContent[prevIndex].isWhitespace()) {
+    prevIndex--
+  }
+
+  if (prevIndex >= 0) {
+    val prevChar = sourceContent[prevIndex]
+    if (prevChar == '.') {
+      val beforeDot = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
+      // A dot is only a package separator if it's not a Kotlin range '..' or varargs/spread '...'
+      if (beforeDot != '.') {
+        return false
+      }
+    }
+    if (prevChar == '/') {
+      val beforeSlash = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
+      // Only reject if pattern does not contain '.' and the slash is an actual path delimiter
+      // (not closing a block comment '*/' or a single-line comment '//')
+      if (!pattern.contains('.') && beforeSlash != '*' && beforeSlash != '/') {
+        return false
+      }
+    }
+  }
+
+  // In all JVM languages, qualified names containing '.' or '/' cannot be local identifiers.
+  if (pattern.contains('.') || pattern.contains('/')) {
+    return true
+  }
+
+  // For unqualified single-word patterns (e.g. "io", "foo"), check if followed by '.' or '/'
+  var nextIndex = matchEnd
+  while (nextIndex < sourceContent.length && sourceContent[nextIndex].isWhitespace()) {
+    nextIndex++
+  }
+  if (nextIndex < sourceContent.length) {
+    val nextChar = sourceContent[nextIndex]
+    if (nextChar == '.' || nextChar == '/') {
+      return true
+    }
+  }
+
+  // Check if preceded by 'package', 'import', or '{@link'
+  if (prevIndex >= 0) {
+    var tokenStart = prevIndex
+    while (tokenStart > 0 && sourceContent[tokenStart - 1].isJavaIdentifierPart()) {
+      tokenStart--
+    }
+    val prevToken = sourceContent.subSequence(tokenStart, prevIndex + 1).toString()
+    if (prevToken == "package" || prevToken == "import") {
+      return true
+    }
+    val lookbackStart = (matchStart - 32).coerceAtLeast(0)
+    val lookbackSnippet = sourceContent.substring(lookbackStart, matchStart)
+    if (lookbackSnippet.contains("{@link")) {
+      return true
+    }
+  }
+
+  return false
 }
