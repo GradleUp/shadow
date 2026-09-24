@@ -915,7 +915,9 @@ You can also customize the source inputs included in the companion sources JAR u
 ### Publishing with Kotlin Multiplatform (KMP)
 
 In Kotlin Multiplatform (KMP) projects, publications are managed by the Kotlin Gradle Plugin (KGP) per target (such as
-the `jvm` publication). You can attach the shadowed sources JAR artifact to the `jvm` Maven publication:
+the `jvm` publication), which publish the original, non-shadowed artifacts. Shadow doesn't publish the shadowed JAR or
+the shadowed sources JAR automatically in KMP projects, so create a dedicated publication for them. Don't attach the
+shadowed sources JAR to KGP's `jvm` publication, as it would not match the non-shadowed JAR published there:
 
 === ":material-language-kotlin: build.gradle.kts"
 
@@ -930,13 +932,17 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
       jvm()
     }
 
+    val shadowJar = tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar") {
+      archiveClassifier = ""
+    }
+
     publishing {
       publications {
-        withType<MavenPublication>().configureEach {
-          if (name == "jvm") {
-            artifact(tasks.named<com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar>("shadowJar").flatMap { it.archiveSourcesFile }) {
-              classifier = "sources"
-            }
+        create<MavenPublication>("shadow") {
+          artifactId = "my-library-all"
+          artifact(shadowJar)
+          artifact(shadowJar.flatMap { it.archiveSourcesFile }) {
+            classifier = "sources"
           }
         }
       }
@@ -959,13 +965,17 @@ the `jvm` publication). You can attach the shadowed sources JAR artifact to the 
       jvm()
     }
 
+    def shadowJar = tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar) {
+      archiveClassifier = ''
+    }
+
     publishing {
       publications {
-        withType(MavenPublication).configureEach {
-          if (name == 'jvm') {
-            artifact(tasks.named('shadowJar', com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar).flatMap { it.archiveSourcesFile }) {
-              classifier = 'sources'
-            }
+        shadow(MavenPublication) {
+          artifactId = 'my-library-all'
+          artifact(shadowJar)
+          artifact(shadowJar.flatMap { it.archiveSourcesFile }) {
+            classifier = 'sources'
           }
         }
       }

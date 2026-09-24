@@ -829,7 +829,6 @@ class PublishingTest : BasePluginTest() {
       |}
       |$shadowJarTask {
       |  archiveClassifier = ''
-      |  generateSourcesJar = true
       |}
       |publishing {
       |  repositories {
