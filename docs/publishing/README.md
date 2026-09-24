@@ -589,9 +589,12 @@ Shadow automatically generates a **Shadowed Sources JAR** containing:
 - Source files from your project's source sets (`Java`, `Kotlin`, `Groovy`, `Scala`).
 - Source files resolved and merged from all bundled dependencies' `-sources.jar` archives.
 - Relocated package declarations, imports, and symbol references that match your [`relocate`][ShadowJar.relocate] rules.
-- Normalized package directory layout matching the declared `package` in each source file.
-- Automatic filtering: dependencies excluded in `dependencies { exclude(...) }` or unused classes removed via
-  `minimize()` are automatically excluded from the shadowed sources JAR as well.
+- Relocated paths for source files laid out in their package directories. Other source files keep their original
+  relative paths, such as Kotlin Multiplatform (KMP) dependency sources under `commonMain/` or `jvmMain/`.
+- Automatic filtering: dependencies excluded in `dependencies { exclude(...) }` are excluded from the shadowed sources
+  JAR as well. When minimizing with the default dependency analyzer (`minimize()`), source files of removed classes are
+  also excluded, as long as they are laid out in their package directories. Minimizing with R8 does not filter the
+  shadowed sources JAR.
 
 ### Publishing with `withSourcesJar()`
 
@@ -848,6 +851,16 @@ To publish shadowed artifacts as the primary publication:
 > dependency filtering, and minimization configuration. As a result, when `generateSourcesJar` is enabled, source files
 > become inputs of `shadowJar`, and any change to them (even a comment that doesn't affect the compiled classes)
 > reruns `shadowJar` and rebuilds the shadowed JAR as well.
+
+> [!NOTE]
+> The shadowed sources JAR has a few limitations compared to the shadowed JAR:
+>
+> - `include(...)` and `exclude(...)` patterns configured on `shadowJar` are not applied to the shadowed sources JAR,
+>   so sources of excluded classes are still included.
+> - When multiple source files share the same path, only the first one is kept, regardless of `duplicatesStrategy` and
+>   `failOnDuplicateEntries`. Project sources are added first, then dependency sources. For example, in KMP projects,
+>   `commonMain/kotlin/foo/Foo.kt` and `jvmMain/kotlin/foo/Foo.kt` (such as `expect` and `actual` declarations) share
+>   the path `foo/Foo.kt`, and KMP dependencies may share paths like `commonMain/Annotations.kt`.
 
 ### Customizing the Sources Archive File
 
