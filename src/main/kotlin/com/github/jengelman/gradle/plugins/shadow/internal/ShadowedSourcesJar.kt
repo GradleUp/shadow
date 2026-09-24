@@ -51,6 +51,7 @@ internal fun generateSourcesJar(
       }
 
       for ((file, relPath) in filesWithRelPaths.sortedBy { it.second }) {
+        if (relPath.isModuleInfo) continue
         val isSource = relPath.isSourceFile()
         if (isSource) {
           if (isUnused(relPath, unusedClasses, sourceToClasses)) continue
@@ -94,6 +95,7 @@ internal fun generateSourcesJar(
               val name = entry.name
               if (
                 name == "META-INF/MANIFEST.MF" ||
+                  name.isModuleInfo ||
                   name.endsWith(".class") ||
                   name.startsWith("META-INF/INDEX.LIST") ||
                   (name.startsWith("META-INF/") &&
@@ -233,3 +235,7 @@ private fun buildSourceToClassesMap(
 
   return sourceToClasses
 }
+
+// Aligned with the default exclusion of `module-info.class` from the shadowed JAR.
+private val String.isModuleInfo: Boolean
+  get() = substringAfterLast('/') == "module-info.java"

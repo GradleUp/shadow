@@ -20,6 +20,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
+import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 import org.junit.jupiter.api.Test
@@ -143,6 +144,44 @@ class ShadowedSourcesJarTest {
 
     assertThat(JarPath(outputJar)).useAll {
       containsOnly("META-INF/", "META-INF/MANIFEST.MF")
+    }
+  }
+
+  @Test
+  fun excludesModuleInfo() {
+    val srcDir = tempDir.resolve("src").createDirectories()
+    srcDir.resolve("module-info.java").writeText("module my.module {}")
+    srcDir.resolve("com/example/Main.java").apply {
+      createParentDirectories()
+      writeText("package com.example;\npublic class Main {}")
+    }
+
+    val depSourcesJar = tempDir.resolve("dep-sources.jar")
+    ZipOutputStream(depSourcesJar.toFile()).use { zos ->
+      zos.writeEntry("module-info.java") { write("module dep {}".toByteArray()) }
+      zos.writeEntry("jvmMain/module-info.java") { write("module dep.jvm {}".toByteArray()) }
+      zos.writeEntry("dep/Dep.java") {
+        write("package dep;\npublic class Dep {}".toByteArray())
+      }
+    }
+
+    val outputJar = tempDir.resolve("output-sources.jar")
+    generateSourcesJar(
+      sourcesJarFile = outputJar.toFile(),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      includedSourcesJars = listOf(depSourcesJar.toFile()),
+    )
+
+    assertThat(JarPath(outputJar)).useAll {
+      containsOnly(
+        "META-INF/MANIFEST.MF",
+        "com/example/Main.java",
+        "dep/Dep.java",
+        "META-INF/",
+        "com/",
+        "com/example/",
+        "dep/",
+      )
     }
   }
 
