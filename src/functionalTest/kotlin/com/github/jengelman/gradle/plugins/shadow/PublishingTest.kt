@@ -376,6 +376,39 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun dontPublishShadowJarAndSourcesWhenShadowJarDisabled() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          |java {
+          |  withSourcesJar()
+          |}
+          """
+            .trimMargin(),
+        shadowBlock =
+          """
+          |enabled = false
+          """
+            .trimMargin(),
+        publicationsBlock =
+          """
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |}
+          """
+            .trimMargin(),
+      )
+    )
+
+    publish()
+
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries)
+      .containsOnly(*withChecksums("maven-1.0.module", "maven-1.0.pom"))
+  }
+
+  @Test
   fun publishJavaComponentWithShadowAndSourcesVariants() {
     projectScript.appendText(
       publishConfiguration(
