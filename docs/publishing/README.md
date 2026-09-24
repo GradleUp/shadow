@@ -575,8 +575,8 @@ customizable properties listed in [Configuring Output Name][configuring-output-n
     }
     ```
 
-We modified `archiveClassifier`, `archiveExtension` and `archiveBaseName` in this example, the published artifact will
-be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
+Since we modified `archiveClassifier`, `archiveExtension`, and `archiveBaseName` in this example, the published
+artifact will be named `my-artifact-2.0-my-classifier.my-ext` instead of `1.0-all.jar`.
 
 ## Shadowed Sources JAR
 
@@ -770,7 +770,7 @@ publication, and disable standard archive tasks to prevent destination file coll
 > become inputs of `shadowJar`, and any change to them (even a comment that doesn't affect the compiled classes)
 > reruns `shadowJar` and rebuilds the shadowed JAR as well.
 
-> [!NOTE]
+> [!WARNING]
 > The shadowed sources JAR has a few limitations compared to the shadowed JAR:
 >
 > - `include(...)` and `exclude(...)` patterns configured on `shadowJar` are not applied to the shadowed sources JAR,
