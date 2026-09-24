@@ -179,24 +179,23 @@ class ShadowPropertiesTest {
       plugins.apply(JavaPlugin::class.java)
       javaPluginExtension.withSourcesJar()
       val shadowJarTask = tasks.shadowJar.get()
-      assertThat(shadowJarTask.generateSourcesJar.get()).isTrue()
-      assertThat(shadowJarTask.archiveSourcesFile.get().asFile).all {
-        isEqualTo(
-          shadowJarTask.destinationDirectory.file("my-project-1.0.0-all-sources.jar").get().asFile
-        )
-        isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
+      with(shadowJarTask) {
+        assertThat(generateSourcesJar.get()).isTrue()
+        assertThat(archiveSourcesFile.get().asFile).all {
+          isEqualTo(destinationDirectory.file("my-project-1.0.0-all-sources.jar").get().asFile)
+          isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
+        }
+        assertThat(outputs.files.files)
+          .containsOnly(
+            archiveFile.get().asFile,
+            archiveSourcesFile.get().asFile,
+          )
+        val mainSourceSet = javaPluginExtension.sourceSets.getByName("main")
+        assertThat(sourceSetsSourceDirs.files)
+          .containsOnly(*mainSourceSet.allSource.files.toTypedArray())
       }
-      assertThat(shadowJarTask.outputs.files.files)
-        .containsOnly(
-          shadowJarTask.archiveFile.get().asFile,
-          shadowJarTask.archiveSourcesFile.get().asFile,
-        )
-      val mainSourceSet = javaPluginExtension.sourceSets.getByName("main")
-      assertThat(shadowJarTask.sourceSetsSourceDirs.files)
-        .containsOnly(*mainSourceSet.allSource.files.toTypedArray())
 
-      val shadowSourcesElements = configurations.shadowSourcesElements.get()
-      with(shadowSourcesElements.artifacts.single()) {
+      with(project.configurations.shadowSourcesElements.get().artifacts.single()) {
         assertThat(classifier).isEqualTo("all-sources")
         assertThat(name).isEqualTo("my-project")
         assertThat(extension).isEqualTo("jar")
