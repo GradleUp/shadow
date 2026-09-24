@@ -60,7 +60,9 @@ internal fun generateSourcesJar(
         if (!visitedFiles.add(relocatedPath)) return
         val bytes =
           if (isSource) {
-            relocators.remapSource(readBytes().decodeToString()).toByteArray()
+            relocators
+              .remapSourceFile(readBytes().decodeToString(), name, relocatedPath)
+              .toByteArray()
           } else {
             readBytes()
           }

@@ -14,6 +14,26 @@ internal fun Iterable<Relocator>.remapSource(sourceContent: String): String {
 }
 
 /**
+ * Remaps the content of the source file at [path], which is relocated to [relocatedPath].
+ *
+ * If the file is laid out in its package directory, its `package` declaration is set to match
+ * [relocatedPath], which is decided per class like class files, as the declaration alone can't
+ * match class-level includes and excludes.
+ */
+internal fun Iterable<Relocator>.remapSourceFile(
+  sourceContent: String,
+  path: String,
+  relocatedPath: String,
+): String {
+  val content = remapSource(sourceContent)
+  val originalPackage = packageRegex.find(sourceContent)?.groupValues?.get(1) ?: return content
+  val relocatedPackage = relocatedPath.packageOfPath
+  if (originalPackage != path.packageOfPath || relocatedPackage.isEmpty()) return content
+  val packageRange = packageRegex.find(content)?.groups?.get(1)?.range ?: return content
+  return content.replaceRange(packageRange, relocatedPackage)
+}
+
+/**
  * Relocates a source file path by stripping its extension before matching against class/path
  * relocators, ensuring class-level include/exclude patterns work symmetrically with binary classes.
  */
@@ -43,3 +63,8 @@ internal fun Iterable<Relocator>.relocateSourcePath(path: String): String {
 internal fun String.isSourceFile(): Boolean {
   return endsWith(".java") || endsWith(".kt") || endsWith(".groovy") || endsWith(".scala")
 }
+
+private val packageRegex = Regex("""^\s*package\s+([\w.]+)""", RegexOption.MULTILINE)
+
+private val String.packageOfPath: String
+  get() = substringBeforeLast('/', "").replace('/', '.')

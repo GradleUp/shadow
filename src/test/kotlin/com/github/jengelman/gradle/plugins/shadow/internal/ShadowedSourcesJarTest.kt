@@ -148,6 +148,50 @@ class ShadowedSourcesJarTest {
   }
 
   @Test
+  fun packageDeclarationFollowsClassIncludesAndExcludes() {
+    val srcDir = tempDir.resolve("src").createDirectories()
+    srcDir.resolve("org/foo/Bar.java").apply {
+      createParentDirectories()
+      writeText("package org.foo;\npublic class Bar {}")
+    }
+    srcDir.resolve("org/foo/Baz.java").apply {
+      createParentDirectories()
+      writeText("package org.foo;\nimport org.foo.Bar;\npublic class Baz {}")
+    }
+    // Not laid out in its package directory, so its package declaration is left as-is.
+    srcDir.resolve("Flat.kt").writeText("package org.foo\nclass Flat")
+
+    val excludeJar = tempDir.resolve("exclude-sources.jar")
+    generateSourcesJar(
+      sourcesJarFile = excludeJar.toFile(),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      relocators =
+        listOf(SimpleRelocator("org.foo", "shaded.org.foo", excludes = listOf("org.foo.Bar"))),
+    )
+    assertThat(JarPath(excludeJar)).useAll {
+      getContent("org/foo/Bar.java").isEqualTo("package org.foo;\npublic class Bar {}")
+      getContent("shaded/org/foo/Baz.java")
+        .isEqualTo("package shaded.org.foo;\nimport org.foo.Bar;\npublic class Baz {}")
+      getContent("Flat.kt").isEqualTo("package shaded.org.foo\nclass Flat")
+    }
+
+    val includeJar = tempDir.resolve("include-sources.jar")
+    generateSourcesJar(
+      sourcesJarFile = includeJar.toFile(),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      relocators =
+        listOf(SimpleRelocator("org.foo", "shaded.org.foo", includes = listOf("org.foo.Bar"))),
+    )
+    assertThat(JarPath(includeJar)).useAll {
+      getContent("shaded/org/foo/Bar.java")
+        .isEqualTo("package shaded.org.foo;\npublic class Bar {}")
+      getContent("org/foo/Baz.java")
+        .isEqualTo("package org.foo;\nimport shaded.org.foo.Bar;\npublic class Baz {}")
+      getContent("Flat.kt").isEqualTo("package org.foo\nclass Flat")
+    }
+  }
+
+  @Test
   fun excludesModuleInfo() {
     val srcDir = tempDir.resolve("src").createDirectories()
     srcDir.resolve("module-info.java").writeText("module my.module {}")
