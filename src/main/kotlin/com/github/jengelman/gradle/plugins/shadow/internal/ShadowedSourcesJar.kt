@@ -50,89 +50,52 @@ internal fun generateSourcesJar(
         }
       }
 
-      for ((file, relPath) in filesWithRelPaths.sortedBy { it.second }) {
-        if (relPath.isModuleInfo) continue
-        val isSource = relPath.isSourceFile()
-        if (isSource) {
-          if (isUnused(relPath, unusedClasses, sourceToClasses)) continue
-          val relocatedPath = relocators.relocateSourcePath(relPath)
-          if (visitedFiles.add(relocatedPath)) {
-            val text = file.readText()
-            val transformedText = relocators.remapSource(text)
-            val bytes = transformedText.toByteArray()
-            zos.writeEntry(
-              name = relocatedPath,
-              preserveLastModified = preserveFileTimestamps,
-              lastModified = file.lastModified(),
-              unixMode = UnixMode.file(),
-            ) {
-              write(bytes)
-            }
+      // Relocates and writes a project or dependency source file, or a resource.
+      fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
+        if (name.isModuleInfo) return
+        val isSource = name.isSourceFile()
+        if (isSource && isUnused(name, unusedClasses, sourceToClasses)) return
+        val relocatedPath =
+          if (isSource) relocators.relocateSourcePath(name) else relocators.relocatePath(name)
+        if (!visitedFiles.add(relocatedPath)) return
+        val bytes =
+          if (isSource) {
+            relocators.remapSource(readBytes().decodeToString()).toByteArray()
+          } else {
+            readBytes()
           }
-        } else {
-          val relocatedPath = relocators.relocatePath(relPath)
-          if (visitedFiles.add(relocatedPath)) {
-            val bytes = file.readBytes()
-            zos.writeEntry(
-              name = relocatedPath,
-              preserveLastModified = preserveFileTimestamps,
-              lastModified = file.lastModified(),
-              unixMode = UnixMode.file(),
-            ) {
-              write(bytes)
-            }
-          }
+        zos.writeEntry(
+          name = relocatedPath,
+          preserveLastModified = preserveFileTimestamps,
+          lastModified = lastModified,
+          unixMode = UnixMode.file(),
+        ) {
+          write(bytes)
         }
       }
+
+      filesWithRelPaths
+        .sortedBy { it.second }
+        .forEach { (file, relPath) ->
+          addEntry(relPath, file.lastModified()) { file.readBytes() }
+        }
 
       sourcesJars.forEach { jarFile ->
         jarFile.useZip {
           entries()
             .toList()
-            .filterNot { it.isDirectory }
+            .filterNot { entry ->
+              val name = entry.name
+              entry.isDirectory ||
+                name == "META-INF/MANIFEST.MF" ||
+                name.endsWith(".class") ||
+                name.startsWith("META-INF/INDEX.LIST") ||
+                (name.startsWith("META-INF/") &&
+                  (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
+            }
             .sortedBy { it.name }
             .forEach { entry ->
-              val name = entry.name
-              if (
-                name == "META-INF/MANIFEST.MF" ||
-                  name.isModuleInfo ||
-                  name.endsWith(".class") ||
-                  name.startsWith("META-INF/INDEX.LIST") ||
-                  (name.startsWith("META-INF/") &&
-                    (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
-              ) {
-                return@forEach
-              }
-              val isSource = name.isSourceFile()
-              if (isSource) {
-                if (isUnused(name, unusedClasses, sourceToClasses)) return@forEach
-                val relocatedPath = relocators.relocateSourcePath(name)
-                if (visitedFiles.add(relocatedPath)) {
-                  val text = getInputStream(entry).bufferedReader().use { it.readText() }
-                  val transformedText = relocators.remapSource(text)
-                  val bytes = transformedText.toByteArray()
-                  zos.writeEntry(
-                    name = relocatedPath,
-                    preserveLastModified = preserveFileTimestamps,
-                    lastModified = entry.time,
-                    unixMode = UnixMode.file(),
-                  ) {
-                    write(bytes)
-                  }
-                }
-              } else {
-                val relocatedPath = relocators.relocatePath(name)
-                if (visitedFiles.add(relocatedPath)) {
-                  zos.writeEntry(
-                    name = relocatedPath,
-                    preserveLastModified = preserveFileTimestamps,
-                    lastModified = entry.time,
-                    unixMode = UnixMode.file(),
-                  ) {
-                    write(getInputStream(entry).use { it.readBytes() })
-                  }
-                }
-              }
+              addEntry(entry.name, entry.time) { getInputStream(entry).use { it.readBytes() } }
             }
         }
       }

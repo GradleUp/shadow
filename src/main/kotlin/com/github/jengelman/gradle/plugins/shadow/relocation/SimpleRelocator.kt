@@ -108,6 +108,8 @@ constructor(
 
   override fun applyToSourceContent(sourceContent: String): String {
     if (rawString || pattern.isEmpty()) return sourceContent
+    // Fast path to skip building subpatterns and regexes for unrelated sources.
+    if (pattern !in sourceContent && pathPattern !in sourceContent) return sourceContent
     val sourceIncludes = extractSourceSubpatterns(includes, pattern)
     val sourceExcludes = extractSourceSubpatterns(excludes, pattern)
     // Relocate package and class references in dot notation (e.g. "org.foo.Bar").
@@ -249,43 +251,27 @@ constructor(
       return result.toString()
     }
 
+    /**
+     * Extracts the parts of [patterns] after [patternPrefix] in both dot and slash notations, as
+     * source contents may reference classes (e.g. "org.foo.Bar") or paths (e.g. "org/foo/Bar").
+     */
     fun extractSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
       if (patternPrefix.isEmpty()) return emptySet()
       val result = mutableSetOf<String>()
       val dotPrefix = patternPrefix.replace('/', '.')
-      val slashPrefix = patternPrefix.replace('.', '/')
       val trailingWildcardRegex = "[./][*]+$".toRegex()
 
       for (pat in patterns) {
         val dotPat = pat.replace('/', '.')
-        if (dotPat.startsWith(dotPrefix)) {
-          val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
-          if (sub.isEmpty()) {
-            result.add("")
-          } else {
-            result.add(sub)
-            result.add(sub.replace('.', '/'))
-          }
-        }
-        val slashPat = pat.replace('.', '/')
-        if (slashPat.startsWith(slashPrefix)) {
-          val sub = slashPat.substring(slashPrefix.length).replaceFirst(trailingWildcardRegex, "")
-          if (sub.isEmpty()) {
-            result.add("")
-          } else {
-            result.add(sub)
-            result.add(sub.replace('/', '.'))
-          }
-        }
+        if (!dotPat.startsWith(dotPrefix)) continue
+        val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
+        result.add(sub)
+        result.add(sub.replace('.', '/'))
       }
       return result
     }
 
-    fun matchesSubpattern(
-      content: CharSequence,
-      offset: Int = 0,
-      subpattern: String,
-    ): Boolean {
+    fun matchesSubpattern(content: CharSequence, offset: Int, subpattern: String): Boolean {
       val subLen = subpattern.length
       if (offset + subLen > content.length) return false
       for (i in 0 until subLen) {
