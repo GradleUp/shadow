@@ -255,28 +255,22 @@ public abstract class ShadowJar : Jar() {
    * Defaults to
    * `<destinationDirectory>/<archiveBaseName>-<archiveClassifier>-sources.<archiveExtension>`.
    */
-  @get:Optional
+  @get:Optional // `archiveFileName` may not have a value when the Java plugin is not applied.
   @get:OutputFile
   public open val archiveSourcesFile: RegularFileProperty =
     objectFactory
       .fileProperty()
       .convention(
-        generateSourcesJar.flatMap { generate ->
-          if (generate) {
-            destinationDirectory.file(
-              archiveFileName.map { name ->
-                val idx = name.lastIndexOf('.')
-                if (idx != -1) {
-                  "${name.substring(0, idx)}-sources${name.substring(idx)}"
-                } else {
-                  "$name-sources"
-                }
-              }
-            )
-          } else {
-            project.provider { null }
+        destinationDirectory.file(
+          archiveFileName.map { name ->
+            val idx = name.lastIndexOf('.')
+            if (idx != -1) {
+              "${name.substring(0, idx)}-sources${name.substring(idx)}"
+            } else {
+              "$name-sources"
+            }
           }
-        }
+        )
       )
 
   /**
@@ -627,21 +621,6 @@ public abstract class ShadowJar : Jar() {
 
   @Suppress("InternalGradleApiUsage") // For creating ShadowCopyAction.
   override fun createCopyAction(): org.gradle.api.internal.file.copy.CopyAction {
-    val unusedClasses =
-      if (_minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER) {
-        findUnusedClasses(
-          sourceSetsClassesDirs = sourceSetsClassesDirs,
-          classJars = apiJars,
-          toMinimize = toMinimize,
-          dependencies = includedDependencies,
-        )
-      } else {
-        emptySet()
-      }
-    if (unusedClasses.isNotEmpty()) {
-      logger.info("Found {} unused classes to drop for minimization.", unusedClasses.size)
-    }
-    this.unusedClasses = unusedClasses
     val actualTransformers =
       transformers.get().let { set ->
         if (
@@ -711,6 +690,23 @@ public abstract class ShadowJar : Jar() {
             .toSet()
             .map { SimpleRelocator(it, "$prefix.$it") }
         }
+      }
+    }
+
+  // We can't cache these classes due to CC serialization.
+  private val unusedClasses: Set<String>
+    get() {
+      return if (
+        _minimizeJar.get() && minimizeSpec.tool.get() == MinimizeTool.DEPENDENCY_ANALYZER
+      ) {
+        findUnusedClasses(
+          sourceSetsClassesDirs = sourceSetsClassesDirs,
+          classJars = apiJars,
+          toMinimize = toMinimize,
+          dependencies = includedDependencies,
+        )
+      } else {
+        emptySet()
       }
     }
 
@@ -824,8 +820,6 @@ public abstract class ShadowJar : Jar() {
       relocators = relocators.get() + packageRelocators,
     )
   }
-
-  private var unusedClasses: Set<String> = emptySet()
 
   private fun generateShadowedSourcesJar() {
     if (!generateSourcesJar.get() || !archiveSourcesFile.isPresent) return
