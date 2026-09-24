@@ -241,6 +241,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 }
 
+// TODO: https://github.com/gradle/gradle/issues/31474
 private class ShadowSourcesPublishArtifact(private val shadowJarTask: TaskProvider<ShadowJar>) :
   PublishArtifact {
   override fun getName(): String = shadowJarTask.flatMap { it.archiveBaseName }.orNull.orEmpty()
