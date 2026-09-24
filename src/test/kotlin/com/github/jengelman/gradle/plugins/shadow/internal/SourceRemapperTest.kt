@@ -25,7 +25,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun relocateSourcePathWithClassInclude() {
+  fun pathWithClassInclude() {
     val relocator =
       SimpleRelocator(
         "pkg",
@@ -46,7 +46,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun relocateSourcePathWithClassExclude() {
+  fun pathWithClassExclude() {
     val relocator =
       SimpleRelocator(
         "pkg",
@@ -60,7 +60,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun relocateSourcePathWithClassOnlyRelocator() {
+  fun pathWithClassOnlyRelocator() {
     val classOnlyRelocator =
       object : Relocator by DefaultRelocator {
         override fun canRelocateClass(className: String) = className.startsWith("custom.pkg.")
@@ -79,7 +79,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun relocateSourcePathWithNonSourceFileDelegatesToRelocatePath() {
+  fun pathWithNonSourceFileDelegatesToRelocatePath() {
     val relocators = listOf(SimpleRelocator("pkg", "hidden.pkg"))
 
     // Resource files and class files are handled via relocatePath
@@ -90,7 +90,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun relocateSourcePathWithMultipleRelocators() {
+  fun pathWithMultipleRelocators() {
     val r1 = SimpleRelocator("pkg.one", "shaded.one")
     val r2 = SimpleRelocator("pkg.two", "shaded.two")
     val relocators = listOf(r1, r2)
@@ -102,7 +102,7 @@ class SourceRemapperTest {
   }
 
   @Test
-  fun relocateSourcePathWithEmptyRelocators() {
+  fun pathWithEmptyRelocators() {
     assertThat(emptyList<Relocator>().relocateSourcePath("com/example/Foo.java"))
       .isEqualTo("com/example/Foo.java")
   }
