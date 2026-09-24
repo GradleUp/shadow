@@ -305,8 +305,15 @@ constructor(
         if (prevChar == '/') {
           val beforeSlash = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
           // Only reject if pattern does not contain '.' and the slash is an actual path delimiter
-          // (not closing a block comment '*/' or a single-line comment '//')
-          if (!pattern.contains('.') && beforeSlash != '*' && beforeSlash != '/') return false
+          // (not a leading slash in a string literal like `getResource("/org/foo/x")`, which is
+          // relocated in class files as well, nor closing a block comment '*/' or a single-line
+          // comment '//')
+          val isLeadingSlash = beforeSlash == null || beforeSlash == '"' || beforeSlash == '\''
+          if (
+            !pattern.contains('.') && !isLeadingSlash && beforeSlash != '*' && beforeSlash != '/'
+          ) {
+            return false
+          }
         }
       }
 

@@ -441,6 +441,30 @@ class SimpleRelocatorTest {
     fun sourceRelocationProvider(): List<Arguments> =
       listOf(
         Arguments.of(
+          "resource paths with leading slash",
+          SimpleRelocator("org.foo", "shaded.org.foo"),
+          """
+          |String a = "org/foo/a.properties";
+          |String b = "/org/foo/b.properties";
+          |getClass().getResource("/org/foo/c.properties");
+          |String d = '/org/foo/d.properties';
+          |String e = "com/example/org/foo/e.properties";
+          |String f = "../org/foo/f.properties";
+          |String g = "my-lib/org/foo/g.properties";
+          """
+            .trimMargin(),
+          """
+          |String a = "shaded/org/foo/a.properties";
+          |String b = "/shaded/org/foo/b.properties";
+          |getClass().getResource("/shaded/org/foo/c.properties");
+          |String d = '/shaded/org/foo/d.properties';
+          |String e = "com/example/org/foo/e.properties";
+          |String f = "../org/foo/f.properties";
+          |String g = "my-lib/org/foo/g.properties";
+          """
+            .trimMargin(),
+        ),
+        Arguments.of(
           "prefix collision with included class",
           SimpleRelocator(
             "org.example",
