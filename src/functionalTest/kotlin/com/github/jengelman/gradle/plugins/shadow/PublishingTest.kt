@@ -9,7 +9,6 @@ import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.single
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
-import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
@@ -410,70 +409,6 @@ class PublishingTest : BasePluginTest() {
           "maven-1.0.pom",
         )
       )
-  }
-
-  @Test
-  fun publishShadowJarInsteadOfJarFromJavaComponent() {
-    projectScript.appendText(
-      publishConfiguration(
-        projectBlock =
-          """
-          |java {
-          |  withSourcesJar()
-          |}
-          |$sourcesJarTask {
-          |  enabled = false
-          |}
-          |components.named('java', org.gradle.api.component.AdhocComponentWithVariants) {
-          |  withVariantsFromConfiguration(configurations.runtimeElements) { skip() }
-          |  withVariantsFromConfiguration(configurations.sourcesElements) { skip() }
-          |}
-          """
-            .trimMargin(),
-        shadowBlock =
-          """
-          |archiveClassifier = ''
-          """
-            .trimMargin(),
-        publicationsBlock =
-          """
-          |shadow(MavenPublication) {
-          |  from components.java
-          |}
-          """
-            .trimMargin(),
-      )
-    )
-
-    publish()
-
-    val artifactRoot = "my/maven/1.0"
-    assertThat(repoPath(artifactRoot).entries)
-      .containsOnly(
-        *withChecksums(
-          "maven-1.0.jar",
-          "maven-1.0-sources.jar",
-          "maven-1.0.module",
-          "maven-1.0.pom",
-        )
-      )
-    assertShadowJarCommon("$artifactRoot/maven-1.0.jar")
-    assertThat(repoPom("$artifactRoot/maven-1.0.pom")).all {
-      transform { it.dependencies.map(Dependency::coordinate) }.containsOnly("my:b:1.0")
-      transform { it.dependencies.map { dep -> dep.scope to dep.isOptional } }
-        .single()
-        .isEqualTo("compile" to true)
-    }
-    repoGmm("$artifactRoot/maven-1.0.module").let { gmm ->
-      assertThat(gmm.variantNames)
-        .containsOnly(
-          API_ELEMENTS_CONFIGURATION_NAME,
-          SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME,
-          SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME,
-        )
-      assertShadowVariantCommon(gmm)
-      assertShadowSourcesVariantCommon(gmm)
-    }
   }
 
   @Test
