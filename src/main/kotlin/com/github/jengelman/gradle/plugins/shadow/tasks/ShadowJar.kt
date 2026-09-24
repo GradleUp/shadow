@@ -823,17 +823,21 @@ public abstract class ShadowJar : Jar() {
 
   private fun generateShadowedSourcesJar() {
     if (!generateSourcesJar.get() || !archiveSourcesFile.isPresent) return
+    val sourcesJarFile = archiveSourcesFile.get().asFile.apply { parentFile?.mkdirs() }
     generateSourcesJar(
-      sourcesJarFile = archiveSourcesFile.get().asFile,
+      sourcesJarFile = sourcesJarFile,
+      zipOutStream =
+        sourcesJarFile.createZipOutputStream(
+          entryCompression = entryCompression,
+          isZip64 = isZip64,
+          encoding = metadataCharset,
+        ),
       sourceSetsSourceDirs = sourceSetsSourceDirs,
       includedSourcesJars = includedSourcesJars.files,
       classesDirs = sourceSetsClassesDirs.files,
       dependencies = includedDependencies.files,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      entryCompression = entryCompression,
-      isZip64 = isZip64,
-      metadataCharset = metadataCharset,
       preserveFileTimestamps = isPreserveFileTimestamps,
     )
   }

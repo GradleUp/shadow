@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.Assert
-import assertk.all
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
@@ -14,12 +13,12 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.useAll as testkitUseAll
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.createDefaultLocalMavenRepository
-import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.JarEntry
@@ -475,11 +474,7 @@ abstract class BasePluginTest {
         .trimMargin()
     }
 
-    fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {
-      body()
-      // Close the resource after all assertions are done.
-      given { it.use(block = {}) }
-    }
+    fun <T : AutoCloseable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = testkitUseAll(body)
 
     fun Assert<BuildResult>.taskOutcomeEquals(taskPath: String, expectedOutcome: TaskOutcome) {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)

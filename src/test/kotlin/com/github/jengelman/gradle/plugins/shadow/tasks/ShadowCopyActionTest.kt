@@ -189,7 +189,7 @@ class ShadowCopyActionTest {
       zipFile = zipFile,
       zipOutStream =
         zipFile.createZipOutputStream(
-          entryCompression = ZipEntryCompression.DEFLATED,
+          entryCompression = ZipEntryCompression.STORED,
           isZip64 = isZip64,
           encoding = null,
         ),
