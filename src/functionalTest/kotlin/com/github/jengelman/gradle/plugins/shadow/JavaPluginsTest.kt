@@ -1472,10 +1472,10 @@ class JavaPluginsTest : BasePluginTest() {
         insert(
           "ext/Ext.java",
           """
-          package ext;
-          public class Ext {}
+          |package ext;
+          |public class Ext {}
           """
-            .trimIndent(),
+            .trimMargin(),
         )
       }
 
