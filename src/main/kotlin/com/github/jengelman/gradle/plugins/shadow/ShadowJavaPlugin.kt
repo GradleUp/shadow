@@ -16,6 +16,7 @@ import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
+import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
 import org.gradle.api.attributes.DocsType
@@ -241,15 +242,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
 }
 
 // TODO: https://github.com/gradle/gradle/issues/31474
-// Mirrors Gradle's `ArchivePublishArtifact`, which is used for the shadowed JAR.
-@Suppress("InternalGradleApiUsage") // For skipping publishing when the task is disabled.
 private class ShadowSourcesPublishArtifact(private val shadowJarTask: TaskProvider<ShadowJar>) :
-  org.gradle.api.internal.artifacts.PublishArtifactInternal {
-  override fun getName(): String {
-    val baseName = shadowJarTask.flatMap { it.archiveBaseName }.orNull.orEmpty()
-    val appendix = shadowJarTask.flatMap { it.archiveAppendix }.orNull
-    return if (appendix.isNullOrEmpty()) baseName else "$baseName-$appendix"
-  }
+  PublishArtifact {
+  override fun getName(): String = shadowJarTask.flatMap { it.archiveBaseName }.orNull.orEmpty()
 
   override fun getExtension(): String =
     shadowJarTask.flatMap { it.archiveExtension }.orNull ?: "jar"
@@ -268,7 +263,4 @@ private class ShadowSourcesPublishArtifact(private val shadowJarTask: TaskProvid
   override fun getBuildDependencies(): TaskDependency = TaskDependency {
     setOf(@Suppress("EagerGradleConfiguration") shadowJarTask.get())
   }
-
-  override fun shouldBePublished(): Boolean =
-    @Suppress("EagerGradleConfiguration") shadowJarTask.get().enabled
 }

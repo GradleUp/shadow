@@ -216,9 +216,6 @@ class ShadowPropertiesTest {
         shadowJarTask.archiveExtension.set("zip")
         assertThat(name).isEqualTo("renamed")
         assertThat(extension).isEqualTo("zip")
-
-        shadowJarTask.archiveAppendix.set("appendix")
-        assertThat(name).isEqualTo("renamed-appendix")
       }
     }
 
