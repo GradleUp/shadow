@@ -137,7 +137,8 @@ class FilteringTest : BasePluginTest() {
         |  exclude($clientProject)
         |}
         """
-          .trimMargin()
+          .trimMargin(),
+      withSourcesJar = true,
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -154,7 +155,8 @@ class FilteringTest : BasePluginTest() {
         |  exclude(project(':client'))
         |}
         """
-          .trimMargin()
+          .trimMargin(),
+      withSourcesJar = true,
     )
     path("client/build.gradle").appendText("version = '1.0.0+1'")
 
@@ -172,7 +174,8 @@ class FilteringTest : BasePluginTest() {
         |  exclude { it.moduleGroup == 'junit' }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
+      withSourcesJar = true,
     )
 
     runWithSuccess(serverShadowJarPath)

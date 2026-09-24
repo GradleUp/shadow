@@ -146,7 +146,7 @@ class JavaPluginsTest : BasePluginTest() {
 
   @Test
   fun includeProjectDependencies() {
-    writeClientAndServerModules()
+    writeClientAndServerModules(withSourcesJar = true)
 
     runWithSuccess(serverShadowJarPath)
 

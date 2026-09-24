@@ -263,7 +263,22 @@ abstract class BasePluginTest {
     return "$basePath.class"
   }
 
-  fun writeClientAndServerModules(clientShadowed: Boolean = false, serverShadowBlock: String = "") {
+  fun writeClientAndServerModules(
+    clientShadowed: Boolean = false,
+    serverShadowBlock: String = "",
+    withSourcesJar: Boolean = false,
+  ) {
+    val javaBlock =
+      if (withSourcesJar) {
+        """
+        |java {
+        |  withSourcesJar()
+        |}
+        """
+          .trimMargin()
+      } else {
+        ""
+      }
     settingsScript.appendText(
       """
       |include 'client', 'server'
@@ -284,9 +299,7 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
-        |java {
-        |  withSourcesJar()
-        |}
+        |$javaBlock
         |dependencies {
         |  implementation 'junit:junit:3.8.2'
         |}
@@ -308,9 +321,7 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
-        |java {
-        |  withSourcesJar()
-        |}
+        |$javaBlock
         |dependencies {
         |  implementation project(':client')
         |}
