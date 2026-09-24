@@ -164,10 +164,8 @@ class ShadowPropertiesTest {
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
         assertThat(configurations.get()).containsOnly(runtimeConfiguration)
         assertThat(generateSourcesJar.get()).isFalse()
-        assertThat(archiveSourcesFile.get().asFile).all {
-          isEqualTo(destinationDirectory.file("my-project-1.0.0-all-sources.jar").get().asFile)
-          isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
-        }
+        assertThat(archiveSourcesFile.orNull).isNull()
+        assertThat(outputs.files.singleFile).isEqualTo(archiveFile.get().asFile)
         assertThat(sourceSetsSourceDirs.files).isEmpty()
         assertThat(includedSourcesJars.files).isEmpty()
       }
@@ -188,6 +186,11 @@ class ShadowPropertiesTest {
         )
         isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
       }
+      assertThat(shadowJarTask.outputs.files.files)
+        .containsOnly(
+          shadowJarTask.archiveFile.get().asFile,
+          shadowJarTask.archiveSourcesFile.get().asFile,
+        )
       val mainSourceSet = javaPluginExtension.sourceSets.getByName("main")
       assertThat(shadowJarTask.sourceSetsSourceDirs.files)
         .containsOnly(*mainSourceSet.allSource.files.toTypedArray())

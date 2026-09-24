@@ -5,6 +5,7 @@ import assertk.assertThat
 import assertk.assertions.contains
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsMatch
+import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
@@ -25,9 +26,11 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.getMainAttr
 import com.github.jengelman.gradle.plugins.shadow.testkit.getStream
 import com.github.jengelman.gradle.plugins.shadow.testkit.runMain
 import com.github.jengelman.gradle.plugins.shadow.util.prependText
+import java.nio.file.Path
 import kotlin.io.path.appendText
 import kotlin.io.path.deleteExisting
 import kotlin.io.path.invariantSeparatorsPathString
+import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.name
 import kotlin.io.path.outputStream
 import kotlin.io.path.relativeTo
@@ -1517,6 +1520,26 @@ class JavaPluginsTest : BasePluginTest() {
             .trimMargin()
         )
     }
+  }
+
+  @Test
+  fun shadowJarOutputsOnlyContainShadowedJarByDefault() {
+    val syncShadowJar = "syncShadowJar"
+    projectScript.appendText(
+      """
+      |tasks.register('$syncShadowJar', Sync) {
+      |  // `singleFile` fails if the sources JAR is registered as an output when it's disabled.
+      |  from $shadowJarTask.map { it.outputs.files.singleFile }
+      |  into layout.buildDirectory.dir('synced')
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(syncShadowJar)
+
+    assertThat(path("build/synced").listDirectoryEntries().map(Path::name))
+      .containsOnly("my-1.0-all.jar")
   }
 
   private fun dependencies(configuration: String, vararg flags: String): String {

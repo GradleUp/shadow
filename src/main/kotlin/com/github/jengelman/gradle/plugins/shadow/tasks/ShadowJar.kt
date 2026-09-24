@@ -253,24 +253,34 @@ public abstract class ShadowJar : Jar() {
    * The destination location of the companion shadowed sources JAR.
    *
    * Defaults to
-   * `<destinationDirectory>/<archiveBaseName>-<archiveClassifier>-sources.<archiveExtension>`.
+   * `<destinationDirectory>/<archiveBaseName>-<archiveClassifier>-sources.<archiveExtension>` when
+   * [generateSourcesJar] is enabled, and has no value otherwise.
    */
-  @get:Optional // `archiveFileName` may not have a value when the Java plugin is not applied.
+  @get:Optional
   @get:OutputFile
   public open val archiveSourcesFile: RegularFileProperty =
     objectFactory
       .fileProperty()
       .convention(
-        destinationDirectory.file(
-          archiveFileName.map { name ->
-            val idx = name.lastIndexOf('.')
-            if (idx != -1) {
-              "${name.substring(0, idx)}-sources${name.substring(idx)}"
-            } else {
-              "$name-sources"
-            }
+        generateSourcesJar.flatMap { generate ->
+          if (generate) {
+            destinationDirectory.file(
+              archiveFileName.map { name ->
+                val idx = name.lastIndexOf('.')
+                if (idx != -1) {
+                  "${name.substring(0, idx)}-sources${name.substring(idx)}"
+                } else {
+                  "$name-sources"
+                }
+              }
+            )
+          } else {
+            // Leave it absent so it isn't registered as a task output when sources JAR generation
+            // is disabled, keeping `outputs.files` to the shadowed JAR only.
+            // TODO: replace with `providers.absent()` once the min Gradle version is 9.9.
+            project.provider { null }
           }
-        )
+        }
       )
 
   /**
