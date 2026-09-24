@@ -60,9 +60,6 @@ abstract class BasePluginTest {
   lateinit var artifactBJar: Path
     private set
 
-  lateinit var artifactGJar: Path
-    private set
-
   val projectScript: Path
     get() = path("build.gradle")
 
@@ -90,7 +87,6 @@ abstract class BasePluginTest {
 
     artifactAJar = path("my/a/1.0/a-1.0.jar", parent = localRepo.root)
     artifactBJar = path("my/b/1.0/b-1.0.jar", parent = localRepo.root)
-    artifactGJar = path("my/g/1.0/g-1.0.jar", parent = localRepo.root)
   }
 
   @BeforeEach
