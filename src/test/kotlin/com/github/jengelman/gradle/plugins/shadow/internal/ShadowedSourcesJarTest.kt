@@ -47,54 +47,6 @@ class ShadowedSourcesJarTest {
   }
 
   @Test
-  fun nonUtf8SourceBytesArePreserved() {
-    val latin1 = StandardCharsets.ISO_8859_1
-    val srcDir = tempDir.resolve("src").createDirectories()
-    srcDir
-      .resolve("foo/Main.java")
-      .createParentDirectories()
-      .writeBytes("package foo;\nclass Main { String s = \"café\"; }".toByteArray(latin1))
-    srcDir
-      .resolve("bar/Other.java")
-      .createParentDirectories()
-      .writeBytes("package bar;\nclass Other { String s = \"naïve\"; }".toByteArray(latin1))
-
-    val depSourcesJar = tempDir.resolve("dep-sources.jar")
-    depSourcesJar
-      .toFile()
-      .createZipOutputStream(
-        entryCompression = ZipEntryCompression.STORED,
-        isZip64 = false,
-        encoding = null,
-      )
-      .use { zos ->
-        zos.writeEntry("dep/Dep.java") {
-          write("package dep;\npublic class Dep { String s = \"über\"; }".toByteArray(latin1))
-        }
-      }
-
-    val outputJar = tempDir.resolve("output-sources.jar")
-    generateSourcesJar(
-      sourcesJarFile = outputJar.toFile(),
-      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
-      includedSourcesJars = listOf(depSourcesJar.toFile()),
-      relocators =
-        listOf(SimpleRelocator("foo", "shaded.foo"), SimpleRelocator("dep", "shaded.dep")),
-    )
-
-    assertThat(JarPath(outputJar)).useAll {
-      getBytes("shaded/foo/Main.java")
-        .isEqualTo("package shaded.foo;\nclass Main { String s = \"café\"; }".toByteArray(latin1))
-      getBytes("bar/Other.java")
-        .isEqualTo("package bar;\nclass Other { String s = \"naïve\"; }".toByteArray(latin1))
-      getBytes("shaded/dep/Dep.java")
-        .isEqualTo(
-          "package shaded.dep;\npublic class Dep { String s = \"über\"; }".toByteArray(latin1)
-        )
-    }
-  }
-
-  @Test
   fun isUnusedMatching() {
     val unusedSet =
       setOf(

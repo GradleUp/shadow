@@ -4,8 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
 import java.io.InputStream
-import java.nio.ByteBuffer
-import java.nio.charset.CharacterCodingException
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCollection
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
@@ -58,7 +56,9 @@ internal fun generateSourcesJar(
           if (isUnused(relPath, unusedClasses, sourceToClasses)) continue
           val relocatedPath = relocators.relocateSourcePath(relPath)
           if (visitedFiles.add(relocatedPath)) {
-            val bytes = relocators.remapSourceBytes(file.readBytes())
+            val text = file.readText()
+            val transformedText = relocators.remapSource(text)
+            val bytes = transformedText.toByteArray()
             zos.writeEntry(
               name = relocatedPath,
               preserveLastModified = preserveFileTimestamps,
@@ -106,8 +106,9 @@ internal fun generateSourcesJar(
                 if (isUnused(name, unusedClasses, sourceToClasses)) return@forEach
                 val relocatedPath = relocators.relocateSourcePath(name)
                 if (visitedFiles.add(relocatedPath)) {
-                  val bytes =
-                    relocators.remapSourceBytes(getInputStream(entry).use { it.readBytes() })
+                  val text = getInputStream(entry).bufferedReader().use { it.readText() }
+                  val transformedText = relocators.remapSource(text)
+                  val bytes = transformedText.toByteArray()
                   zos.writeEntry(
                     name = relocatedPath,
                     preserveLastModified = preserveFileTimestamps,
@@ -151,22 +152,6 @@ internal fun generateSourcesJar(
     sourcesJarFile.delete()
     gradleError("Could not create shadowed sources JAR '$sourcesJarFile'.", e)
   }
-
-/**
- * Remaps source content without assuming its encoding. UTF-8 is tried first, and other encodings
- * fall back to ISO-8859-1, which maps each byte to a char losslessly, while package names to
- * relocate are ASCII. Bytes are kept as-is if nothing is relocated.
- */
-private fun Iterable<Relocator>.remapSourceBytes(bytes: ByteArray): ByteArray {
-  val (text, charset) =
-    try {
-      Charsets.UTF_8.newDecoder().decode(ByteBuffer.wrap(bytes)).toString() to Charsets.UTF_8
-    } catch (_: CharacterCodingException) {
-      String(bytes, Charsets.ISO_8859_1) to Charsets.ISO_8859_1
-    }
-  val transformedText = remapSource(text)
-  return if (transformedText == text) bytes else transformedText.toByteArray(charset)
-}
 
 internal fun isUnused(
   canonicalPath: String,
