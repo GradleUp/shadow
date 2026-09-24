@@ -160,6 +160,16 @@ abstract class BasePluginTest {
       .trimMargin()
   }
 
+  fun compileOnlyStdlib(exclude: Boolean): String {
+    return if (exclude) {
+      // Disable the stdlib dependency added via `implementation`.
+      path("gradle.properties").writeText("kotlin.stdlib.default.dependency=false")
+      "compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'"
+    } else {
+      ""
+    }
+  }
+
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
     return JarPath(parent.resolve(relative))
   }
@@ -421,6 +431,7 @@ abstract class BasePluginTest {
       "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
     const val runShadowTask = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
     const val jarTask = "tasks.named('jar', Jar)"
+    const val sourcesJarTask = "tasks.named('sourcesJar', Jar)"
 
     const val infoArgument = "--info"
 

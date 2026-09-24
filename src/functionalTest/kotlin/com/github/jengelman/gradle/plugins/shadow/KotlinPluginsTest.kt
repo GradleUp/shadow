@@ -410,14 +410,4 @@ class KotlinPluginsTest : BasePluginTest() {
 
     assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar")).doesNotExist()
   }
-
-  private fun compileOnlyStdlib(exclude: Boolean): String {
-    return if (exclude) {
-      // Disable the stdlib dependency added via `implementation`.
-      path("gradle.properties").writeText("kotlin.stdlib.default.dependency=false")
-      "compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'"
-    } else {
-      ""
-    }
-  }
 }
