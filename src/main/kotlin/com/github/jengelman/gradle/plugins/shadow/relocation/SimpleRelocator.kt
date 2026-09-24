@@ -217,9 +217,7 @@ constructor(
       includedPatterns: Set<String>,
       excludedPatterns: Set<String>,
     ): String {
-      if (hasIncludes && includedPatterns.isEmpty()) {
-        return sourceContent
-      }
+      if (hasIncludes && includedPatterns.isEmpty()) return sourceContent
 
       val regex = Regex("\\b" + Regex.escape(patternFrom) + "\\b")
       val matches = regex.findAll(sourceContent).toList()
@@ -316,24 +314,18 @@ constructor(
           val beforeDot = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
           // A dot is only a package separator if it's not a Kotlin range '..' or varargs/spread
           // '...'
-          if (beforeDot != '.') {
-            return false
-          }
+          if (beforeDot != '.') return false
         }
         if (prevChar == '/') {
           val beforeSlash = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
           // Only reject if pattern does not contain '.' and the slash is an actual path delimiter
           // (not closing a block comment '*/' or a single-line comment '//')
-          if (!pattern.contains('.') && beforeSlash != '*' && beforeSlash != '/') {
-            return false
-          }
+          if (!pattern.contains('.') && beforeSlash != '*' && beforeSlash != '/') return false
         }
       }
 
       // In all JVM languages, qualified names containing '.' or '/' cannot be local identifiers.
-      if (pattern.contains('.') || pattern.contains('/')) {
-        return true
-      }
+      if (pattern.contains('.') || pattern.contains('/')) return true
 
       // For unqualified single-word patterns (e.g. "io", "foo"), check if followed by '.' or '/'
       var nextIndex = matchEnd
@@ -342,9 +334,7 @@ constructor(
       }
       if (nextIndex < sourceContent.length) {
         val nextChar = sourceContent[nextIndex]
-        if (nextChar == '.' || nextChar == '/') {
-          return true
-        }
+        if (nextChar == '.' || nextChar == '/') return true
       }
 
       // Check if preceded by 'package', 'import', or '{@link'
@@ -354,14 +344,10 @@ constructor(
           tokenStart--
         }
         val prevToken = sourceContent.subSequence(tokenStart, prevIndex + 1).toString()
-        if (prevToken == "package" || prevToken == "import") {
-          return true
-        }
+        if (prevToken == "package" || prevToken == "import") return true
         val lookbackStart = (matchStart - 32).coerceAtLeast(0)
         val lookbackSnippet = sourceContent.substring(lookbackStart, matchStart)
-        if (lookbackSnippet.contains("{@link")) {
-          return true
-        }
+        if (lookbackSnippet.contains("{@link")) return true
       }
 
       return false
