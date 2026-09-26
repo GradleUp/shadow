@@ -10,6 +10,7 @@ same permissions, irrespective of the locally configured umask.
 
 More information about reproducible builds can be found at [reproducible-builds.org][reproducible-builds.org].
 
+<!-- test: RelocationTest#preserveLastModifiedCorrectly -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

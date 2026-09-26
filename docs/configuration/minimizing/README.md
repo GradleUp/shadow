@@ -27,6 +27,7 @@ Shadow provides two minimization backends:
 
 By default, calling `minimize()` enables Shadow's built-in dependency analyzer:
 
+<!-- test: MinimizeTest#useMinimizeWithDependenciesWithApiScope -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -48,6 +49,7 @@ useful when the dependency analyzer cannot find the usage of a class programmati
 loaded dynamically via `Class.forName(String)` or loaded via Java SPI (`ServiceLoader`). Each of the `group`, `name` and
 `version` fields separated by `:` of a `dependency` is interpreted as a regular expression.
 
+<!-- test: MinimizeTest#excludeDependencyFromMinimize -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -74,6 +76,7 @@ loaded dynamically via `Class.forName(String)` or loaded via Java SPI (`ServiceL
 
 Similar to [`ShadowJar.dependencies`][ShadowJar.dependencies], projects can also be excluded.
 
+<!-- test: MinimizeTest#excludeProjectFromMinimize -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -131,6 +134,7 @@ rules published in dependency JARs, for example under `META-INF/proguard`.
 > Alternatively, if you use [R8 Repackaging][r8-repackaging] (e.g. `-repackageclasses`), R8 applies embedded rules
 > natively without needing rule rewriting.
 
+<!-- test: R8MinimizationTest#honorCustomProguardRules -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -184,6 +188,7 @@ R8 also supports ProGuard reporting options such as
 
 Add them as `proguardRules` when you want to retain name mappings, matched keep rules, or removed code:
 
+<!-- test: R8MinimizationTest#generateReportsRelativeToConfigurationFile -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -241,6 +246,7 @@ When your classes reference types that are available on the compile classpath bu
 (such as `compileOnly` dependencies or `gradleApi()`), supply them to R8 via `classpath` so R8 can analyze the complete
 class hierarchy without bundling those dependencies into the output archive:
 
+<!-- test: R8MinimizationTest#supportClasspathInR8 -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -302,6 +308,7 @@ are independent and can be used together.
 
 For example, to downgrade R8 warnings to info:
 
+<!-- test: R8MinimizationTest#passCustomR8Args -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -336,6 +343,7 @@ For example, to downgrade R8 warnings to info:
 
 To enable name obfuscation:
 
+<!-- test: R8MinimizationTest#canEnableObfuscation -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -370,6 +378,7 @@ To enable name obfuscation:
 
 To enable optimization:
 
+<!-- test: R8MinimizationTest#canEnableOptimization -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -404,6 +413,7 @@ To enable optimization:
 
 To enable both:
 
+<!-- test: R8MinimizationTest#canEnableObfuscation -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -448,6 +458,7 @@ enabled (the default):
 - **`include(...)` (Shrink only specific dependencies)**: Applies R8 shrinking *only* to matching dependencies. All
   other dependencies are automatically kept in full.
 
+<!-- test: R8MinimizationTest#honorDependencyExcludes -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -500,6 +511,7 @@ and generates `-dontoptimize` to disable optimization unless explicitly enabled.
 To take full control over Shadow-generated rules and maximize R8 optimizations (such as shrinking unused project classes
 or methods and running optimizations), disable `useDefaultRules`:
 
+<!-- test: R8MinimizationTest#disableDefaultRules -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
