@@ -5,16 +5,21 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.sha
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.runtimeConfiguration
 import com.github.jengelman.gradle.plugins.shadow.internal.sourceSets
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.registerShadowJarCommon
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.shadowJar
+import java.io.File
+import java.util.Date
 import javax.inject.Inject
 import org.gradle.api.NamedDomainObjectProvider
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.ConsumableConfiguration
+import org.gradle.api.artifacts.PublishArtifact
 import org.gradle.api.attributes.Bundling
 import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.DocsType
 import org.gradle.api.attributes.LibraryElements
 import org.gradle.api.attributes.Usage
 import org.gradle.api.attributes.java.TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE
@@ -23,6 +28,9 @@ import org.gradle.api.component.ConfigurationVariantDetails
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.logging.Logger
 import org.gradle.api.plugins.JavaPlugin.COMPILE_CLASSPATH_CONFIGURATION_NAME
+import org.gradle.api.plugins.JavaPlugin.SOURCES_ELEMENTS_CONFIGURATION_NAME
+import org.gradle.api.tasks.TaskDependency
+import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 
 public abstract class ShadowJavaPlugin
@@ -38,9 +46,24 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     }
 
   protected open fun Project.configureShadowJar() {
+    val mainSourceSet = sourceSets.named("main")
     val taskProvider =
       registerShadowJarCommon(tasks.named("jar", Jar::class.java)) { task ->
-        task.from(sourceSets.named("main").map { it.output })
+        task.from(mainSourceSet.map { it.output })
+        task.generateSourcesJar.convention(
+          // If `withSourcesJar` is present in `java` block.
+          provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null }
+        )
+        task.sourceSetsSourceDirs.convention(
+          // Avoid snapshotting source inputs when sources JAR generation is disabled.
+          task.generateSourcesJar.flatMap { generate ->
+            if (generate) {
+              mainSourceSet.map { it.allSource }
+            } else {
+              provider { emptySet() }
+            }
+          }
+        )
         task.configurations.convention(provider { listOf(runtimeConfiguration) })
       }
     artifacts.add(configurations.shadow.name, taskProvider)
@@ -53,14 +76,9 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         compileClasspath.extendsFrom(shadowConfig)
       }
     val shadowRuntimeElements =
-      configurations.consumable(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) { shadowRuntimeElements
-        ->
-        shadowRuntimeElements.extendsFrom(shadowConfig)
-        shadowRuntimeElements.attributes { attrs ->
-          attrs.attribute(
-            Usage.USAGE_ATTRIBUTE,
-            objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
-          )
+      registerConsumableConfiguration(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+        extendsFrom(shadowConfig)
+        attributes { attrs ->
           attrs.attribute(
             Category.CATEGORY_ATTRIBUTE,
             objects.named(Category::class.java, Category.LIBRARY),
@@ -69,13 +87,30 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
             objects.named(LibraryElements::class.java, LibraryElements.JAR),
           )
-          attrs.attributeProvider(
-            Bundling.BUNDLING_ATTRIBUTE,
-            shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
-          )
         }
-        shadowRuntimeElements.outgoing.artifact(tasks.shadowJar)
+        outgoing.artifact(tasks.shadowJar)
       }
+    registerConsumableConfiguration(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME) {
+      attributes { attrs ->
+        attrs.attribute(
+          Category.CATEGORY_ATTRIBUTE,
+          objects.named(Category::class.java, Category.DOCUMENTATION),
+        )
+        attrs.attribute(
+          DocsType.DOCS_TYPE_ATTRIBUTE,
+          objects.named(DocsType::class.java, DocsType.SOURCES),
+        )
+      }
+      val shadowJarTask = tasks.shadowJar
+      val artifact = ShadowSourcesPublishArtifact(shadowJarTask)
+      outgoing.artifacts(
+        shadowJarTask.flatMap { task ->
+          task.generateSourcesJar.map { generate ->
+            if (generate) listOf(artifact) else emptyList()
+          }
+        }
+      )
+    }
 
     // See more details in #2086.
     afterEvaluate {
@@ -112,20 +147,39 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   }
 
   protected open fun Project.configureComponents() {
+    val addIntoJavaComponent = shadow.addShadowVariantIntoJavaComponent
     val shadowRuntimeElements = configurations.shadowRuntimeElements
-    val shadowComponent = softwareComponentFactory.adhoc(COMPONENT_NAME)
-    components.add(shadowComponent)
-    shadowComponent.addVariants(
-      outgoingConfiguration = shadowRuntimeElements,
-      logger = logger,
-    ) {
-      mapToMavenScope("runtime")
+    val shadowSourcesElements = configurations.shadowSourcesElements
+    val generateSourcesJar = { tasks.shadowJar.flatMap { it.generateSourcesJar }.get() }
+
+    softwareComponentFactory.adhoc(COMPONENT_NAME).let { component ->
+      components.add(component)
+      component.addVariants(
+        outgoingConfiguration = shadowRuntimeElements,
+        logger = logger,
+        shouldAdd = { true },
+      ) {
+        mapToMavenScope("runtime")
+      }
+      component.addVariants(
+        outgoingConfiguration = shadowSourcesElements,
+        logger = logger,
+        shouldAdd = generateSourcesJar,
+      )
     }
+
     components.named("java", AdhocComponentWithVariants::class.java) { component ->
       component.addVariants(
         outgoingConfiguration = shadowRuntimeElements,
         logger = logger,
-        shouldAdd = shadow.addShadowVariantIntoJavaComponent::get,
+        shouldAdd = addIntoJavaComponent::get,
+      ) {
+        mapToOptional()
+      }
+      component.addVariants(
+        outgoingConfiguration = shadowSourcesElements,
+        logger = logger,
+        shouldAdd = { addIntoJavaComponent.get() && generateSourcesJar() },
       ) {
         mapToOptional()
       }
@@ -135,8 +189,8 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
   private fun AdhocComponentWithVariants.addVariants(
     outgoingConfiguration: NamedDomainObjectProvider<ConsumableConfiguration>,
     logger: Logger,
-    shouldAdd: () -> Boolean = { true },
-    action: ConfigurationVariantDetails.() -> Unit,
+    shouldAdd: () -> Boolean,
+    action: ConfigurationVariantDetails.() -> Unit = {},
   ) {
     addVariantsFromConfiguration(outgoingConfiguration) { variant ->
       if (shouldAdd()) {
@@ -149,16 +203,64 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
     }
   }
 
+  private fun Project.registerConsumableConfiguration(
+    name: String,
+    action: ConsumableConfiguration.() -> Unit,
+  ) =
+    configurations.consumable(name) { configuration ->
+      configuration.attributes { attrs ->
+        attrs.attribute(
+          Usage.USAGE_ATTRIBUTE,
+          objects.named(Usage::class.java, Usage.JAVA_RUNTIME),
+        )
+        attrs.attributeProvider(
+          Bundling.BUNDLING_ATTRIBUTE,
+          shadow.bundlingAttribute.map { attr -> objects.named(Bundling::class.java, attr) },
+        )
+      }
+      configuration.action()
+    }
+
   @Deprecated("This method will be removed in Shadow 10.")
   protected open fun Project.configureJavaGradlePlugin() {}
 
   public companion object {
     public const val COMPONENT_NAME: String = SHADOW
     public const val SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME: String = "shadowRuntimeElements"
+    public const val SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME: String = "shadowSourcesElements"
 
     @get:JvmSynthetic
     public inline val ConfigurationContainer.shadowRuntimeElements:
       NamedDomainObjectProvider<ConsumableConfiguration>
       get() = named(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
+
+    @get:JvmSynthetic
+    public inline val ConfigurationContainer.shadowSourcesElements:
+      NamedDomainObjectProvider<ConsumableConfiguration>
+      get() = named(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME, ConsumableConfiguration::class.java)
+  }
+}
+
+// TODO: https://github.com/gradle/gradle/issues/31474
+private class ShadowSourcesPublishArtifact(private val shadowJarTask: TaskProvider<ShadowJar>) :
+  PublishArtifact {
+  override fun getName(): String = shadowJarTask.flatMap { it.archiveBaseName }.orNull.orEmpty()
+
+  override fun getExtension(): String =
+    shadowJarTask.flatMap { it.archiveExtension }.orNull ?: "jar"
+
+  override fun getType(): String = "jar"
+
+  override fun getClassifier(): String {
+    val shadowClassifier = shadowJarTask.flatMap { it.archiveClassifier }.orNull
+    return if (shadowClassifier.isNullOrEmpty()) "sources" else "$shadowClassifier-sources"
+  }
+
+  override fun getFile(): File = shadowJarTask.flatMap { it.archiveSourcesFile }.get().asFile
+
+  override fun getDate(): Date? = null
+
+  override fun getBuildDependencies(): TaskDependency = TaskDependency {
+    setOf(@Suppress("EagerGradleConfiguration") shadowJarTask.get())
   }
 }

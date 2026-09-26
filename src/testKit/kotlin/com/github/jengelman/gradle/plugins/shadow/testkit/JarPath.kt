@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.testkit
 
 import assertk.Assert
+import assertk.all
 import assertk.assertions.containsAtLeast
 import assertk.assertions.containsExactly
 import assertk.assertions.containsNone
@@ -120,6 +121,12 @@ fun Assert<URLClassLoader>.runMain(
     }
   }
   os.toString().invariantEolString
+}
+
+fun <T : AutoCloseable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {
+  body()
+  // Close the resource after all assertions are done.
+  given { it.use(block = {}) }
 }
 
 private fun Assert<JarPath>.toEntries() = transform { actual ->

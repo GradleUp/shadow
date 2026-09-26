@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.relocation
 
 import java.util.Objects
-import java.util.regex.Pattern
 import org.codehaus.plexus.util.SelectorUtils
 import org.gradle.api.tasks.Input
 
@@ -28,8 +27,6 @@ constructor(
   @get:Input internal val pathPattern: String
   @get:Input internal val shadedPattern: String
   @get:Input internal val shadedPathPattern: String
-  private val sourcePackageExcludes = mutableSetOf<String>()
-  private val sourcePathExcludes = mutableSetOf<String>()
 
   @get:Input public val includes: MutableSet<String> = mutableSetOf()
   @get:Input public val excludes: MutableSet<String> = mutableSetOf()
@@ -66,24 +63,6 @@ constructor(
     if (!excludes.isNullOrEmpty()) {
       this.excludes.addAll(excludes)
     }
-
-    if (!rawString) {
-      // Create exclude pattern sets for sources.
-      for (exclude in this.excludes) {
-        // Excludes should be subpackages of the global pattern.
-        if (exclude.startsWith(this.pattern)) {
-          sourcePackageExcludes.add(
-            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), "")
-          )
-        }
-        // Excludes should be subpackages of the global pattern.
-        if (exclude.startsWith(pathPattern)) {
-          sourcePathExcludes.add(
-            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), "")
-          )
-        }
-      }
-    }
   }
 
   public open fun include(pattern: String) {
@@ -95,7 +74,7 @@ constructor(
   }
 
   override fun canRelocatePath(path: String): Boolean {
-    if (rawString) return Pattern.compile(pathPattern).matcher(path).find()
+    if (rawString) return pathPattern.toPattern().matcher(path).find()
     // If string is too short - no need to perform expensive string operations.
     if (path.length < pathPattern.length) return false
     var adjustedPath = path.removeSuffix(".class")
@@ -127,15 +106,31 @@ constructor(
     return if (rawString) clazz else clazz.replaceFirst(pattern.toRegex(), shadedPattern)
   }
 
-  /**
-   * We don't call this function now, so we don't have to expose [sourcePackageExcludes] and
-   * [sourcePathExcludes] as inputs.
-   */
   override fun applyToSourceContent(sourceContent: String): String {
-    if (rawString) return sourceContent
+    if (rawString || pattern.isEmpty()) return sourceContent
+    // Fast path to skip building subpatterns and regexes for unrelated sources.
+    if (pattern !in sourceContent && pathPattern !in sourceContent) return sourceContent
+    val sourceIncludes = extractSourceSubpatterns(includes, pattern)
+    val sourceExcludes = extractSourceSubpatterns(excludes, pattern)
+    // Relocate package and class references in dot notation (e.g. "org.foo.Bar").
     val content =
-      shadeSourceWithExcludes(sourceContent, pattern, shadedPattern, sourcePackageExcludes)
-    return shadeSourceWithExcludes(content, pathPattern, shadedPathPattern, sourcePathExcludes)
+      relocateSourcePattern(
+        sourceContent = sourceContent,
+        patternFrom = pattern,
+        patternTo = shadedPattern,
+        hasIncludes = includes.isNotEmpty(),
+        includedPatterns = sourceIncludes,
+        excludedPatterns = sourceExcludes,
+      )
+    // Relocate resource and classpath references in slash notation (e.g. "org/foo/Bar").
+    return relocateSourcePattern(
+      sourceContent = content,
+      patternFrom = pathPattern,
+      patternTo = shadedPathPattern,
+      hasIncludes = includes.isNotEmpty(),
+      includedPatterns = sourceIncludes,
+      excludedPatterns = sourceExcludes,
+    )
   }
 
   override fun equals(other: Any?): Boolean {
@@ -147,8 +142,6 @@ constructor(
       pathPattern == other.pathPattern &&
       shadedPattern == other.shadedPattern &&
       shadedPathPattern == other.shadedPathPattern &&
-      sourcePackageExcludes == other.sourcePackageExcludes &&
-      sourcePathExcludes == other.sourcePathExcludes &&
       includes == other.includes &&
       excludes == other.excludes
   }
@@ -161,8 +154,6 @@ constructor(
       pathPattern,
       shadedPattern,
       shadedPathPattern,
-      sourcePackageExcludes,
-      sourcePathExcludes,
       includes,
       excludes,
     )
@@ -175,8 +166,6 @@ constructor(
     append("pathPattern='$pathPattern'").append(", ")
     append("shadedPattern='$shadedPattern'").append(", ")
     append("shadedPathPattern='$shadedPathPattern'").append(", ")
-    append("sourcePackageExcludes=$sourcePackageExcludes").append(", ")
-    append("sourcePathExcludes=$sourcePathExcludes").append(", ")
     append("includes=$includes").append(", ")
     append("excludes=$excludes")
     append(")")
@@ -191,27 +180,6 @@ constructor(
   }
 
   private companion object {
-    /** Match dot, slash or space at end of string */
-    val RX_ENDS_WITH_DOT_SLASH_SPACE: Pattern = Pattern.compile("[./ ]$")
-
-    /**
-     * Match
-     * - certain Java keywords + space
-     * - beginning of Javadoc link + optional line breaks and continuations with '*'
-     * - (opening curly brace / opening parenthesis / comma / equals / semicolon) + space
-     * - (closing curly brace / closing multi-line comment) + space
-     *
-     * at end of string
-     */
-    val RX_ENDS_WITH_JAVA_KEYWORD: Pattern =
-      Pattern.compile(
-        "\\b(import|package|public|protected|private|static|final|synchronized|abstract|volatile|extends|implements|throws) $" +
-          "|" +
-          "\\{@link( \\*)* $" +
-          "|" +
-          "([{}(=;,]|\\*/) $"
-      )
-
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {
       patterns ?: return@buildSet
       for (pattern in patterns) {
@@ -243,43 +211,139 @@ constructor(
       }
     }
 
-    fun shadeSourceWithExcludes(
+    fun relocateSourcePattern(
       sourceContent: String,
       patternFrom: String,
       patternTo: String,
+      hasIncludes: Boolean,
+      includedPatterns: Set<String>,
       excludedPatterns: Set<String>,
     ): String {
-      // Usually shading makes package names a bit longer, so make buffer 10% bigger than original
-      // source.
-      val shadedSourceContent = StringBuilder(sourceContent.length * 11 / 10)
-      // Make sure that search pattern starts at word boundary and that we look for literal ".", not
-      // regex jokers.
-      val snippets =
-        sourceContent
-          .split(("\\b" + patternFrom.replace(".", "[.]") + "\\b").toRegex())
-          .filter(CharSequence::isNotEmpty)
-      snippets.forEachIndexed { i, snippet ->
-        val isFirstSnippet = i == 0
-        val previousSnippet = if (isFirstSnippet) "" else snippets[i - 1]
-        var doExclude = false
-        for (excludedPattern in excludedPatterns) {
-          if (snippet.startsWith(excludedPattern)) {
-            doExclude = true
-            break
-          }
-        }
-        if (isFirstSnippet) {
-          shadedSourceContent.append(snippet)
+      if (hasIncludes && includedPatterns.isEmpty()) return sourceContent
+
+      val regex = Regex("\\b" + Regex.escape(patternFrom) + "\\b")
+      val matches = regex.findAll(sourceContent).toList()
+      if (matches.isEmpty()) return sourceContent
+
+      val result = StringBuilder((sourceContent.length * 1.1).toInt())
+      var lastIndex = 0
+
+      for (match in matches) {
+        val matchStart = match.range.first
+        val matchEnd = match.range.last + 1
+
+        result.append(sourceContent, lastIndex, matchStart)
+        lastIndex = matchEnd
+
+        val isIncluded =
+          !hasIncludes || includedPatterns.any { matchesSubpattern(sourceContent, matchEnd, it) }
+        val isExcluded = excludedPatterns.any { matchesSubpattern(sourceContent, matchEnd, it) }
+        val contextValid = isValidSourceContext(patternFrom, sourceContent, matchStart, matchEnd)
+
+        if (isIncluded && !isExcluded && contextValid) {
+          result.append(patternTo)
         } else {
-          val previousSnippetOneLine = previousSnippet.replace("\\s+".toRegex(), " ")
-          val afterDotSlashSpace =
-            RX_ENDS_WITH_DOT_SLASH_SPACE.matcher(previousSnippetOneLine).find()
-          val afterJavaKeyWord = RX_ENDS_WITH_JAVA_KEYWORD.matcher(previousSnippetOneLine).find()
-          val shouldExclude = doExclude || afterDotSlashSpace && !afterJavaKeyWord
-          shadedSourceContent.append(if (shouldExclude) patternFrom else patternTo).append(snippet)
+          result.append(patternFrom)
         }
       }
-      return shadedSourceContent.toString()
+
+      result.append(sourceContent, lastIndex, sourceContent.length)
+      return result.toString()
+    }
+
+    /**
+     * Extracts the parts of [patterns] after [patternPrefix] in both dot and slash notations, as
+     * source contents may reference classes (e.g. "org.foo.Bar") or paths (e.g. "org/foo/Bar").
+     */
+    fun extractSourceSubpatterns(patterns: Set<String>, patternPrefix: String): Set<String> {
+      if (patternPrefix.isEmpty()) return emptySet()
+      val result = mutableSetOf<String>()
+      val dotPrefix = patternPrefix.replace('/', '.')
+      val trailingWildcardRegex = "[./][*]+$".toRegex()
+
+      for (pat in patterns) {
+        val dotPat = pat.replace('/', '.')
+        if (!dotPat.startsWith(dotPrefix)) continue
+        val sub = dotPat.substring(dotPrefix.length).replaceFirst(trailingWildcardRegex, "")
+        result.add(sub)
+        result.add(sub.replace('.', '/'))
+      }
+      return result
+    }
+
+    fun matchesSubpattern(content: CharSequence, offset: Int, subpattern: String): Boolean {
+      val subLen = subpattern.length
+      if (offset + subLen > content.length) return false
+      for (i in 0 until subLen) {
+        if (content[offset + i] != subpattern[i]) return false
+      }
+      if (subLen == 0 || offset + subLen == content.length) return true
+      if (subpattern.endsWith('.') || subpattern.endsWith('/')) return true
+      val nextChar = content[offset + subLen]
+      return !nextChar.isLetterOrDigit() && nextChar != '_'
+    }
+
+    fun isValidSourceContext(
+      pattern: String,
+      sourceContent: CharSequence,
+      matchStart: Int,
+      matchEnd: Int,
+    ): Boolean {
+      var prevIndex = matchStart - 1
+      while (prevIndex >= 0 && sourceContent[prevIndex].isWhitespace()) {
+        prevIndex--
+      }
+
+      if (prevIndex >= 0) {
+        val prevChar = sourceContent[prevIndex]
+        if (prevChar == '.') {
+          val beforeDot = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
+          // A dot is only a package separator if it's not a Kotlin range '..' or varargs/spread
+          // '...'
+          if (beforeDot != '.') return false
+        }
+        if (prevChar == '/') {
+          val beforeSlash = if (prevIndex > 0) sourceContent[prevIndex - 1] else null
+          // Only reject if pattern does not contain '.' and the slash is an actual path delimiter
+          // (not a leading slash in a string literal like `getResource("/org/foo/x")`, which is
+          // relocated in class files as well, nor closing a block comment '*/' or a single-line
+          // comment '//')
+          val isLeadingSlash = beforeSlash == null || beforeSlash == '"' || beforeSlash == '\''
+          if (
+            !pattern.contains('.') && !isLeadingSlash && beforeSlash != '*' && beforeSlash != '/'
+          ) {
+            return false
+          }
+        }
+      }
+
+      // In all JVM languages, qualified names containing '.' or '/' cannot be local identifiers.
+      if (pattern.contains('.') || pattern.contains('/')) return true
+
+      // For unqualified single-word patterns (e.g. "io", "foo"), check if followed by '.' or '/'
+      var nextIndex = matchEnd
+      while (nextIndex < sourceContent.length && sourceContent[nextIndex].isWhitespace()) {
+        nextIndex++
+      }
+      if (nextIndex < sourceContent.length) {
+        val nextChar = sourceContent[nextIndex]
+        if (nextChar == '.' || nextChar == '/') return true
+      }
+
+      // Check if preceded by 'package', 'import', or '{@link'
+      if (prevIndex >= 0) {
+        var tokenStart = prevIndex
+        while (tokenStart > 0 && sourceContent[tokenStart - 1].isJavaIdentifierPart()) {
+          tokenStart--
+        }
+        val prevToken = sourceContent.subSequence(tokenStart, prevIndex + 1).toString()
+        if (prevToken == "package" || prevToken == "import") return true
+        val lookbackStart = (matchStart - 32).coerceAtLeast(0)
+        val lookbackSnippet = sourceContent.substring(lookbackStart, matchStart)
+        if (lookbackSnippet.contains("{@link")) return true
+      }
+
+      return false
     }
   }
 }

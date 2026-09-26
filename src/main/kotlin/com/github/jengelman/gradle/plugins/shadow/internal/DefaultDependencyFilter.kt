@@ -1,11 +1,22 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import com.github.jengelman.gradle.plugins.shadow.tasks.DependencyFilter
+import javax.inject.Inject
 import org.gradle.api.Project
+import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ResolvedDependency
+import org.gradle.api.artifacts.result.ResolvedDependencyResult
+import org.gradle.api.attributes.Category
+import org.gradle.api.attributes.DocsType
+import org.gradle.api.file.FileCollection
+import org.gradle.api.model.ObjectFactory
 
-internal class DefaultDependencyFilter(project: Project) :
-  DependencyFilter.AbstractDependencyFilter(project) {
+internal abstract class DefaultDependencyFilter
+@Inject
+constructor(
+  project: Project,
+  private val objectFactory: ObjectFactory,
+) : DependencyFilter.AbstractDependencyFilter(project) {
   override fun resolve(
     dependencies: Set<ResolvedDependency>,
     includedDependencies: MutableSet<ResolvedDependency>,
@@ -18,5 +29,53 @@ internal class DefaultDependencyFilter(project: Project) :
         resolve(dep.children, includedDependencies, excludedDependencies)
       }
     }
+  }
+
+  fun resolveSourcesJars(configurations: Collection<Configuration>): FileCollection {
+    return configurations
+      .map { resolveSourcesJars(it) }
+      .reduceOrNull { acc, fileCollection -> acc + fileCollection }
+      ?: objectFactory.fileCollection()
+  }
+
+  private fun resolveSourcesJars(configuration: Configuration): FileCollection {
+    val includes = mutableSetOf<ResolvedDependency>()
+    val excludes = mutableSetOf<ResolvedDependency>()
+    resolve(
+      dependencies = configuration.resolvedConfiguration.firstLevelModuleDependencies,
+      includedDependencies = includes,
+      excludedDependencies = excludes,
+    )
+
+    val includedComponentIds =
+      configuration.incoming.resolutionResult.allDependencies
+        .filterIsInstance<ResolvedDependencyResult>()
+        .filter { dep ->
+          includes.any { inc ->
+            inc.moduleGroup == dep.selected.moduleVersion?.group &&
+              inc.moduleName == dep.selected.moduleVersion?.name &&
+              inc.moduleVersion == dep.selected.moduleVersion?.version
+          }
+        }
+        .map { it.selected.id }
+        .toSet()
+
+    return configuration.incoming
+      .artifactView { view ->
+        view.withVariantReselection()
+        view.attributes { attrs ->
+          attrs.attribute(
+            Category.CATEGORY_ATTRIBUTE,
+            objectFactory.named(Category::class.java, Category.DOCUMENTATION),
+          )
+          attrs.attribute(
+            DocsType.DOCS_TYPE_ATTRIBUTE,
+            objectFactory.named(DocsType::class.java, DocsType.SOURCES),
+          )
+        }
+        view.componentFilter { id -> id in includedComponentIds }
+        view.lenient(true)
+      }
+      .files
   }
 }

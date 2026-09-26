@@ -137,7 +137,8 @@ class FilteringTest : BasePluginTest() {
         |  exclude($clientProject)
         |}
         """
-          .trimMargin()
+          .trimMargin(),
+      withSourcesJar = true,
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -154,7 +155,8 @@ class FilteringTest : BasePluginTest() {
         |  exclude(project(':client'))
         |}
         """
-          .trimMargin()
+          .trimMargin(),
+      withSourcesJar = true,
     )
     path("client/build.gradle").appendText("version = '1.0.0+1'")
 
@@ -172,7 +174,8 @@ class FilteringTest : BasePluginTest() {
         |  exclude { it.moduleGroup == 'junit' }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
+      withSourcesJar = true,
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -190,6 +193,16 @@ class FilteringTest : BasePluginTest() {
         loadClass("client.Client")
         loadClass("server.Server")
       }
+    }
+    assertThat(outputServerShadowedSourcesJar).useAll {
+      containsOnly(
+        "client/",
+        "server/",
+        "client/Client.java",
+        "server/Server.java",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -242,7 +255,7 @@ class FilteringTest : BasePluginTest() {
     projectScript.appendText(
       """
       |dependencies {
-      |  implementation 'my:g:1.0'
+      |  implementation 'my:l:1.0'
       |}
       |$shadowJarTask {
       |  dependencies {
@@ -256,7 +269,81 @@ class FilteringTest : BasePluginTest() {
     runWithSuccess(shadowJarPath)
 
     assertThat(outputShadowedJar).useAll {
-      containsOnly("g.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+      containsOnly("l.properties", *entriesInAB, "META-INF/", "META-INF/MANIFEST.MF")
+    }
+  }
+
+  @Test
+  fun excludeDependencyFromSourcesJar() {
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |  implementation 'my:h:1.0'
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |  dependencies {
+      |    exclude(dependency('my:h:1.0'))
+      |  }
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly(*entriesInAB, "g/", "g/G.class", "META-INF/", "META-INF/MANIFEST.MF")
+    }
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly("g/", "g/G.java", "META-INF/", "META-INF/MANIFEST.MF")
+    }
+  }
+
+  @Test
+  fun sourcesJarRespectsSourceDirectorySetFilters() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |public class Main {}
+        """
+          .trimMargin()
+      )
+    path("src/main/java/my/Excluded.java")
+      .writeText(
+        """
+        |package my;
+        |public class Excluded {}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |sourceSets {
+      |  main {
+      |    java {
+      |      exclude '**/Excluded.java'
+      |    }
+      |  }
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
     }
   }
 
@@ -279,6 +366,9 @@ class FilteringTest : BasePluginTest() {
         loadClass("server.Server")
         loadClass("junit.framework.Test")
       }
+    }
+    assertThat(outputServerShadowedSourcesJar).useAll {
+      containsOnly("server/", "server/Server.java", "META-INF/", "META-INF/MANIFEST.MF")
     }
   }
 }

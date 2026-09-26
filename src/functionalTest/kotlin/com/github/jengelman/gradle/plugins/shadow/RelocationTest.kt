@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar.Companion.CONS
 import com.github.jengelman.gradle.plugins.shadow.testkit.classLoader
 import com.github.jengelman.gradle.plugins.shadow.testkit.containsOnly
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
+import com.github.jengelman.gradle.plugins.shadow.testkit.getContent
 import com.github.jengelman.gradle.plugins.shadow.testkit.isAssignableFrom
 import com.github.jengelman.gradle.plugins.shadow.testkit.loadClass
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
@@ -735,6 +736,66 @@ class RelocationTest : BasePluginTest() {
       |}
       """
         .trimMargin()
+    }
+  }
+
+  @Test
+  fun generateShadowedSourcesJarWithRelocation() {
+    path("src/main/java/my/Main.java")
+      .writeText(
+        """
+        |package my;
+        |import g.G;
+        |public class Main {
+        |  G g;
+        |}
+        """
+          .trimMargin()
+      )
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  implementation 'my:g:1.0'
+      |}
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |  relocate('g', 'shadow.g')
+      |}
+      """
+        .trimMargin()
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedSourcesJar).useAll {
+      containsOnly(
+        "my/",
+        "my/Main.java",
+        "shadow/",
+        "shadow/g/",
+        "shadow/g/G.java",
+        "META-INF/",
+        "META-INF/MANIFEST.MF",
+      )
+      getContent("my/Main.java")
+        .isEqualTo(
+          """
+          |package my;
+          |import shadow.g.G;
+          |public class Main {
+          |  G g;
+          |}
+          """
+            .trimMargin()
+        )
+      getContent("shadow/g/G.java")
+        .isEqualTo(
+          """
+          |package shadow.g;
+          |public class G {}
+          """
+            .trimMargin()
+        )
     }
   }
 
