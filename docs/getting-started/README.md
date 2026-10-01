@@ -1,5 +1,6 @@
 # Getting Started
 
+<!-- test: BasePluginTest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -20,6 +21,7 @@
 
 Alternatively, the plugin can be added to the buildscript classpath and applied:
 
+<!-- test: BasePluginTest -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

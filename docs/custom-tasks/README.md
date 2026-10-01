@@ -5,6 +5,7 @@ possible to add arbitrary [`ShadowJar`][ShadowJar] tasks to a project. When doin
 [`configurations`][ShadowJar.configurations] property is specified to inform Shadow which dependencies to merge into the
 output.
 
+<!-- test: JavaPluginsTest#registerCustomShadowJarTask -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -61,6 +62,7 @@ It is also possible to create a shadow JAR that contains *only* the dependencies
 code. This is accomplished by creating a custom [`ShadowJar`][ShadowJar] task and configuring the
 [`configurations`][ShadowJar.configurations] property, but **not** adding any project sources with `from(...)`.
 
+<!-- test: JavaPluginsTest#registerCustomShadowJarThatContainsDependenciesOnly -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
