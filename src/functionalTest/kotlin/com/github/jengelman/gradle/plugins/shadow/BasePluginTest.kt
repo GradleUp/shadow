@@ -1,7 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow
 
 import assertk.Assert
-import assertk.all
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotNull
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.SHADOW_INSTALL_TASK_NAME
@@ -14,12 +13,12 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
 import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.testkit.useAll as testkitUseAll
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
 import com.github.jengelman.gradle.plugins.shadow.util.AppendableMavenRepository
 import com.github.jengelman.gradle.plugins.shadow.util.JarBuilder
 import com.github.jengelman.gradle.plugins.shadow.util.JvmLang
 import com.github.jengelman.gradle.plugins.shadow.util.createDefaultLocalMavenRepository
-import java.io.Closeable
 import java.nio.file.Path
 import java.util.Properties
 import java.util.jar.JarEntry
@@ -73,8 +72,14 @@ abstract class BasePluginTest {
   open val outputShadowedJar: JarPath
     get() = jarPath("build/libs/my-1.0-all.jar")
 
+  val outputShadowedSourcesJar: JarPath
+    get() = jarPath("build/libs/my-1.0-all-sources.jar")
+
   val outputServerShadowedJar: JarPath
     get() = jarPath("server/build/libs/server-1.0-all.jar")
+
+  val outputServerShadowedSourcesJar: JarPath
+    get() = jarPath("server/build/libs/server-1.0-all-sources.jar")
 
   @BeforeAll
   fun beforeAll() {
@@ -148,6 +153,16 @@ abstract class BasePluginTest {
            |
            """
       .trimMargin()
+  }
+
+  fun compileOnlyStdlib(exclude: Boolean): String {
+    return if (exclude) {
+      // Disable the stdlib dependency added via `implementation`.
+      path("gradle.properties").writeText("kotlin.stdlib.default.dependency=false")
+      "compileOnly 'org.jetbrains.kotlin:kotlin-stdlib'"
+    } else {
+      ""
+    }
   }
 
   fun jarPath(relative: String, parent: Path = projectRoot): JarPath {
@@ -244,7 +259,22 @@ abstract class BasePluginTest {
     return "$basePath.class"
   }
 
-  fun writeClientAndServerModules(clientShadowed: Boolean = false, serverShadowBlock: String = "") {
+  fun writeClientAndServerModules(
+    clientShadowed: Boolean = false,
+    serverShadowBlock: String = "",
+    withSourcesJar: Boolean = false,
+  ) {
+    val javaBlock =
+      if (withSourcesJar) {
+        """
+        |java {
+        |  withSourcesJar()
+        |}
+        """
+          .trimMargin()
+      } else {
+        ""
+      }
     settingsScript.appendText(
       """
       |include 'client', 'server'
@@ -265,6 +295,7 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |$javaBlock
         |dependencies {
         |  implementation 'junit:junit:3.8.2'
         |}
@@ -286,6 +317,7 @@ abstract class BasePluginTest {
       .writeText(
         """
         |${getDefaultProjectBuildScript("java")}
+        |$javaBlock
         |dependencies {
         |  implementation project(':client')
         |}
@@ -405,6 +437,7 @@ abstract class BasePluginTest {
       "tasks.named('$SHADOW_JAR_TASK_NAME', ${ShadowJar::class.java.name})"
     const val runShadowTask = "tasks.named('$SHADOW_RUN_TASK_NAME', JavaExec)"
     const val jarTask = "tasks.named('jar', Jar)"
+    const val sourcesJarTask = "tasks.named('sourcesJar', Jar)"
 
     const val infoArgument = "--info"
 
@@ -416,10 +449,16 @@ abstract class BasePluginTest {
       }
     }
 
-    fun createEmptyClassBytes(internalName: String): ByteArray {
+    fun createEmptyClassBytes(
+      internalName: String,
+      sourceFile: String? = "${internalName.substringAfterLast('/')}.java",
+    ): ByteArray {
       return ClassWriter(0)
         .apply {
           visit(Opcodes.V1_8, Opcodes.ACC_PUBLIC, internalName, null, "java/lang/Object", null)
+          if (sourceFile != null) {
+            visitSource(sourceFile, null)
+          }
           visitEnd()
         }
         .toByteArray()
@@ -442,11 +481,7 @@ abstract class BasePluginTest {
         .trimMargin()
     }
 
-    fun <T : Closeable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = all {
-      body()
-      // Close the resource after all assertions are done.
-      given { it.use(block = {}) }
-    }
+    fun <T : AutoCloseable> Assert<T>.useAll(body: Assert<T>.() -> Unit) = testkitUseAll(body)
 
     fun Assert<BuildResult>.taskOutcomeEquals(taskPath: String, expectedOutcome: TaskOutcome) {
       return transform { it.task(taskPath)?.outcome }.isNotNull().isEqualTo(expectedOutcome)

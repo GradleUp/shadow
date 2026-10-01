@@ -4,6 +4,7 @@ import com.github.jengelman.gradle.plugins.shadow.testkit.assertNoDeprecationWar
 import com.github.jengelman.gradle.plugins.shadow.testkit.commonGradleArgs
 import com.github.jengelman.gradle.plugins.shadow.testkit.enableNoImplicitLookupInParentProjects
 import com.github.jengelman.gradle.plugins.shadow.testkit.gradleRunner
+import com.github.jengelman.gradle.plugins.shadow.testkit.isDokkaIssue4600
 import java.nio.file.Path
 import java.util.jar.JarOutputStream
 import kotlin.io.path.createDirectory
@@ -104,6 +105,9 @@ sealed interface SnippetExecutable {
         .assertNoDeprecationWarnings()
     } catch (t: Throwable) {
       val buildOutput = (t as? UnexpectedBuildFailure)?.buildResult?.output ?: gradleBuildOutput
+
+      if (buildOutput?.isDokkaIssue4600 == true) return
+
       throw AssertionError(
         buildString {
           append("The error line in the doc is near $sourceLocation")
