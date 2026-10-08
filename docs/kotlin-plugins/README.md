@@ -11,6 +11,7 @@ kotlin.stdlib.default.dependency=false
 Kotlin compilations may still require the standard libraries, you can add them into `compileOnly` (`compileClasspath`)
 to make sure compilations success and avoid shadowing as follows:
 
+<!-- test: KotlinPluginsTest#compatKotlinJvmPlugin -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -33,6 +34,7 @@ See more information about [Dependency on the standard library][dependency-on-th
 
 Shadow works well for Kotlin JVM projects like Java projects. Here is an example:
 
+<!-- test: KotlinPluginsTest#compatKotlinJvmPlugin -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -67,6 +69,7 @@ build logic for [Publishing Libraries][publishing-libraries], [Running Applicati
 Shadow honors Kotlin's [`org.jetbrains.kotlin.multiplatform`][org.jetbrains.kotlin.multiplatform] plugin and will
 automatically configure additional tasks for bundling the shadowed JAR for its `jvm` target.
 
+<!-- test: KotlinPluginsTest#compatKmpJvmTarget -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -148,6 +151,7 @@ is enabled by default via the deprecated `enableKotlinModuleRemapping` property.
 To explicitly apply this remapping (recommended for future compatibility), add
 [`KotlinModuleMetadataTransformer`][KotlinModuleMetadataTransformer] to your task configuration:
 
+<!-- test: TransformersTest#kotlinModuleMetadataTransformer -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
