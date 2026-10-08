@@ -262,15 +262,15 @@ class SimpleRelocatorTest {
           ),
       )
     assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class"),
       )
       .isFalse()
     assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class"),
       )
       .isFalse()
     assertThat(
-        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class"),
       )
       .isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
@@ -284,15 +284,15 @@ class SimpleRelocatorTest {
         excludes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
       )
     assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class"),
       )
       .isFalse()
     assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class"),
       )
       .isFalse()
     assertThat(
-        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class"),
       )
       .isFalse()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isTrue()
@@ -306,18 +306,18 @@ class SimpleRelocatorTest {
           listOf(
             "org/apache/iceberg/spark/parquet/**",
             "org/apache/spark/sql/execution/datasources/parquet/**",
-          )
+          ),
       )
     assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
-      )
-      .isTrue()
-    assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class"),
       )
       .isTrue()
     assertThat(
-        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class"),
+      )
+      .isTrue()
+    assertThat(
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class"),
       )
       .isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isFalse()
@@ -327,18 +327,18 @@ class SimpleRelocatorTest {
   fun canRelocateIncludedSourceFileWithRegex() {
     val relocator =
       SimpleRelocator(
-        includes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]")
+        includes = listOf("%regex[org/apache/iceberg/.*]", "%regex[org/apache/spark/.*]"),
       )
     assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class")
-      )
-      .isTrue()
-    assertThat(
-        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet.class"),
       )
       .isTrue()
     assertThat(
-        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class")
+        relocator.canRelocatePath("org/apache/iceberg/spark/parquet/SparkNativeParquet$.class"),
+      )
+      .isTrue()
+    assertThat(
+        relocator.canRelocatePath("org/apache/spark/sql/execution/datasources/parquet/v1.class"),
       )
       .isTrue()
     assertThat(relocator.canRelocatePath("org/foo/Class.class")).isFalse()
@@ -376,9 +376,9 @@ class SimpleRelocatorTest {
     assertThat(
         fooRelocator.applyToSourceContent(
           asmRelocator.applyToSourceContent(
-            ioRelocator.applyToSourceContent(relocator.applyToSourceContent(sourceFile))
-          )
-        )
+            ioRelocator.applyToSourceContent(relocator.applyToSourceContent(sourceFile)),
+          ),
+        ),
       )
       .isEqualTo(relocatedFile)
   }

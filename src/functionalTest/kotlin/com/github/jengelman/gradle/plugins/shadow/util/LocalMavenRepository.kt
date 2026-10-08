@@ -6,7 +6,7 @@ import kotlin.io.path.createTempDirectory
 
 fun createDefaultLocalMavenRepository(junitJar: Path): AppendableMavenRepository {
   return AppendableMavenRepository(
-      root = createTempDirectory().resolve("local-maven-repo").createDirectories()
+      root = createTempDirectory().resolve("local-maven-repo").createDirectories(),
     )
     .apply {
       jarModule("junit", "junit", "3.8.2") { useJar(junitJar) }

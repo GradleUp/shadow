@@ -35,7 +35,7 @@ class ParallelRelocationTest : BasePluginTest() {
       |  relocate 'com.example.pkg', 'relocated.pkg'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -79,7 +79,7 @@ class ParallelRelocationTest : BasePluginTest() {
       |  relocate 'com.example.test', 'shadowed.example.test'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -116,7 +116,7 @@ class ParallelRelocationTest : BasePluginTest() {
       |  relocate 'com.example.relocated', 'shadowed.example.relocated'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -147,7 +147,7 @@ class ParallelRelocationTest : BasePluginTest() {
       |  relocate 'corrupt', 'relocated.corrupt'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithFailure(shadowJarPath)

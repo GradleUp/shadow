@@ -65,8 +65,8 @@ class PublishingTest : BasePluginTest() {
           |archiveClassifier = ''
           |archiveBaseName = 'maven-all'
           """
-            .trimMargin()
-      )
+            .trimMargin(),
+      ),
     )
 
     val assertions = { variantAttrs: Array<Pair<String, String>> ->
@@ -92,7 +92,7 @@ class PublishingTest : BasePluginTest() {
       |  id 'org.gradle.toolchains.foojay-resolver-convention'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.appendText(
       """
@@ -100,7 +100,7 @@ class PublishingTest : BasePluginTest() {
       |  toolchain.languageVersion = JavaLanguageVersion.of(17)
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     assertions(attrsWithoutTargetJvm + targetJvmAttr17)
 
@@ -110,7 +110,7 @@ class PublishingTest : BasePluginTest() {
       |  targetCompatibility = JavaVersion.VERSION_11
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
 
@@ -120,7 +120,7 @@ class PublishingTest : BasePluginTest() {
       |  sourceCompatibility = JavaVersion.VERSION_1_8
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     // sourceCompatibility doesn't affect the target JVM version.
     assertions(attrsWithoutTargetJvm + targetJvmAttr11)
@@ -131,7 +131,7 @@ class PublishingTest : BasePluginTest() {
       |  options.release = 8
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     // options.release flag is honored.
     assertions(attrsWithoutTargetJvm + targetJvmAttr8)
@@ -154,14 +154,14 @@ class PublishingTest : BasePluginTest() {
           |archiveBaseName = 'maven-all'
           """
             .trimMargin(),
-      )
+      ),
     )
 
     val result = publish(infoArgument)
 
     assertThat(result.output)
       .contains(
-        "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
+        "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
       )
     assertShadowVariantCommon(
       gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
@@ -189,14 +189,14 @@ class PublishingTest : BasePluginTest() {
           |archiveBaseName = 'maven-all'
           """
             .trimMargin(),
-      )
+      ),
     )
 
     val result = publish(infoArgument)
 
     assertThat(result.output)
       .contains(
-        "Skipping setting org.gradle.jvm.version attribute for shadowRuntimeElements configuration."
+        "Skipping setting org.gradle.jvm.version attribute for shadowRuntimeElements configuration.",
       )
     assertShadowVariantCommon(
       gmm = gmmAdapter.fromJson(repoPath("my/maven-all/1.0/maven-all-1.0.module")),
@@ -224,7 +224,7 @@ class PublishingTest : BasePluginTest() {
           |archiveBaseName = 'maven-all'
           """
             .trimMargin(),
-      )
+      ),
     )
 
     publish()
@@ -256,7 +256,7 @@ class PublishingTest : BasePluginTest() {
           |}
           """
             .trimMargin(),
-      )
+      ),
     )
 
     publish()
@@ -311,7 +311,7 @@ class PublishingTest : BasePluginTest() {
           |}
           """
             .trimMargin(),
-      )
+      ),
     )
 
     publish()
@@ -345,7 +345,7 @@ class PublishingTest : BasePluginTest() {
           |}
           """
             .trimMargin(),
-      )
+      ),
     )
 
     publish()
@@ -361,7 +361,7 @@ class PublishingTest : BasePluginTest() {
     assertShadowJarCommon(repoJarPath("$artifactRoot/my-gradle-plugin-1.0.jar"))
     assertPomCommon(repoPath("$artifactRoot/my-gradle-plugin-1.0.pom"))
     assertShadowVariantCommon(
-      gmmAdapter.fromJson(repoPath("$artifactRoot/my-gradle-plugin-1.0.module"))
+      gmmAdapter.fromJson(repoPath("$artifactRoot/my-gradle-plugin-1.0.module")),
     )
   }
 
@@ -390,7 +390,7 @@ class PublishingTest : BasePluginTest() {
           |}
           """
             .trimMargin(),
-      )
+      ),
     )
 
     publish()
@@ -442,7 +442,7 @@ class PublishingTest : BasePluginTest() {
           |}
           """
             .trimMargin(),
-      )
+      ),
     )
 
     publish()
@@ -558,7 +558,7 @@ class PublishingTest : BasePluginTest() {
           |}
           """
             .trimMargin(),
-      )
+      ),
     )
 
     val result = publish(infoArgument)
@@ -569,7 +569,7 @@ class PublishingTest : BasePluginTest() {
           "Adding shadowRuntimeElements variant to java component."
         } else {
           "Skipping adding shadowRuntimeElements variant to java component."
-        }
+        },
       )
     val assertVariantsCommon = { gmm: GradleModuleMetadata ->
       assertThat(gmm.apiElementsVariant).all {

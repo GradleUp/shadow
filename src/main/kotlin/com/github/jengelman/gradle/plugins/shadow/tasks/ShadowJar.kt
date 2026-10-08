@@ -457,7 +457,7 @@ public abstract class ShadowJar : Jar() {
 
   @Deprecated(
     message =
-      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10."
+      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10.",
   )
   @JvmOverloads
   public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
@@ -474,7 +474,7 @@ public abstract class ShadowJar : Jar() {
   @Suppress("DeprecatedCallableAddReplaceWith")
   @Deprecated(
     message =
-      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10."
+      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10.",
   )
   @JvmSynthetic
   public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
@@ -786,7 +786,7 @@ public abstract class ShadowJar : Jar() {
 
           project.plugins.withId("org.gradle.java") {
             task.javaLauncher.convention(
-              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain),
             )
           }
 

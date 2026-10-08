@@ -15,7 +15,7 @@ class AppendingTransformerTest : BaseTransformerTest() {
       transform<AppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "resource = '$ENTRY_TEST_PROPERTIES'",
-      )
+      ),
     )
 
     runWithSuccess(shadowJarPath)

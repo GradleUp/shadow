@@ -37,7 +37,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  r8 {}
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -64,7 +64,7 @@ class R8MinimizationTest : BasePluginTest() {
         |-keep,includedescriptorclasses class app.App { *; }
         |# End of content from $inputConfigPath
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -102,7 +102,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -132,7 +132,7 @@ class R8MinimizationTest : BasePluginTest() {
         |-keep class lib.Reflective { *; }
         |# End of content from $inputConfigPath
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -149,7 +149,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -173,7 +173,7 @@ class R8MinimizationTest : BasePluginTest() {
         |-keep class lib.Reflective { *; }
         |# End of content from $inputConfigPath
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -188,7 +188,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -226,7 +226,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -245,7 +245,7 @@ class R8MinimizationTest : BasePluginTest() {
         |-printusage reports/usage.txt
         |# End of content from $inputConfigPath
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
     assertThat(path("app/build/r8/reports/mapping.txt").readText()).contains("lib.Used")
     assertThat(path("app/build/r8/reports/seeds.txt").readText()).contains("app.App")
@@ -262,7 +262,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  r8 {}
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
     path("lib/src/main/resources/META-INF/proguard/lib.pro")
       .writeText("-keep class lib.Reflective { *; }")
@@ -299,7 +299,7 @@ class R8MinimizationTest : BasePluginTest() {
         |-keep class lib.Reflective { *; }
         |# End of content from $embeddedConfigPath
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -312,7 +312,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  r8 {}
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
     path("lib/src/main/resources/META-INF/proguard/lib.pro")
       .writeText(
@@ -324,7 +324,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  public <init>();
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(appShadowJarPath)
@@ -358,7 +358,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -387,7 +387,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -410,7 +410,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  r8 {}
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -444,7 +444,7 @@ class R8MinimizationTest : BasePluginTest() {
         |-keep class lib.Used { *; }
         |# End of content from $inputConfigPath
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -524,7 +524,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(appShadowJarPath)
@@ -585,7 +585,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(appShadowJarPath)
@@ -613,7 +613,7 @@ class R8MinimizationTest : BasePluginTest() {
       """
       |include 'app', 'lib'
       """
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.deleteExisting()
 
@@ -627,7 +627,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("lib/src/main/java/lib/Unused.java")
       .writeText(
@@ -635,7 +635,7 @@ class R8MinimizationTest : BasePluginTest() {
         |package lib;
         |public class Unused {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("lib/src/main/java/lib/Reflective.java")
       .writeText(
@@ -643,7 +643,7 @@ class R8MinimizationTest : BasePluginTest() {
         |package lib;
         |public class Reflective {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("lib/build.gradle")
       .writeText(
@@ -651,7 +651,7 @@ class R8MinimizationTest : BasePluginTest() {
         |${getDefaultProjectBuildScript("java")}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("app/src/main/java/app/App.java")
@@ -665,7 +665,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("app/build.gradle")
       .writeText(
@@ -680,7 +680,7 @@ class R8MinimizationTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -689,7 +689,7 @@ class R8MinimizationTest : BasePluginTest() {
       """
       |include 'app', 'service'
       """
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.deleteExisting()
 
@@ -701,7 +701,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  String greet();
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("service/src/main/java/service/DefaultGreeter.java")
       .writeText(
@@ -713,7 +713,7 @@ class R8MinimizationTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("service/src/main/resources/META-INF/services/service.Greeter")
       .writeText("service.DefaultGreeter")
@@ -723,7 +723,7 @@ class R8MinimizationTest : BasePluginTest() {
         |${getDefaultProjectBuildScript("java")}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("app/src/main/java/app/App.java")
@@ -732,7 +732,7 @@ class R8MinimizationTest : BasePluginTest() {
         |package app;
         |public class App {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("app/build.gradle")
       .writeText(
@@ -748,7 +748,7 @@ class R8MinimizationTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 }

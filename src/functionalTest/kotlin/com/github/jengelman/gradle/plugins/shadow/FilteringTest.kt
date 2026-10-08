@@ -22,7 +22,7 @@ class FilteringTest : BasePluginTest() {
       |  implementation 'my:b:1.0'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
   }
 
@@ -43,7 +43,7 @@ class FilteringTest : BasePluginTest() {
       |  exclude 'a2.properties'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -64,7 +64,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
     projectScript.appendText(
@@ -78,7 +78,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -99,7 +99,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     path("src/main/java/my/Passed.java")
       .writeText(
@@ -107,7 +107,7 @@ class FilteringTest : BasePluginTest() {
         |package my;
         |public class Passed {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(shadowJarPath)
@@ -137,7 +137,7 @@ class FilteringTest : BasePluginTest() {
         |  exclude($clientProject)
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -154,7 +154,7 @@ class FilteringTest : BasePluginTest() {
         |  exclude(project(':client'))
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
     path("client/build.gradle").appendText("version = '1.0.0+1'")
 
@@ -172,7 +172,7 @@ class FilteringTest : BasePluginTest() {
         |  exclude { it.moduleGroup == 'junit' }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -203,7 +203,7 @@ class FilteringTest : BasePluginTest() {
       |  exclude 'a2.properties'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -227,7 +227,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -250,7 +250,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)

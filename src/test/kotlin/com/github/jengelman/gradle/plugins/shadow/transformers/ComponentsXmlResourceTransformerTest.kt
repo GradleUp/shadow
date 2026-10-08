@@ -68,7 +68,7 @@ class ComponentsXmlResourceTransformerTest :
           |  </components>
           |</component-set>
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 }

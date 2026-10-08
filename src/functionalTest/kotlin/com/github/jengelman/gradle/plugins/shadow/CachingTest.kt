@@ -34,7 +34,7 @@ class CachingTest : BasePluginTest() {
       |  implementation 'my:b:1.0'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -56,7 +56,7 @@ class CachingTest : BasePluginTest() {
       |  implementation 'my:b:1.0'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -69,7 +69,7 @@ class CachingTest : BasePluginTest() {
       |  archiveBaseName = "foo"
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertExecutionsFromCacheAndUpToDate()
@@ -89,7 +89,7 @@ class CachingTest : BasePluginTest() {
           |  duplicatesStrategy = DuplicatesStrategy.$strategy
           |}
           """
-            .trimMargin()
+            .trimMargin(),
         )
 
         assertCompositeExecutions()
@@ -111,7 +111,7 @@ class CachingTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val assertions = { valueFoo: String, valueBar: String ->
@@ -153,7 +153,7 @@ class CachingTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName) }
@@ -176,7 +176,7 @@ class CachingTest : BasePluginTest() {
       |  mainClass = '$mainClassName'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions { getMainAttr(mainClassAttributeKey).isEqualTo(mainClassName) }
@@ -198,7 +198,7 @@ class CachingTest : BasePluginTest() {
       |  implementation 'my:b:1.0'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -219,7 +219,7 @@ class CachingTest : BasePluginTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -239,7 +239,7 @@ class CachingTest : BasePluginTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -253,7 +253,7 @@ class CachingTest : BasePluginTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -276,7 +276,7 @@ class CachingTest : BasePluginTest() {
       |  implementation 'junit:junit:3.8.2'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -297,7 +297,7 @@ class CachingTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions {
@@ -316,7 +316,7 @@ class CachingTest : BasePluginTest() {
         |package server;
         |public class Server {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
@@ -340,7 +340,7 @@ class CachingTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     assertCompositeExecutions(jarPathProvider = { outputServerShadowedJar }) {
@@ -433,7 +433,7 @@ class CachingTest : BasePluginTest() {
       |  implementation 'junit:junit:3.8.2'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     val mainClassEntry = writeClass(withImports = true)
 
@@ -453,7 +453,7 @@ class CachingTest : BasePluginTest() {
       |  relocate 'junit.framework', 'foo.junit.framework'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val relocatedEntries =
       junitEntries.map { it.replace("junit/framework/", "foo/junit/framework/") }.toTypedArray()
@@ -483,7 +483,7 @@ class CachingTest : BasePluginTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val mainClassEntry = writeClass(withImports = true)
     val fooEntries =
@@ -536,8 +536,8 @@ class CachingTest : BasePluginTest() {
           """
           |path = 'META-INF/foo'
           """
-            .trimMargin()
-      )
+            .trimMargin(),
+      ),
     )
 
     assertions()
@@ -557,7 +557,7 @@ class CachingTest : BasePluginTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions()
@@ -567,7 +567,7 @@ class CachingTest : BasePluginTest() {
       |${transform<GroovyExtensionModuleTransformer>()}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertCompositeExecutions()
@@ -578,7 +578,7 @@ class CachingTest : BasePluginTest() {
       |  transform(${CustomResourceTransformer::class.java.name})
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertExecutionSuccess()
@@ -635,7 +635,7 @@ class CachingTest : BasePluginTest() {
       """
       |include 'client', 'server'
       """
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.deleteExisting()
 
@@ -649,7 +649,7 @@ class CachingTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/src/main/java/client/Unused.java")
       .writeText(
@@ -657,7 +657,7 @@ class CachingTest : BasePluginTest() {
         |package client;
         |public class Unused {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/src/main/java/client/Reflective.java")
       .writeText(
@@ -665,7 +665,7 @@ class CachingTest : BasePluginTest() {
         |package client;
         |public class Reflective {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/build.gradle")
       .writeText(
@@ -673,7 +673,7 @@ class CachingTest : BasePluginTest() {
         |${getDefaultProjectBuildScript("java")}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("server/src/main/java/server/Server.java")
@@ -687,7 +687,7 @@ class CachingTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("server/build.gradle")
       .writeText(
@@ -705,7 +705,7 @@ class CachingTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 }

@@ -20,8 +20,8 @@ class GroovyExtensionModuleTransformerTest : BaseTransformerTest() {
   fun groovyExtensionModuleTransformer() {
     projectScript.appendText(
       transform<GroovyExtensionModuleTransformer>(
-        dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar())
-      )
+        dependenciesBlock = implementationFiles(buildJarFoo(), buildJarBar()),
+      ),
     )
 
     runWithSuccess(shadowJarPath)

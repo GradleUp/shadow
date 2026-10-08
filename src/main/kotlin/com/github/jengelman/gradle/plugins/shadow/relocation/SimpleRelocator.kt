@@ -73,13 +73,13 @@ constructor(
         // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(this.pattern)) {
           sourcePackageExcludes.add(
-            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), "")
+            exclude.substring(this.pattern.length).replaceFirst("[.][*]$".toRegex(), ""),
           )
         }
         // Excludes should be subpackages of the global pattern.
         if (exclude.startsWith(pathPattern)) {
           sourcePathExcludes.add(
-            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), "")
+            exclude.substring(pathPattern.length).replaceFirst("/[*]$".toRegex(), ""),
           )
         }
       }
@@ -209,7 +209,7 @@ constructor(
           "|" +
           "\\{@link( \\*)* $" +
           "|" +
-          "([{}(=;,]|\\*/) $"
+          "([{}(=;,]|\\*/) $",
       )
 
     fun normalizePatterns(patterns: Collection<String>?) = buildSet {

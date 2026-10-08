@@ -30,7 +30,7 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
       |  transform(${ProGuardFilesResourceTransformer::class.java.name})
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -50,7 +50,7 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
           |-keep class com.example.Client
           |-keep class com.example.Server
           """
-            .trimMargin()
+            .trimMargin(),
         )
       getContent("META-INF/proguard/client.pro").isEqualTo("-dontwarn com.example.client.**")
       getContent("META-INF/proguard/server.pro").isEqualTo("-dontwarn com.example.server.**")
@@ -97,7 +97,7 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
       |  relocate("bar", "relocated.bar")
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -127,7 +127,7 @@ class ProGuardFilesResourceTransformerTest : BaseTransformerTest() {
           |# Extension rules
           |-keep class relocated.bar.BarDriver
           """
-            .trimMargin()
+            .trimMargin(),
         )
       classLoader {
         loadClass("relocated.com.example.Driver")
