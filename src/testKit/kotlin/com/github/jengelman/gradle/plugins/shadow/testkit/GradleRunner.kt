@@ -49,6 +49,13 @@ val commonGradleArgs =
     isolatedProjectsFlag,
   )
 
+// TODO: https://github.com/Kotlin/dokka/issues/4600
+val String.isDokkaIssue4600: Boolean
+  get() = let { output ->
+    output.contains("The Configuration.setVisible(boolean) method has been deprecated") &&
+      output.contains("org.jetbrains.dokka.gradle")
+  }
+
 fun gradleRunner(
   projectDir: Path,
   arguments: Iterable<String>,
