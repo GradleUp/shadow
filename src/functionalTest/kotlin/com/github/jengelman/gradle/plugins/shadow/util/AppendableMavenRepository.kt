@@ -106,7 +106,7 @@ class AppendableMavenRepository(val root: Path) {
       |Publish modules to Maven repository at ${root.toUri()}:
       |${modules.joinToString("\n") { it.coordinate }}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     modules.clear()
   }
@@ -119,7 +119,7 @@ class AppendableMavenRepository(val root: Path) {
       val (groupId, artifactId, version) =
         coordinate.split(":").takeIf { it.size == 3 }
           ?: error(
-            "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'."
+            "Invalid coordinate format: '$coordinate'. Expected format is 'groupId:artifactId:version'.",
           )
       val dependency =
         Dependency().also {

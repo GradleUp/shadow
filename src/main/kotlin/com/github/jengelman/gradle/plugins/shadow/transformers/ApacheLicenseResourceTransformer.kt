@@ -24,7 +24,7 @@ constructor(
   patternSet: PatternSet =
     PatternSet()
       .apply { isCaseSensitive = false }
-      .include(LICENSE_PATH, LICENSE_TXT_PATH, LICENSE_MD_PATH)
+      .include(LICENSE_PATH, LICENSE_TXT_PATH, LICENSE_MD_PATH),
 ) : PatternFilterableResourceTransformer(patternSet = patternSet) {
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return super.canTransformResource(element).also { flag -> checkDupStrategy(flag, element) }

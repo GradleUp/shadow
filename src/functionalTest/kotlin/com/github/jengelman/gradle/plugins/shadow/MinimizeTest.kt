@@ -64,7 +64,7 @@ class MinimizeTest : BasePluginTest() {
         |  api project(':lib')
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
@@ -98,7 +98,7 @@ class MinimizeTest : BasePluginTest() {
         """
         |minimize()
         """
-          .trimMargin()
+          .trimMargin(),
     )
     path("server/src/main/java/server/Server.java")
       .writeText(
@@ -110,7 +110,7 @@ class MinimizeTest : BasePluginTest() {
         |  private final String client = Client.class.getName();
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(serverShadowJarPath)
@@ -145,7 +145,7 @@ class MinimizeTest : BasePluginTest() {
         |  CustomUtils u;
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     projectScript.appendText(
       """
@@ -158,7 +158,7 @@ class MinimizeTest : BasePluginTest() {
       |  minimize()
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -202,7 +202,7 @@ class MinimizeTest : BasePluginTest() {
         |  exclude(dependency('junit:junit:.*'))
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -235,7 +235,7 @@ class MinimizeTest : BasePluginTest() {
         |  exclude(project(':client'))
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(serverShadowJarPath)
@@ -271,7 +271,7 @@ class MinimizeTest : BasePluginTest() {
         |  exclude(project(':client'))
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
     path("client/src/main/java/client/Client.java")
       .writeText(
@@ -282,7 +282,7 @@ class MinimizeTest : BasePluginTest() {
         |  public static void main(String[] args) {}
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(serverShadowJarPath)
@@ -310,7 +310,7 @@ class MinimizeTest : BasePluginTest() {
         |package client;
         |public class Client {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     runWithSuccess(serverShadowJarPath)
 
@@ -346,7 +346,7 @@ class MinimizeTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -366,7 +366,7 @@ class MinimizeTest : BasePluginTest() {
         |  api platform('my:bom:1.0')
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(":impl:$SHADOW_JAR_TASK_NAME")
@@ -392,7 +392,7 @@ class MinimizeTest : BasePluginTest() {
       """
       |include 'api', 'lib', 'impl'
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.deleteExisting()
 
@@ -402,7 +402,7 @@ class MinimizeTest : BasePluginTest() {
         |package lib;
         |public interface LibEntity {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("lib/src/main/java/lib/UnusedLibEntity.java")
       .writeText(
@@ -410,7 +410,7 @@ class MinimizeTest : BasePluginTest() {
         |package lib;
         |public class UnusedLibEntity implements LibEntity {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("lib/build.gradle")
       .writeText(
@@ -419,7 +419,7 @@ class MinimizeTest : BasePluginTest() {
         |  id 'java'
         |}
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("api/src/main/java/api/Entity.java")
@@ -428,7 +428,7 @@ class MinimizeTest : BasePluginTest() {
         |package api;
         |public interface Entity {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("api/src/main/java/api/UnusedEntity.java")
       .writeText(
@@ -437,7 +437,7 @@ class MinimizeTest : BasePluginTest() {
         |import lib.LibEntity;
         |public class UnusedEntity implements LibEntity {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("api/build.gradle")
       .writeText(
@@ -450,7 +450,7 @@ class MinimizeTest : BasePluginTest() {
         |  implementation project(':lib')
         |}
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("impl/src/main/java/impl/SimpleEntity.java")
@@ -460,7 +460,7 @@ class MinimizeTest : BasePluginTest() {
         |import api.Entity;
         |public class SimpleEntity implements Entity {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("impl/build.gradle")
       .writeText(
@@ -474,7 +474,7 @@ class MinimizeTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 }

@@ -25,7 +25,7 @@ internal fun ResourceTransformer.checkDupStrategy(
           Set it to INCLUDE or WARN to ensure all duplicates are processed by the transformer.
           See https://gradleup.com/shadow/configuration/merging/#handling-duplicates-strategy for more details.
         """
-          .trimIndent()
+          .trimIndent(),
       )
     }
     else -> Unit

@@ -60,7 +60,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
           |This product includes software developed at
           |The Apache Software Foundation (https://www.apache.org/).
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -88,7 +88,7 @@ class ApacheNoticeResourceTransformerTest : BaseTransformerTest<ApacheNoticeReso
           |
           |Notice from B
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
