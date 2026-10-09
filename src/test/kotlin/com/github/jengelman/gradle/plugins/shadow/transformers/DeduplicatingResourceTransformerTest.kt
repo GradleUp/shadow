@@ -134,7 +134,7 @@ class DeduplicatingResourceTransformerTest :
           |    * $file3 (SHA256: dab741b6289e7dccc1ed42330cae1accc2b755ce8079c2cd5d4b5366c9f769a6)
           |
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 }

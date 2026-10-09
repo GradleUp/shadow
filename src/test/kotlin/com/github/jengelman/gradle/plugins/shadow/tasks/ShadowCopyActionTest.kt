@@ -69,7 +69,7 @@ class ShadowCopyActionTest {
         |```
         |See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64 for more details.
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -94,7 +94,7 @@ class ShadowCopyActionTest {
         |```
         |See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64 for more details.
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 

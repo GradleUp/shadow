@@ -45,7 +45,7 @@ class ReproduciblePropertiesTest {
         |key=value
         |key2=value2
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -70,7 +70,7 @@ class ReproduciblePropertiesTest {
         |€²³=x
         |传傳磨宿说説=b
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -89,7 +89,7 @@ class ReproduciblePropertiesTest {
         """
         |\ leading\:\=\#\!=line1\nline2\t\\
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 

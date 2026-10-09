@@ -98,7 +98,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             .attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
         } else {
           logger.info(
-            "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
+            "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
           )
         }
       } else {

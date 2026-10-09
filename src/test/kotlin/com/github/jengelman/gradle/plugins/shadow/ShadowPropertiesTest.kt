@@ -157,7 +157,7 @@ class ShadowPropertiesTest {
               .launcherFor(javaPluginExtension.toolchain)
               .get()
               .metadata
-              .jvmVersion
+              .jvmVersion,
           )
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
@@ -192,14 +192,14 @@ class ShadowPropertiesTest {
               .launcherFor(javaPluginExtension.toolchain)
               .get()
               .metadata
-              .jvmVersion
+              .jvmVersion,
           )
       }
 
       with(startShadowScripts) {
         assertThat(description)
           .isEqualTo(
-            "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
+            "Creates OS specific scripts to run the project as a JVM application using the shadow jar",
           )
         assertThat(classpath?.files)
           .isNotNull()

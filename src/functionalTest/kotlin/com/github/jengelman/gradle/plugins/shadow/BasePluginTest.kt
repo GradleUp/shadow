@@ -249,7 +249,7 @@ abstract class BasePluginTest {
       """
       |include 'client', 'server'
       """
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.deleteExisting()
 
@@ -259,7 +259,7 @@ abstract class BasePluginTest {
         |package client;
         |public class Client {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/build.gradle")
       .writeText(
@@ -270,7 +270,7 @@ abstract class BasePluginTest {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("server/src/main/java/server/Server.java")
@@ -280,7 +280,7 @@ abstract class BasePluginTest {
         |import client.Client;
         |public class Server {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("server/build.gradle")
       .writeText(
@@ -294,7 +294,7 @@ abstract class BasePluginTest {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     if (!clientShadowed) return
@@ -306,7 +306,7 @@ abstract class BasePluginTest {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("server/src/main/java/server/Server.java")
       .writeText(
@@ -316,7 +316,7 @@ abstract class BasePluginTest {
         |import client.junit.framework.Test;
         |public class Server {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     val replaced =
       path("server/build.gradle")
@@ -338,7 +338,7 @@ abstract class BasePluginTest {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     path("src/main/java/my/plugin/MyPlugin.java")
@@ -353,7 +353,7 @@ abstract class BasePluginTest {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 

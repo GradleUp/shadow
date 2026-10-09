@@ -76,7 +76,7 @@ public open class MergeLicenseResourceTransformer(
       |This artifact includes dependencies with the following licenses:
       |----------------------------------------------------------------
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
 
   /** Separator between included dependency license texts. */
@@ -85,7 +85,7 @@ public open class MergeLicenseResourceTransformer(
 
   @Inject
   public constructor(
-    objectFactory: ObjectFactory
+    objectFactory: ObjectFactory,
   ) : this(
     objectFactory,
     patternSet =

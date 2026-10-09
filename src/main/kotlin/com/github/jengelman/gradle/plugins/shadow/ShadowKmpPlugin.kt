@@ -39,7 +39,7 @@ public abstract class ShadowKmpPlugin : Plugin<Project> {
       task.configurations.convention(
         kotlinJvmMain
           .flatMap { configurations.named(it.runtimeDependencyConfigurationName) }
-          .map { listOf(it) }
+          .map { listOf(it) },
       )
 
       if (!isAtLeastKgp("1.9.0")) return@registerShadowJarCommon
