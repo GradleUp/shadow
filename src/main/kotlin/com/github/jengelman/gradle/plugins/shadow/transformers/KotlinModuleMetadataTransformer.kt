@@ -26,7 +26,7 @@ public open class KotlinModuleMetadataTransformer(
 
   @Inject
   public constructor(
-    objectFactory: ObjectFactory
+    objectFactory: ObjectFactory,
   ) : this(
     objectFactory,
     PatternSet().include("**/*.kotlin_module"),

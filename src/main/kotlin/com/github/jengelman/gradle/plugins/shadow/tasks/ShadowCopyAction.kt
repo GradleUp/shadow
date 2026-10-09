@@ -1,5 +1,5 @@
 @file:Suppress(
-  "InternalGradleApiUsage"
+  "InternalGradleApiUsage",
 ) // We have to use internal Gradle APIs to implement a CopyAction.
 
 package com.github.jengelman.gradle.plugins.shadow.tasks
@@ -104,7 +104,7 @@ internal constructor(
             ```
             See: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Zip.html#org.gradle.api.tasks.bundling.Zip:zip64 for more details.
           """
-            .trimIndent()
+            .trimIndent(),
         )
       }
       zipFile.delete()
@@ -205,7 +205,7 @@ internal constructor(
                 entryName = relocatedPath,
                 fileDetails = fileDetails,
                 deferredBytes = deferred,
-              )
+              ),
             )
             if (pendingEntries.size >= MAX_PENDING_ENTRIES) {
               runBlocking { pendingEntries.removeFirst().writeToZip() }
@@ -243,7 +243,7 @@ internal constructor(
       logger.debug("Transforming resource '{}' using {}.", path, transformer::class.simpleName)
       fileDetails.inputStream().use { inputStream ->
         transformer.transform(
-          TransformerContext(path = path, inputStream = inputStream, relocators = relocators)
+          TransformerContext(path = path, inputStream = inputStream, relocators = relocators),
         )
       }
       return true

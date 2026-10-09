@@ -23,7 +23,7 @@ class KotlinPluginsTest : BasePluginTest() {
   override fun beforeEach() {
     super.beforeEach()
     projectScript.writeText(
-      getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform")
+      getDefaultProjectBuildScript(plugin = "org.jetbrains.kotlin.multiplatform"),
     )
   }
 
@@ -40,7 +40,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  $stdlib
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val mainClassEntry = writeClass(withImports = true, jvmLang = JvmLang.Kotlin)
 
@@ -93,7 +93,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -144,7 +144,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -167,7 +167,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  mingwX64()
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result =
@@ -179,7 +179,7 @@ class KotlinPluginsTest : BasePluginTest() {
 
     assertThat(result.output)
       .contains(
-        "Cannot locate tasks that match ':shadowJar' as task 'shadowJar' not found in root project"
+        "Cannot locate tasks that match ':shadowJar' as task 'shadowJar' not found in root project",
       )
   }
 
@@ -203,7 +203,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -237,7 +237,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -275,7 +275,7 @@ class KotlinPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithFailure(shadowJarPath, infoArgument)

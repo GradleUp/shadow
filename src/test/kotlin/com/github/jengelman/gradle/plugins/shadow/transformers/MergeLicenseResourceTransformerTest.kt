@@ -76,7 +76,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
           |
           |license three
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -104,7 +104,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
           |
           |license one
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -123,7 +123,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
           |SPDX-License-Identifier: Apache-2.0
           |artifact license file content
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -152,7 +152,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
       artifactLicense.set(
         tempDir.resolve("artifact-license").toFile().apply {
           writeText("artifact license text")
-        }
+        },
       )
 
       val content = transformToJar().use { it.getContent("MY_LICENSE") }
@@ -167,7 +167,7 @@ class MergeLicenseResourceTransformerTest : BaseTransformerTest<MergeLicenseReso
           |----
           |license two
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 }

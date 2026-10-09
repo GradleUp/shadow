@@ -52,7 +52,7 @@ class BytecodeRemappingTest {
       SimpleRelocator(
         "com.github.jengelman.gradle.plugins.shadow.internal",
         "com.example.relocated",
-      )
+      ),
     )
 
   // Internal name of the relocated FixtureBase for use in assertions.
@@ -240,7 +240,7 @@ class BytecodeRemappingTest {
           "com.github.jengelman.gradle.plugins.shadow.internal",
           "com.example.relocated",
           skipStringConstants = true,
-        )
+        ),
       )
     val result = fixtureSubjectDetails.remapClass(skipRelocators)
 
@@ -267,7 +267,7 @@ class BytecodeRemappingTest {
     val method = result.classInfo().methodData.single { it.name == "methodWithGeneric" }
     assertThat(checkNotNull(method.signature))
       .isEqualTo(
-        $$"(Ljava/util/List<+Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>;)Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;"
+        $$"(Ljava/util/List<+Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>;)Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;",
       )
   }
 
@@ -278,7 +278,7 @@ class BytecodeRemappingTest {
     val method = result.classInfo().methodData.single { it.name == "methodWithNestedGeneric" }
     assertThat(checkNotNull(method.signature))
       .isEqualTo(
-        $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V"
+        $$"(Lcom/example/relocated/BytecodeRemappingTest$FixtureGenericOuter<Lcom/example/relocated/BytecodeRemappingTest$FixtureBase;>.FixtureInner;)V",
       )
   }
 
@@ -527,7 +527,7 @@ private fun ByteArray.classInfo(): ClassBytecodeInfo {
                   checkcastTargets.toList(),
                   invokeOwners.toList(),
                   stringConsts.toList(),
-                )
+                ),
               )
             }
           }

@@ -44,7 +44,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -61,7 +61,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest() {
           |----
           |license two
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }
