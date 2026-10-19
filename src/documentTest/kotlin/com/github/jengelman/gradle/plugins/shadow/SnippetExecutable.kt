@@ -46,7 +46,6 @@ sealed interface SnippetExecutable {
         |include ':api', ':main'
         |rootProject.name = 'snippet'
         |$enableNoImplicitLookupInParentProjects
-        |enableFeaturePreview 'STABLE_CONFIGURATION_CACHE'
         |enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
         """
             .trimMargin(),
