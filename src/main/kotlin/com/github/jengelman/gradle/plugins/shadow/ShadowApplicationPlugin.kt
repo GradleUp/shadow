@@ -46,7 +46,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.description = "Runs this project as a JVM application using the shadow jar"
       task.group = ApplicationPlugin.APPLICATION_GROUP
 
-      task.classpath = files(tasks.shadowJar)
+      task.classpath = files(tasks.shadowJar.flatMap { it.archiveFile })
 
       with(applicationExtension) {
         task.mainModule.convention(mainModule)
@@ -63,7 +63,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       task.description =
         "Creates OS specific scripts to run the project as a JVM application using the shadow jar"
 
-      task.classpath = files(tasks.shadowJar)
+      task.classpath = files(tasks.shadowJar.flatMap { it.archiveFile })
 
       @Suppress("InternalGradleApiUsage") // TODO: replace usages of conventionMapping.
       with(applicationExtension) {
@@ -118,7 +118,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
       dist.contents { distSpec ->
         distSpec.from(file("src/dist"))
         distSpec.into("lib") { lib ->
-          lib.from(tasks.shadowJar)
+          lib.from(tasks.shadowJar.flatMap { it.archiveFile })
           // Reflects the value of the `Class-Path` attribute in the JAR manifest.
           lib.from(configurations.shadow)
         }
