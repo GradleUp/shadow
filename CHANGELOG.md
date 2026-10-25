@@ -18,6 +18,7 @@
 
 - Bump min Gradle requirement to 9.4.0. ([#2114](https://github.com/GradleUp/shadow/pull/2114))
 - Remove runtime dependencies on Commons Codec and Commons IO by using JDK APIs. ([#2136](https://github.com/GradleUp/shadow/pull/2136))
+- Remove runtime dependency on `log4j-core` by reading and writing `Log4j2Plugins.dat` files directly in `Log4j2PluginsCacheFileTransformer`. ([#2343](https://github.com/GradleUp/shadow/pull/2343))
 - **POTENTIALLY BREAKING:** Remove `Serializable` from `DependencyFilter`. ([#2144](https://github.com/GradleUp/shadow/pull/2144))
 - Bump default R8 from `9.1.31` to `9.5.28`. ([#2340](https://github.com/GradleUp/shadow/pull/2340))
 - Allow repackaging Service file classes with R8. ([#2174](https://github.com/GradleUp/shadow/pull/2174))

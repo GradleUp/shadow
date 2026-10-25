@@ -4,21 +4,25 @@ import com.github.jengelman.gradle.plugins.shadow.internal.checkDupStrategy
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocateClass
-import java.io.FilterOutputStream
-import java.io.OutputStream
-import java.net.URL
-import java.nio.file.Path
-import java.util.Collections
-import java.util.Enumeration
-import kotlin.io.path.createTempFile
-import kotlin.io.path.deleteIfExists
-import kotlin.io.path.outputStream
-import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
-import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
+import java.io.DataInputStream
+import java.io.DataOutputStream
+import java.util.Locale
+import java.util.SortedMap
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileTreeElement
 
 /**
+ * Merges Log4j 2 plugin cache files (`Log4j2Plugins.dat`) and relocates the plugin classes in them.
+ *
+ * The binary format is read and written directly instead of depending on `log4j-core`, mirroring
+ * [org.apache.logging.log4j.core.config.plugins.processor.PluginCache](https://github.com/apache/logging-log4j2/blob/2.x/log4j-core/src/main/java/org/apache/logging/log4j/core/config/plugins/processor/PluginCache.java).
+ * The format is frozen in Log4j 2. Log4j 3 no longer generates it, but still reads it for plugins
+ * compiled against Log4j 2, see
+ * [org.apache.logging.log4j.plugins.model.PluginRegistry](https://github.com/apache/logging-log4j2/blob/main/log4j-plugins/src/main/java/org/apache/logging/log4j/plugins/model/PluginRegistry.java).
+ * Log4j 3 plugins are registered as
+ * `META-INF/services/org.apache.logging.log4j.plugins.model.PluginService` instead, which can be
+ * merged by [ServiceFileTransformer].
+ *
  * Modified from
  * [org.apache.logging.log4j.maven.plugins.shade.transformer.Log4j2PluginCacheFileTransformer.java](https://github.com/apache/logging-log4j-transform/blob/main/log4j-transform-maven-shade-plugin-extensions/src/main/java/org/apache/logging/log4j/maven/plugins/shade/transformer/Log4j2PluginCacheFileTransformer.java).
  *
@@ -27,66 +31,77 @@ import org.gradle.api.file.FileTreeElement
  */
 @CacheableTransformer
 public open class Log4j2PluginsCacheFileTransformer : ResourceTransformer {
-  /** Log4j config files to share across the transformation stages. */
-  private val tempFiles = mutableListOf<Path>()
+  /** Plugin entries keyed by category and then by plugin key, sorted like Log4j's `PluginCache`. */
+  private val categories = sortedMapOf<String, SortedMap<String, PluginEntry>>()
 
   /** [Relocator] instances to share across the transformation stages. */
   private val tempRelocators = mutableListOf<Relocator>()
+
+  /** Whether any dat file is collected, even if it contains no plugins. */
+  private var hasDatFile = false
 
   override fun canTransformResource(element: FileTreeElement): Boolean {
     return (PLUGIN_CACHE_FILE == element.path).also { flag -> checkDupStrategy(flag, element) }
   }
 
   override fun transform(context: TransformerContext) {
-    val temporaryFile = createTempFile("Log4j2Plugins", ".dat")
-    tempFiles.add(temporaryFile)
-    context.inputStream.copyTo(temporaryFile.outputStream())
+    // Don't close the input stream, it is managed by the caller.
+    val input = DataInputStream(context.inputStream.buffered())
+    repeat(input.readInt()) {
+      val category = categories.getOrPut(input.readUTF().lowercase(Locale.ROOT)) { sortedMapOf() }
+      repeat(input.readInt()) {
+        // Always read all parts of the entry, even if not adding, to advance the stream.
+        val entry =
+          PluginEntry(
+            key = input.readUTF(),
+            className = input.readUTF(),
+            name = input.readUTF(),
+            printable = input.readBoolean(),
+            defer = input.readBoolean(),
+          )
+        // The first found entry wins, same as Log4j's `PluginCache`.
+        category.putIfAbsent(entry.key, entry)
+      }
+    }
     tempRelocators.addAll(context.relocators)
+    hasDatFile = true
   }
 
   /** @return `true` if any dat file collected. */
-  override fun hasTransformedResource(): Boolean = tempFiles.isNotEmpty()
+  override fun hasTransformedResource(): Boolean = hasDatFile
 
   override fun modifyOutputStream(os: ZipOutputStream, preserveFileTimestamps: Boolean) {
-    try {
-      val aggregator = PluginCache()
-      aggregator.loadCacheFiles(urlEnumeration)
-      relocatePlugins(aggregator)
-      os.writeEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps) {
-        // Prevent the aggregator to close the jar output.
-        aggregator.writeCache(CloseShieldOutputStream(this))
+    os.writeEntry(PLUGIN_CACHE_FILE, preserveFileTimestamps) {
+      // Don't close the output stream, it would close the jar output.
+      val output = DataOutputStream(buffered())
+      output.writeInt(categories.size)
+      categories.forEach { (category, entries) ->
+        output.writeUTF(category)
+        output.writeInt(entries.size)
+        entries.values.forEach { entry ->
+          output.writeUTF(entry.key)
+          output.writeUTF(tempRelocators.relocateClass(entry.className))
+          output.writeUTF(entry.name)
+          output.writeBoolean(entry.printable)
+          output.writeBoolean(entry.defer)
+        }
       }
-    } finally {
-      deleteTempFiles()
+      output.flush()
     }
+    categories.clear()
+    hasDatFile = false
   }
 
-  internal fun relocatePlugins(pluginCache: PluginCache) {
-    pluginCache.allCategories.values.forEach { currentMap ->
-      currentMap.values.forEach { currentPluginEntry ->
-        currentPluginEntry.className = tempRelocators.relocateClass(currentPluginEntry.className)
-      }
-    }
-  }
+  private class PluginEntry(
+    val key: String,
+    val className: String,
+    val name: String,
+    val printable: Boolean,
+    val defer: Boolean,
+  )
 
-  private fun deleteTempFiles() {
-    val pathIterator = tempFiles.listIterator()
-    while (pathIterator.hasNext()) {
-      val path = pathIterator.next()
-      path.deleteIfExists()
-      pathIterator.remove()
-    }
-  }
-
-  private val urlEnumeration: Enumeration<URL>
-    get() {
-      val urls = tempFiles.map { it.toUri().toURL() }
-      return Collections.enumeration(urls)
-    }
-
-  private class CloseShieldOutputStream(output: OutputStream) : FilterOutputStream(output) {
-    override fun close() {
-      flush()
-    }
+  internal companion object {
+    const val PLUGIN_CACHE_FILE: String =
+      "META-INF/org/apache/logging/log4j/core/config/plugins/Log4j2Plugins.dat"
   }
 }
