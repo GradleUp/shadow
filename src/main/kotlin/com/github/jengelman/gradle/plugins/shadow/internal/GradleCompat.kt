@@ -9,6 +9,8 @@ import org.gradle.api.artifacts.Configuration
 import org.gradle.api.distribution.DistributionContainer
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileTreeElement
+import org.gradle.api.file.RegularFile
+import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtraPropertiesExtension
 import org.gradle.api.plugins.JavaApplication
@@ -129,3 +131,12 @@ internal inline fun <reified V : Any> ObjectFactory.mapProperty(
 
 internal inline fun ObjectFactory.fileCollection(path: () -> Any): ConfigurableFileCollection =
   fileCollection().apply { @Suppress("UnstableApiUsage") convention(path()) }
+
+@Suppress("UNCHECKED_CAST")
+internal inline fun ObjectFactory.fileProperty(path: () -> Any): RegularFileProperty =
+  fileProperty().apply {
+    when (val value = path()) {
+      is Provider<*> -> convention(value as Provider<RegularFile>)
+      else -> convention(value as RegularFile)
+    }
+  }

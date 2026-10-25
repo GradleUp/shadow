@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
 import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.API_ELEMENTS_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.RUNTIME_ELEMENTS_CONFIGURATION_NAME
 
@@ -17,6 +18,9 @@ data class GradleModuleMetadata(private val variants: List<Variant>) {
 
   val shadowRuntimeElementsVariant: Variant
     get() = variants.single { it.name == SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME }
+
+  val shadowSourcesElementsVariant: Variant
+    get() = variants.single { it.name == SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME }
 
   val variantNames: List<String>
     get() = variants.map { it.name }

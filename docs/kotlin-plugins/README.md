@@ -139,6 +139,9 @@ automatically configure additional tasks for bundling the shadowed JAR for its `
     }
     ```
 
+For details on publishing shadowed artifacts and sources JAR in KMP projects, see
+[Publishing with Kotlin Multiplatform (KMP)][publishing-with-kmp].
+
 ## Kotlin Module Metadata Remapping
 
 Kotlin module metadata (`.kotlin_module`) files contain information about package parts and facades. When relocating
@@ -169,4 +172,5 @@ To explicitly apply this remapping (recommended for future compatibility), add
 [KotlinModuleMetadataTransformer]: ../api/shadow/com.github.jengelman.gradle.plugins.shadow.transformers/-kotlin-module-metadata-transformer/index.html
 [dependency-on-the-standard-library]: https://kotlinlang.org/docs/gradle-configure-project.html#dependency-on-the-standard-library
 [publishing-libraries]: ../publishing/README.md
+[publishing-with-kmp]: ../publishing/README.md#publishing-with-kotlin-multiplatform-kmp
 [running-applications]: ../application-plugin/README.md

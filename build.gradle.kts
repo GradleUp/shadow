@@ -147,6 +147,7 @@ dependencies {
   testPluginRuntimeOnly(testKit.map { it.output })
   testPluginRuntimeOnly(libs.foojayResolver)
   testPluginRuntimeOnly(libs.pluginPublish)
+  testPluginRuntimeOnly(libs.dokka)
 
   lintChecks(libs.androidx.gradlePluginLints)
 }

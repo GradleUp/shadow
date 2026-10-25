@@ -4,6 +4,7 @@ import assertk.all
 import assertk.assertThat
 import assertk.assertions.containsNone
 import assertk.assertions.containsOnly
+import assertk.assertions.isEmpty
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isNotNull
@@ -15,6 +16,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Compan
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.shadowDistZip
 import com.github.jengelman.gradle.plugins.shadow.ShadowApplicationPlugin.Companion.startShadowScripts
 import com.github.jengelman.gradle.plugins.shadow.ShadowBasePlugin.Companion.shadow
+import com.github.jengelman.gradle.plugins.shadow.ShadowJavaPlugin.Companion.shadowSourcesElements
 import com.github.jengelman.gradle.plugins.shadow.internal.applicationExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaPluginExtension
 import com.github.jengelman.gradle.plugins.shadow.internal.javaToolchainService
@@ -35,7 +37,6 @@ import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_API_CONFIGURATION_NAME
 import org.gradle.api.plugins.JavaPlugin.COMPILE_ONLY_CONFIGURATION_NAME
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.bundling.AbstractArchiveTask
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.language.base.plugins.LifecycleBasePlugin
 import org.gradle.language.base.plugins.LifecycleBasePlugin.ASSEMBLE_TASK_NAME
@@ -162,7 +163,75 @@ class ShadowPropertiesTest {
 
         assertThat(relocationPrefix.get()).isEqualTo(ShadowBasePlugin.SHADOW)
         assertThat(configurations.get()).containsOnly(runtimeConfiguration)
+        assertThat(generateSourcesJar.get()).isFalse()
+        assertThat(archiveSourcesFile.orNull).isNull()
+        assertThat(outputs.files.singleFile).isEqualTo(archiveFile.get().asFile)
+        assertThat(sourceSetsSourceDirs.files).isEmpty()
+        assertThat(includedSourcesJars.files).isEmpty()
       }
+
+      assertThat(configurations.shadowSourcesElements.get().artifacts).isEmpty()
+    }
+
+  @Test
+  fun applyJavaPluginWithSourcesJar() =
+    with(project) {
+      plugins.apply(JavaPlugin::class.java)
+      javaPluginExtension.withSourcesJar()
+      val shadowJarTask = tasks.shadowJar.get()
+      with(shadowJarTask) {
+        assertThat(generateSourcesJar.get()).isTrue()
+        assertThat(archiveSourcesFile.get().asFile).all {
+          isEqualTo(destinationDirectory.file("my-project-1.0.0-all-sources.jar").get().asFile)
+          isEqualTo(projectDir.resolve("build/libs/my-project-1.0.0-all-sources.jar"))
+        }
+        assertThat(outputs.files.files)
+          .containsOnly(
+            archiveFile.get().asFile,
+            archiveSourcesFile.get().asFile,
+          )
+        val mainSourceSet = javaPluginExtension.sourceSets.getByName("main")
+        assertThat(sourceSetsSourceDirs.files)
+          .containsOnly(*mainSourceSet.allSource.files.toTypedArray())
+      }
+
+      with(project.configurations.shadowSourcesElements.get().artifacts.single()) {
+        assertThat(classifier).isEqualTo("all-sources")
+        assertThat(name).isEqualTo("my-project")
+        assertThat(extension).isEqualTo("jar")
+        assertThat(type).isEqualTo("jar")
+        assertThat(file).isEqualTo(shadowJarTask.archiveSourcesFile.get().asFile)
+        assertThat(date).isNull()
+        assertThat(buildDependencies.getDependencies(null)).containsOnly(shadowJarTask)
+
+        // Test dynamic updates on ShadowSourcesPublishArtifact
+        shadowJarTask.archiveClassifier.set("custom")
+        assertThat(classifier).isEqualTo("custom-sources")
+
+        shadowJarTask.archiveClassifier.set("")
+        assertThat(classifier).isEqualTo("sources")
+
+        shadowJarTask.archiveBaseName.set("renamed")
+        shadowJarTask.archiveExtension.set("zip")
+        assertThat(name).isEqualTo("renamed")
+        assertThat(extension).isEqualTo("zip")
+      }
+    }
+
+  @Test
+  fun shadowSourcesElementsArtifactTogglesWithGenerateSourcesJar() =
+    with(project) {
+      plugins.apply(JavaPlugin::class.java)
+      val shadowJarTask = tasks.shadowJar.get()
+      val shadowSourcesElements = configurations.shadowSourcesElements.get()
+
+      assertThat(shadowSourcesElements.artifacts).isEmpty()
+
+      shadowJarTask.generateSourcesJar.set(true)
+      assertThat(shadowSourcesElements.artifacts.size).isEqualTo(1)
+
+      shadowJarTask.generateSourcesJar.set(false)
+      assertThat(shadowSourcesElements.artifacts).isEmpty()
     }
 
   @Test
@@ -226,7 +295,7 @@ class ShadowPropertiesTest {
       }
 
       listOf(shadowDistZip, shadowDistTar).forEach {
-        with(it as AbstractArchiveTask) {
+        with(it) {
           assertThat(description).isEqualTo("Bundles the project as a distribution.")
           assertThat(group).isEqualTo("distribution")
           assertThat(archiveAppendix.orNull).isNull()

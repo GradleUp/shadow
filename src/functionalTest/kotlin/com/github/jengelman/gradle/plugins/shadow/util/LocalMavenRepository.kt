@@ -1,5 +1,6 @@
 package com.github.jengelman.gradle.plugins.shadow.util
 
+import com.github.jengelman.gradle.plugins.shadow.BasePluginTest.Companion.createEmptyClassBytes
 import java.nio.file.Path
 import kotlin.io.path.createDirectories
 import kotlin.io.path.createTempDirectory
@@ -39,7 +40,76 @@ fun createDefaultLocalMavenRepository(junitJar: Path): AppendableMavenRepository
         }
       val g =
         jarModule("my", "g", "1.0") {
-          buildJar { insert("g.properties", "g") }
+          buildJar { insert("g/G.class", createEmptyClassBytes("g/G")) }
+          buildSourcesJar {
+            insert(
+              "g/G.java",
+              """
+              |package g;
+              |public class G {}
+              """
+                .trimMargin(),
+            )
+          }
+        }
+      val h =
+        jarModule("my", "h", "1.0") {
+          buildJar {
+            insert("h/H.class", createEmptyClassBytes("h/H"))
+            insert("h/UnusedH.class", createEmptyClassBytes("h/UnusedH"))
+          }
+          buildSourcesJar {
+            insert(
+              "h/H.java",
+              """
+              |package h;
+              |public class H {}
+              """
+                .trimMargin(),
+            )
+            insert(
+              "h/UnusedH.java",
+              """
+              |package h;
+              |public class UnusedH {}
+              """
+                .trimMargin(),
+            )
+          }
+        }
+      val k =
+        jarModule("my", "k", "1.0") {
+          buildJar {
+            insert("k/CustomUtils.class", createEmptyClassBytes("k/CustomUtils", "Utils.kt"))
+            insert(
+              "k/CustomUnusedUtils.class",
+              createEmptyClassBytes("k/CustomUnusedUtils", "UnusedUtils.kt"),
+            )
+          }
+          buildSourcesJar {
+            insert(
+              "k/Utils.kt",
+              """
+              |@file:JvmName("CustomUtils")
+              |package k
+              |fun util() {}
+              """
+                .trimMargin(),
+            )
+            insert(
+              "k/UnusedUtils.kt",
+              """
+              |@file:JvmName("CustomUnusedUtils")
+              |package k
+              |fun unusedUtil() {}
+              """
+                .trimMargin(),
+            )
+          }
+        }
+      val l =
+        jarModule("my", "l", "1.0") {
+          buildJar { insert("l.properties", "l") }
           addDependency(pomModule("my", "pom-dep", "1.0"))
         }
       bomModule("my", "bom", "1.0") {
@@ -50,6 +120,9 @@ fun createDefaultLocalMavenRepository(junitJar: Path): AppendableMavenRepository
         addDependency(e)
         addDependency(f)
         addDependency(g)
+        addDependency(h)
+        addDependency(k)
+        addDependency(l)
       }
     }
 }
