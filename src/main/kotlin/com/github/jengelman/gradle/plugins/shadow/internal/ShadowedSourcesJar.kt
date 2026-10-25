@@ -4,6 +4,10 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
 import java.io.InputStream
+import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.runBlocking
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCollection
 import org.vafer.jdeb.shaded.objectweb.asm.ClassReader
@@ -50,56 +54,90 @@ internal fun generateSourcesJar(
         }
       }
 
-      // Relocates and writes a project or dependency source file, or a resource.
-      fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
-        if (name.isModuleInfo) return
-        val isSource = name.isSourceFile()
-        if (isSource && isUnused(name, unusedClasses, sourceToClasses)) return
-        val relocatedPath =
-          if (isSource) relocators.relocateSourcePath(name) else relocators.relocatePath(name)
-        if (!visitedFiles.add(relocatedPath)) return
-        val bytes =
-          if (isSource) {
-            relocators
-              .remapSourceFile(readBytes().decodeToString(), name, relocatedPath)
-              .toByteArray()
-          } else {
-            readBytes()
+      runBlocking {
+        val pendingEntries = ArrayDeque<PendingSourceEntry>()
+
+        fun writeToZip(entryName: String, lastModified: Long, bytes: ByteArray) {
+          zos.writeEntry(
+            name = entryName,
+            preserveLastModified = preserveFileTimestamps,
+            lastModified = lastModified,
+            unixMode = UnixMode.file(),
+          ) {
+            write(bytes)
           }
-        zos.writeEntry(
-          name = relocatedPath,
-          preserveLastModified = preserveFileTimestamps,
-          lastModified = lastModified,
-          unixMode = UnixMode.file(),
-        ) {
-          write(bytes)
-        }
-      }
-
-      filesWithRelPaths
-        .sortedBy { it.second }
-        .forEach { (file, relPath) ->
-          addEntry(relPath, file.lastModified()) { file.readBytes() }
         }
 
-      sourcesJars.forEach { jarFile ->
-        jarFile.useZip {
-          entries()
-            .toList()
-            .filterNot { entry ->
-              val name = entry.name
-              entry.isDirectory ||
-                name == "META-INF/MANIFEST.MF" ||
-                name.endsWith(".class") ||
-                name.startsWith("META-INF/INDEX.LIST") ||
-                (name.startsWith("META-INF/") &&
-                  (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
-            }
-            .sortedBy { it.name }
-            .forEach { entry ->
-              addEntry(entry.name, entry.time) { getInputStream(entry).use { it.readBytes() } }
-            }
+        suspend fun PendingSourceEntry.writeToZip() {
+          writeToZip(entryName, lastModified, deferredBytes.await())
         }
+
+        suspend fun flush() {
+          while (pendingEntries.isNotEmpty()) {
+            pendingEntries.removeFirst().writeToZip()
+          }
+        }
+
+        // Relocates and writes a project or dependency source file, or a resource.
+        suspend fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
+          if (name.isModuleInfo) return
+          val isSource = name.isSourceFile()
+          if (isSource && isUnused(name, unusedClasses, sourceToClasses)) return
+          val relocatedPath =
+            if (isSource) relocators.relocateSourcePath(name) else relocators.relocatePath(name)
+          if (!visitedFiles.add(relocatedPath)) return
+          if (!isSource) {
+            // Resources gain nothing from parallelism, write them directly to avoid buffering.
+            flush()
+            writeToZip(relocatedPath, lastModified, readBytes())
+            return
+          }
+          val rawBytes = readBytes()
+          val deferred =
+            async(Dispatchers.Default) {
+              relocators
+                .remapSourceFile(rawBytes.decodeToString(), name, relocatedPath)
+                .toByteArray()
+            }
+          pendingEntries.addLast(
+            PendingSourceEntry(
+              entryName = relocatedPath,
+              lastModified = lastModified,
+              deferredBytes = deferred,
+            ),
+          )
+          if (pendingEntries.size >= MAX_PENDING_ENTRIES) {
+            pendingEntries.removeFirst().writeToZip()
+          }
+        }
+
+        filesWithRelPaths
+          .sortedBy { it.second }
+          .forEach { (file, relPath) ->
+            addEntry(relPath, file.lastModified()) { file.readBytes() }
+          }
+
+        sourcesJars.forEach { jarFile ->
+          jarFile.useZip {
+            entries()
+              .toList()
+              .filterNot { entry ->
+                val name = entry.name
+                entry.isDirectory ||
+                  name == "META-INF/MANIFEST.MF" ||
+                  name.endsWith(".class") ||
+                  name.startsWith("META-INF/INDEX.LIST") ||
+                  (name.startsWith("META-INF/") &&
+                    (name.endsWith(".SF") || name.endsWith(".DSA") || name.endsWith(".RSA")))
+              }
+              .sortedBy { it.name }
+              .forEach { entry ->
+                addEntry(entry.name, entry.time) { getInputStream(entry).use { it.readBytes() } }
+              }
+          }
+        }
+
+        flush()
       }
 
       val entries = zos.entries.map { it.name }
@@ -200,6 +238,18 @@ private fun buildSourceToClassesMap(
 
   return sourceToClasses
 }
+
+private class PendingSourceEntry(
+  val entryName: String,
+  val lastModified: Long,
+  val deferredBytes: Deferred<ByteArray>,
+)
+
+/**
+ * Maximum number of in-flight parallel source remapping tasks in the sliding window. Bounds memory
+ * consumption on large archives while keeping worker threads saturated.
+ */
+private const val MAX_PENDING_ENTRIES = 128
 
 // Aligned with the default exclusion of `module-info.class` from the shadowed JAR.
 private val String.isModuleInfo: Boolean
