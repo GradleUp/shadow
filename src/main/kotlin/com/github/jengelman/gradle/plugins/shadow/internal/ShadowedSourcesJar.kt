@@ -4,9 +4,6 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import java.io.File
 import java.io.InputStream
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCollection
@@ -55,7 +52,7 @@ internal fun generateSourcesJar(
       }
 
       runBlocking {
-        val pendingEntries = ArrayDeque<PendingSourceEntry>()
+        val parallelWriter = OrderedParallelWriter(this)
 
         fun writeToZip(entryName: String, lastModified: Long, bytes: ByteArray) {
           zos.writeEntry(
@@ -68,18 +65,8 @@ internal fun generateSourcesJar(
           }
         }
 
-        suspend fun PendingSourceEntry.writeToZip() {
-          writeToZip(entryName, lastModified, deferredBytes.await())
-        }
-
-        suspend fun flush() {
-          while (pendingEntries.isNotEmpty()) {
-            pendingEntries.removeFirst().writeToZip()
-          }
-        }
-
         // Relocates and writes a project or dependency source file, or a resource.
-        suspend fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
+        fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
           if (name.isModuleInfo) return
           val isSource = name.isSourceFile()
           if (isSource && isUnused(name, unusedClasses, sourceToClasses)) return
@@ -88,27 +75,19 @@ internal fun generateSourcesJar(
           if (!visitedFiles.add(relocatedPath)) return
           if (!isSource) {
             // Resources gain nothing from parallelism, write them directly to avoid buffering.
-            flush()
+            parallelWriter.flush()
             writeToZip(relocatedPath, lastModified, readBytes())
             return
           }
           val rawBytes = readBytes()
-          val deferred =
-            async(Dispatchers.Default) {
+          parallelWriter.submit(
+            compute = {
               relocators
                 .remapSourceFile(rawBytes.decodeToString(), name, relocatedPath)
                 .toByteArray()
-            }
-          pendingEntries.addLast(
-            PendingSourceEntry(
-              entryName = relocatedPath,
-              lastModified = lastModified,
-              deferredBytes = deferred,
-            ),
+            },
+            write = { writeToZip(relocatedPath, lastModified, it) },
           )
-          if (pendingEntries.size >= MAX_PENDING_ENTRIES) {
-            pendingEntries.removeFirst().writeToZip()
-          }
         }
 
         filesWithRelPaths
@@ -137,7 +116,7 @@ internal fun generateSourcesJar(
           }
         }
 
-        flush()
+        parallelWriter.flush()
       }
 
       val entries = zos.entries.map { it.name }
@@ -238,18 +217,6 @@ private fun buildSourceToClassesMap(
 
   return sourceToClasses
 }
-
-private class PendingSourceEntry(
-  val entryName: String,
-  val lastModified: Long,
-  val deferredBytes: Deferred<ByteArray>,
-)
-
-/**
- * Maximum number of in-flight parallel source remapping tasks in the sliding window. Bounds memory
- * consumption on large archives while keeping worker threads saturated.
- */
-private const val MAX_PENDING_ENTRIES = 128
 
 // Aligned with the default exclusion of `module-info.class` from the shadowed JAR.
 private val String.isModuleInfo: Boolean
