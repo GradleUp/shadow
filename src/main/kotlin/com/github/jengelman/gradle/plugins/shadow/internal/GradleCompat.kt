@@ -130,7 +130,7 @@ internal inline fun <reified V : Any> ObjectFactory.mapProperty(
   }
 
 internal inline fun ObjectFactory.fileCollection(path: () -> Any): ConfigurableFileCollection =
-  fileCollection().apply { @Suppress("UnstableApiUsage") convention(path()) }
+  @Suppress("UnstableApiUsage") fileCollection().convention(path())
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun ObjectFactory.fileProperty(path: () -> Any): RegularFileProperty =
