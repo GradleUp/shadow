@@ -31,14 +31,12 @@ internal class OrderedParallelWriter(private val scope: CoroutineScope) {
   private fun PendingEntry.writeBytes() {
     write(runBlocking { deferredBytes.await() })
   }
-
-  private class PendingEntry(val deferredBytes: Deferred<ByteArray>, val write: (ByteArray) -> Unit)
-
-  private companion object {
-    /**
-     * Maximum number of in-flight parallel tasks in the sliding window. Bounds memory consumption
-     * on large archives while keeping worker threads saturated.
-     */
-    const val MAX_PENDING_ENTRIES = 128
-  }
 }
+
+/**
+ * Maximum number of in-flight parallel tasks in the sliding window. Bounds memory consumption on
+ * large archives while keeping worker threads saturated.
+ */
+private const val MAX_PENDING_ENTRIES = 128
+
+private class PendingEntry(val deferredBytes: Deferred<ByteArray>, val write: (ByteArray) -> Unit)
