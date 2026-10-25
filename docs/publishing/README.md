@@ -779,6 +779,13 @@ publication, and disable standard archive tasks to prevent destination file coll
 >   `failOnDuplicateEntries`. Project sources are added first, then dependency sources. For example, in KMP projects,
 >   `commonMain/kotlin/foo/Foo.kt` and `jvmMain/kotlin/foo/Foo.kt` (such as `expect` and `actual` declarations) share
 >   the path `foo/Foo.kt`, and KMP dependencies may share paths like `commonMain/Annotations.kt`.
+> - Source contents are relocated textually. Relocator `include`/`exclude` patterns are only honored in source contents
+>   when they are package or class prefixes like `foo.bar.*` or `foo.bar.Baz`. Regex patterns (`%regex[...]`) and
+>   wildcards in the middle of patterns are ignored there, while source file paths still follow them, so references in
+>   relocated sources may be left unchanged or relocated unexpectedly.
+> - With class-level includes or excludes, classes in the same package may end up in different packages. Unqualified
+>   references between them (without `import`) are not rewritten, so the shadowed sources may not compile, which can
+>   break Javadoc or Dokka generation from them.
 
 ### Customizing the Sources Archive File
 
