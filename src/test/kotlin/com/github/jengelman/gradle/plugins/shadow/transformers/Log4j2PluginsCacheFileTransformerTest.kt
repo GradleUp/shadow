@@ -12,16 +12,17 @@ import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.SimpleRelocator
 import com.github.jengelman.gradle.plugins.shadow.testkit.JarPath
 import com.github.jengelman.gradle.plugins.shadow.testkit.getBytes
-import com.github.jengelman.gradle.plugins.shadow.testkit.requireResourceAsPath
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer.Companion.PLUGIN_CACHE_FILE
 import com.github.jengelman.gradle.plugins.shadow.util.zipOutputStream
 import java.io.ByteArrayOutputStream
+import java.io.DataOutputStream
 import java.net.URL
 import java.util.Collections
 import java.util.jar.JarInputStream
 import kotlin.io.path.createTempFile
 import kotlin.io.path.writeBytes
 import org.apache.logging.log4j.core.config.plugins.processor.PluginCache
-import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor.PLUGIN_CACHE_FILE
+import org.apache.logging.log4j.core.config.plugins.processor.PluginProcessor
 import org.apache.tools.zip.ZipOutputStream
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
@@ -46,6 +47,11 @@ class Log4j2PluginsCacheFileTransformerTest :
     }
 
   @Test
+  fun pluginCacheFilePathMatchesLog4j() {
+    assertThat(PLUGIN_CACHE_FILE).isEqualTo(PluginProcessor.PLUGIN_CACHE_FILE)
+  }
+
+  @Test
   fun relocateClassesInsideDatFile() =
     with(transformer) {
       val relocator = SimpleRelocator("org.apache.logging", "new.location.org.apache.logging")
@@ -56,13 +62,7 @@ class Log4j2PluginsCacheFileTransformerTest :
         modifyOutputStream(zos, true)
       }
 
-      // Extract the .dat file bytes to a temp file to avoid JarURLConnection locking tempJar on
-      // Windows
-      val tempDat = createTempFile(directory = tempDir, suffix = ".dat")
-      tempDat.writeBytes(JarPath(tempJar).use { it.getBytes(PLUGIN_CACHE_FILE) })
-
-      val cache = PluginCache()
-      cache.loadCacheFiles(Collections.enumeration(listOf(tempDat.toUri().toURL())))
+      val cache = loadPluginCache(JarPath(tempJar).use { it.getBytes(PLUGIN_CACHE_FILE) })
 
       assertThat(cache.getCategory("lookup")["date"]?.className)
         .isEqualTo("new.location.org.apache.logging.log4j.core.lookup.DateLookup")
@@ -97,24 +97,93 @@ class Log4j2PluginsCacheFileTransformerTest :
       }
     }
 
+  @Test
+  fun mergeSameAsLog4jPluginCache() =
+    with(transformer) {
+      val one =
+        datBytes(
+          "Lookup" to listOf(entry("date", "foo.DateLookup"), entry("env", "foo.EnvLookup")),
+          "Converter" to listOf(entry("message", "foo.MessageConverter")),
+        )
+      val two =
+        datBytes(
+          "lookup" to
+            listOf(entry("date", "bar.DateLookup"), entry("java", "bar.JavaLookup", true)),
+          "Core" to listOf(entry("console", "bar.ConsoleAppender", defer = true)),
+        )
+      transform(TransformerContext(PLUGIN_CACHE_FILE, one.inputStream()))
+      transform(TransformerContext(PLUGIN_CACHE_FILE, two.inputStream()))
+
+      val actual = transformToJar().use { it.getBytes(PLUGIN_CACHE_FILE) }
+
+      val expected =
+        ByteArrayOutputStream().also { output ->
+          PluginCache().apply {
+            loadCacheFiles(Collections.enumeration(listOf(one, two).map(::datUrl)))
+            writeCache(output)
+          }
+        }
+      assertThat(actual.contentEquals(expected.toByteArray())).isTrue()
+      assertThat(loadPluginCache(actual).getCategory("lookup")["date"]?.className)
+        .isEqualTo("foo.DateLookup")
+    }
+
   @ParameterizedTest
   @MethodSource("relocationProvider")
   fun relocations(pattern: String, shadedPattern: String, expected: String) =
     with(transformer) {
-      val aggregator =
-        PluginCache().apply { loadCacheFiles(Collections.enumeration(listOf(pluginCacheUrl))) }
       transform(context(SimpleRelocator(pattern, shadedPattern)))
-      relocatePlugins(aggregator)
 
-      for (pluginEntryMap in aggregator.allCategories.values) {
+      val cache = loadPluginCache(transformToJar().use { it.getBytes(PLUGIN_CACHE_FILE) })
+
+      for (pluginEntryMap in cache.allCategories.values) {
         for (entry in pluginEntryMap.values) {
           assertThat(entry.className).startsWith(expected)
         }
       }
     }
 
+  private fun loadPluginCache(bytes: ByteArray): PluginCache {
+    return PluginCache().apply { loadCacheFiles(Collections.enumeration(listOf(datUrl(bytes)))) }
+  }
+
+  /** Writes the bytes to a temp file to avoid JarURLConnection locking jars on Windows. */
+  private fun datUrl(bytes: ByteArray): URL {
+    val tempDat = createTempFile(directory = tempDir, suffix = ".dat")
+    tempDat.writeBytes(bytes)
+    return tempDat.toUri().toURL()
+  }
+
+  private class Entry(
+    val key: String,
+    val className: String,
+    val printable: Boolean,
+    val defer: Boolean,
+  )
+
   private companion object {
-    val pluginCacheUrl: URL = requireResourceAsPath(PLUGIN_CACHE_FILE).toUri().toURL()
+    fun entry(key: String, className: String, printable: Boolean = false, defer: Boolean = false) =
+      Entry(key, className, printable, defer)
+
+    /** Writes the raw `Log4j2Plugins.dat` format, keeping the category names as they are. */
+    fun datBytes(vararg categories: Pair<String, List<Entry>>): ByteArray {
+      val bytes = ByteArrayOutputStream()
+      DataOutputStream(bytes).use { output ->
+        output.writeInt(categories.size)
+        categories.forEach { (category, entries) ->
+          output.writeUTF(category)
+          output.writeInt(entries.size)
+          entries.forEach {
+            output.writeUTF(it.key)
+            output.writeUTF(it.className)
+            output.writeUTF(it.key)
+            output.writeBoolean(it.printable)
+            output.writeBoolean(it.defer)
+          }
+        }
+      }
+      return bytes.toByteArray()
+    }
 
     fun context(vararg relocators: Relocator): TransformerContext {
       return resourceContext(PLUGIN_CACHE_FILE, relocators = relocators)
