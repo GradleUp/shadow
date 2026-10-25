@@ -57,7 +57,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
           |  <entry key="key2">val2</entry>
           |</properties>
           |"""
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -93,7 +93,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
           |  <entry key="key2">val2</entry>
           |</properties>
           |"""
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -125,7 +125,7 @@ class XmlAppendingTransformerTest : BaseTransformerTest<XmlAppendingTransformer>
           |  <c />
           |</a>
           |"""
-            .trimMargin()
+            .trimMargin(),
         )
     }
 }

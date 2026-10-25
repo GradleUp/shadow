@@ -52,7 +52,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
         task.from(mainSourceSet.map { it.output })
         task.generateSourcesJar.convention(
           // If `withSourcesJar` is present in `java` block.
-          provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null }
+          provider { configurations.findByName(SOURCES_ELEMENTS_CONFIGURATION_NAME) != null },
         )
         task.sourceSetsSourceDirs.convention(
           // Avoid snapshotting source inputs when sources JAR generation is disabled.
@@ -62,7 +62,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             } else {
               provider { emptySet() }
             }
-          }
+          },
         )
         task.configurations.convention(provider { listOf(runtimeConfiguration) })
       }
@@ -108,7 +108,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           task.generateSourcesJar.map { generate ->
             if (generate) listOf(artifact) else emptyList()
           }
-        }
+        },
       )
     }
 
@@ -133,7 +133,7 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
             .attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
         } else {
           logger.info(
-            "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases."
+            "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
           )
         }
       } else {

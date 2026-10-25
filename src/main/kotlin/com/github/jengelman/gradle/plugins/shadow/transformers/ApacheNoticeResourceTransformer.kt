@@ -50,13 +50,13 @@ public open class ApacheNoticeResourceTransformer(
       // NOTICE file corresponding to the section 4d of The Apache License,
       // Version 2.0, in this case for
       """
-        .trimIndent() + " " // The space is important for formatting.
+        .trimIndent() + " ", // The space is important for formatting.
     )
 
   @get:Input
   public open val preamble2: Property<String> =
     objectFactory.property(
-      "\n// ------------------------------------------------------------------\n"
+      "\n// ------------------------------------------------------------------\n",
     )
 
   @get:Input
@@ -88,7 +88,7 @@ public open class ApacheNoticeResourceTransformer(
 
   @Inject
   public constructor(
-    objectFactory: ObjectFactory
+    objectFactory: ObjectFactory,
   ) : this(
     objectFactory,
     patternSet =

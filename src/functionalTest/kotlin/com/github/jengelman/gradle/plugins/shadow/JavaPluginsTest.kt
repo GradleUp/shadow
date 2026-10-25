@@ -82,7 +82,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
@@ -100,7 +100,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  addShadowJarToAssembleLifecycle = false
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithSuccess(ASSEMBLE_TASK_NAME)
@@ -140,7 +140,7 @@ class JavaPluginsTest : BasePluginTest() {
         |     --relocation-prefix     Prefix used for auto relocation of packages in the dependencies.
         |     --rerun     Causes the task to be re-run even if up-to-date.
         """
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -234,7 +234,7 @@ class JavaPluginsTest : BasePluginTest() {
       """
       |include 'client', 'server'
       """
-        .trimMargin()
+        .trimMargin(),
     )
     projectScript.deleteExisting()
 
@@ -244,7 +244,7 @@ class JavaPluginsTest : BasePluginTest() {
         |package client;
         |public class Client {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/build.gradle")
       .writeText(
@@ -270,7 +270,7 @@ class JavaPluginsTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("server/src/main/java/server/Server.java")
@@ -281,7 +281,7 @@ class JavaPluginsTest : BasePluginTest() {
         |import client.junit.framework.Test;
         |public class Server {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("server/build.gradle")
       .writeText(
@@ -293,7 +293,7 @@ class JavaPluginsTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     // Running server:jar to ensure it compiles against the shadowed client
@@ -334,7 +334,7 @@ class JavaPluginsTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     path("consumer/build.gradle")
@@ -352,7 +352,7 @@ class JavaPluginsTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     val result = runWithSuccess(":consumer:printClasspathFiles")
@@ -375,7 +375,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  implementation sourceSets.custom.output
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/src/custom/java/client/Custom1.java")
       .writeText(
@@ -383,7 +383,7 @@ class JavaPluginsTest : BasePluginTest() {
         |package client;
         |public class Custom1 {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/src/custom/java/client/Custom2.java")
       .writeText(
@@ -391,7 +391,7 @@ class JavaPluginsTest : BasePluginTest() {
         |package client;
         |public class Custom2 {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("client/src/custom/resources/Foo.bar").writeText("Foo=Bar")
 
@@ -427,7 +427,7 @@ class JavaPluginsTest : BasePluginTest() {
         |}
         |
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("server/build.gradle")
       .appendText(
@@ -436,7 +436,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  addMultiReleaseAttribute = $addAttribute
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(serverShadowJarPath)
@@ -465,7 +465,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  ${implementationFiles(resJar)}
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -485,7 +485,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  compileOnly 'my:b:1.0'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -519,7 +519,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  runtimeOnly 'my:runtime-only:1.0'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -544,7 +544,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  implementation 'junit:junit:3.8.2'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -569,7 +569,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -591,7 +591,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  shadow 'junit:junit:3.8.2'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -613,7 +613,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  entryCompression = ${ZipEntryCompression::class.java.canonicalName}.$method
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -633,7 +633,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  compileOnly 'my:b:1.0'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -706,7 +706,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(testShadowJarTask)
@@ -721,7 +721,7 @@ class JavaPluginsTest : BasePluginTest() {
             |Hello, World! (foo) from Main
             |Refs: junit.framework.Test
             |"""
-              .trimMargin()
+              .trimMargin(),
           )
       }
     }
@@ -753,7 +753,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  logger.lifecycle("Has ShadowBasePlugin: " + hasShadowBasePlugin)
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithSuccess(testShadowJarTask)
@@ -770,7 +770,7 @@ class JavaPluginsTest : BasePluginTest() {
             |Hello, World! (foo) from Main
             |Refs: junit.framework.Test
             |"""
-              .trimMargin()
+              .trimMargin(),
           )
       }
     }
@@ -792,7 +792,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  configurations = project.configurations.named('runtimeClasspath').map { [it] }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess("jar", dependencyShadowJar)
@@ -819,14 +819,14 @@ class JavaPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithFailure(customShadowJar)
 
     assertThat(result.output)
       .contains(
-        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+        "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration.",
       )
   }
 
@@ -840,7 +840,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  ${implementationFiles(nonExistentDir)}
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithSuccess(shadowJarPath)
@@ -857,7 +857,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  ${implementationFiles(badJarPath)}
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithFailure(shadowJarPath)
@@ -875,7 +875,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  ${implementationFiles(fooAarPath)}
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithFailure(shadowJarPath)
@@ -902,7 +902,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -943,7 +943,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  from(nonJar)
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -969,7 +969,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  )
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1012,7 +1012,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  includedDependencies.from(files(createJars).asFileTree)
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1031,7 +1031,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  id 'com.gradle.develocity'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result =
@@ -1063,7 +1063,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  failOnDuplicateEntries = $enable
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result =
@@ -1086,7 +1086,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  mainClass = '$input'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     val result = runWithSuccess(shadowJarPath, infoArgument)
@@ -1105,7 +1105,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  id 'java-library'
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("lib/src/main/java/com/company/Utils.java")
       .writeText(
@@ -1118,7 +1118,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("app/build.gradle")
       .writeText(
@@ -1176,7 +1176,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("app/src/main/java/com/company/Main.java")
       .writeText(
@@ -1189,7 +1189,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(":app:$SHADOW_JAR_TASK_NAME")
@@ -1220,7 +1220,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  toolchain.languageVersion = JavaLanguageVersion.of(${JavaVersion.current().majorVersion})
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     val result = runWithSuccess(shadowJarPath)
@@ -1249,7 +1249,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess("resolveAndLockAll", "--write-locks")
@@ -1279,7 +1279,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  ${implementationFiles(one, two)}
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1311,7 +1311,7 @@ class JavaPluginsTest : BasePluginTest() {
         |  public static void main(String[] args) {}
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     projectScript.appendText(
       """
@@ -1327,7 +1327,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  source = zipTree($shadowJarTask.flatMap { it.archiveSourcesFile }).matching { include('**/*.java') }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess("javadoc")
@@ -1354,7 +1354,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  generateSourcesJar = true
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1391,7 +1391,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  generateSourcesJar = true
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1420,7 +1420,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  generateSourcesJar = true
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1446,7 +1446,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  generateSourcesJar = true
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1465,7 +1465,7 @@ class JavaPluginsTest : BasePluginTest() {
         |package extra;
         |public class Extra {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     val customSourcesJar =
       buildJar("libs/external-sources.jar") {
@@ -1487,7 +1487,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  includedSourcesJars.from '${customSourcesJar.invariantSeparatorsPathString}'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -1509,7 +1509,7 @@ class JavaPluginsTest : BasePluginTest() {
           |package extra;
           |public class Extra {}
           """
-            .trimMargin()
+            .trimMargin(),
         )
       getContent("ext/Ext.java")
         .isEqualTo(
@@ -1517,7 +1517,7 @@ class JavaPluginsTest : BasePluginTest() {
           |package ext;
           |public class Ext {}
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }
@@ -1533,7 +1533,7 @@ class JavaPluginsTest : BasePluginTest() {
       |  into layout.buildDirectory.dir('synced')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(syncShadowJar)

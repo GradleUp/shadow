@@ -75,11 +75,11 @@ class GroovyExtensionModuleTransformerTest :
       assertThat(properties.getProperty(KEY_EXTENSION_CLASSES))
         .isEqualTo(
           "com.example.shaded.acme.foo.FooExtension,com.example.shaded.acme.foo.BarExtension," +
-            "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension"
+            "com.example.shaded.acme.bar.SomeExtension,com.example.shaded.acme.bar.AnotherExtension",
         )
       assertThat(properties.getProperty(KEY_STATIC_EXTENSION_CLASSES))
         .isEqualTo(
-          "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension"
+          "com.example.shaded.acme.foo.FooStaticExtension,com.example.shaded.acme.bar.SomeStaticExtension",
         )
     }
 

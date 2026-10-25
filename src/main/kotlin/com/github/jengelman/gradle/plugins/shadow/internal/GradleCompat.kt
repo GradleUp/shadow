@@ -77,7 +77,7 @@ internal fun FileTreeElement.inputStream(): InputStream =
 internal fun FileTreeElement.readBytes(): ByteArray = inputStream().use(InputStream::readBytes)
 
 internal inline fun <reified V : Any> ObjectFactory.property(
-  defaultValue: Any? = null
+  defaultValue: Any? = null,
 ): Property<V> =
   property(V::class.java).apply {
     defaultValue ?: return@apply
@@ -90,7 +90,7 @@ internal inline fun <reified V : Any> ObjectFactory.property(
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified V : Any> ObjectFactory.listProperty(
-  defaultValue: Any? = null
+  defaultValue: Any? = null,
 ): ListProperty<V> =
   listProperty(V::class.java).apply {
     defaultValue ?: return@apply
@@ -103,7 +103,7 @@ internal inline fun <reified V : Any> ObjectFactory.listProperty(
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified V : Any> ObjectFactory.setProperty(
-  defaultValue: Any? = null
+  defaultValue: Any? = null,
 ): SetProperty<V> =
   setProperty(V::class.java).apply {
     defaultValue ?: return@apply
@@ -116,7 +116,7 @@ internal inline fun <reified V : Any> ObjectFactory.setProperty(
 
 @Suppress("UNCHECKED_CAST")
 internal inline fun <reified V : Any> ObjectFactory.mapProperty(
-  defaultValue: Any? = null
+  defaultValue: Any? = null,
 ): MapProperty<String, V> =
   mapProperty(String::class.java, V::class.java).apply {
     defaultValue ?: return@apply

@@ -272,7 +272,7 @@ public abstract class ShadowJar : Jar() {
                 } else {
                   "$name-sources"
                 }
-              }
+              },
             )
           } else {
             // Leave it absent so it isn't registered as a task output when sources JAR generation
@@ -280,7 +280,7 @@ public abstract class ShadowJar : Jar() {
             // TODO: replace with `providers.absent()` once the min Gradle version is 9.9.
             project.provider { null }
           }
-        }
+        },
       )
 
   /**
@@ -542,7 +542,7 @@ public abstract class ShadowJar : Jar() {
 
   @Deprecated(
     message =
-      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10."
+      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10.",
   )
   @JvmOverloads
   public open fun <R : Relocator> relocate(clazz: Class<R>, action: Action<R> = Action {}) {
@@ -559,7 +559,7 @@ public abstract class ShadowJar : Jar() {
   @Suppress("DeprecatedCallableAddReplaceWith")
   @Deprecated(
     message =
-      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10."
+      "Construct a Relocator instance and use relocate(Relocator, Action) instead. This will be removed in Shadow 10.",
   )
   @JvmSynthetic
   public inline fun <reified R : Relocator> relocate(action: Action<R> = Action {}) {
@@ -896,7 +896,7 @@ public abstract class ShadowJar : Jar() {
 
           project.plugins.withId("org.gradle.java") {
             task.javaLauncher.convention(
-              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain)
+              project.javaToolchainService.launcherFor(project.javaPluginExtension.toolchain),
             )
           }
 

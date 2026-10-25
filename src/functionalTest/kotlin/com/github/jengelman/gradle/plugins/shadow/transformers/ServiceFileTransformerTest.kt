@@ -74,7 +74,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |  relocate("bar", "relocated.bar")
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -100,7 +100,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           |relocated.foo.FooDriver
           |relocated.bar.BarDriver
           |"""
-            .trimMargin()
+            .trimMargin(),
         )
       classLoader {
         loadClass("relocated.com.example.Driver")
@@ -144,7 +144,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -163,7 +163,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
           |relocated.foo.FooDriver
           |relocated.bar.BarDriver
           |"""
-            .trimMargin()
+            .trimMargin(),
         )
       classLoader {
         loadClass("relocated.com.example.Driver")
@@ -187,7 +187,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |  mergeServiceFiles()
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     path("src/main/resources/$servicesBarEntry").writeText(CONTENT_THREE)
 
@@ -243,7 +243,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -265,7 +265,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -294,7 +294,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -317,7 +317,7 @@ class ServiceFileTransformerTest : BaseTransformerTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
   }
 

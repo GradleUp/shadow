@@ -86,7 +86,7 @@ public open class DeduplicatingResourceTransformer(
     if (duplicatePaths.isNotEmpty()) {
       val message = buildString {
         append(
-          "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadowed JAR:\n"
+          "Found ${duplicatePaths.size} path duplicate(s) with different content in the shadowed JAR:\n",
         )
         duplicatePaths.forEach { (path, infos) ->
           append("  * $path\n")

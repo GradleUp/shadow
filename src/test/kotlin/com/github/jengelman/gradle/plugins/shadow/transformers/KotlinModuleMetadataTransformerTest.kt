@@ -96,7 +96,7 @@ class KotlinModuleMetadataTransformerTest : BaseTransformerTest<KotlinModuleMeta
               originalParts.multiFileClassParts.entries.associateTo(mutableMapOf()) { (name, facade)
                 ->
                 name.replace("kotlin/", "my/kotlin/") to facade.replace("kotlin/", "my/kotlin/")
-              }
+              },
             )
         }
       }

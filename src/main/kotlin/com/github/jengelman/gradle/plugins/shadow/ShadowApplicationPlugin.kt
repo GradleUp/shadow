@@ -98,7 +98,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           gradleError(
             "The specified installation directory '$destinationDir' is neither empty nor does it contain an installation for '${applicationName.get()}'.\n" +
               "If you really want to install to this directory, delete it and run the install task again.\n" +
-              "Alternatively, choose a different installation directory."
+              "Alternatively, choose a different installation directory.",
           )
         }
       }
@@ -113,7 +113,7 @@ public abstract class ShadowApplicationPlugin : Plugin<Project> {
           // defaults to project.name so we append the suffix to match the default
           // distributionBaseName. Modified from `ApplicationPlugin.configureDistribution()`.
           "${applicationExtension.applicationName}-$DISTRIBUTION_NAME"
-        }
+        },
       )
       dist.contents { distSpec ->
         distSpec.from(file("src/dist"))

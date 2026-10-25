@@ -78,7 +78,7 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
           | * f.properties
           |   * Property foo is duplicated 2 times with different values
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
 
@@ -211,7 +211,12 @@ class PropertiesFileTransformerTest : BaseTransformerTest<PropertiesFileTransfor
     @JvmStatic
     fun charsetProvider() =
       listOf(
-        Arguments.of("utf8.properties", "utf-8", mapOf("foo" to "传傳磨宿说説"), mapOf("foo" to "传傳磨宿说説"))
+        Arguments.of(
+          "utf8.properties",
+          "utf-8",
+          mapOf("foo" to "传傳磨宿说説"),
+          mapOf("foo" to "传傳磨宿说説"),
+        ),
       )
 
     @JvmStatic

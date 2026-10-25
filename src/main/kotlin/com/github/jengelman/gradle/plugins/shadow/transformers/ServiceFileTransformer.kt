@@ -29,7 +29,7 @@ public open class ServiceFileTransformer
 @JvmOverloads
 constructor(
   patternSet: PatternSet =
-    PatternSet().include(SERVICES_PATTERN).exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR)
+    PatternSet().include(SERVICES_PATTERN).exclude(PATH_LEGACY_GROOVY_EXTENSION_MODULE_DESCRIPTOR),
 ) : PatternFilterableResourceTransformer(patternSet = patternSet) {
   @get:Internal internal val serviceEntries = mutableMapOf<String, MutableSet<String>>()
 

@@ -40,14 +40,14 @@ class RelocationTest : BasePluginTest() {
       |  relocationPrefix = '$relocationPrefix'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val entryPrefix = relocationPrefix.replace('.', '/')
     val relocatedEntries = buildSet {
       addAll(
         junitEntries
           .map { "$entryPrefix/$it" }
-          .filterNot { it.startsWith("$entryPrefix/META-INF/") }
+          .filterNot { it.startsWith("$entryPrefix/META-INF/") },
       )
       var parent = entryPrefix
       while (parent.isNotEmpty()) {
@@ -90,7 +90,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate 'junit.framework', 'b'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val runnerFilter = { it: String -> it.startsWith("junit/runner/") }
     val frameworkFilter = { it: String -> it.startsWith("junit/framework/") }
@@ -140,7 +140,7 @@ class RelocationTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val runnerFilter = { it: String ->
       it.startsWith("junit/runner/") && it != "junit/runner/BaseTestRunner.class"
@@ -190,7 +190,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate 'junit.framework', 'shadow.junit'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val relocatedEntries =
       junitEntries.map { it.replace("junit/framework/", "shadow/junit/") }.toTypedArray()
@@ -206,7 +206,7 @@ class RelocationTest : BasePluginTest() {
         |  public void run(TestResult result) { }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(shadowJarPath)
@@ -243,7 +243,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate 'foo', 'bar'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -283,7 +283,7 @@ class RelocationTest : BasePluginTest() {
       |  preserveFileTimestamps = $preserveFileTimestamps
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -311,7 +311,7 @@ class RelocationTest : BasePluginTest() {
           // time.
           if (entry.time < currentTimeMillis) {
             fail(
-              "Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}"
+              "Relocated directory ${entry.name} has an invalid last modified time: ${entry.time}",
             )
           }
         }
@@ -372,7 +372,7 @@ class RelocationTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -411,7 +411,7 @@ class RelocationTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -442,7 +442,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate('', 'foo/')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -467,7 +467,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate('foo', 'shadow.foo')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -480,7 +480,7 @@ class RelocationTest : BasePluginTest() {
             |shadow.foo.Foo
             |shadow.foo.Bar
             |"""
-              .trimMargin()
+              .trimMargin(),
           )
       }
     }
@@ -498,7 +498,7 @@ class RelocationTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val expected =
       if (skipStringConstants) {
@@ -544,7 +544,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate('org.package', 'shadow.org.package')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -558,7 +558,7 @@ class RelocationTest : BasePluginTest() {
             |(Lshadow/org/package/ClassC;Lshadow/org/package/ClassD;)
             |()Lshadow/org/package/ClassE;Lshadow/org/package/ClassF;
             |"""
-              .trimMargin()
+              .trimMargin(),
           )
       }
     }
@@ -576,7 +576,7 @@ class RelocationTest : BasePluginTest() {
       |  enableAutoRelocation = true
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(":jar", shadowJarPath)
@@ -603,7 +603,7 @@ class RelocationTest : BasePluginTest() {
       |  enableKotlinModuleRemapping = $enableKotlinModuleRemapping
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -658,7 +658,7 @@ class RelocationTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -692,7 +692,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate 'foo', 'shadow.foo'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -750,7 +750,7 @@ class RelocationTest : BasePluginTest() {
         |  G g;
         |}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     projectScript.appendText(
       """
@@ -762,7 +762,7 @@ class RelocationTest : BasePluginTest() {
       |  relocate('g', 'shadow.g')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -786,7 +786,7 @@ class RelocationTest : BasePluginTest() {
           |  G g;
           |}
           """
-            .trimMargin()
+            .trimMargin(),
         )
       getContent("shadow/g/G.java")
         .isEqualTo(
@@ -794,7 +794,7 @@ class RelocationTest : BasePluginTest() {
           |package shadow.g;
           |public class G {}
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }

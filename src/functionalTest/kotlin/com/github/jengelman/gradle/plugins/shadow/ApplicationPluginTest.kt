@@ -119,7 +119,7 @@ class ApplicationPluginTest : BasePluginTest() {
         |Hello, World! (bar) from Main
         |Refs: junit.framework.Test
         |"""
-          .trimMargin()
+          .trimMargin(),
       )
   }
 
@@ -144,7 +144,7 @@ class ApplicationPluginTest : BasePluginTest() {
         |  }
         |}
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     var result = runWithSuccess(runShadowPath)
@@ -169,7 +169,7 @@ class ApplicationPluginTest : BasePluginTest() {
       |  args 'bar'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     result = runWithSuccess(":run")
@@ -186,7 +186,7 @@ class ApplicationPluginTest : BasePluginTest() {
       |  mainClass = 'my.Main2' // Different from application.mainClass.
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(runShadowPath) // Run without errors.
@@ -278,7 +278,7 @@ class ApplicationPluginTest : BasePluginTest() {
         |applicationName = '${applicationNames.first}'
         |executableDir = '${executableDirs.first}'
         """
-          .trimMargin()
+          .trimMargin(),
     )
 
     runWithSuccess(installShadowDistPath, shadowDistZipPath)
@@ -328,13 +328,13 @@ class ApplicationPluginTest : BasePluginTest() {
       |}
       |
       """
-        .trimMargin()
+        .trimMargin(),
     )
     settingsScript.writeText(
       getDefaultSettingsBuildScript(
         startBlock = settingsBlock,
         endBlock = "rootProject.name = 'myapp'",
-      )
+      ),
     )
   }
 

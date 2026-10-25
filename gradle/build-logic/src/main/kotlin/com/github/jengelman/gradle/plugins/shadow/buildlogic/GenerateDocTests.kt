@@ -48,7 +48,7 @@ abstract class GenerateDocTests : DefaultTask() {
                   lineNumber = line,
                   snippet = matcher.group(2),
                   sourceLocation = "${file.toURI()}:$line",
-                )
+                ),
               )
             }
           }
@@ -112,7 +112,7 @@ abstract class GenerateDocTests : DefaultTask() {
             |}
             |
             """
-              .trimMargin()
+              .trimMargin(),
           )
       }
   }

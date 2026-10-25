@@ -30,7 +30,7 @@ class FindResourceInClasspathTest : BasePluginTest() {
       |  exclude("a.properties")
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     assertThat(runWithSuccess(":find1").output)

@@ -35,7 +35,7 @@ class TransformersTest : BaseTransformerTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -67,8 +67,8 @@ class TransformersTest : BaseTransformerTest() {
           |mainClass = 'my.Main'
           |manifestEntries = ['$TEST_ENTRY_ATTR_KEY': 'PASSED', 'Number-Entry': 123, '$NEW_ENTRY_ATTR_KEY': 'NEW']
           """
-            .trimMargin()
-      )
+            .trimMargin(),
+      ),
     )
 
     runWithSuccess(shadowJarPath)
@@ -96,10 +96,10 @@ class TransformersTest : BaseTransformerTest() {
           """
           |manifestEntries.put('Header-To-Remove-1', ${ManifestResourceTransformer::class.java.name}.NULL)
           """
-            .trimMargin()
+            .trimMargin(),
       )}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -117,8 +117,8 @@ class TransformersTest : BaseTransformerTest() {
     val two = buildJarOne { insert(PLUGIN_CACHE_FILE, content) }
     projectScript.appendText(
       transform<Log4j2PluginsCacheFileTransformer>(
-        dependenciesBlock = implementationFiles(one, two)
-      )
+        dependenciesBlock = implementationFiles(one, two),
+      ),
     )
 
     runWithSuccess(shadowJarPath)
@@ -149,7 +149,7 @@ class TransformersTest : BaseTransformerTest() {
       transform<PreserveFirstFoundResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "include('foo/bar')",
-      )
+      ),
     )
 
     runWithSuccess(shadowJarPath)
@@ -173,7 +173,7 @@ class TransformersTest : BaseTransformerTest() {
       |  transform(${CustomResourceTransformer::class.java.name})
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -190,7 +190,7 @@ class TransformersTest : BaseTransformerTest() {
       insert("foo/bar.txt", "bar")
     }
     projectScript.appendText(
-      transform<DeduplicatingResourceTransformer>(dependenciesBlock = implementationFiles(one))
+      transform<DeduplicatingResourceTransformer>(dependenciesBlock = implementationFiles(one)),
     )
 
     runWithSuccess(shadowJarPath)
@@ -215,7 +215,7 @@ class TransformersTest : BaseTransformerTest() {
       transform<MergeLicenseResourceTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "artifactLicense = file('LICENSE')",
-      )
+      ),
     )
 
     runWithSuccess(shadowJarPath)
@@ -239,7 +239,7 @@ class TransformersTest : BaseTransformerTest() {
           |
           |License from Two
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }
@@ -261,7 +261,7 @@ class TransformersTest : BaseTransformerTest() {
           |copyright = 'Copyright 2026 Foo\n'
           """
             .trimMargin(),
-      )
+      ),
     )
 
     runWithSuccess(shadowJarPath)
@@ -279,7 +279,7 @@ class TransformersTest : BaseTransformerTest() {
           |
           |Notice from B
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }
@@ -330,7 +330,7 @@ class TransformersTest : BaseTransformerTest() {
       |  relocate('org.example', 'relocated.org.example')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -354,7 +354,7 @@ class TransformersTest : BaseTransformerTest() {
           |  </components>
           |</component-set>
           """
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }
@@ -375,7 +375,7 @@ class TransformersTest : BaseTransformerTest() {
       |  relocate('kotlin', 'my.kotlin')
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -421,7 +421,7 @@ class TransformersTest : BaseTransformerTest() {
       transform<XmlAppendingTransformer>(
         dependenciesBlock = implementationFiles(one, two),
         transformerBlock = "resource = '$xmlEntry'",
-      )
+      ),
     )
 
     runWithSuccess(shadowJarPath)
@@ -436,7 +436,7 @@ class TransformersTest : BaseTransformerTest() {
           |  <child id="2" />
           |</root>
           |"""
-            .trimMargin()
+            .trimMargin(),
         )
     }
   }
@@ -446,7 +446,7 @@ class TransformersTest : BaseTransformerTest() {
       assertThat(getValue(TEST_ENTRY_ATTR_KEY)).isEqualTo("PASSED")
       assertThat(getValue(mainClassAttributeKey)).isEqualTo("my.Main")
       assertThat(getValue(NEW_ENTRY_ATTR_KEY)).isEqualTo("NEW")
-    }
+    },
   ) {
     val mf = outputShadowedJar.use { it.manifest }
     assertThat(mf).isNotNull()

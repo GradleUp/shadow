@@ -21,7 +21,7 @@ public abstract class ShadowPlugin : Plugin<Project> {
       withId("com.android.base") {
         gradleError(
           "Shadow does not support being used with AGP. You may need the Android Fused Library plugin instead. " +
-            "See https://developer.android.com/build/publish-library/fused-library"
+            "See https://developer.android.com/build/publish-library/fused-library",
         )
       }
       project.configureBuildScan()

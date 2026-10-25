@@ -45,7 +45,7 @@ class MinimizeSpecsTest {
       assertThat(classpath.files).isEmpty()
       assertThat(configurationFile.get().asFile)
         .isEqualTo(
-          project.layout.buildDirectory.file("shadowJar/r8/configuration.txt").get().asFile
+          project.layout.buildDirectory.file("shadowJar/r8/configuration.txt").get().asFile,
         )
     }
 

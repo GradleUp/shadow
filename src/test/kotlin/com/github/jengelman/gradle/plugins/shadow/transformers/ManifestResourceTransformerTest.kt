@@ -60,7 +60,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
         assertThat(jarPath.getMainAttr("Export-Package"))
           .isEqualTo(
             "jakarta.decorator;version=\"2.0\";uses:=\"jakarta.enterprise.inject\"," +
-              "jakarta.enterprise.context;version=\"2.0\";uses:=\"jakarta.enterprise.util,jakarta.inject\""
+              "jakarta.enterprise.context;version=\"2.0\";uses:=\"jakarta.enterprise.util,jakarta.inject\"",
           )
         assertThat(jarPath.getMainAttr("Import-Package"))
           .isEqualTo("jakarta.el,jakarta.enterprise.context;version=\"[2.0,3)\"")
@@ -71,7 +71,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
               "jakarta.enterprise.util,jakarta.enterprise.inject,jakarta.enterprise.inject.spi," +
               "jakarta.enterprise.inject.spi.configurator,jakarta.enterprise.inject.literal," +
               "jakarta.enterprise.inject.se,jakarta.enterprise.event," +
-              "jakarta.decorator\";version:List<Version>=\"2.0,1.2,1.1,1.0\""
+              "jakarta.decorator\";version:List<Version>=\"2.0,1.2,1.1,1.0\"",
           )
         assertThat(jarPath.getMainAttr("Require-Capability"))
           .isEqualTo(
@@ -86,7 +86,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
               "filter:=\"(&(osgi.contract=JavaInterceptor)(version=1.2.0))\"," +
               "osgi.contract;osgi.contract=JavaInject;" +
               "filter:=\"(&(osgi.contract=JavaInject)(version=1.0.0))\"," +
-              "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=1.8))\""
+              "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=1.8))\"",
           )
       }
     }
@@ -102,7 +102,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
         assertThat(jarPath.getMainAttr("Export-Package"))
           .isEqualTo(
             "shaded.javax.decorator;version=\"2.0\";uses:=\"shaded.javax.enterprise.inject\"," +
-              "shaded.javax.enterprise.context;version=\"2.0\";uses:=\"shaded.javax.enterprise.util,shaded.javax.inject\""
+              "shaded.javax.enterprise.context;version=\"2.0\";uses:=\"shaded.javax.enterprise.util,shaded.javax.inject\"",
           )
         assertThat(jarPath.getMainAttr("Import-Package"))
           .isEqualTo("shaded.javax.el,shaded.javax.enterprise.context;version=\"[2.0,3)\"")
@@ -113,7 +113,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
               "shaded.javax.enterprise.util,shaded.javax.enterprise.inject,shaded.javax.enterprise.inject.spi," +
               "shaded.javax.enterprise.inject.spi.configurator,shaded.javax.enterprise.inject.literal," +
               "shaded.javax.enterprise.inject.se,shaded.javax.enterprise.event," +
-              "shaded.javax.decorator\";version:List<Version>=\"2.0,1.2,1.1,1.0\""
+              "shaded.javax.decorator\";version:List<Version>=\"2.0,1.2,1.1,1.0\"",
           )
         assertThat(jarPath.getMainAttr("Require-Capability"))
           .isEqualTo(
@@ -128,7 +128,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
               "filter:=\"(&(osgi.contract=JavaInterceptor)(version=1.2.0))\"," +
               "osgi.contract;osgi.contract=JavaInject;" +
               "filter:=\"(&(osgi.contract=JavaInject)(version=1.0.0))\"," +
-              "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=1.8))\""
+              "osgi.ee;filter:=\"(&(osgi.ee=JavaSE)(version=1.8))\"",
           )
       }
     }
@@ -178,7 +178,7 @@ class ManifestResourceTransformerTest : BaseTransformerTest<ManifestResourceTran
       transformToJar().use { jarPath ->
         assertThat(jarPath.getMainAttr("Export-Package"))
           .isEqualTo(
-            """shaded.org.foo.public.api;version="1.0",org.foo.internal.impl;version="1.0""""
+            """shaded.org.foo.public.api;version="1.0",org.foo.internal.impl;version="1.0"""",
           )
       }
     }

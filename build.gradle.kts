@@ -168,7 +168,7 @@ testing.suites {
               // Prettify test failure output in console.
               result.exception?.message?.lineSequence()?.firstOrNull()?.let(logger::error)
             }
-          }
+          },
         )
       }
     }

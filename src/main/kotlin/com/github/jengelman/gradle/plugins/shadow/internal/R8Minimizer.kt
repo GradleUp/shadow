@@ -41,7 +41,7 @@ internal fun minimizeWithR8(
 ) {
   if (r8Classpath.isEmpty) {
     gradleError(
-      "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration."
+      "R8 minimization requires a non-empty R8 classpath. Apply the Shadow plugin or configure the shadowR8 configuration.",
     )
   }
 
@@ -67,7 +67,7 @@ internal fun minimizeWithR8(
         keptDependencyFiles = keptDependencyFiles,
         relocators = relocators,
       )
-      .joinToString(System.lineSeparator())
+      .joinToString(System.lineSeparator()),
   )
 
   val arguments = buildList {
@@ -127,12 +127,12 @@ private fun createRules(
       addAll(
         // Project classes are the public surface of the shadowed jar, even when nothing in the
         // input jar refers to every class directly.
-        sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses")
+        sourceSetsClassesDirs.toKeepRules(jarClasses, relocators, "-keep,includedescriptorclasses"),
       )
       addAll(
         // Keep dependencies users explicitly excluded from minimization, matching the existing
         // minimize { exclude(...) } contract for the default analyzer.
-        keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep")
+        keptDependencyFiles.toKeepRules(jarClasses, relocators, "-keep"),
       )
       addAll(serviceRules)
     }

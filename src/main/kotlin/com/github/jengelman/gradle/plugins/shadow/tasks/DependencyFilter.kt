@@ -63,7 +63,7 @@ public interface DependencyFilter {
               excludedDependencies = excludes,
             )
             excludes.flatMap { it.moduleArtifacts.map(ResolvedArtifact::getFile) }
-          }
+          },
         )
     }
 

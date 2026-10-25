@@ -22,7 +22,7 @@ class FilteringTest : BasePluginTest() {
       |  implementation 'my:b:1.0'
       |}
       |"""
-        .trimMargin()
+        .trimMargin(),
     )
   }
 
@@ -43,7 +43,7 @@ class FilteringTest : BasePluginTest() {
       |  exclude 'a2.properties'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -64,7 +64,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     val dependency = if (useAccessor) "libs.my.d" else "'my:d:1.0'"
     projectScript.appendText(
@@ -78,7 +78,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -99,7 +99,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
     path("src/main/java/my/Passed.java")
       .writeText(
@@ -107,7 +107,7 @@ class FilteringTest : BasePluginTest() {
         |package my;
         |public class Passed {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
 
     runWithSuccess(shadowJarPath)
@@ -216,7 +216,7 @@ class FilteringTest : BasePluginTest() {
       |  exclude 'a2.properties'
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -240,7 +240,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -263,7 +263,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -288,7 +288,7 @@ class FilteringTest : BasePluginTest() {
       |  }
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)
@@ -309,7 +309,7 @@ class FilteringTest : BasePluginTest() {
         |package my;
         |public class Main {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     path("src/main/java/my/Excluded.java")
       .writeText(
@@ -317,7 +317,7 @@ class FilteringTest : BasePluginTest() {
         |package my;
         |public class Excluded {}
         """
-          .trimMargin()
+          .trimMargin(),
       )
     projectScript.appendText(
       """
@@ -332,7 +332,7 @@ class FilteringTest : BasePluginTest() {
       |  generateSourcesJar = true
       |}
       """
-        .trimMargin()
+        .trimMargin(),
     )
 
     runWithSuccess(shadowJarPath)

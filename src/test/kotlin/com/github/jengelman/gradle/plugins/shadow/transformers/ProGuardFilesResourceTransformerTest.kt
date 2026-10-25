@@ -56,7 +56,7 @@ class ProGuardFilesResourceTransformerTest :
           |"""
             .trimMargin(),
           relocator,
-        )
+        ),
       )
       transform(
         textContext(
@@ -68,7 +68,7 @@ class ProGuardFilesResourceTransformerTest :
           """
             .trimMargin(),
           relocator,
-        )
+        ),
       )
       transform(
         textContext(
@@ -80,7 +80,7 @@ class ProGuardFilesResourceTransformerTest :
           """
             .trimMargin(),
           relocator,
-        )
+        ),
       )
 
       assertThat(hasTransformedResource()).isTrue()
@@ -99,7 +99,7 @@ class ProGuardFilesResourceTransformerTest :
             |-keep class shaded.com.foo.Baz
             |-dontwarn shaded.com.foo.internal.*
             """
-              .trimMargin()
+              .trimMargin(),
           )
         assertThat(jarPath.getContent("META-INF/proguard/client.pro"))
           .isEqualTo(
@@ -108,7 +108,7 @@ class ProGuardFilesResourceTransformerTest :
             |-dontwarn shaded.com.foo.**
             |-keep class shaded.com.foo.Test? { @shaded.com.foo.MyAnnotation <fields>; }
             """
-              .trimMargin()
+              .trimMargin(),
           )
       }
     }

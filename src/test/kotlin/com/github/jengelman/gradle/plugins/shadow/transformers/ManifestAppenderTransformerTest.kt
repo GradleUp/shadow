@@ -55,7 +55,7 @@ class ManifestAppenderTransformerTest : BaseTransformerTest<ManifestAppenderTran
           |
           |"""
             .trimMargin()
-            .crlfEolString
+            .crlfEolString,
         )
     }
 
