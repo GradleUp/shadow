@@ -120,8 +120,8 @@ class ShadowedSourcesJarTest {
         "META-INF/",
         "a/",
         "m/",
-        "z/",
         "z/sub/",
+        "z/",
       )
     }
   }
@@ -269,10 +269,10 @@ class ShadowedSourcesJarTest {
         "shaded/dep/Dep.java",
         "shaded/dep/resource.txt",
         "META-INF/",
-        "com/",
         "com/example/",
-        "shaded/",
+        "com/",
         "shaded/dep/",
+        "shaded/",
       )
       getContent("shaded/dep/Dep.java").isEqualTo("package shaded.dep;\npublic class Dep {}")
       getContent("shaded/dep/resource.txt").isEqualTo("dep resource")
@@ -306,8 +306,8 @@ class ShadowedSourcesJarTest {
         "META-INF/MANIFEST.MF",
         *expectedEntries.toTypedArray(),
         "META-INF/",
-        "shaded/",
         "shaded/example/",
+        "shaded/",
       )
       names.forEach { name ->
         getContent("shaded/example/$name.java")
@@ -339,5 +339,4 @@ private fun generateSourcesJar(
     dependencies = emptyList(),
     relocators = relocators,
     unusedClasses = emptySet(),
-    preserveFileTimestamps = true,
   )

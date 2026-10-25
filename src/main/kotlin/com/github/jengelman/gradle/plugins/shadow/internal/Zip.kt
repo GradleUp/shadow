@@ -8,6 +8,7 @@ import org.apache.tools.zip.UnixStat
 import org.apache.tools.zip.Zip64Mode
 import org.apache.tools.zip.ZipEntry
 import org.apache.tools.zip.ZipOutputStream
+import org.gradle.api.file.FileCopyDetails
 import org.gradle.api.tasks.bundling.ZipEntryCompression
 
 @JvmInline
@@ -100,6 +101,38 @@ internal inline fun ZipOutputStream.writeEntry(
     write()
   } finally {
     closeEntry()
+  }
+}
+
+/**
+ * Writes the missing parent directory entries of all written entries, taking the timestamp and
+ * permissions from [visitedDirs] when available.
+ */
+internal fun ZipOutputStream.writeParentDirectoryEntries(
+  preserveLastModified: Boolean = false,
+  visitedDirs: Map<String, FileCopyDetails> = emptyMap(),
+) {
+  val entries = entries.map { it.name }
+  val added = entries.toMutableSet()
+  val currentTimeMillis = System.currentTimeMillis()
+
+  entries.forEach { name ->
+    name.parentDirectoryEntries().asReversed().forEach { entryName ->
+      if (!added.add(entryName)) return@forEach
+      val details = visitedDirs[entryName.removeSuffix("/")]
+      val (lastModified, unixMode) =
+        if (details == null) {
+          currentTimeMillis to UnixMode.directory()
+        } else {
+          details.lastModified to UnixMode.directory(details.permissions.toUnixNumeric())
+        }
+      writeEntry(
+        name = entryName,
+        preserveLastModified = preserveLastModified,
+        lastModified = lastModified,
+        unixMode = unixMode,
+      )
+    }
   }
 }
 

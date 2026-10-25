@@ -9,10 +9,10 @@ import com.github.jengelman.gradle.plugins.shadow.internal.UnixMode
 import com.github.jengelman.gradle.plugins.shadow.internal.entries
 import com.github.jengelman.gradle.plugins.shadow.internal.gradleError
 import com.github.jengelman.gradle.plugins.shadow.internal.inputStream
-import com.github.jengelman.gradle.plugins.shadow.internal.parentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.internal.readBytes
 import com.github.jengelman.gradle.plugins.shadow.internal.remapClass
 import com.github.jengelman.gradle.plugins.shadow.internal.writeEntry
+import com.github.jengelman.gradle.plugins.shadow.internal.writeParentDirectoryEntries
 import com.github.jengelman.gradle.plugins.shadow.relocation.Relocator
 import com.github.jengelman.gradle.plugins.shadow.relocation.relocatePath
 import com.github.jengelman.gradle.plugins.shadow.transformers.ResourceTransformer
@@ -83,7 +83,7 @@ internal constructor(
         }
 
         processTransformers(zos)
-        addDirs(zos)
+        zos.writeParentDirectoryEntries(isPreserveFileTimestamps, visitedDirs)
         checkDuplicateEntries(zos)
       }
     } catch (e: Exception) {
@@ -114,31 +114,6 @@ internal constructor(
     transformers.forEach { transformer ->
       if (transformer.hasTransformedResource()) {
         transformer.modifyOutputStream(zos, isPreserveFileTimestamps)
-      }
-    }
-  }
-
-  private fun addDirs(zos: ZipOutputStream) {
-    val entries = zos.entries.map { it.name }
-    val added = entries.toMutableSet()
-    val currentTimeMillis = System.currentTimeMillis()
-
-    entries.forEach { name ->
-      name.parentDirectoryEntries().asReversed().forEach { entryName ->
-        if (!added.add(entryName)) return@forEach
-        val details = visitedDirs[entryName.removeSuffix("/")]
-        val (lastModified, unixMode) =
-          if (details == null) {
-            currentTimeMillis to UnixMode.directory()
-          } else {
-            details.lastModified to UnixMode.directory(details.permissions.toUnixNumeric())
-          }
-        zos.writeEntry(
-          name = entryName,
-          preserveLastModified = isPreserveFileTimestamps,
-          lastModified = lastModified,
-          unixMode = unixMode,
-        )
       }
     }
   }
