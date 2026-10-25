@@ -32,6 +32,12 @@
 - Parallelize bytecode remapping. ([#2302](https://github.com/GradleUp/shadow/pull/2302))  
   Custom `Relocator` implementations must now be thread-safe.  
   Significantly improves `shadowJar` execution performance when relocating classes (up to ~4.6x faster on large dependencies).
+- **POTENTIALLY BREAKING:** Generate a shadowed sources JAR by default when `java.withSourcesJar()` is enabled. ([#2265](https://github.com/GradleUp/shadow/pull/2265))
+  - The sources JAR is registered as an output of `shadowJar`, so `from(tasks.shadowJar)`, `files(tasks.shadowJar)`, or
+    `tasks.shadowJar.get().outputs.files.singleFile` now see two files. Use `tasks.shadowJar.flatMap { it.archiveFile }`
+    to reference the shadowed JAR only, or set `generateSourcesJar = false` on `shadowJar` to opt out.
+  - The `shadow` component, and the `java` component when `addShadowVariantIntoJavaComponent` is enabled (the default),
+    now publish an additional shadowed sources variant (e.g. `<name>-<version>-all-sources.jar`).
 
 ### Deprecated
 
