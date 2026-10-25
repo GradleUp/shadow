@@ -483,6 +483,46 @@ block provides a method that accepts a `Closure` for selecting dependencies.
     }
     ```
 
+### Declaring Excluded Dependencies for Consumers
+
+Dependency filtering only controls the content of the shadowed JAR. Excluded dependencies are dropped entirely, they are
+**not** automatically added to the [`shadow` configuration][shadow-configuration], so they won't appear in the
+published POM file, Gradle Module Metadata, or the `Class-Path` attribute of the manifest.
+
+This is intentional. A dependency is often excluded because the target environment already provides it (e.g. the
+Gradle API for a Gradle plugin), so exposing it to consumers would be wrong. Moreover, the filter only sees resolved
+dependencies, so declared versions, scopes, and exclusions can't be restored from them.
+
+If some dependencies should not be bundled but still be required at runtime, declare them in the `shadow` configuration
+explicitly. For example, to bundle `log4j-core` only, while keeping its transitive dependency `log4j-api` as a runtime
+dependency:
+
+=== ":material-language-kotlin: build.gradle.kts"
+
+    ```kotlin
+    dependencies {
+      // Bundled into the shadowed JAR without its transitive dependencies.
+      implementation("org.apache.logging.log4j:log4j-core:2.11.1") {
+        isTransitive = false
+      }
+      // Not bundled, but declared as a runtime dependency of the shadowed JAR.
+      shadow("org.apache.logging.log4j:log4j-api:2.11.1")
+    }
+    ```
+
+=== ":simple-apachegroovy: build.gradle"
+
+    ```groovy
+    dependencies {
+      // Bundled into the shadowed JAR without its transitive dependencies.
+      implementation('org.apache.logging.log4j:log4j-core:2.11.1') {
+        transitive = false
+      }
+      // Not bundled, but declared as a runtime dependency of the shadowed JAR.
+      shadow 'org.apache.logging.log4j:log4j-api:2.11.1'
+    }
+    ```
+
 
 [Jar.from]: https://docs.gradle.org/current/dsl/org.gradle.jvm.tasks.Jar.html#org.gradle.jvm.tasks.Jar:from(java.lang.Object,%20org.gradle.api.Action)
 [Jar]: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.bundling.Jar.html
@@ -495,3 +535,4 @@ block provides a method that accepts a `Closure` for selecting dependencies.
 [pom-files]: https://repo1.maven.org/maven2/org/graalvm/polyglot/js-community/24.2.2/
 [so-files]: https://repo1.maven.org/maven2/io/github/ganadist/sqlite4java/libsqlite4java-osx-aarch64/1.0.392/
 [minimizing]: ../minimizing/README.md
+[shadow-configuration]: ../../publishing/README.md#shadow-configuration-and-publishing

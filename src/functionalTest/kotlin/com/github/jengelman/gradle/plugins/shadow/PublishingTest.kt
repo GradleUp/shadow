@@ -277,6 +277,35 @@ class PublishingTest : BasePluginTest() {
     assertShadowVariantCommon("$artifactRoot/maven-1.0.module")
   }
 
+  @Test // #265
+  fun publishBundledDependencyWithTransitiveDependencyInShadowConfiguration() {
+    projectScript.appendText(
+      publishConfiguration(
+        dependenciesBlock =
+          """
+          |implementation('my:d:1.0') {
+          |  transitive = false
+          |}
+          |shadow 'my:c:1.0'
+          """
+            .trimMargin(),
+      ),
+    )
+
+    publish()
+
+    val artifactRoot = "my/maven-all/1.0"
+    assertThat(repoJarPath("$artifactRoot/maven-all-1.0-all.jar")).useAll {
+      containsOnly("d.properties", "META-INF/", "META-INF/MANIFEST.MF")
+      getMainAttr(classPathAttributeKey).isEqualTo("c-1.0.jar")
+    }
+    assertPomCommon("$artifactRoot/maven-all-1.0.pom", coordinates = arrayOf("my:c:1.0"))
+    assertShadowVariantCommon(
+      "$artifactRoot/maven-all-1.0.module",
+      coordinates = arrayOf("my:c:1.0"),
+    )
+  }
+
   @Test
   fun publishShadowJarWithSourcesWhenWithSourcesJarEnabled() {
     projectScript.appendText(

@@ -155,7 +155,8 @@ The Shadow plugin provides a custom configuration (`configurations.shadow`) to s
 `shadow` configuration, are translated to become `RUNTIME` scoped dependencies of the published artifact.
 
 No other dependencies are automatically configured for inclusion in the POM file. For example, excluded dependencies are
-**not** automatically added to the POM file or if the configuration for merging are modified by specifying
+**not** automatically added to the POM file (see [Declaring Excluded Dependencies for Consumers][excluded-dependencies])
+or if the configuration for merging are modified by specifying
 `shadowJar.configurations = [configurations.myConfiguration]`, there is no automatic configuration of the POM file.
 
 This automatic configuration occurs _only_ when using the above methods for configuring publishing. If this behavior is
@@ -1000,3 +1001,4 @@ If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed source
 [gradle-plugin-publish-docs]: https://docs.gradle.org/current/userguide/publishing_gradle_plugins.html#shadow_dependencies
 [configuring-output-name]: ../configuration/README.md#configuring-output-name
 [dokka]: https://kotlinlang.org/docs/dokka-introduction.html
+[excluded-dependencies]: ../configuration/dependencies/README.md#declaring-excluded-dependencies-for-consumers
