@@ -32,10 +32,9 @@ constructor(
 
   override val classpath: ConfigurableFileCollection = objectFactory.fileCollection()
 
-  override val configurationFile: RegularFileProperty =
-    objectFactory
-      .fileProperty()
-      .convention(layout.buildDirectory.file("shadowJar/r8/configuration.txt"))
+  override val configurationFile: RegularFileProperty = objectFactory.fileProperty {
+    layout.buildDirectory.file("shadowJar/r8/configuration.txt")
+  }
 
   override fun enableObfuscation() {
     defaultArgs.set(emptyList())

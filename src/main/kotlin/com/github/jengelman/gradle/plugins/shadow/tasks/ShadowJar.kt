@@ -10,6 +10,7 @@ import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
+import com.github.jengelman.gradle.plugins.shadow.internal.fileProperty
 import com.github.jengelman.gradle.plugins.shadow.internal.findUnusedClasses
 import com.github.jengelman.gradle.plugins.shadow.internal.generateSourcesJar
 import com.github.jengelman.gradle.plugins.shadow.internal.getApiJars
@@ -258,30 +259,27 @@ public abstract class ShadowJar : Jar() {
    */
   @get:Optional
   @get:OutputFile
-  public open val archiveSourcesFile: RegularFileProperty =
-    objectFactory
-      .fileProperty()
-      .convention(
-        generateSourcesJar.flatMap { generate ->
-          if (generate) {
-            destinationDirectory.file(
-              archiveFileName.map { name ->
-                val idx = name.lastIndexOf('.')
-                if (idx != -1) {
-                  "${name.substring(0, idx)}-sources${name.substring(idx)}"
-                } else {
-                  "$name-sources"
-                }
-              },
-            )
-          } else {
-            // Leave it absent so it isn't registered as a task output when sources JAR generation
-            // is disabled, keeping `outputs.files` to the shadowed JAR only.
-            // TODO: replace with `providers.absent()` once the min Gradle version is 9.9.
-            project.provider { null }
-          }
-        },
-      )
+  public open val archiveSourcesFile: RegularFileProperty = objectFactory.fileProperty {
+    generateSourcesJar.flatMap { generate ->
+      if (generate) {
+        destinationDirectory.file(
+          archiveFileName.map { name ->
+            val idx = name.lastIndexOf('.')
+            if (idx != -1) {
+              "${name.substring(0, idx)}-sources${name.substring(idx)}"
+            } else {
+              "$name-sources"
+            }
+          },
+        )
+      } else {
+        // Leave it absent so it isn't registered as a task output when sources JAR generation
+        // is disabled, keeping `outputs.files` to the shadowed JAR only.
+        // TODO: replace with `providers.absent()` once the min Gradle version is 9.9.
+        objectFactory.fileProperty()
+      }
+    }
+  }
 
   /**
    * Enables auto relocation of packages in the dependencies.
