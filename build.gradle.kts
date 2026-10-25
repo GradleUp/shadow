@@ -154,7 +154,6 @@ dependencies {
 testing.suites {
   named<JvmTestSuite>("test") {
     dependencies {
-      // Used to verify the compatibility of the Log4j plugin cache files written by Shadow.
       implementation(libs.apache.log4j)
       implementation(libs.xmlunit)
     }
