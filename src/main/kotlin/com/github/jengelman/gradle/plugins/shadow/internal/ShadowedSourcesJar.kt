@@ -20,7 +20,6 @@ internal fun generateSourcesJar(
   dependencies: Iterable<File>,
   relocators: Iterable<Relocator>,
   unusedClasses: Set<String>,
-  preserveFileTimestamps: Boolean,
 ) =
   try {
     zipOutStream.use { zos ->
@@ -36,11 +35,7 @@ internal fun generateSourcesJar(
 
       val manifestEntry = "META-INF/MANIFEST.MF"
       visitedFiles.add(manifestEntry)
-      zos.writeEntry(
-        name = manifestEntry,
-        preserveLastModified = preserveFileTimestamps,
-        unixMode = UnixMode.file(),
-      ) {
+      zos.writeEntry(name = manifestEntry, unixMode = UnixMode.file()) {
         write("Manifest-Version: 1.0\n\n".toByteArray())
       }
 
@@ -54,19 +49,12 @@ internal fun generateSourcesJar(
       runBlocking {
         val parallelWriter = OrderedParallelWriter(this)
 
-        fun writeToZip(entryName: String, lastModified: Long, bytes: ByteArray) {
-          zos.writeEntry(
-            name = entryName,
-            preserveLastModified = preserveFileTimestamps,
-            lastModified = lastModified,
-            unixMode = UnixMode.file(),
-          ) {
-            write(bytes)
-          }
+        fun writeToZip(entryName: String, bytes: ByteArray) {
+          zos.writeEntry(name = entryName, unixMode = UnixMode.file()) { write(bytes) }
         }
 
         // Relocates and writes a project or dependency source file, or a resource.
-        fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
+        fun addEntry(name: String, readBytes: () -> ByteArray) {
           if (name.isModuleInfo) return
           val isSource = name.isSourceFile()
           if (isSource && isUnused(name, unusedClasses, sourceToClasses)) return
@@ -76,7 +64,7 @@ internal fun generateSourcesJar(
           if (!isSource) {
             // Resources gain nothing from parallelism, write them directly to avoid buffering.
             parallelWriter.flush()
-            writeToZip(relocatedPath, lastModified, readBytes())
+            writeToZip(relocatedPath, readBytes())
             return
           }
           val rawBytes = readBytes()
@@ -86,14 +74,14 @@ internal fun generateSourcesJar(
                 .remapSourceFile(rawBytes.decodeToString(), name, relocatedPath)
                 .toByteArray()
             },
-            write = { writeToZip(relocatedPath, lastModified, it) },
+            write = { writeToZip(relocatedPath, it) },
           )
         }
 
         filesWithRelPaths
           .sortedBy { it.second }
           .forEach { (file, relPath) ->
-            addEntry(relPath, file.lastModified()) { file.readBytes() }
+            addEntry(relPath) { file.readBytes() }
           }
 
         sourcesJars.forEach { jarFile ->
@@ -111,7 +99,7 @@ internal fun generateSourcesJar(
               }
               .sortedBy { it.name }
               .forEach { entry ->
-                addEntry(entry.name, entry.time) { getInputStream(entry).use { it.readBytes() } }
+                addEntry(entry.name) { getInputStream(entry).use { it.readBytes() } }
               }
           }
         }
@@ -119,18 +107,7 @@ internal fun generateSourcesJar(
         parallelWriter.flush()
       }
 
-      val entries = zos.entries.map { it.name }
-      val added = entries.toMutableSet()
-      entries.forEach { name ->
-        name.parentDirectoryEntries().forEach { entryName ->
-          if (!added.add(entryName)) return@forEach
-          zos.writeEntry(
-            name = entryName,
-            preserveLastModified = preserveFileTimestamps,
-            unixMode = UnixMode.directory(),
-          )
-        }
-      }
+      zos.writeParentDirectoryEntries()
     }
   } catch (e: Exception) {
     sourcesJarFile.delete()

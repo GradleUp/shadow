@@ -210,6 +210,9 @@ public abstract class ShadowJar : Jar() {
    * `java.withSourcesJar()` is enabled, and `false` otherwise. In projects applying the `shadow`
    * plugin for Kotlin Multiplatform, this convention defaults to `true` when sources publishing is
    * enabled on the JVM target, and `false` otherwise.
+   *
+   * Entries in the shadowed sources JAR always use [CONSTANT_TIME_FOR_ZIP_ENTRIES] as their
+   * timestamp, regardless of [isPreserveFileTimestamps].
    */
   @get:Input
   @get:Option(
@@ -846,7 +849,6 @@ public abstract class ShadowJar : Jar() {
       dependencies = includedDependencies.files,
       relocators = relocators.get() + packageRelocators,
       unusedClasses = unusedClasses,
-      preserveFileTimestamps = isPreserveFileTimestamps,
     )
   }
 
