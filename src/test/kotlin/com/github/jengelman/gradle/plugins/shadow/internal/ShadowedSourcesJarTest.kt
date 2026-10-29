@@ -278,6 +278,44 @@ class ShadowedSourcesJarTest {
       getContent("shaded/dep/resource.txt").isEqualTo("dep resource")
     }
   }
+
+  @Test
+  fun remapsManySourcesInParallel() {
+    val srcDir = tempDir.resolve("src").createDirectories()
+    val names = (1..500).map { "Class%03d".format(it) }
+    names.forEach { name ->
+      srcDir.resolve("com/example/$name.java").apply {
+        createParentDirectories()
+        writeText("package com.example;\npublic class $name {}")
+      }
+      srcDir.resolve("com/example/$name.txt").writeText("resource $name")
+    }
+
+    val outputJar = tempDir.resolve("output-sources.jar")
+    generateSourcesJar(
+      sourcesJarFile = outputJar.toFile(),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      relocators = listOf(SimpleRelocator("com.example", "shaded.example")),
+    )
+
+    val expectedEntries = names.flatMap {
+      listOf("shaded/example/$it.java", "shaded/example/$it.txt")
+    }
+    assertThat(JarPath(outputJar)).useAll {
+      containsExactly(
+        "META-INF/MANIFEST.MF",
+        *expectedEntries.toTypedArray(),
+        "META-INF/",
+        "shaded/",
+        "shaded/example/",
+      )
+      names.forEach { name ->
+        getContent("shaded/example/$name.java")
+          .isEqualTo("package shaded.example;\npublic class $name {}")
+        getContent("shaded/example/$name.txt").isEqualTo("resource $name")
+      }
+    }
+  }
 }
 
 private fun generateSourcesJar(
