@@ -39,6 +39,10 @@
     to reference the shadowed JAR only, or set `generateSourcesJar = false` on `shadowJar` to opt out.
   - The `shadow` component, and the `java` component when `addShadowVariantIntoJavaComponent` is enabled (the default),
     now publish an additional shadowed sources variant (e.g. `<name>-<version>-all-sources.jar`).
+- **POTENTIALLY BREAKING:** Always add the `org.gradle.jvm.version` attribute to the shadowed variant lazily, and remove the last `afterEvaluate` usage.  
+  This fixes the conflicts when other plugins lock the `shadowRuntimeElements` configuration early (#2054), without eagerly locking `toolchain.languageVersion` (#2086).
+  - Setting `addTargetJvmVersionAttribute` to `false` no longer removes the attribute, the value falls back to `java.targetCompatibility` instead of being inferred from the compile tasks.
+  - The value falls back to `java.targetCompatibility` as well when `java.disableAutoTargetJvm()` is called, instead of being skipped.
 
 ### Deprecated
 

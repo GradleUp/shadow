@@ -106,9 +106,11 @@ the `shadow` extension to `false`. If you want to publish the standard JAR only,
     }
     ```
 
-The target JVM version attribute (`org.gradle.jvm.version`) of the shadowed variant is added by default, it is useful
-for consumers to select the correct variant based on their target JVM version. But it may cause issues in some cases,
-you can disable this by setting the `addTargetJvmVersionAttribute` property in the `shadow` extension to `false`:
+The target JVM version attribute (`org.gradle.jvm.version`) of the shadowed variant is always added, it is useful
+for consumers to select the correct variant based on their target JVM version. By default, the value is inferred from
+the compile tasks (e.g. `options.release` of `compileJava`), the same as the `java` component does. If it causes issues
+in some cases, you can set the `addTargetJvmVersionAttribute` property in the `shadow` extension to `false`, then the
+value falls back to `java.targetCompatibility`:
 
 === ":material-language-kotlin: build.gradle.kts"
 

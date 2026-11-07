@@ -75,21 +75,40 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
       configurations.named(COMPILE_CLASSPATH_CONFIGURATION_NAME) { compileClasspath ->
         compileClasspath.extendsFrom(shadowConfig)
       }
-    val shadowRuntimeElements =
-      registerConsumableConfiguration(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
-        extendsFrom(shadowConfig)
-        attributes { attrs ->
-          attrs.attribute(
-            Category.CATEGORY_ATTRIBUTE,
-            objects.named(Category::class.java, Category.LIBRARY),
-          )
-          attrs.attribute(
-            LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
-            objects.named(LibraryElements::class.java, LibraryElements.JAR),
-          )
-        }
-        outgoing.artifact(tasks.shadowJar)
+    registerConsumableConfiguration(SHADOW_RUNTIME_ELEMENTS_CONFIGURATION_NAME) {
+      extendsFrom(shadowConfig)
+      attributes { attrs ->
+        attrs.attribute(
+          Category.CATEGORY_ATTRIBUTE,
+          objects.named(Category::class.java, Category.LIBRARY),
+        )
+        attrs.attribute(
+          LibraryElements.LIBRARY_ELEMENTS_ATTRIBUTE,
+          objects.named(LibraryElements::class.java, LibraryElements.JAR),
+        )
+        // Must be lazy, reading the JVM version eagerly locks `toolchain.languageVersion` (#2086),
+        // and mutating attributes in `afterEvaluate` may fail if the configuration has been
+        // locked by other plugins (#2054).
+        attrs.attributeProvider(
+          TARGET_JVM_VERSION_ATTRIBUTE,
+          provider {
+            val compileJvmVersion =
+              if (shadow.addTargetJvmVersionAttribute.get()) {
+                compileClasspathConfig
+                  .get()
+                  .attributes
+                  .getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
+                  // `Int.MAX_VALUE` is set when `java.disableAutoTargetJvm()` is called.
+                  ?.takeIf { it != Int.MAX_VALUE }
+              } else {
+                null
+              }
+            compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
+          },
+        )
       }
+      outgoing.artifact(tasks.shadowJar)
+    }
     registerConsumableConfiguration(SHADOW_SOURCES_ELEMENTS_CONFIGURATION_NAME) {
       attributes { attrs ->
         attrs.attribute(
@@ -110,39 +129,6 @@ constructor(private val softwareComponentFactory: SoftwareComponentFactory) : Pl
           }
         },
       )
-    }
-
-    // See more details in #2086.
-    afterEvaluate {
-      if (shadow.addTargetJvmVersionAttribute.get()) {
-        // This eager call will lock `toolchain.languageVersion`, so we must defer it by
-        // `afterEvaluate`.
-        val compileJvmVersion =
-          compileClasspathConfig.get().attributes.getAttribute(TARGET_JVM_VERSION_ATTRIBUTE)
-        val targetJvmVersion =
-          compileJvmVersion ?: javaPluginExtension.targetCompatibility.majorVersion.toInt()
-        if (targetJvmVersion != Int.MAX_VALUE) {
-          logger.info(
-            "Setting target JVM version to {} for {} configuration.",
-            targetJvmVersion,
-            shadowRuntimeElements.name,
-          )
-          shadowRuntimeElements
-            .get()
-            .attributes
-            .attribute(TARGET_JVM_VERSION_ATTRIBUTE, targetJvmVersion)
-        } else {
-          logger.info(
-            "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
-          )
-        }
-      } else {
-        logger.info(
-          "Skipping setting {} attribute for {} configuration.",
-          TARGET_JVM_VERSION_ATTRIBUTE,
-          shadowRuntimeElements.name,
-        )
-      }
     }
   }
 

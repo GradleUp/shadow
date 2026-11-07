@@ -15,9 +15,14 @@ public interface ShadowExtension {
   public val addShadowVariantIntoJavaComponent: Property<Boolean>
 
   /**
-   * If `true`, adds a [TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE] attribute to the Gradle
+   * The [TargetJvmVersion.TARGET_JVM_VERSION_ATTRIBUTE] attribute is always added to the Gradle
    * Module Metadata of the shadowed JAR. This affects how consumers resolve the published artifact
    * based on the target JVM version.
+   *
+   * If `true`, the value is inferred from the compile tasks (e.g. `options.release` of
+   * `compileJava`), the same as the `java` component does. If `false`, or the value can't be
+   * inferred (e.g. `java.disableAutoTargetJvm()` is called), the value falls back to
+   * `java.targetCompatibility`.
    *
    * Defaults to `true`.
    */

@@ -139,7 +139,7 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test // #1665
-  fun dontInjectTargetJvmVersionWhenAutoTargetJvmDisabled() {
+  fun fallBackToTargetCompatibilityWhenAutoTargetJvmDisabled() {
     projectScript.appendText(
       publishConfiguration(
         projectBlock =
@@ -158,26 +158,25 @@ class PublishingTest : BasePluginTest() {
       ),
     )
 
-    val result = publish(infoArgument)
+    publish()
 
-    assertThat(result.output)
-      .contains(
-        "Cannot set the target JVM version to Int.MAX_VALUE when `java.autoTargetJvmDisabled` is enabled or in other cases.",
-      )
     assertShadowVariantCommon(
       "my/maven-all/1.0/maven-all-1.0.module",
-      variantAttrs = shadowVariantAttrsWithoutTargetJvm,
+      variantAttrs = shadowVariantAttrs,
     )
   }
 
   @Test
-  fun dontInjectTargetJvmVersionWhenOptingOut() {
+  fun useTargetCompatibilityWhenOptingOut() {
     projectScript.appendText(
       publishConfiguration(
         projectBlock =
           """
           |shadow {
           |  addTargetJvmVersionAttribute = false
+          |}
+          |tasks.named('compileJava') {
+          |  options.release = 8
           |}
           """
             .trimMargin(),
@@ -190,15 +189,11 @@ class PublishingTest : BasePluginTest() {
       ),
     )
 
-    val result = publish(infoArgument)
+    publish()
 
-    assertThat(result.output)
-      .contains(
-        "Skipping setting org.gradle.jvm.version attribute for shadowRuntimeElements configuration.",
-      )
     assertShadowVariantCommon(
       "my/maven-all/1.0/maven-all-1.0.module",
-      variantAttrs = shadowVariantAttrsWithoutTargetJvm,
+      variantAttrs = shadowVariantAttrs,
     )
   }
 
