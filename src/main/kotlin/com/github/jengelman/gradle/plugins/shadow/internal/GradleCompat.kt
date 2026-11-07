@@ -23,6 +23,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.SourceSetContainer
 import org.gradle.jvm.toolchain.JavaToolchainService
+import org.gradle.util.GradleVersion
 
 @Suppress("NOTHING_TO_INLINE")
 internal inline fun gradleError(message: String, cause: Throwable? = null): Nothing =
@@ -67,6 +68,14 @@ internal fun Project.addBuildScanCustomValues() {
     }
   }
 }
+
+/** TODO: this could be removed after bumping the min Gradle requirement to 9.9 or above. */
+internal fun <T : Any> Project.absentProviderCompat(): Provider<T> =
+  if (GradleVersion.current() >= GradleVersion.version("9.9")) {
+    providers.absent()
+  } else {
+    provider { null }
+  }
 
 internal fun FileTreeElement.inputStream(): InputStream =
   try {
