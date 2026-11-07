@@ -23,4 +23,28 @@ class AppendingTransformerTest : BaseTransformerTest() {
     val content = outputShadowedJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
     assertThat(content).isEqualTo(CONTENT_ONE_TWO)
   }
+
+  @Test
+  fun configureTransformerInstanceWithAction() {
+    val one = buildJarOne { insert(ENTRY_TEST_PROPERTIES, CONTENT_ONE) }
+    val two = buildJarTwo { insert(ENTRY_TEST_PROPERTIES, CONTENT_TWO) }
+    projectScript.appendText(
+      """
+      |dependencies {
+      |  ${implementationFiles(one, two)}
+      |}
+      |$shadowJarTask {
+      |  transform(new ${AppendingTransformer::class.java.name}(objects)) {
+      |    resource = '$ENTRY_TEST_PROPERTIES'
+      |  }
+      |}
+      """
+        .trimMargin(),
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    val content = outputShadowedJar.use { it.getContent(ENTRY_TEST_PROPERTIES) }
+    assertThat(content).isEqualTo(CONTENT_ONE_TWO)
+  }
 }

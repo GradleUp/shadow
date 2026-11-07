@@ -359,6 +359,47 @@ class PublishingTest : BasePluginTest() {
   }
 
   @Test
+  fun publishShadowComponentWithSourcesJar() {
+    projectScript.appendText(
+      publishConfiguration(
+        projectBlock =
+          """
+          |java {
+          |  withSourcesJar()
+          |}
+          """
+            .trimMargin(),
+        publicationsBlock =
+          """
+          |shadow(MavenPublication) {
+          |  from components.shadow
+          |}
+          """
+            .trimMargin(),
+      ),
+    )
+
+    publish()
+
+    val artifactRoot = "my/maven/1.0"
+    assertThat(repoPath(artifactRoot).entries)
+      .containsOnly(
+        *withChecksums(
+          "maven-1.0-all.jar",
+          "maven-1.0-all-sources.jar",
+          "maven-1.0.module",
+          "maven-1.0.pom",
+        ),
+      )
+    assertShadowJarCommon("$artifactRoot/maven-1.0-all.jar")
+    assertPomCommon("$artifactRoot/maven-1.0.pom")
+    repoGmm("$artifactRoot/maven-1.0.module").let { gmm ->
+      assertShadowVariantCommon(gmm)
+      assertShadowSourcesVariantCommon(gmm)
+    }
+  }
+
+  @Test
   fun publishWithSourcesJarAndCustomClassifier() {
     projectScript.appendText(
       publishConfiguration(

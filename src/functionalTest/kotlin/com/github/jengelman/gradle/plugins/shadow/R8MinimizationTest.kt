@@ -513,6 +513,36 @@ class R8MinimizationTest : BasePluginTest() {
   }
 
   @Test
+  fun overrideR8Dependency() {
+    writeR8AppAndLibModules(
+      appProjectBlock =
+        """
+        |dependencies {
+        |  shadowR8 '${BuildConfig.DEFAULT_R8_DEPENDENCY}'
+        |}
+        """
+          .trimMargin(),
+      appShadowBlock =
+        """
+        |minimize {
+        |  r8 {}
+        |}
+        """
+          .trimMargin(),
+    )
+
+    runWithSuccess(appShadowJarPath)
+
+    assertThat(outputAppShadowedJar).useAll {
+      containsExactly(
+        "app/App.class",
+        "lib/Used.class",
+        "META-INF/MANIFEST.MF",
+      )
+    }
+  }
+
+  @Test
   fun passCustomR8Args() {
     writeR8AppAndLibModules(
       appShadowBlock =

@@ -7,6 +7,7 @@ import assertk.assertions.containsAtLeast
 import assertk.assertions.containsMatch
 import assertk.assertions.containsOnly
 import assertk.assertions.doesNotContain
+import assertk.assertions.doesNotExist
 import assertk.assertions.isEqualTo
 import assertk.assertions.isNotEmpty
 import assertk.assertions.isNotEqualTo
@@ -1519,6 +1520,54 @@ class JavaPluginsTest : BasePluginTest() {
           """
             .trimMargin(),
         )
+    }
+  }
+
+  @Test
+  fun customizeArchiveSourcesFile() {
+    writeClass()
+    projectScript.appendText(
+      """
+      |$shadowJarTask {
+      |  generateSourcesJar = true
+      |  archiveSourcesFile = layout.buildDirectory.file('custom-libs/my-sources.jar')
+      |}
+      """
+        .trimMargin(),
+    )
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(projectRoot.resolve("build/libs/my-1.0-all-sources.jar")).doesNotExist()
+    assertThat(jarPath("build/custom-libs/my-sources.jar")).useAll {
+      containsOnly("my/", "my/Main.java", "META-INF/", "META-INF/MANIFEST.MF")
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["groovy", "scala"])
+  fun compatGroovyAndScalaPlugins(plugin: String) {
+    projectScript.writeText(
+      """
+      |${getDefaultProjectBuildScript(plugin = plugin)}
+      |dependencies {
+      |  implementation 'junit:junit:3.8.2'
+      |}
+      |$shadowJarTask {
+      |  manifest {
+      |    attributes '$mainClassAttributeKey': 'my.Main'
+      |  }
+      |}
+      """
+        .trimMargin(),
+    )
+    val mainClassEntry = writeClass(withImports = true)
+
+    runWithSuccess(shadowJarPath)
+
+    assertThat(outputShadowedJar).useAll {
+      containsOnly("my/", mainClassEntry, *junitEntries, "META-INF/", "META-INF/MANIFEST.MF")
+      getMainAttr(mainClassAttributeKey).isEqualTo("my.Main")
     }
   }
 

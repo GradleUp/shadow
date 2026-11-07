@@ -4,6 +4,7 @@ Shadow also works well for Groovy and Scala, here are integration examples:
 
 For Groovy:
 
+<!-- test: JavaPluginsTest#compatGroovyAndScalaPlugins -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -38,6 +39,7 @@ For Groovy:
 
 For Scala:
 
+<!-- test: JavaPluginsTest#compatGroovyAndScalaPlugins -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

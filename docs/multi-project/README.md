@@ -10,6 +10,7 @@ In a multi-project build there may be one project that applies Shadow and anothe
 dependency. In this case, use Gradle's normal dependency declaration mechanism to depend on the `shadow`
 configuration of the shadowed project.
 
+<!-- test: JavaPluginsTest#dependOnProjectShadowJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -40,6 +41,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
 
 **In the shadowed project (`:api`):**
 
+<!-- test: JavaPluginsTest#consumeShadowedProjectViaApiElementsAndRuntimeElements -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -90,6 +92,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
 
 **Consuming projects can then depend on `:api` without specifying the `shadow` configuration:**
 
+<!-- test: JavaPluginsTest#consumeShadowedProjectViaApiElementsAndRuntimeElements -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -111,6 +114,7 @@ the shadowed JAR by default, preventing accidental consumption of the unshadowed
 If you want to exclude transitive dependencies that were bundled into the shadow JAR, you can add `exclude` rules to the
 configurations as well:
 
+<!-- test: JavaPluginsTest#excludeRulesPreventBundledDepsOnConsumerClasspath -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin

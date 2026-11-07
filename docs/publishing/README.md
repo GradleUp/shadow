@@ -6,6 +6,7 @@ The Shadow plugin will automatically configure the necessary tasks in the presen
 [`maven-publish`][maven-publish] plugin. The plugin provides the `shadow` component to configure the publication with
 the necessary artifact and dependencies in the POM file.
 
+<!-- test: PublishingTest#publishJarAndShadowJarWithGradleMetadata -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -56,6 +57,7 @@ JAR. This allows consumers of the published library to choose between the standa
 This feature is enabled by default. It can be disabled by setting the `addShadowVariantIntoJavaComponent` property in
 the `shadow` extension to `false`. If you want to publish the standard JAR only, disable this feature like:
 
+<!-- test: PublishingTest#publishShadowVariantJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -110,6 +112,7 @@ The target JVM version attribute (`org.gradle.jvm.version`) of the shadowed vari
 for consumers to select the correct variant based on their target JVM version. But it may cause issues in some cases,
 you can disable this by setting the `addTargetJvmVersionAttribute` property in the `shadow` extension to `false`:
 
+<!-- test: PublishingTest#dontInjectTargetJvmVersionWhenOptingOut -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -130,6 +133,7 @@ The BUNDLING attribute (`org.gradle.dependency.bundling`) of the shadowed varian
 useful for consumers to distinguish between normal and shadowed dependencies. You can override this attribute by setting
 the `bundlingAttribute` property in the `shadow` extension:
 
+<!-- test: PublishingTest#overrideBundlingAttrInGradleMetadata -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -162,6 +166,7 @@ or if the configuration for merging are modified by specifying
 This automatic configuration occurs _only_ when using the above methods for configuring publishing. If this behavior is
 not desirable, then publishing **must** be manually configured.
 
+<!-- test: PublishingTest#publishJarAndShadowJarWithGradleMetadata -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -249,6 +254,7 @@ not desirable, then publishing **must** be manually configured.
 You may want to publish the shadowed JAR instead of the original JAR. This can be done by trimming the
 `archiveClassifier` of the shadowed JAR like the following:
 
+<!-- test: PublishingTest#publishShadowJarInsteadOfJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -306,6 +312,7 @@ If you want to replace standard JARs with the shadowed ones, disable the standar
 created and needs handling when `java.withSourcesJar()` is enabled; if `withSourcesJar()` is not used, you only need to
 configure the `jar` task):
 
+<!-- test: PublishingTest#publishShadowJarInsteadOfJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -352,6 +359,7 @@ configure the `jar` task):
 
 Or set different `archiveClassifier` values for the standard tasks:
 
+<!-- test: PublishingTest#publishShadowJarInsteadOfJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -404,6 +412,7 @@ publish the output of the [`ShadowJar`][ShadowJar] tasks as the consumable artif
 the [Gradle Plugin Publish docs][gradle-plugin-publish-docs] for details. The only thing you need to do from the Shadow
 side is to empty the `archiveClassifier` like:
 
+<!-- test: PublishingTest#publishShadowedGradlePlugin -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -443,6 +452,7 @@ side is to empty the `archiveClassifier` like:
 It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via the
 [`MavenPublication.artifact()`][MavenPublication.artifact] method.
 
+<!-- test: PublishingTest#publishCustomShadowJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -512,6 +522,7 @@ It is possible to publish a custom [`ShadowJar`][ShadowJar] task's output via th
 It is possible to configure the artifact name of the shadowed JAR via properties like `archiveBaseName`, see more
 customizable properties listed in [Configuring Output Name][configuring-output-name]. e.g.
 
+<!-- test: PublishingTest#publishShadowJarWithCustomArtifactName -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -606,6 +617,7 @@ When Gradle's standard `java.withSourcesJar()` is enabled, the Shadow plugin aut
 > In Kotlin/JVM projects applying `id("org.jetbrains.kotlin.jvm")`, configure `java { withSourcesJar() }` in the same
 > way. The Kotlin JVM plugin applies Gradle's Java plugin internally.
 
+<!-- test: PublishingTest#publishShadowComponentWithSourcesJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -686,6 +698,7 @@ To publish shadowed artifacts as the primary publication, publish the `shadow` c
 publication, and disable standard archive tasks to prevent destination file collisions in `build/libs` (disabling
 `sourcesJar` is only needed when `java.withSourcesJar()` is enabled):
 
+<!-- test: PublishingTest#publishShadowJarWithSourcesWhenWithSourcesJarEnabled -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -794,6 +807,7 @@ The companion shadowed sources JAR output location is configured via
 [`ShadowJar.archiveSourcesFile`][ShadowJar.archiveSourcesFile],
 which defaults to the same destination and base name as `archiveFile` with `-sources.jar` suffix:
 
+<!-- test: JavaPluginsTest#customizeArchiveSourcesFile -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -814,6 +828,7 @@ You can also customize the source inputs included in the companion sources JAR u
 [`sourceSetsSourceDirs`][ShadowJar.sourceSetsSourceDirs] and
 [`includedSourcesJars`][ShadowJar.includedSourcesJars]:
 
+<!-- test: JavaPluginsTest#generateShadowedSourcesJarWithCustomSources -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -845,6 +860,7 @@ the `jvm` publication), which publish the original, non-shadowed artifacts. Shad
 the shadowed sources JAR automatically in KMP projects, so create a dedicated publication for them. Don't attach the
 shadowed sources JAR to KGP's `jvm` publication, as it would not match the non-shadowed JAR published there:
 
+<!-- test: PublishingTest#publishKmpWithShadowedSources -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -925,6 +941,7 @@ contents have already been transformed), you can configure the `javadoc` task (o
 sources and classes directly from `shadowJar`. The generated documentation will reflect the relocated package names
 (e.g. `shadow.com.Example` instead of `com.Example`).
 
+<!-- test: JavaPluginsTest#generateJavadocFromShadowedSourcesJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
@@ -945,6 +962,7 @@ sources and classes directly from `shadowJar`. The generated documentation will 
 
 If using [Dokka][dokka] for Kotlin projects, you can extract the shadowed sources and configure `sourceRoots`:
 
+<!-- test: KotlinPluginsTest#generateDokkaFromShadowedSourcesJar -->
 === ":material-language-kotlin: build.gradle.kts"
 
     ```kotlin
