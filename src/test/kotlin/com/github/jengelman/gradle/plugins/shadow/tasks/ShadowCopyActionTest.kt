@@ -137,7 +137,7 @@ class ShadowCopyActionTest {
     assertThat(result.didWork).isTrue()
     val expectedEntries =
       (1..count).map { "relocated/example/Class$it.class" } +
-        listOf("relocated/example/", "relocated/")
+        listOf("relocated/", "relocated/example/")
     JarPath(zipFile.toPath()).use {
       assertThat(it).containsExactly(*expectedEntries.toTypedArray())
     }
