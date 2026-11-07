@@ -7,6 +7,7 @@ import com.github.jengelman.gradle.plugins.shadow.ShadowDsl
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultDependencyFilter
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultInheritManifest
 import com.github.jengelman.gradle.plugins.shadow.internal.DefaultMinimizeSpec
+import com.github.jengelman.gradle.plugins.shadow.internal.absentProviderCompat
 import com.github.jengelman.gradle.plugins.shadow.internal.classPathAttributeKey
 import com.github.jengelman.gradle.plugins.shadow.internal.createZipOutputStream
 import com.github.jengelman.gradle.plugins.shadow.internal.fileCollection
@@ -275,8 +276,7 @@ public abstract class ShadowJar : Jar() {
       } else {
         // Leave it absent so it isn't registered as a task output when sources JAR generation
         // is disabled, keeping `outputs.files` to the shadowed JAR only.
-        // TODO: replace with `providers.absent()` once the min Gradle version is 9.9.
-        objectFactory.fileProperty()
+        project.absentProviderCompat()
       }
     }
   }
