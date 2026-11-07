@@ -9,7 +9,7 @@ import org.gradle.api.tasks.Input
  * [org.apache.maven.plugins.shade.relocation.Relocator.java](https://github.com/apache/maven-shade-plugin/blob/master/src/main/java/org/apache/maven/plugins/shade/relocation/Relocator.java).
  *
  * Implementations of [Relocator] must be thread-safe, as their methods may be invoked concurrently
- * across multiple worker threads during parallel bytecode remapping.
+ * across multiple worker threads during parallel bytecode and source remapping.
  *
  * @author Jason van Zyl
  * @author John Engelman
