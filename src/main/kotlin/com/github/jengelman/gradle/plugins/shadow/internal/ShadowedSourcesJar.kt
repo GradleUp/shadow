@@ -124,18 +124,7 @@ internal fun generateSourcesJar(
         parallelWriter.flush()
       }
 
-      val entries = zos.entries.map { it.name }
-      val added = entries.toMutableSet()
-      entries.forEach { name ->
-        name.parentDirectoryEntries().forEach { entryName ->
-          if (!added.add(entryName)) return@forEach
-          zos.writeEntry(
-            name = entryName,
-            preserveLastModified = preserveFileTimestamps,
-            unixMode = UnixMode.directory(),
-          )
-        }
-      }
+      zos.writeParentDirectoryEntries()
     }
   } catch (e: Exception) {
     sourcesJarFile.delete()

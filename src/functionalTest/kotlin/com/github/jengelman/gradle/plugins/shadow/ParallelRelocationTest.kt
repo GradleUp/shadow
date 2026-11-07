@@ -46,8 +46,8 @@ class ParallelRelocationTest : BasePluginTest() {
         "META-INF/MANIFEST.MF",
         *relocatedEntries,
         "META-INF/",
-        "relocated/pkg/",
         "relocated/",
+        "relocated/pkg/",
       )
       classLoader {
         loadClass("relocated.pkg.${classNames.first()}")
