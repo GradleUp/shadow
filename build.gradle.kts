@@ -63,11 +63,12 @@ lint {
 spotless {
   kotlin {
     ktfmt(libs.ktfmt.get().version).googleStyle()
-    target("src/**/*.kt", "gradle/build-logic/src/**/*.kt")
-  }
-  kotlinGradle {
-    ktfmt(libs.ktfmt.get().version).googleStyle()
-    target("*.kts", "gradle/build-logic/*.kts")
+    target(
+      "src/**/*.kt",
+      "gradle/build-logic/src/**/*.kt",
+      "*.kts",
+      "gradle/build-logic/*.kts",
+    )
   }
 }
 
