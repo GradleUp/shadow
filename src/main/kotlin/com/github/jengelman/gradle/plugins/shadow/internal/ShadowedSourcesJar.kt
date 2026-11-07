@@ -20,7 +20,6 @@ internal fun generateSourcesJar(
   dependencies: Iterable<File>,
   relocators: Iterable<Relocator>,
   unusedClasses: Set<String>,
-  preserveFileTimestamps: Boolean,
 ) =
   try {
     zipOutStream.use { zos ->
@@ -36,11 +35,7 @@ internal fun generateSourcesJar(
 
       val manifestEntry = "META-INF/MANIFEST.MF"
       visitedFiles.add(manifestEntry)
-      zos.writeEntry(
-        name = manifestEntry,
-        preserveLastModified = preserveFileTimestamps,
-        unixMode = UnixMode.file(),
-      ) {
+      zos.writeEntry(name = manifestEntry, unixMode = UnixMode.file()) {
         write("Manifest-Version: 1.0\n\n".toByteArray())
       }
 
@@ -54,21 +49,14 @@ internal fun generateSourcesJar(
       runBlocking {
         val parallelWriter = OrderedParallelWriter(this)
 
-        fun writeToZip(entryName: String, lastModified: Long, bytes: ByteArray) {
-          zos.writeEntry(
-            name = entryName,
-            preserveLastModified = preserveFileTimestamps,
-            lastModified = lastModified,
-            unixMode = UnixMode.file(),
-          ) {
-            write(bytes)
-          }
+        fun writeToZip(entryName: String, bytes: ByteArray) {
+          zos.writeEntry(name = entryName, unixMode = UnixMode.file()) { write(bytes) }
         }
 
         val hasRelocators = relocators.any()
 
         // Relocates and writes a project or dependency source file, or a resource.
-        fun addEntry(name: String, lastModified: Long, readBytes: () -> ByteArray) {
+        fun addEntry(name: String, readBytes: () -> ByteArray) {
           if (name.isModuleInfo) return
           val isSource = name.isSourceFile()
           if (isSource && isUnused(name, unusedClasses, sourceToClasses)) return
@@ -79,7 +67,7 @@ internal fun generateSourcesJar(
             // Resources, and sources without relocators, are copied as is and gain nothing from
             // parallelism. Queue only the write so they are read when their turn comes, which
             // avoids buffering them without draining the parallel window.
-            parallelWriter.submitDirect { writeToZip(relocatedPath, lastModified, readBytes()) }
+            parallelWriter.submitDirect { writeToZip(relocatedPath, readBytes()) }
             return
           }
           val rawBytes = readBytes()
@@ -89,14 +77,14 @@ internal fun generateSourcesJar(
                 .remapSourceFile(rawBytes.decodeToString(), name, relocatedPath)
                 .toByteArray()
             },
-            write = { writeToZip(relocatedPath, lastModified, it) },
+            write = { writeToZip(relocatedPath, it) },
           )
         }
 
         filesWithRelPaths
           .sortedBy { it.second }
           .forEach { (file, relPath) ->
-            addEntry(relPath, file.lastModified()) { file.readBytes() }
+            addEntry(relPath) { file.readBytes() }
           }
 
         sourcesJars.forEach { jarFile ->
@@ -114,7 +102,7 @@ internal fun generateSourcesJar(
               }
               .sortedBy { it.name }
               .forEach { entry ->
-                addEntry(entry.name, entry.time) { getInputStream(entry).use { it.readBytes() } }
+                addEntry(entry.name) { getInputStream(entry).use { it.readBytes() } }
               }
             // Queued resources read from this JAR, so they must be written before it is closed.
             parallelWriter.flush()

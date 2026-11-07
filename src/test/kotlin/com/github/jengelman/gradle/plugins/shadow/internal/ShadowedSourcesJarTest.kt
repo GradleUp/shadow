@@ -1,6 +1,7 @@
 package com.github.jengelman.gradle.plugins.shadow.internal
 
 import assertk.assertThat
+import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import assertk.assertions.isFalse
 import assertk.assertions.isTrue
@@ -20,6 +21,7 @@ import kotlin.io.path.createDirectories
 import kotlin.io.path.createParentDirectories
 import kotlin.io.path.writeBytes
 import kotlin.io.path.writeText
+import org.apache.tools.zip.ZipFile
 import org.apache.tools.zip.ZipOutputStream
 import org.gradle.api.file.FileCollection
 import org.gradle.api.tasks.bundling.ZipEntryCompression
@@ -230,6 +232,58 @@ class ShadowedSourcesJarTest {
   }
 
   @Test
+  fun entriesUseConstantTimestamp() {
+    val timestamp = 1_700_000_000_000
+    val srcDir = tempDir.resolve("src").createDirectories()
+    srcDir.resolve("com/example/Main.java").apply {
+      createParentDirectories()
+      writeText("package com.example;\npublic class Main {}")
+      toFile().setLastModified(timestamp)
+    }
+
+    val depSourcesJar = tempDir.resolve("dep-sources.jar")
+    depSourcesJar
+      .toFile()
+      .createZipOutputStream(
+        entryCompression = ZipEntryCompression.STORED,
+        isZip64 = false,
+        encoding = null,
+      )
+      .use { zos ->
+        zos.writeEntry("dep/resource.txt", lastModified = timestamp) {
+          write("dep resource".toByteArray())
+        }
+      }
+
+    val outputJar = tempDir.resolve("output-sources.jar")
+    generateSourcesJar(
+      sourcesJarFile = outputJar.toFile(),
+      sourceSetsSourceDirs = testObjectFactory.fileCollection().from(srcDir),
+      includedSourcesJars = listOf(depSourcesJar.toFile()),
+    )
+
+    // Reading the time back goes through DOS time, so compare with an entry written the same way.
+    val referenceJar = tempDir.resolve("reference.jar").toFile()
+    ZipOutputStream(referenceJar).use { it.writeEntry("reference", preserveLastModified = false) }
+    val constantTime = ZipFile(referenceJar).use { it.getEntry("reference").time }
+
+    ZipFile(outputJar.toFile()).use { zip ->
+      val times = zip.entries.toList().associate { it.name to it.time }
+      assertThat(times.keys)
+        .containsOnly(
+          "META-INF/MANIFEST.MF",
+          "com/example/Main.java",
+          "dep/resource.txt",
+          "META-INF/",
+          "com/",
+          "com/example/",
+          "dep/",
+        )
+      assertThat(times.values.toSet()).containsOnly(constantTime)
+    }
+  }
+
+  @Test
   fun mergesAndRelocatesIncludedSourcesJar() {
     val srcDir = tempDir.resolve("src").createDirectories()
     srcDir.resolve("com/example/Main.java").apply {
@@ -339,5 +393,4 @@ private fun generateSourcesJar(
     dependencies = emptyList(),
     relocators = relocators,
     unusedClasses = emptySet(),
-    preserveFileTimestamps = true,
   )
