@@ -28,7 +28,7 @@ dokka = { module = "org.jetbrains.dokka:dokka-gradle-plugin", version.ref = "dok
 
 androidx-gradlePluginLints = "androidx.lint:lint-gradle:1.0.0"
 # Dummy to get renovate updates, the version is used in rootProject build.gradle with spotless.
-ktfmt = "org.jetbrains.kotlinx:ktfmt:0.65"
+ktfmt = "org.jetbrains.kotlinx:ktfmt:0.65.1"
 r8 = "com.android.tools:r8:9.5.33"
 
 junit-bom = "org.junit:junit-bom:6.1.3"
